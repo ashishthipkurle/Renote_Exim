@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // produce a static export folder at `out`
+  output: 'export',
   images: {
     remotePatterns: [
       {
