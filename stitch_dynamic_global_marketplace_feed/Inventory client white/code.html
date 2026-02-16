@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Global Smart Inventory Management Hub</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#0a0c12",
+                        "text-dark": "#1e293b",
+                        "text-secondary": "#64748b",
+                        "card-white": "#ffffff",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+        .glow-pulse {
+            box-shadow: 0 0 0 0 rgba(19, 91, 236, 0.7);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(19, 91, 236, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(19, 91, 236, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(19, 91, 236, 0); }
+        }
+        .stagger-item {
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeInSlide 0.5s ease forwards;
+        }
+        @keyframes fadeInSlide {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-[#f0f2f5] font-display text-text-dark antialiased overflow-x-hidden">
+<div class="flex min-h-screen">
+<aside class="w-20 lg:w-64 border-r border-slate-200 bg-white flex flex-col items-center lg:items-start py-6 transition-all duration-300 relative z-20 sticky top-0 h-screen shadow-sm">
+<div class="px-6 mb-10 flex items-center gap-3">
+<div class="size-10 bg-primary rounded-lg flex items-center justify-center shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-white">grid_view</span>
+</div>
+<h1 class="hidden lg:block text-xl font-bold tracking-tight text-slate-800">TradeFlow</h1>
+</div>
+<nav class="flex-1 w-full px-3 space-y-2">
+<a class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-100 transition-colors group text-slate-500 hover:text-slate-900" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">home</span>
+<span class="hidden lg:block text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-100 transition-colors group text-slate-500 hover:text-slate-900" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">grid_view</span>
+<span class="hidden lg:block text-sm font-medium">All Categories</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-xl bg-primary/10 text-primary border border-primary/20 transition-colors group shadow-sm" href="#">
+<span class="material-symbols-outlined fill-1">package_2</span>
+<span class="hidden lg:block text-sm font-bold">Inventory</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-100 transition-colors group text-slate-500 hover:text-slate-900" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">local_shipping</span>
+<span class="hidden lg:block text-sm font-medium">Orders</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-100 transition-colors group text-slate-500 hover:text-slate-900" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">analytics</span>
+<span class="hidden lg:block text-sm font-medium">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-100 transition-colors group text-slate-500 hover:text-slate-900" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">account_balance_wallet</span>
+<span class="hidden lg:block text-sm font-medium">Finance</span>
+</a>
+</nav>
+<div class="px-3 w-full mt-auto pt-6 border-t border-slate-200 space-y-2">
+<a class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-100 transition-colors group text-slate-500 hover:text-slate-900 mb-2" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">settings</span>
+<span class="hidden lg:block text-sm font-medium">Settings</span>
+</a>
+<div class="flex items-center gap-3 px-3 py-3 rounded-xl bg-slate-50 border border-slate-200 hover:border-slate-300 transition-colors cursor-pointer">
+<div class="size-8 rounded-full bg-slate-200 overflow-hidden ring-2 ring-white">
+<img class="w-full h-full object-cover" data-alt="User profile avatar of a businessman" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrZLkmqRTP7qfcm8kS-Cw4ZgzJYBIuNUoMeenXMNS7dujLfHPr6cxc_E6S3EXn5oAjGUwE1fPsHcawRos2sVBXr2_JWYnWW5xN-IdZDTk6Zogbl1H2PjM5jeHgXDUg5BolPSsd4ztGaMg91sWN-hbSlQWvf1zyScvfIY8ydGzJRLKhf0m-a3jU4Fl4VL89Uxw55JiNA963xtRgFRhGwgbxT4cnfLPpKG0oeatq1GVt1uspFa7D-jUKPSowvnZOazzpZX6nAWDgQDw"/>
+</div>
+<div class="hidden lg:block overflow-hidden">
+<p class="text-xs font-bold truncate text-slate-800">Alex Rivera</p>
+<p class="text-[10px] text-slate-500 truncate">Admin Account</p>
+</div>
+</div>
+</div>
+</aside>
+<main class="flex-1 p-4 lg:p-8 space-y-8 overflow-y-auto">
+<header class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<h2 class="text-3xl font-black tracking-tight text-slate-800">Global Stock Overview</h2>
+<p class="text-slate-500 mt-1">Manage cross-border inventory across all warehouse nodes.</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="bg-white hover:bg-slate-50 text-slate-600 font-bold py-2.5 px-4 rounded-xl transition-all flex items-center gap-2 border border-slate-200 shadow-sm">
+<span class="material-symbols-outlined text-sm">cloud_download</span>
+                    Export Report
+                </button>
+<button class="bg-primary hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-blue-500/30">
+<span class="material-symbols-outlined text-sm">add_box</span>
+                    Add Product
+                </button>
+</div>
+</header>
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
+<section class="xl:col-span-9 space-y-6">
+<div class="glass p-4 rounded-xl flex flex-col md:flex-row gap-4 justify-between items-center">
+<div class="relative w-full md:w-96">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-100 border border-transparent focus:bg-white focus:border-primary rounded-lg text-sm text-slate-800 focus:ring-1 focus:ring-primary placeholder-slate-400 outline-none transition-all" placeholder="Search by SKU, Product Name..." type="text"/>
+</div>
+<div class="flex gap-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/10 border border-primary/20 text-primary text-xs font-bold whitespace-nowrap">
+<span class="material-symbols-outlined text-[16px]">warehouse</span>
+                            All Locations
+                        </button>
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-500 hover:text-slate-800 text-xs font-bold whitespace-nowrap transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[16px]">category</span>
+                            Electronics
+                        </button>
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-500 hover:text-slate-800 text-xs font-bold whitespace-nowrap transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[16px]">filter_list</span>
+                            More Filters
+                        </button>
+</div>
+</div>
+<div class="space-y-4">
+<div class="hidden md:grid grid-cols-12 gap-4 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider">
+<div class="col-span-5">Product Details</div>
+<div class="col-span-2">Pricing (B2B/B2C)</div>
+<div class="col-span-3">Stock Level</div>
+<div class="col-span-2 text-right">Status</div>
+</div>
+<div class="stagger-item glass p-4 rounded-xl border border-transparent hover:border-primary/30 transition-all grid grid-cols-1 md:grid-cols-12 gap-4 items-center group" style="animation-delay: 0.1s;">
+<div class="md:col-span-5 flex items-center gap-4">
+<div class="size-16 rounded-lg bg-slate-100 flex-shrink-0 overflow-hidden relative border border-slate-200">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Smart home security camera" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTXwqU4eC_I3BF3BBpNaizzEaZtysDEPlrwKHAMnXIMVj1ksI1zErzJdqhuiv-9AT4fHscfNj5G98Kh-4QVl1RInWI_7FUpDgy1DDVTdKHaAb2bey53uNE43GTCTeDgfbZ7gLjS71T6QDHW4cEvnX_axpxwOHL9KR3GThlsCJOAAamz_SkGwB8gSynqnch26z4rzFfgKC3YGdN7fV9sGzjsOPwhpgr8J_gCLaV0v35Xv46XhOUgR5q-hRKoCO4W3CCUkNJW1oX13o"/>
+</div>
+<div>
+<h3 class="text-sm font-bold text-slate-800 group-hover:text-primary transition-colors">AI Security Camera Pro</h3>
+<p class="text-xs text-slate-500 mt-0.5">SKU: CAM-AI-9002</p>
+<div class="flex items-center gap-2 mt-1.5">
+<span class="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-[10px] text-slate-500 font-medium">Electronics</span>
+<span class="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-[10px] text-slate-500 font-medium">Warehouse A (US)</span>
+</div>
+</div>
+</div>
+<div class="md:col-span-2">
+<div class="flex flex-col gap-1">
+<span class="text-xs font-medium text-slate-500">B2B: <span class="text-slate-800 font-bold">$125.00</span></span>
+<span class="text-xs font-medium text-slate-500">B2C: <span class="text-slate-800 font-bold">$189.99</span></span>
+</div>
+</div>
+<div class="md:col-span-3">
+<div class="flex justify-between text-xs mb-1.5">
+<span class="text-emerald-600 font-bold">1,240 units</span>
+<span class="text-slate-500">Target: 1,500</span>
+</div>
+<div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+<div class="bg-emerald-500 h-full w-[82%] shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
+</div>
+</div>
+<div class="md:col-span-2 flex justify-end items-center gap-3">
+<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-600 text-[10px] font-bold uppercase tracking-wide">
+<span class="size-1.5 rounded-full bg-emerald-500"></span>
+                                In Stock
+                            </span>
+<button class="size-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-700 transition-colors">
+<span class="material-symbols-outlined text-lg">more_vert</span>
+</button>
+</div>
+</div>
+<div class="stagger-item glass p-4 rounded-xl border border-transparent hover:border-primary/30 transition-all grid grid-cols-1 md:grid-cols-12 gap-4 items-center group" style="animation-delay: 0.2s;">
+<div class="md:col-span-5 flex items-center gap-4">
+<div class="size-16 rounded-lg bg-slate-100 flex-shrink-0 overflow-hidden relative border border-slate-200">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Premium Noise Cancelling Headphones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvaMoglHLfvhnpkgcXiuIO9ZF42U7zu1ZNJPAbCspRG1TLOgei8zDHsMoz5SjhOhJ_NyxBymDetyKKy9KkJgkIcy0TAksFK15mXtU_v-fNhvYNniTYT_EEPMHweMywpiwqncN3IAK1oVL870Z6QBS8BdY0hm_ZuwMAWN1DdfzbebETAdwdik4FqnTeKTv4qGGZ4BprMf9egQqoBCbYt_V_kYbA1wYycHbueI0vukpkEEE1IwK4M7hW8uSdwAkR-TrLmbsvQnId2SA"/>
+</div>
+<div>
+<h3 class="text-sm font-bold text-slate-800 group-hover:text-primary transition-colors">SonicPure NC Headphones</h3>
+<p class="text-xs text-slate-500 mt-0.5">SKU: AUD-NC-2201</p>
+<div class="flex items-center gap-2 mt-1.5">
+<span class="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-[10px] text-slate-500 font-medium">Audio</span>
+<span class="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-[10px] text-slate-500 font-medium">Warehouse C (EU)</span>
+</div>
+</div>
+</div>
+<div class="md:col-span-2">
+<div class="flex flex-col gap-1">
+<span class="text-xs font-medium text-slate-500">B2B: <span class="text-slate-800 font-bold">$85.00</span></span>
+<span class="text-xs font-medium text-slate-500">B2C: <span class="text-slate-800 font-bold">$149.00</span></span>
+</div>
+</div>
+<div class="md:col-span-3">
+<div class="flex justify-between text-xs mb-1.5">
+<span class="text-amber-500 font-bold">128 units</span>
+<span class="text-slate-500">Restock: 100</span>
+</div>
+<div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+<div class="bg-amber-500 h-full w-[35%] shadow-[0_0_10px_rgba(245,158,11,0.5)]"></div>
+</div>
+</div>
+<div class="md:col-span-2 flex justify-end items-center gap-3">
+<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-600 text-[10px] font-bold uppercase tracking-wide">
+<span class="size-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                Low Stock
+                            </span>
+<button class="size-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-700 transition-colors">
+<span class="material-symbols-outlined text-lg">more_vert</span>
+</button>
+</div>
+</div>
+<div class="stagger-item glass p-4 rounded-xl border border-transparent hover:border-primary/30 transition-all grid grid-cols-1 md:grid-cols-12 gap-4 items-center group" style="animation-delay: 0.3s;">
+<div class="md:col-span-5 flex items-center gap-4">
+<div class="size-16 rounded-lg bg-slate-100 flex-shrink-0 overflow-hidden relative border border-slate-200">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Luxury Watch" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhK5-ZR0bboC3ZDn1ayJa7wmlLT4fFdvPXlpPhYxJSUwFTYAYiYUEprCKqS4gWEj0S9_w3x0cvvjzdsGXaQ5KjJw8FwY1PS0FdVscNUXpiWlgDm-MU7ZZTyUSv6vfQbc_PvLTOPS9IlJqnVqNfBK0h8HsjYc5_4W2Us3IuBRyIScwTg3iZwROaaG8gMqloi4zfBqqcOu6YXYd_FH7BR0p90a5_TMIvhYE9UMCnZ7WCtLIQjwWnNGPVlJZd_riE1x-Q3b1IGGMU900"/>
+</div>
+<div>
+<h3 class="text-sm font-bold text-slate-800 group-hover:text-primary transition-colors">Chronos Elite S1</h3>
+<p class="text-xs text-slate-500 mt-0.5">SKU: WTC-LUX-005</p>
+<div class="flex items-center gap-2 mt-1.5">
+<span class="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-[10px] text-slate-500 font-medium">Luxury</span>
+<span class="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-[10px] text-slate-500 font-medium">Warehouse B (CN)</span>
+</div>
+</div>
+</div>
+<div class="md:col-span-2">
+<div class="flex flex-col gap-1">
+<span class="text-xs font-medium text-slate-500">B2B: <span class="text-slate-800 font-bold">$850.00</span></span>
+<span class="text-xs font-medium text-slate-500">B2C: <span class="text-slate-800 font-bold">$1,299.00</span></span>
+</div>
+</div>
+<div class="md:col-span-3">
+<div class="flex justify-between text-xs mb-1.5">
+<span class="text-emerald-600 font-bold">54 units</span>
+<span class="text-slate-500">Target: 60</span>
+</div>
+<div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+<div class="bg-emerald-500 h-full w-[90%] shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
+</div>
+</div>
+<div class="md:col-span-2 flex justify-end items-center gap-3">
+<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-600 text-[10px] font-bold uppercase tracking-wide">
+<span class="size-1.5 rounded-full bg-emerald-500"></span>
+                                In Stock
+                            </span>
+<button class="size-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-700 transition-colors">
+<span class="material-symbols-outlined text-lg">more_vert</span>
+</button>
+</div>
+</div>
+<div class="stagger-item glass p-4 rounded-xl border border-transparent hover:border-primary/30 transition-all grid grid-cols-1 md:grid-cols-12 gap-4 items-center group" style="animation-delay: 0.4s;">
+<div class="md:col-span-5 flex items-center gap-4">
+<div class="size-16 rounded-lg bg-slate-100 flex-shrink-0 overflow-hidden relative border border-slate-200">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 grayscale opacity-70" data-alt="Coffee Maker Espresso Machine" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBz2FlZ4ur4abzQMU04Pjopb5DVzmHhck78_ewWeES0JZiECesgECD99ijT3L801T19W8Ps3ObAXddwdyAKzxWSrPUUN9QQFmRkPWo5fmUroMkusyqUe1K8pcG2rwkIsdW2_iQW6qJ8vPEMBAcE0NBG2H1gKDzk7fk38wIl536hLsXBmCAVAzw4hoOFdEfp1dYMCdO3mulPOuGpUECKaOhSuJ5e1e7Bzs3zAnL7IYqffq435rhPBnALv737qYULE2M3V686G4Xr2qI"/>
+</div>
+<div>
+<h3 class="text-sm font-bold text-slate-800 group-hover:text-primary transition-colors">Barista Pro X2</h3>
+<p class="text-xs text-slate-500 mt-0.5">SKU: KIT-COF-404</p>
+<div class="flex items-center gap-2 mt-1.5">
+<span class="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-[10px] text-slate-500 font-medium">Home</span>
+<span class="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-[10px] text-slate-500 font-medium">Warehouse A (US)</span>
+</div>
+</div>
+</div>
+<div class="md:col-span-2">
+<div class="flex flex-col gap-1">
+<span class="text-xs font-medium text-slate-500">B2B: <span class="text-slate-800 font-bold">$420.00</span></span>
+<span class="text-xs font-medium text-slate-500">B2C: <span class="text-slate-800 font-bold">$699.00</span></span>
+</div>
+</div>
+<div class="md:col-span-3">
+<div class="flex justify-between text-xs mb-1.5">
+<span class="text-rose-500 font-bold">2 units</span>
+<span class="text-slate-500">Restock: 50</span>
+</div>
+<div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+<div class="bg-rose-500 h-full w-[4%] shadow-[0_0_10px_rgba(244,63,94,0.5)]"></div>
+</div>
+</div>
+<div class="md:col-span-2 flex justify-end items-center gap-3">
+<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-rose-50 border border-rose-200 text-rose-600 text-[10px] font-bold uppercase tracking-wide">
+<span class="size-1.5 rounded-full bg-rose-500 animate-pulse"></span>
+                                Critical
+                            </span>
+<button class="size-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-700 transition-colors">
+<span class="material-symbols-outlined text-lg">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+<button class="w-full py-4 glass border border-dashed border-slate-300 rounded-xl text-xs font-bold text-slate-500 hover:text-primary hover:bg-slate-50 transition-all mt-4">
+                    LOAD MORE INVENTORY
+                </button>
+</section>
+<section class="xl:col-span-3 space-y-6">
+<div class="glass p-6 rounded-xl relative overflow-hidden group">
+<div class="absolute -right-6 -top-6 size-24 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-colors"></div>
+<h3 class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-2">Total Inventory Value</h3>
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-black text-slate-900">$4.2M</span>
+<span class="text-xs font-bold text-emerald-600 flex items-center bg-emerald-50 px-1.5 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+                            +12%
+                        </span>
+</div>
+<p class="text-xs text-slate-500 mt-2">Aggregated across 5 global hubs</p>
+<div class="mt-4 pt-4 border-t border-slate-200 grid grid-cols-2 gap-4">
+<div>
+<p class="text-[10px] text-slate-500 uppercase font-bold">B2B Share</p>
+<p class="text-lg font-bold text-slate-800">65%</p>
+</div>
+<div>
+<p class="text-[10px] text-slate-500 uppercase font-bold">B2C Share</p>
+<p class="text-lg font-bold text-slate-800">35%</p>
+</div>
+</div>
+</div>
+<div class="glass rounded-xl overflow-hidden">
+<div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
+<h3 class="font-bold text-slate-800 text-sm">Low Stock Alerts</h3>
+<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-600 border border-rose-200">3 ACTION NEEDED</span>
+</div>
+<div class="p-2 space-y-1">
+<div class="p-3 hover:bg-slate-50 rounded-lg transition-colors cursor-pointer group">
+<div class="flex gap-3">
+<div class="size-10 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 group-hover:text-primary transition-colors border border-slate-200">
+<span class="material-symbols-outlined text-lg">coffee_maker</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-bold text-slate-800 truncate">Barista Pro X2</p>
+<p class="text-xs text-rose-500 font-medium">Only 2 left in US</p>
+</div>
+<button class="size-8 rounded-full border border-slate-200 flex items-center justify-center hover:bg-primary hover:border-primary hover:text-white transition-all text-slate-400">
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+</div>
+</div>
+<div class="p-3 hover:bg-slate-50 rounded-lg transition-colors cursor-pointer group">
+<div class="flex gap-3">
+<div class="size-10 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 group-hover:text-primary transition-colors border border-slate-200">
+<span class="material-symbols-outlined text-lg">sports_soccer</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-bold text-slate-800 truncate">Pro League Ball</p>
+<p class="text-xs text-amber-500 font-medium">15 left in EU</p>
+</div>
+<button class="size-8 rounded-full border border-slate-200 flex items-center justify-center hover:bg-primary hover:border-primary hover:text-white transition-all text-slate-400">
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+</div>
+</div>
+<div class="p-3 hover:bg-slate-50 rounded-lg transition-colors cursor-pointer group">
+<div class="flex gap-3">
+<div class="size-10 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 group-hover:text-primary transition-colors border border-slate-200">
+<span class="material-symbols-outlined text-lg">headphones</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-bold text-slate-800 truncate">Studio Monitors</p>
+<p class="text-xs text-amber-500 font-medium">8 left in CN</p>
+</div>
+<button class="size-8 rounded-full border border-slate-200 flex items-center justify-center hover:bg-primary hover:border-primary hover:text-white transition-all text-slate-400">
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+</div>
+</div>
+</div>
+<div class="p-3 border-t border-slate-200">
+<button class="w-full py-2 text-xs font-bold text-primary hover:text-blue-700 transition-colors">VIEW ALL ALERTS</button>
+</div>
+</div>
+<div class="glass p-4 rounded-xl">
+<h3 class="font-bold text-slate-800 text-sm mb-4">Warehouse Capacity</h3>
+<div class="space-y-4">
+<div>
+<div class="flex justify-between text-xs mb-1">
+<span class="text-slate-500">North America (US)</span>
+<span class="text-slate-800 font-bold">88%</span>
+</div>
+<div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+<div class="bg-rose-500 h-full w-[88%]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs mb-1">
+<span class="text-slate-500">Europe (DE)</span>
+<span class="text-slate-800 font-bold">45%</span>
+</div>
+<div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+<div class="bg-emerald-500 h-full w-[45%]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs mb-1">
+<span class="text-slate-500">Asia Pacific (CN)</span>
+<span class="text-slate-800 font-bold">62%</span>
+</div>
+<div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[62%]"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+</div>
+
+</body></html>

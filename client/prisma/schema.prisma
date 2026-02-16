@@ -1,0 +1,263 @@
+// This is a placeholder database schema
+// Replace this URL with your actual PostgreSQL connection string
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// User model with role-based access
+model User {
+  id            String    @id @default(uuid())
+  name          String?
+  email         String    @unique
+  password      String?
+  role          Role      @default(IMPORTER)
+  companyName   String?
+  country       String?
+  phone         String?
+  website       String?
+  verified      Boolean   @default(false)
+  avatar        String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  exportedProducts Product[]          @relation("ExporterProducts")
+  orders           Order[]            @relation("ImporterOrders")
+  shipments        Shipment[]
+  sentMessages     Message[]          @relation("Sender")
+  receivedMessages Message[]          @relation("Receiver")
+  documents        Document[]
+  notifications    Notification[]
+
+  @@map("users")
+}
+
+enum Role {
+  EXPORTER
+  IMPORTER
+  ADMIN
+}
+
+// Product model for exporters
+model Product {
+  id              String    @id @default(uuid())
+  exporterId      String
+  exporter        User      @relation("ExporterProducts", fields: [exporterId], references: [id], onDelete: Cascade)
+
+  name            String
+  category        ProductCategory
+  description     String    @db.Text
+  price           Float
+  minOrderQty     Int
+  unit            String
+  originCountry   String
+  hsCode          String?
+  images          String[]
+  certifications  String[]
+
+  available       Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  orders          Order[]
+
+  @@map("products")
+}
+
+enum ProductCategory {
+  CHEMICALS
+  MACHINES
+  TEXTILES
+  MEDICAL
+  HANDICRAFTS
+  FOOD
+  ELECTRONICS
+  AUTOMOTIVE
+  CONSTRUCTION
+  AGRICULTURE
+  OTHER
+}
+
+// Order model
+model Order {
+  id              String      @id @default(uuid())
+  orderNumber     String      @unique
+
+  productId       String
+  product         Product     @relation(fields: [productId], references: [id])
+
+  importerId      String
+  importer        User        @relation("ImporterOrders", fields: [importerId], references: [id])
+
+  quantity        Int
+  totalPrice      Float
+  currency        String      @default("USD")
+
+  status          OrderStatus @default(PENDING)
+  paymentStatus   PaymentStatus @default(PENDING)
+
+  notes           String?     @db.Text
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  // Relations
+  shipment        Shipment?
+  messages        Message[]
+
+  @@map("orders")
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  DISPUTED
+}
+
+enum PaymentStatus {
+  PENDING
+  PARTIAL
+  PAID
+  REFUNDED
+}
+
+// Shipment tracking
+model Shipment {
+  id                  String    @id @default(uuid())
+  orderId             String    @unique
+  order               Order     @relation(fields: [orderId], references: [id])
+
+  userId              String
+  user                User      @relation(fields: [userId], references: [id])
+
+  trackingNumber      String    @unique
+  carrier             String
+
+  origin              String
+  destination         String
+
+  estimatedDelivery   DateTime
+  actualDelivery      DateTime?
+
+  status              ShipmentStatus @default(PREPARING)
+
+  currentLocation     String?
+  statusHistory       Json[]
+
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@map("shipments")
+}
+
+enum ShipmentStatus {
+  PREPARING
+  IN_TRANSIT
+  CUSTOMS
+  OUT_FOR_DELIVERY
+  DELIVERED
+  DELAYED
+  RETURNED
+}
+
+// Messaging system
+model Message {
+  id          String    @id @default(uuid())
+
+  senderId    String
+  sender      User      @relation("Sender", fields: [senderId], references: [id])
+
+  receiverId  String
+  receiver    User      @relation("Receiver", fields: [receiverId], references: [id])
+
+  orderId     String?
+  order       Order?    @relation(fields: [orderId], references: [id])
+
+  subject     String?
+  content     String    @db.Text
+  read        Boolean   @default(false)
+
+  createdAt   DateTime  @default(now())
+
+  @@map("messages")
+}
+
+// Document management
+model Document {
+  id          String    @id @default(uuid())
+
+  ownerId     String
+  owner       User      @relation(fields: [ownerId], references: [id])
+
+  type        DocumentType
+  fileName    String
+  fileUrl     String
+  fileSize    Int
+  mimeType    String
+
+  verified    Boolean   @default(false)
+  verifiedAt  DateTime?
+  verifiedBy  String?
+
+  description String?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("documents")
+}
+
+enum DocumentType {
+  BUSINESS_LICENSE
+  TAX_CERTIFICATE
+  IMPORT_EXPORT_LICENSE
+  CERTIFICATE_OF_ORIGIN
+  QUALITY_CERTIFICATE
+  INSURANCE_DOCUMENT
+  INVOICE
+  PACKING_LIST
+  BILL_OF_LADING
+  OTHER
+}
+
+// Notification system
+model Notification {
+  id        String    @id @default(uuid())
+
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+
+  type      NotificationType
+  title     String
+  message   String    @db.Text
+  link      String?
+
+  read      Boolean   @default(false)
+  readAt    DateTime?
+
+  createdAt DateTime  @default(now())
+
+  @@map("notifications")
+}
+
+enum NotificationType {
+  ORDER_PLACED
+  ORDER_CONFIRMED
+  ORDER_SHIPPED
+  ORDER_DELIVERED
+  MESSAGE_RECEIVED
+  PAYMENT_RECEIVED
+  DOCUMENT_VERIFIED
+  ACCOUNT_VERIFIED
+  GENERAL
+}

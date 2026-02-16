@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Advanced Trade Analytics Hub (Fixed)</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "primary-dark": "#0f49bd",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                        "surface-dark": "#1a2332",
+                        "surface-light": "#ffffff",
+                        "success": "#00d27a",
+                        "danger": "#ff4d4f",
+                        "warning": "#faad14",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>.no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .dark .glass-panel {
+            background: rgba(26, 35, 50, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }.radar-chart-bg {
+            background: radial-gradient(circle at center, transparent 0%, transparent 19%, rgba(19, 91, 236, 0.1) 20%, transparent 21%, transparent 39%, rgba(19, 91, 236, 0.1) 40%, transparent 41%, transparent 59%, rgba(19, 91, 236, 0.1) 60%, transparent 61%, transparent 79%, rgba(19, 91, 236, 0.1) 80%, transparent 81%);
+        }
+        .radar-poly {
+            clip-path: polygon(50% 10%, 90% 30%, 80% 80%, 20% 80%, 10% 30%);
+            animation: pulse-radar 4s ease-in-out infinite;
+        }
+        @keyframes pulse-radar {
+            0% { transform: scale(0.95); opacity: 0.7; }
+            50% { transform: scale(1.05); opacity: 0.9; }
+            100% { transform: scale(0.95); opacity: 0.7; }
+        }.trend-line path {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: dash 3s ease-out forwards;
+        }
+        @keyframes dash {
+            to { stroke-dashoffset: 0; }
+        }.heatmap-cell {
+            transition: all 0.3s ease;
+        }
+        .heatmap-cell:hover {
+            transform: scale(1.1);
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-100 font-display selection:bg-primary selection:text-white transition-colors duration-300 flex overflow-hidden h-screen">
+<nav class="hidden lg:flex flex-col w-24 h-screen sticky top-0 bg-[#0b1019]/90 backdrop-blur-xl border-r border-slate-800 z-50 flex-shrink-0 items-center py-6">
+<div class="mb-10 w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center shadow-lg shadow-primary/20">
+<span class="material-icons-round text-white text-2xl">public</span>
+</div>
+<div class="flex-1 flex flex-col gap-6 w-full items-center">
+<a class="group relative w-12 h-12 flex items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all" href="#">
+<span class="material-icons-round text-2xl">dashboard</span>
+<div class="absolute left-14 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">Dashboard</div>
+</a>
+<a class="group relative w-12 h-12 flex items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all" href="#">
+<span class="material-icons-round text-2xl">grid_view</span>
+<div class="absolute left-14 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">All Categories</div>
+</a>
+<a class="group relative w-12 h-12 flex items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all" href="#">
+<span class="material-icons-round text-2xl">inventory_2</span>
+<div class="absolute left-14 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">Inventory</div>
+</a>
+<a class="group relative w-12 h-12 flex items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all" href="#">
+<span class="material-icons-round text-2xl">contacts</span>
+<div class="absolute left-14 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">Directory</div>
+</a>
+<a class="group relative w-12 h-12 flex items-center justify-center rounded-xl bg-primary text-white shadow-lg shadow-primary/30 transition-all" href="#">
+<span class="material-icons-round text-2xl">analytics</span>
+<div class="absolute left-14 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">Analytics</div>
+</a>
+<a class="group relative w-12 h-12 flex items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all" href="#">
+<div class="relative">
+<span class="material-icons-round text-2xl">notifications</span>
+<span class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#0b1019]"></span>
+</div>
+<div class="absolute left-14 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">Notifications</div>
+</a>
+</div>
+<div class="flex flex-col gap-4 items-center w-full">
+<a class="group relative w-12 h-12 flex items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all" href="#">
+<span class="material-icons-round text-2xl">settings</span>
+<div class="absolute left-14 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">Settings</div>
+</a>
+<div class="w-10 h-10 rounded-full border-2 border-slate-700 overflow-hidden cursor-pointer">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDH8L5n3RnUyHIAcOwSKknG-QuUh76bBTnmy3be1FqByXtqFR9EAOy2hTsdPGFpGHeBoUGOex2TUdiTbrAc8M2lwkXK2Jdp5hsJ5jxjGYB0gTZ0dhnHHN9-VjT8Fy1QljFBgr6pP9G0UeD-kFVQxLAsscZcvPewik1ththIF_zHSbsSsAkmZw_0JCJ9SE3lVT41N9y5_vn_ol7ecTFCRoYlceOC-gNecIFeBQW_XL0a8bLeF7CPLebrBNNmJM1mWUKE6jvlPas8rAc"/>
+</div>
+</div>
+</nav>
+<div class="flex-1 flex flex-col h-screen overflow-hidden relative">
+<header class="sticky top-0 z-40 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex-shrink-0">
+<div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+<div class="flex items-center gap-4">
+<button class="lg:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-surface-dark text-slate-500 dark:text-slate-400 transition-colors">
+<span class="material-icons-round text-2xl">menu</span>
+</button>
+<div class="flex flex-col">
+<h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white hidden sm:block">Trade Analytics</h1>
+<span class="text-xs text-slate-500 dark:text-slate-400 font-medium hidden sm:block">Real-time market insights &amp; financial performance</span>
+</div>
+</div>
+<div class="flex items-center gap-3 justify-end flex-1">
+<div class="flex items-center bg-slate-100 dark:bg-surface-dark rounded-lg px-3 py-1.5 border border-slate-200 dark:border-slate-700 mr-4">
+<span class="material-icons-round text-slate-400 text-sm mr-2">calendar_today</span>
+<span class="text-sm font-medium text-slate-600 dark:text-slate-300">Oct 2023 - Nov 2023</span>
+<span class="material-icons-round text-slate-400 text-sm ml-2">arrow_drop_down</span>
+</div>
+<button class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-surface-dark relative">
+<span class="material-icons-round text-slate-500 dark:text-slate-400">notifications_none</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-background-dark"></span>
+</button>
+<div class="h-8 w-[1px] bg-slate-200 dark:bg-slate-700 mx-2"></div>
+<button class="flex items-center gap-2 hover:opacity-80 transition-opacity">
+<img alt="User Profile" class="w-9 h-9 rounded-full border-2 border-white dark:border-surface-dark shadow-sm" data-alt="User profile avatar placeholder" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDH8L5n3RnUyHIAcOwSKknG-QuUh76bBTnmy3be1FqByXtqFR9EAOy2hTsdPGFpGHeBoUGOex2TUdiTbrAc8M2lwkXK2Jdp5hsJ5jxjGYB0gTZ0dhnHHN9-VjT8Fy1QljFBgr6pP9G0UeD-kFVQxLAsscZcvPewik1ththIF_zHSbsSsAkmZw_0JCJ9SE3lVT41N9y5_vn_ol7ecTFCRoYlceOC-gNecIFeBQW_XL0a8bLeF7CPLebrBNNmJM1mWUKE6jvlPas8rAc"/>
+</button>
+</div>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto p-6 lg:p-8 bg-background-light dark:bg-background-dark scroll-smooth">
+<div class="max-w-[1920px] mx-auto space-y-8">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="glass-panel p-6 rounded-2xl relative overflow-hidden group">
+<div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-icons-round text-6xl text-primary">public</span>
+</div>
+<h3 class="text-slate-500 dark:text-slate-400 text-sm font-medium mb-2">Global Import Volume</h3>
+<div class="flex items-baseline gap-2 mb-2">
+<span class="text-3xl font-bold text-slate-900 dark:text-white">2.4M</span>
+<span class="text-sm font-medium text-slate-500">units</span>
+</div>
+<div class="flex items-center gap-1 text-sm font-medium text-success bg-success/10 w-fit px-2 py-1 rounded-full">
+<span class="material-icons-round text-sm">trending_up</span>
+<span>+12.5%</span>
+</div>
+</div>
+<div class="glass-panel p-6 rounded-2xl relative overflow-hidden group">
+<div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-icons-round text-6xl text-purple-500">payments</span>
+</div>
+<h3 class="text-slate-500 dark:text-slate-400 text-sm font-medium mb-2">Total Transaction Value</h3>
+<div class="flex items-baseline gap-2 mb-2">
+<span class="text-3xl font-bold text-slate-900 dark:text-white">$845.2M</span>
+</div>
+<div class="flex items-center gap-1 text-sm font-medium text-success bg-success/10 w-fit px-2 py-1 rounded-full">
+<span class="material-icons-round text-sm">trending_up</span>
+<span>+8.3%</span>
+</div>
+</div>
+<div class="glass-panel p-6 rounded-2xl relative overflow-hidden group">
+<div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-icons-round text-6xl text-warning">local_shipping</span>
+</div>
+<h3 class="text-slate-500 dark:text-slate-400 text-sm font-medium mb-2">Active Shipments</h3>
+<div class="flex items-baseline gap-2 mb-2">
+<span class="text-3xl font-bold text-slate-900 dark:text-white">1,248</span>
+</div>
+<div class="flex items-center gap-1 text-sm font-medium text-warning bg-warning/10 w-fit px-2 py-1 rounded-full">
+<span class="material-icons-round text-sm">remove</span>
+<span>0.4%</span>
+</div>
+</div>
+<div class="glass-panel p-6 rounded-2xl relative overflow-hidden group">
+<div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-icons-round text-6xl text-danger">pie_chart</span>
+</div>
+<h3 class="text-slate-500 dark:text-slate-400 text-sm font-medium mb-2">Avg. Profit Margin</h3>
+<div class="flex items-baseline gap-2 mb-2">
+<span class="text-3xl font-bold text-slate-900 dark:text-white">18.2%</span>
+</div>
+<div class="flex items-center gap-1 text-sm font-medium text-danger bg-danger/10 w-fit px-2 py-1 rounded-full">
+<span class="material-icons-round text-sm">trending_down</span>
+<span>-2.1%</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-8 h-full">
+<div class="xl:col-span-2 space-y-8">
+<div class="glass-panel p-6 rounded-2xl">
+<div class="flex items-center justify-between mb-6">
+<div>
+<h2 class="text-lg font-bold text-slate-900 dark:text-white">Market Trends Analysis</h2>
+<p class="text-sm text-slate-500 dark:text-slate-400">Comparative category performance &amp; currency impact</p>
+</div>
+<div class="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-lg">
+<button class="px-4 py-1.5 text-xs font-semibold bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded-md shadow-sm transition-all">Category Performance</button>
+<button class="px-4 py-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-md transition-colors">Regional Demand</button>
+</div>
+</div>
+<div class="grid grid-cols-1 gap-8 items-center">
+
+<div class="h-full flex flex-col justify-center">
+<h4 class="text-sm font-bold text-slate-700 dark:text-slate-300 mb-6 lg:text-left pl-8">Currency Fluctuation vs. Demand</h4>
+<div class="h-64 w-full relative pl-8">
+<div class="absolute inset-0 flex flex-col justify-between text-[10px] text-slate-400 font-mono left-0 h-full py-4 z-10 pointer-events-none">
+<div class="flex items-center w-full"><span class="w-8 text-right pr-2">1.20</span><div class="flex-1 border-b border-dashed border-slate-200 dark:border-slate-700/50"></div></div>
+<div class="flex items-center w-full"><span class="w-8 text-right pr-2">1.15</span><div class="flex-1 border-b border-dashed border-slate-200 dark:border-slate-700/50"></div></div>
+<div class="flex items-center w-full"><span class="w-8 text-right pr-2">1.10</span><div class="flex-1 border-b border-dashed border-slate-200 dark:border-slate-700/50"></div></div>
+<div class="flex items-center w-full"><span class="w-8 text-right pr-2">1.05</span><div class="flex-1 border-b border-dashed border-slate-200 dark:border-slate-700/50"></div></div>
+<div class="flex items-center w-full"><span class="w-8 text-right pr-2">1.00</span><div class="flex-1 border-b border-slate-200 dark:border-slate-600"></div></div>
+</div>
+<div class="absolute inset-0 pl-8 pb-4 pt-4 h-full w-full"><svg class="w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 400 150">
+<defs>
+<filter height="140%" id="glow" width="140%" x="-20%" y="-20%">
+<fegaussianblur result="blur" stddeviation="3"></fegaussianblur>
+<fecomposite in="SourceGraphic" in2="blur" operator="over"></fecomposite>
+</filter>
+</defs>
+<!-- Main Data Line 1 - Neon Blue -->
+<path class="trend-line-path" d="M0,100 C40,100 60,40 100,40 C140,40 160,110 200,110 C240,110 260,30 300,30 C340,30 360,80 400,80" fill="none" filter="url(#glow)" stroke="#135bec" stroke-linecap="round" stroke-width="3"></path>
+<!-- Main Data Line 2 - Neon Green -->
+<path d="M0,130 C40,130 60,90 100,90 C140,90 160,120 200,120 C240,120 260,60 300,60 C340,60 360,100 400,100" fill="none" filter="url(#glow)" stroke="#00d27a" stroke-dasharray="4 4" stroke-linecap="round" stroke-width="2"></path>
+<!-- Main Data Line 3 - Neon Purple -->
+<path d="M0,80 C40,80 60,120 100,120 C140,120 160,50 200,50 C240,50 260,100 300,100 C340,100 360,40 400,40" fill="none" opacity="0.6" stroke="#a855f7" stroke-linecap="round" stroke-width="2"></path>
+<circle cx="300" cy="30" fill="white" r="4" stroke="#135bec" stroke-width="2"></circle>
+</svg>
+<div class="absolute top-[30px] left-[300px] bg-slate-800/90 backdrop-blur-md text-white text-[10px] px-2 py-1 rounded border border-white/10 shadow-xl -translate-x-1/2 -translate-y-full mb-2">
+    Peak Demand
+</div></div>
+</div>
+<div class="flex items-center gap-6 mt-4 justify-center lg:justify-start pl-8"><div class="flex items-center gap-2">
+<span class="w-3 h-1 bg-primary rounded-full shadow-[0_0_8px_#135bec]"></span>
+<span class="text-xs text-slate-500 dark:text-slate-400">Exch. Rate</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-1 bg-success rounded-full border border-dashed border-success shadow-[0_0_8px_#00d27a]"></span>
+<span class="text-xs text-slate-500 dark:text-slate-400">Category Demand</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-1 bg-purple-500 rounded-full opacity-60"></span>
+<span class="text-xs text-slate-500 dark:text-slate-400">Market Index</span>
+</div></div>
+</div>
+</div>
+</div>
+<div class="glass-panel p-8 rounded-2xl relative overflow-hidden">
+<div class="absolute inset-0 opacity-5 pointer-events-none">
+<img alt="world map background" class="w-full h-full object-cover" src="https://www.transparenttextures.com/patterns/world-map.png"/>
+</div>
+<div class="relative z-10">
+<div class="mb-8">
+<h2 class="text-xl font-bold text-slate-900 dark:text-white">Market Performance</h2>
+<p class="text-sm text-slate-500 dark:text-slate-400">Top performing trade lanes</p>
+</div>
+<div class="space-y-6">
+<!-- Asia-Pacific -->
+<div class="p-5 rounded-xl border border-slate-200/50 dark:border-white/5 bg-white/5 dark:bg-slate-800/20 backdrop-blur-sm flex flex-col gap-3 relative border-l-4 border-l-blue-500">
+<div class="flex justify-between items-center">
+<span class="font-bold text-slate-900 dark:text-white">Asia-Pacific</span>
+<span class="text-sm font-bold text-success">+18% YoY</span>
+</div>
+<div class="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden shadow-[0_0_8px_rgba(59,130,246,0.3)]">
+<div class="bg-blue-500 h-full rounded-full w-[82%] shadow-[0_0_15px_rgba(59,130,246,0.6)]"></div>
+</div>
+<div class="flex justify-between text-xs font-medium">
+<span class="text-slate-500">$12.4M Volume</span>
+<span class="text-slate-400">High Demand</span>
+</div>
+</div>
+<!-- North America -->
+<div class="p-5 rounded-xl border border-slate-200/50 dark:border-white/5 bg-white/5 dark:bg-slate-800/20 backdrop-blur-sm flex flex-col gap-3 relative border-l-4 border-l-cyan-400">
+<div class="flex justify-between items-center">
+<span class="font-bold text-slate-900 dark:text-white">North America</span>
+<span class="text-sm font-bold text-success">+6% YoY</span>
+</div>
+<div class="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden shadow-[0_0_8px_rgba(34,211,238,0.3)]">
+<div class="bg-cyan-400 h-full rounded-full w-[64%] shadow-[0_0_15px_rgba(34,211,238,0.6)]"></div>
+</div>
+<div class="flex justify-between text-xs font-medium">
+<span class="text-slate-500">$8.1M Volume</span>
+<span class="text-slate-400">Steady</span>
+</div>
+</div>
+<!-- Europe -->
+<div class="p-5 rounded-xl border border-slate-200/50 dark:border-white/5 bg-white/5 dark:bg-slate-800/20 backdrop-blur-sm flex flex-col gap-3 relative border-l-4 border-l-purple-500">
+<div class="flex justify-between items-center">
+<span class="font-bold text-slate-900 dark:text-white">Europe</span>
+<span class="text-sm font-bold text-danger">-2% YoY</span>
+</div>
+<div class="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden shadow-[0_0_8px_rgba(168,85,247,0.3)]">
+<div class="bg-purple-500 h-full rounded-full w-[42%] shadow-[0_0_15px_rgba(168,85,247,0.6)]"></div>
+</div>
+<div class="flex justify-between text-xs font-medium">
+<span class="text-slate-500">$5.3M Volume</span>
+<span class="text-slate-400">Cooling</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="xl:col-span-1 space-y-8">
+<div class="glass-panel p-6 rounded-2xl h-full flex flex-col">
+<div class="mb-6">
+<h2 class="text-lg font-bold text-slate-900 dark:text-white mb-1">Financial Performance</h2>
+<p class="text-sm text-slate-500 dark:text-slate-400">Profitability &amp; Cost Analysis</p>
+</div>
+<div class="bg-gradient-to-br from-slate-800 to-slate-900 dark:from-surface-dark dark:to-[#0b1019] p-6 rounded-xl text-white shadow-xl mb-8 relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4 opacity-10">
+<span class="material-icons-round text-8xl">account_balance_wallet</span>
+</div>
+<div class="relative z-10">
+<span class="text-slate-400 text-xs font-medium uppercase tracking-wider">Net Profit (YTD)</span>
+<div class="text-3xl font-bold mt-1 mb-4">$12,450,200</div>
+<div class="flex gap-4">
+<div>
+<span class="block text-xs text-slate-400">Income</span>
+<span class="block text-sm font-semibold text-success flex items-center gap-1">
+<span class="material-icons-round text-xs">arrow_upward</span> $45.2M
+                                        </span>
+</div>
+<div class="w-[1px] bg-white/10"></div>
+<div>
+<span class="block text-xs text-slate-400">Expenses</span>
+<span class="block text-sm font-semibold text-danger flex items-center gap-1">
+<span class="material-icons-round text-xs">arrow_downward</span> $32.8M
+                                        </span>
+</div>
+</div>
+</div>
+<div class="mt-6 pt-4 border-t border-white/10">
+<div class="flex justify-between items-center text-xs">
+<span class="text-slate-400">Projected Q4 Growth</span>
+<span class="text-white font-bold">+15%</span>
+</div>
+<div class="w-full bg-white/10 rounded-full h-1.5 mt-2">
+<div class="bg-primary h-1.5 rounded-full w-[75%] shadow-[0_0_10px_rgba(19,91,236,0.5)]"></div>
+</div>
+</div>
+</div>
+<div class="flex-1 overflow-hidden flex flex-col">
+<h3 class="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center justify-between">
+                            Recent Large Transactions
+                            <button class="text-primary text-xs font-medium hover:underline">View All</button>
+</h3>
+<div class="space-y-4 overflow-y-auto pr-2 custom-scrollbar">
+<div class="flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
+<span class="material-icons-round">precision_manufacturing</span>
+</div>
+<div>
+<div class="text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-primary transition-colors">Steel Coils Bulk</div>
+<div class="text-xs text-slate-500">Shanghai Steel Corp.</div>
+</div>
+</div>
+<div class="text-right">
+<div class="text-sm font-bold text-slate-800 dark:text-white">$125,000</div>
+<div class="text-[10px] text-success bg-success/10 px-1.5 py-0.5 rounded inline-block">Completed</div>
+</div>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400">
+<span class="material-icons-round">memory</span>
+</div>
+<div>
+<div class="text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-primary transition-colors">Microchips Batch A</div>
+<div class="text-xs text-slate-500">TechTronix Ltd.</div>
+</div>
+</div>
+<div class="text-right">
+<div class="text-sm font-bold text-slate-800 dark:text-white">$84,200</div>
+<div class="text-[10px] text-warning bg-warning/10 px-1.5 py-0.5 rounded inline-block">Pending</div>
+</div>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center text-teal-600 dark:text-teal-400">
+<span class="material-icons-round">local_shipping</span>
+</div>
+<div>
+<div class="text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-primary transition-colors">Logistics Fee</div>
+<div class="text-xs text-slate-500">Maersk Line</div>
+</div>
+</div>
+<div class="text-right">
+<div class="text-sm font-bold text-slate-800 dark:text-white">-$12,400</div>
+<div class="text-[10px] text-slate-500 bg-slate-200 dark:bg-slate-700 px-1.5 py-0.5 rounded inline-block">Debit</div>
+</div>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400">
+<span class="material-icons-round">agriculture</span>
+</div>
+<div>
+<div class="text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-primary transition-colors">Organic Coffee</div>
+<div class="text-xs text-slate-500">Colombia Exp.</div>
+</div>
+</div>
+<div class="text-right">
+<div class="text-sm font-bold text-slate-800 dark:text-white">$45,000</div>
+<div class="text-[10px] text-success bg-success/10 px-1.5 py-0.5 rounded inline-block">Completed</div>
+</div>
+</div>
+</div>
+<button class="w-full mt-6 py-3 bg-white dark:bg-surface-dark border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex items-center justify-center gap-2 shadow-sm">
+<span class="material-icons-round">file_download</span> Download Financial Report
+                        </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

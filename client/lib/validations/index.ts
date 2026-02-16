@@ -1,0 +1,73 @@
+import { z } from 'zod';
+
+// User Registration Schema
+export const registerSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(8, 'Password must be at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number'),
+  role: z.enum(['EXPORTER', 'IMPORTER']),
+  companyName: z.string().optional(),
+  country: z.string().min(2, 'Country is required'),
+  phone: z.string().optional(),
+  website: z.string().url().optional().or(z.literal('')),
+});
+
+export type RegisterInput = z.infer<typeof registerSchema>;
+
+// User Login Schema
+export const loginSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(1, 'Password is required'),
+});
+
+export type LoginInput = z.infer<typeof loginSchema>;
+
+// Product Schema
+export const productSchema = z.object({
+  name: z.string().min(3, 'Product name must be at least 3 characters'),
+  category: z.enum([
+    'CHEMICALS',
+    'MACHINES',
+    'TEXTILES',
+    'MEDICAL',
+    'HANDICRAFTS',
+    'FOOD',
+    'ELECTRONICS',
+    'AUTOMOTIVE',
+    'CONSTRUCTION',
+    'AGRICULTURE',
+    'OTHER',
+  ]),
+  description: z.string().min(20, 'Description must be at least 20 characters'),
+  price: z.number().positive('Price must be positive'),
+  minOrderQty: z.number().int().positive('Minimum order quantity must be positive'),
+  unit: z.string().min(1, 'Unit is required'),
+  originCountry: z.string().min(2, 'Origin country is required'),
+  hsCode: z.string().optional(),
+  images: z.array(z.string().url()).min(1, 'At least one image is required'),
+  certifications: z.array(z.string()).optional().default([]),
+});
+
+export type ProductInput = z.infer<typeof productSchema>;
+
+// Order Schema
+export const orderSchema = z.object({
+  productId: z.string().uuid('Invalid product ID'),
+  quantity: z.number().int().positive('Quantity must be positive'),
+  notes: z.string().optional(),
+});
+
+export type OrderInput = z.infer<typeof orderSchema>;
+
+// Message Schema
+export const messageSchema = z.object({
+  receiverId: z.string().uuid('Invalid receiver ID'),
+  orderId: z.string().uuid().optional(),
+  subject: z.string().min(1, 'Subject is required').optional(),
+  content: z.string().min(1, 'Message content is required'),
+});
+
+export type MessageInput = z.infer<typeof messageSchema>;

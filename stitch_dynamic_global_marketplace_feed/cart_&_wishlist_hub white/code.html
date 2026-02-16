@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NexusTrade | Cart &amp; Wishlist</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f8f9fc",
+                        "background-dark": "#ffffff",
+                        "surface-light": "#ffffff",
+                        "text-main": "#1e293b",
+                        "text-muted": "#64748b",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                    boxShadow: {
+                        "glass": "0 8px 32px 0 rgba(31, 38, 135, 0.07)",
+                        "premium": "0 20px 40px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01)",
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        }
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.85);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+        }
+        .glow-primary {
+            text-shadow: 0 0 1px rgba(19, 91, 236, 0.1);
+        }
+        .glow-border:focus-within {
+            box-shadow: 0 0 0 2px rgba(19, 91, 236, 0.1);
+            border-color: #135bec;
+        }.text-slate-400 {
+            color: #64748b;
+        }
+        .hover\:bg-white\/\[0\.05\]:hover {
+            background-color: rgba(241, 245, 249, 0.5);
+        }
+        .border-white\/10 {
+            border-color: rgba(0, 0, 0, 0.06);
+        }
+        .border-white\/20 {
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+        .bg-white\/5 {
+            background-color: rgba(0, 0, 0, 0.03);
+        }
+        .bg-black\/40 {
+             background-color: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-background-light font-display text-text-main min-h-screen selection:bg-primary/10 selection:text-primary">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<header class="sticky top-0 z-50 glass-card px-6 py-4 flex items-center justify-between border-b border-slate-200/60">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3">
+<div class="size-10 bg-primary flex items-center justify-center rounded-lg shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-white text-2xl">rocket_launch</span>
+</div>
+<h2 class="text-xl font-bold tracking-tight text-slate-900">NexusTrade</h2>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-sm font-medium text-slate-600 hover:text-primary transition-colors" href="#">Market</a>
+<a class="text-sm font-medium text-slate-600 hover:text-primary transition-colors" href="#">Portfolio</a>
+<a class="text-sm font-medium text-primary font-semibold" href="#">Academy</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+<input class="bg-white border border-slate-200 rounded-full py-2 pl-10 pr-4 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary w-64 placeholder-slate-400" placeholder="Search assets..." type="text"/>
+</div>
+<button class="p-2 rounded-full hover:bg-slate-100 transition-colors relative text-slate-600">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 size-2 bg-primary rounded-full ring-2 ring-white"></span>
+</button>
+<div class="size-10 rounded-full bg-cover bg-center border border-slate-200 shadow-sm" data-alt="User profile avatar image" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAKHJy8o2egg0s86oKzexl__9kruP56gpZwTRXtzG1W99eNCAA4PUoTrA8_4qnkMbxurG5kON-w3KZ3PNEfljsKYBuegEGLrnBUs3y3e-lzlbJcgE-PgYy-LdOuuTvn91ghoo7kJQ8ZLbeU9xywUBa9iiP00aIIc5tAfx1mqdSxeFla_5nNIy-Gse7bGqIeIf1uXCAevFH-PbEWy51LCSqpznz5pgEVlA11vY3QYymYHghl11l05t1j3w1Yn049jwymKLQYSl40Rxs');"></div>
+</div>
+</header>
+<main class="flex-1 w-full max-w-7xl mx-auto px-4 md:px-8 py-8">
+<div class="flex items-center justify-between mb-8 border-b border-slate-200">
+<div class="flex gap-8">
+<button class="relative pb-4 text-lg font-bold border-b-2 border-primary text-slate-900">
+                        My Shopping Cart
+                        <span class="ml-2 px-2 py-0.5 text-xs bg-primary/10 text-primary font-bold rounded-full">3</span>
+</button>
+<button class="pb-4 text-lg font-medium text-slate-500 hover:text-slate-900 transition-all">
+                        Saved Wishlist
+                        <span class="ml-2 px-2 py-0.5 text-xs bg-slate-100 text-slate-600 font-bold rounded-full">12</span>
+</button>
+</div>
+<div class="pb-4 hidden sm:block">
+<p class="text-sm text-slate-500 italic">"Free shipping on orders over $5,000"</p>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<div class="lg:col-span-2 space-y-6">
+<div class="glass-card rounded-xl p-4 flex flex-col sm:flex-row gap-6 transition-all hover:-translate-y-0.5 duration-300">
+<div class="w-full sm:w-48 aspect-video sm:aspect-square rounded-lg bg-cover bg-center shadow-sm" data-alt="High-end professional trading monitor setup" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC8h3QjlabEr5zS68p2u6i_2_hbpFzFKFmAk2w-ThItXOZP5hHdmWDWPEtMxsB_0dsGNahp9yVksWcGRGL5mD0cka9rrhlMfBtU8K5RhGr5Z2UUrbnY2mCDrml-Fs6IP9mAk2R4CZcGkjXDLWN3A2-qQugHKe5qJ5YLz4pVU0JBTceqlBIFad0EzVHB8XESen7uTmTeqATF8WJJ04h1kJFUtE7Md468yZMN0Z0aEI__THKzAR4-JETTxj0f7VMQcAH1ijpOoB5-SGs');"></div>
+<div class="flex-1 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start">
+<div>
+<h3 class="text-lg font-bold text-slate-900">Nexus Pro Curved 49" Monitor</h3>
+<p class="text-xs text-slate-500 mt-1 uppercase tracking-wider font-semibold">SKU: NX-49-ULTRA | <span class="text-emerald-600 font-bold">In Stock</span></p>
+</div>
+<p class="text-xl font-extrabold text-slate-900">$1,499.00</p>
+</div>
+<p class="text-sm text-slate-500 mt-2 line-clamp-2">Ultra-wide 5K resolution with 240Hz refresh rate optimized for real-time market data visualization.</p>
+</div>
+<div class="flex items-center justify-between mt-6">
+<div class="flex items-center gap-3">
+<div class="flex items-center bg-white border border-slate-200 rounded-lg p-1 shadow-sm">
+<button class="size-8 flex items-center justify-center hover:bg-slate-50 text-slate-600 rounded-md transition-colors">
+<span class="material-symbols-outlined text-sm">remove</span>
+</button>
+<input class="w-10 bg-transparent border-none text-center text-sm font-semibold text-slate-900 focus:ring-0" type="number" value="1"/>
+<button class="size-8 flex items-center justify-center hover:bg-slate-50 text-slate-600 rounded-md transition-colors">
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+</div>
+<button class="flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-primary transition-colors ml-4">
+<span class="material-symbols-outlined text-sm">favorite</span>
+                                        Save for later
+                                    </button>
+</div>
+<button class="text-slate-400 hover:text-red-500 transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</div>
+<div class="glass-card rounded-xl p-4 flex flex-col sm:flex-row gap-6 transition-all hover:-translate-y-0.5 duration-300">
+<div class="w-full sm:w-48 aspect-video sm:aspect-square rounded-lg bg-cover bg-center shadow-sm" data-alt="Mechanical backlit professional trading keyboard" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBKlgCXyQFKIVnQ8XQpONmUs2yTsploz2JdPCQ8UehI_VtE2Fp7XR8PGZ18GHRWT2iUG6hfkCr_1vlLnu7EVJ-OLW85299N8gn2pHvOCC0ihsKiriQw5fEnrZoO5FgI0rpkJDvls6sJe5Z0bKrZ6ehMIrRBmIg69cmUVBgeJJJtIBgqHB2QWxfz8QU4aDVTm0OE9jwbgYvVnjMB89_7Rm0ze-FD7pm5uqUNpDA-YQum2keBCljmgZ3CWV7h3RgqngFwCHg9yjTYAsg');"></div>
+<div class="flex-1 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start">
+<div>
+<h3 class="text-lg font-bold text-slate-900">Nexus Stealth Mechanical Keyboard</h3>
+<p class="text-xs text-slate-500 mt-1 uppercase tracking-wider font-semibold">SKU: NX-KBD-V2 | <span class="text-emerald-600 font-bold">In Stock</span></p>
+</div>
+<p class="text-xl font-extrabold text-slate-900">$249.00</p>
+</div>
+<p class="text-sm text-slate-500 mt-2 line-clamp-2">Silent tactile switches with programmable macro keys for instant trade executions.</p>
+</div>
+<div class="flex items-center justify-between mt-6">
+<div class="flex items-center gap-3">
+<div class="flex items-center bg-white border border-slate-200 rounded-lg p-1 shadow-sm">
+<button class="size-8 flex items-center justify-center hover:bg-slate-50 text-slate-600 rounded-md transition-colors">
+<span class="material-symbols-outlined text-sm">remove</span>
+</button>
+<input class="w-10 bg-transparent border-none text-center text-sm font-semibold text-slate-900 focus:ring-0" type="number" value="2"/>
+<button class="size-8 flex items-center justify-center hover:bg-slate-50 text-slate-600 rounded-md transition-colors">
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+</div>
+<button class="flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-primary transition-colors ml-4">
+<span class="material-symbols-outlined text-sm">favorite</span>
+                                        Save for later
+                                    </button>
+</div>
+<button class="text-slate-400 hover:text-red-500 transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</div>
+<div class="glass-card rounded-xl p-4 flex flex-col sm:flex-row gap-6 transition-all hover:-translate-y-0.5 duration-300">
+<div class="w-full sm:w-48 aspect-video sm:aspect-square rounded-lg bg-cover bg-center shadow-sm" data-alt="Ergonomic high-back leather executive chair" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDOnrlRLj-z8GndPmEW0ofw5vGZ7SgR4oUeUPhlF7bwDOGGgsc6vgna5yuG1qfyQompLFz5B7eBeh7GOKdHov8dIYfONH6cHs-UEYzkPgJWUcljn02HfeqYimEyqmQPJQGk6qSCFAQNhQKiINtjbzxv-ulNnr3UOuySRp0hiEAVUXcN0P6QJupON-uWR38TZSGnfRpUjqPdW4YBPqWiuk-6FYfyAeOfXiBRPXcn42gc9kqGn6FuoNn33z7z6m6N4IRmJBzngIShgSw');"></div>
+<div class="flex-1 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start">
+<div>
+<h3 class="text-lg font-bold text-slate-900">Nexus Executive Ergonomic Chair</h3>
+<p class="text-xs text-slate-500 mt-1 uppercase tracking-wider font-semibold">SKU: NX-CHR-99 | <span class="text-amber-500 font-bold">Low Stock</span></p>
+</div>
+<p class="text-xl font-extrabold text-slate-900">$899.00</p>
+</div>
+<p class="text-sm text-slate-500 mt-2 line-clamp-2">Full lumbar support with 4D armrests designed for 12+ hour trading sessions.</p>
+</div>
+<div class="flex items-center justify-between mt-6">
+<div class="flex items-center gap-3">
+<div class="flex items-center bg-white border border-slate-200 rounded-lg p-1 shadow-sm">
+<button class="size-8 flex items-center justify-center hover:bg-slate-50 text-slate-600 rounded-md transition-colors">
+<span class="material-symbols-outlined text-sm">remove</span>
+</button>
+<input class="w-10 bg-transparent border-none text-center text-sm font-semibold text-slate-900 focus:ring-0" type="number" value="1"/>
+<button class="size-8 flex items-center justify-center hover:bg-slate-50 text-slate-600 rounded-md transition-colors">
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+</div>
+<button class="flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-primary transition-colors ml-4">
+<span class="material-symbols-outlined text-sm">favorite</span>
+                                        Save for later
+                                    </button>
+</div>
+<button class="text-slate-400 hover:text-red-500 transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="lg:col-span-1">
+<div class="sticky top-28 glass-card rounded-xl p-6 shadow-xl shadow-slate-200/50">
+<h3 class="text-xl font-bold mb-6 text-slate-900">Order Summary</h3>
+<div class="space-y-4 mb-6">
+<div class="flex justify-between text-sm">
+<span class="text-slate-500">Subtotal</span>
+<span class="font-semibold text-slate-900">$2,896.00</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-slate-500">Tax estimate (8%)</span>
+<span class="font-semibold text-slate-900">$231.68</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-slate-500">Secure Shipping</span>
+<span class="text-emerald-600 font-bold">FREE</span>
+</div>
+</div>
+<div class="relative mb-6">
+<input class="w-full bg-slate-50 border border-slate-200 rounded-lg py-3 px-4 text-sm text-slate-900 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder-slate-400" placeholder="Promo Code" type="text"/>
+<button class="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-bold text-primary px-3 py-1.5 hover:bg-primary/10 rounded-md transition-colors">APPLY</button>
+</div>
+<div class="pt-6 border-t border-slate-200 mb-8">
+<div class="flex justify-between items-center">
+<span class="text-lg font-medium text-slate-700">Order Total</span>
+<span class="text-3xl font-extrabold text-slate-900 tracking-tight">$3,127.68</span>
+</div>
+</div>
+<button class="w-full bg-primary hover:bg-blue-600 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-primary/30 transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined">lock</span>
+                            Proceed to Secure Checkout
+                        </button>
+<div class="mt-8 flex flex-wrap justify-center gap-6 opacity-60 text-slate-500">
+<div class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-tighter">
+<span class="material-symbols-outlined text-sm">verified_user</span>
+                                Encrypted
+                            </div>
+<div class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-tighter">
+<span class="material-symbols-outlined text-sm">local_shipping</span>
+                                Fast Delivery
+                            </div>
+<div class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-tighter">
+<span class="material-symbols-outlined text-sm">restart_alt</span>
+                                30-Day Return
+                            </div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-24">
+<div class="flex items-center justify-between mb-8">
+<h2 class="text-2xl font-bold text-slate-900">Recommended for Your Setup</h2>
+<button class="text-sm font-medium text-primary hover:underline hover:text-blue-700">View All Favorites</button>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="glass-card rounded-xl overflow-hidden group hover:shadow-lg transition-shadow bg-white">
+<div class="relative aspect-square bg-cover bg-center" data-alt="Designer trading desk mat and accessory" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDPqnf90IOmefpERNSAVbcLHlrq-YUO66FXgbaQpCtna32EtFxhO9bLKdMDxpoggXZGIFeS-D_nC5n9768k6OzcjavLKLkvq_j0gnGbJL_5ExCsbtabts_V-Ty3r_jTAPIy80Qf9PbbmkKf6KL7J06l0KEmw8Bx9qk3fvXHeISfqOm-iSo1wBgjC8aWD1dWhuTdiT84mfnU9LtdBxHRG5DU1hDfg3ieVxdl_DYFKHxa6WOIi751xbC1Fj-XTgAIGWqufncjtWs-pQk');">
+<div class="absolute inset-0 bg-white/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 backdrop-blur-sm">
+<button class="size-10 rounded-full bg-primary flex items-center justify-center text-white shadow-lg hover:bg-blue-600 transition-colors">
+<span class="material-symbols-outlined">shopping_cart</span>
+</button>
+<button class="size-10 rounded-full bg-white flex items-center justify-center text-slate-500 border border-slate-200 shadow-md hover:text-red-500 transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+<div class="absolute top-3 left-3 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm">20% OFF</div>
+</div>
+<div class="p-4">
+<h4 class="font-bold truncate text-slate-900">Premium Felt Desk Mat</h4>
+<div class="flex items-center gap-2 mt-1">
+<span class="text-lg font-bold text-slate-900">$79.00</span>
+<span class="text-sm text-slate-400 line-through">$99.00</span>
+</div>
+<button class="w-full mt-4 py-2 border border-primary text-primary text-sm font-bold rounded-lg hover:bg-primary hover:text-white transition-all shadow-sm">
+                                Move to Cart
+                            </button>
+</div>
+</div>
+<div class="glass-card rounded-xl overflow-hidden group hover:shadow-lg transition-shadow bg-white">
+<div class="relative aspect-square bg-cover bg-center" data-alt="Ergonomic trading mouse with side buttons" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDpn0oqP3hOMTsRMdjQXkETdM1pp96a0JRF0LipvFkzt53piOF0Uu6HY863NWGmBF-xpsrUwT5Dj-6YVdfEqOiqwsH3rtlgxj4Lq9wHCvUfhXcZPwrEzUIal7IiKoI6r9knz4KfSjoJhRkY1NK7-zvh4vDMFaKq6hXUyHJINKv-0Pw20drFYCQVtTKx-WxL5q9jgcZgTgkBNV8uywiDUfr-HC0tiYc7pNy6rLwrKH1LClXgdeGLAqrH6S6jmgA63mw-ED3xMdmux08');">
+<div class="absolute inset-0 bg-white/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 backdrop-blur-sm">
+<button class="size-10 rounded-full bg-primary flex items-center justify-center text-white shadow-lg hover:bg-blue-600 transition-colors">
+<span class="material-symbols-outlined">shopping_cart</span>
+</button>
+<button class="size-10 rounded-full bg-white flex items-center justify-center text-slate-500 border border-slate-200 shadow-md hover:text-red-500 transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+<div class="p-4">
+<h4 class="font-bold truncate text-slate-900">Precision FX Trading Mouse</h4>
+<div class="flex items-center gap-2 mt-1">
+<span class="text-lg font-bold text-slate-900">$129.00</span>
+</div>
+<button class="w-full mt-4 py-2 border border-primary text-primary text-sm font-bold rounded-lg hover:bg-primary hover:text-white transition-all shadow-sm">
+                                Move to Cart
+                            </button>
+</div>
+</div>
+<div class="glass-card rounded-xl overflow-hidden group hover:shadow-lg transition-shadow bg-white">
+<div class="relative aspect-square bg-cover bg-center" data-alt="Smart LED ambient lighting bar" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDsch8W4P5-mI8RlXiYW5C0mzfUhroWfQw-5y5FpgCPbuJd8rdRgA_ijO_zhjvumGTutjhHCebYKWSFf9ZCik2cqVNEWpxBZqkUcohnqqGRt5szPzN2F-x1Ghj6-5J5GkZzlMUoMbr8Z4pRxemR-GIY9cTMhvy2oFSy-OY_9Y5YEeXYqp8fJu83LJGGCWP17EWphyCBjts4ZPX0CbLTzspeN-mm0_riwJIJvvC4NHW2nlqADPa-vVUz-krr0xLXzqG45lsgbTSuLfU');">
+<div class="absolute inset-0 bg-white/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 backdrop-blur-sm">
+<button class="size-10 rounded-full bg-primary flex items-center justify-center text-white shadow-lg hover:bg-blue-600 transition-colors">
+<span class="material-symbols-outlined">shopping_cart</span>
+</button>
+<button class="size-10 rounded-full bg-white flex items-center justify-center text-slate-500 border border-slate-200 shadow-md hover:text-red-500 transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+<div class="p-4">
+<h4 class="font-bold truncate text-slate-900">Nexus Glo Smart Bar</h4>
+<div class="flex items-center gap-2 mt-1">
+<span class="text-lg font-bold text-slate-900">$59.00</span>
+</div>
+<button class="w-full mt-4 py-2 border border-primary text-primary text-sm font-bold rounded-lg hover:bg-primary hover:text-white transition-all shadow-sm">
+                                Move to Cart
+                            </button>
+</div>
+</div>
+<div class="glass-card rounded-xl overflow-hidden group hover:shadow-lg transition-shadow bg-white">
+<div class="relative aspect-square bg-cover bg-center" data-alt="Large screen tablet for trading charts" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCQkP-DbEU2Tpnq7fo8uANNYH29pQ79cSEssWhie5sdKgosiAnQvXn-oqEC4G6kFjfeqsJHZ70uA9zun64-u92WiMbVQajdp6dF1l08N_LZLGvPcoIXZycONbIJE3yDws_M5YbKhHgPSjAT9TLNEkrUYZNK1Ib46F_4_bt5ilndHfbW9oLB1JiIEOxEpOKG0rd5V_VNOsHHy3XlOuNzzeZpSDGvT0KwFE4C7bgSP3wEwyw0Y3aZnTc7L0bgvC1gtE7yw1bCsENl-BQ');">
+<div class="absolute inset-0 bg-white/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 backdrop-blur-sm">
+<button class="size-10 rounded-full bg-primary flex items-center justify-center text-white shadow-lg hover:bg-blue-600 transition-colors">
+<span class="material-symbols-outlined">shopping_cart</span>
+</button>
+<button class="size-10 rounded-full bg-white flex items-center justify-center text-slate-500 border border-slate-200 shadow-md hover:text-red-500 transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+<div class="p-4">
+<h4 class="font-bold truncate text-slate-900">Nexus Pad 12" Charting Tablet</h4>
+<div class="flex items-center gap-2 mt-1">
+<span class="text-lg font-bold text-slate-900">$799.00</span>
+</div>
+<button class="w-full mt-4 py-2 border border-primary text-primary text-sm font-bold rounded-lg hover:bg-primary hover:text-white transition-all shadow-sm">
+                                Move to Cart
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="mt-24 border-t border-slate-200 bg-white/50 px-8 py-12 backdrop-blur-sm">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+<div class="flex items-center gap-3">
+<div class="size-8 bg-primary flex items-center justify-center rounded-lg shadow-sm">
+<span class="material-symbols-outlined text-white text-lg">rocket_launch</span>
+</div>
+<h2 class="text-lg font-bold tracking-tight text-slate-800">NexusTrade</h2>
+</div>
+<div class="flex gap-8 text-sm text-slate-500">
+<a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="hover:text-primary transition-colors" href="#">Shipping Guide</a>
+<a class="hover:text-primary transition-colors" href="#">Help Center</a>
+</div>
+<div class="flex gap-4">
+<div class="size-8 bg-white rounded-full flex items-center justify-center border border-slate-200 text-slate-600 hover:text-primary hover:border-primary transition-colors shadow-sm">
+<span class="material-symbols-outlined text-sm">alternate_email</span>
+</div>
+<div class="size-8 bg-white rounded-full flex items-center justify-center border border-slate-200 text-slate-600 hover:text-primary hover:border-primary transition-colors shadow-sm">
+<span class="material-symbols-outlined text-sm">public</span>
+</div>
+</div>
+</div>
+<p class="text-center text-[10px] text-slate-400 mt-12 uppercase tracking-widest">© 2024 NexusTrade Systems International. All Rights Reserved.</p>
+</footer>
+</div>
+
+</body></html>

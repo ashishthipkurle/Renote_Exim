@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Secure Trade Checkout | TechTrade</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#0a0a0c",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-dark {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .glow-primary {
+            box-shadow: 0 0 20px rgba(19, 91, 236, 0.3);
+        }
+        .glow-text {
+            text-shadow: 0 0 10px rgba(19, 91, 236, 0.5);
+        }
+        .step-active {
+            box-shadow: 0 0 15px rgba(19, 91, 236, 0.6);
+        }
+        input:focus {
+            outline: none;
+            border-color: #135bec !important;
+            box-shadow: 0 0 0 2px rgba(19, 91, 236, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen selection:bg-primary/30">
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 z-50 border-b border-white/5 bg-background-dark/80 backdrop-blur-md px-6 lg:px-20 py-4">
+<div class="max-w-7xl mx-auto flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center glow-primary">
+<span class="material-symbols-outlined text-white text-2xl">shield_with_heart</span>
+</div>
+<h1 class="text-xl font-extrabold tracking-tight text-white uppercase italic">TechTrade</h1>
+</div>
+<nav class="hidden md:flex items-center gap-10">
+<a class="text-sm font-semibold text-slate-400 hover:text-primary transition-colors" href="#">Marketplace</a>
+<a class="text-sm font-semibold text-slate-400 hover:text-primary transition-colors" href="#">Portfolio</a>
+<a class="text-sm font-semibold text-slate-400 hover:text-primary transition-colors" href="#">Analytics</a>
+</nav>
+<div class="flex items-center gap-4">
+<div class="text-right hidden sm:block">
+<p class="text-xs text-slate-500 font-medium">Secured Connection</p>
+<p class="text-xs text-primary font-bold">Node: SG-429</p>
+</div>
+<div class="w-10 h-10 rounded-full bg-slate-800 border border-white/10 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="User profile avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBn9iEy487lS9JXookcCndie_2jejCAxG93hCjNs1cJGeKMQLm_lZDt_Bz7RTeR9wB9hz9-p6qMSlzyf2mPHSKiJn92UK19J7MKGL-hSOF2e2QtbfrDdk4faJdzik6JmcB5JWDpp7A39qfMTYgmfVLvCaoXszIHMPy3NHVcFPZYZhdmQg1Eh28h47JTLnxulxg8vej-GoC-cqQSe8wOUylFZV5tYNO3vLgylWL85Ng3fqaHxcv07VcJM9BsoLnp-LU3JK3P5jYC13c"/>
+</div>
+</div>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-6 lg:px-20 py-12">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+<!-- Left Column: Checkout Process -->
+<div class="lg:col-span-8 flex flex-col gap-10">
+<!-- Progress Tracker -->
+<div class="flex items-center justify-between relative px-2">
+<div class="absolute top-1/2 left-0 w-full h-0.5 bg-white/5 -translate-y-1/2 z-0"></div>
+<div class="absolute top-1/2 left-0 w-[66%] h-0.5 bg-primary -translate-y-1/2 z-0 shadow-[0_0_10px_rgba(19,91,236,0.5)]"></div>
+<div class="relative z-10 flex flex-col items-center gap-2 group">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white step-active">
+<span class="material-symbols-outlined text-xl">local_shipping</span>
+</div>
+<span class="text-xs font-bold text-primary tracking-wider uppercase">Shipping</span>
+</div>
+<div class="relative z-10 flex flex-col items-center gap-2">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white step-active ring-4 ring-primary/20">
+<span class="material-symbols-outlined text-xl">account_balance_wallet</span>
+</div>
+<span class="text-xs font-bold text-primary tracking-wider uppercase">Payment</span>
+</div>
+<div class="relative z-10 flex flex-col items-center gap-2">
+<div class="w-10 h-10 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center text-slate-400">
+<span class="material-symbols-outlined text-xl">verified</span>
+</div>
+<span class="text-xs font-bold text-slate-500 tracking-wider uppercase">Review</span>
+</div>
+</div>
+<!-- Form Section: Payment Method -->
+<section class="flex flex-col gap-6">
+<div>
+<h2 class="text-3xl font-extrabold text-white tracking-tight mb-2">Secure Payment</h2>
+<p class="text-slate-400">Select your preferred terminal for encrypted asset transfer.</p>
+</div>
+<!-- Payment Selectors -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+<button class="glass p-6 rounded-xl flex flex-col items-start gap-4 border-2 border-primary transition-all glow-primary">
+<div class="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">credit_card</span>
+</div>
+<div class="text-left">
+<p class="text-white font-bold">Credit Card</p>
+<p class="text-xs text-slate-500 mt-1">Stripe Gateway</p>
+</div>
+</button>
+<button class="glass p-6 rounded-xl flex flex-col items-start gap-4 hover:border-white/20 transition-all group">
+<div class="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-slate-400 group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">currency_bitcoin</span>
+</div>
+<div class="text-left">
+<p class="text-slate-300 font-bold group-hover:text-white">Web3 Wallet</p>
+<p class="text-xs text-slate-500 mt-1">Connect MetaMask</p>
+</div>
+</button>
+<button class="glass p-6 rounded-xl flex flex-col items-start gap-4 hover:border-white/20 transition-all group">
+<div class="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-slate-400 group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">account_balance</span>
+</div>
+<div class="text-left">
+<p class="text-slate-300 font-bold group-hover:text-white">Bank Transfer</p>
+<p class="text-xs text-slate-500 mt-1">Direct Wire</p>
+</div>
+</button>
+</div>
+<!-- Glassmorphic Card Mockup -->
+<div class="glass-dark p-8 rounded-2xl relative overflow-hidden group border-white/10">
+<div class="absolute -top-24 -right-24 w-64 h-64 bg-primary/20 rounded-full blur-[100px]"></div>
+<div class="relative z-10 flex flex-col gap-8">
+<div class="flex justify-between items-start">
+<div class="w-12 h-10 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-md opacity-80"></div>
+<span class="material-symbols-outlined text-white/40 text-4xl">contactless</span>
+</div>
+<div class="flex flex-col gap-1">
+<label class="text-[10px] uppercase tracking-[0.2em] text-slate-500 font-bold">Card Number</label>
+<input class="bg-transparent border-none p-0 text-xl md:text-2xl text-white font-mono tracking-widest focus:ring-0" type="text" value="4242 4242 4242 4242"/>
+</div>
+<div class="flex gap-12">
+<div class="flex flex-col gap-1">
+<label class="text-[10px] uppercase tracking-[0.2em] text-slate-500 font-bold">Expires</label>
+<input class="bg-transparent border-none p-0 text-white font-mono tracking-widest focus:ring-0 w-20" placeholder="MM/YY" type="text"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="text-[10px] uppercase tracking-[0.2em] text-slate-500 font-bold">CVC</label>
+<input class="bg-transparent border-none p-0 text-white font-mono tracking-widest focus:ring-0 w-12" type="password" value="***"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Billing Form -->
+<div class="glass p-8 rounded-xl grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="md:col-span-2">
+<label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Cardholder Name</label>
+<input class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white" placeholder="AXEL VANCE" type="text"/>
+</div>
+<div>
+<label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Billing Postal Code</label>
+<input class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white" placeholder="10001" type="text"/>
+</div>
+<div>
+<label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Region/City</label>
+<input class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white" placeholder="New York City" type="text"/>
+</div>
+</div>
+<!-- Security Badges -->
+<div class="flex flex-wrap gap-6 items-center py-4 px-2">
+<div class="flex items-center gap-2 text-emerald-400">
+<span class="material-symbols-outlined text-lg">encrypted</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">256-bit AES Encrypted</span>
+</div>
+<div class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined text-lg">verified_user</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Verified Merchant</span>
+</div>
+<div class="flex items-center gap-2 text-slate-500">
+<span class="material-symbols-outlined text-lg">lock</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">PCI-DSS Compliant</span>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Order Summary -->
+<div class="lg:col-span-4">
+<div class="sticky top-32 flex flex-col gap-6">
+<div class="glass p-8 rounded-2xl border-white/10 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
+<h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                            Trade Summary
+                            <span class="material-symbols-outlined text-primary">receipt_long</span>
+</h3>
+<div class="flex flex-col gap-4 mb-8">
+<div class="flex items-center gap-4">
+<div class="w-16 h-16 rounded-lg bg-slate-800 border border-white/5 flex-shrink-0 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Cryptographic hardware wallet" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCG8_BahQbHXbUuHHjAAoly_mLfSxhljpHGwFkXQf5RhMzRnIbSwcfxAG_Ugy_KKbbAmp2NugXjtAVtsXcA4Ev0MDXGXVtUFMFJN0wSajTiqRJxccEGDdZcX1fjSTST46thf0zauPFyjuIkl5J9jTBhN-tj1-0B-PJYAQ1jQtHKCwg1AFBxPK_cAMhYQIJBwk-UkBmK3tcfNZ0-2jC3PKm2pEbyzFDIaKv2HEKfUHZiQhhhWzF7AK2An-hlFGlNNJGCx16w7pq_GOA"/>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold text-white">Neural-Link Core v2</p>
+<p class="text-xs text-slate-500">Hardware Access Node</p>
+</div>
+<p class="text-sm font-bold text-white">$2,499.00</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-16 h-16 rounded-lg bg-slate-800 border border-white/5 flex-shrink-0 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="High tech circuit patterns" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwY2hXvvd0eJVQqbAG_vmvgoVNc7OpTvmx0c7ItjGYpWIx8kbec4g1jpuD-skQ2OEKEhwsr7J-9upFWsEo0cWfpKpEq_vqvLeeNWRBLZy-IZlXsjP0LJIRcmUbqJlMKJMKnbVYdsxF58T4Zh1unyVfjxZ3vvmKtYxscgcEpFX-1rYilTOIKIEAOf46rVsFa5b5QQZW5cyhF5sJR9y9ecit7lqwiqtPtBWQ1aryjBvH5T8W0jhLHmuUlTmHI1LJXQZ1fioqoTJ7Cec"/>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold text-white">Quantum Encryption Key</p>
+<p class="text-xs text-slate-500">Software Subscription</p>
+</div>
+<p class="text-sm font-bold text-white">$149.00</p>
+</div>
+</div>
+<div class="flex flex-col gap-3 py-6 border-y border-white/5">
+<div class="flex justify-between text-sm">
+<span class="text-slate-500">Subtotal</span>
+<span class="text-slate-300">$2,648.00</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-slate-500">Network Gas Fee</span>
+<span class="text-primary font-bold">+$12.45</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-slate-500">Secure Shipping</span>
+<span class="text-slate-300">FREE</span>
+</div>
+</div>
+<div class="flex justify-between items-end pt-6">
+<div>
+<p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Total Trade Value</p>
+<p class="text-4xl font-extrabold text-white glow-text">$2,660.45</p>
+</div>
+</div>
+</div>
+<!-- Main Action -->
+<button class="group relative w-full bg-primary py-5 rounded-xl text-white font-extrabold text-lg uppercase tracking-[0.2em] shadow-[0_0_30px_rgba(19,91,236,0.4)] hover:shadow-[0_0_50px_rgba(19,91,236,0.6)] transition-all overflow-hidden">
+<span class="relative z-10 flex items-center justify-center gap-3">
+                            Finalize Trade
+                            <span class="material-symbols-outlined">bolt</span>
+</span>
+<!-- Shimmer scan effect -->
+<div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
+</button>
+<p class="text-center text-[10px] text-slate-500 font-medium px-4">
+                        By clicking "Finalize Trade", you agree to the TechTrade Protocol Terms and authorize the immediate transfer of digital assets.
+                    </p>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Security Banner -->
+<footer class="mt-20 border-t border-white/5 py-10 px-6 bg-black/40">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
+<div class="flex items-center gap-6 opacity-40 grayscale hover:grayscale-0 transition-all">
+<span class="material-symbols-outlined text-4xl">security</span>
+<span class="material-symbols-outlined text-4xl">fingerprint</span>
+<span class="material-symbols-outlined text-4xl">vpn_lock</span>
+<span class="material-symbols-outlined text-4xl">database</span>
+</div>
+<div class="text-center md:text-right">
+<p class="text-xs text-slate-500">© 2024 TechTrade Systems Inc. • Encrypted Node ID: #88392-XX</p>
+<div class="flex gap-4 mt-2 justify-center md:justify-end">
+<a class="text-[10px] text-slate-400 hover:text-white uppercase tracking-widest" href="#">Privacy Protocol</a>
+<a class="text-[10px] text-slate-400 hover:text-white uppercase tracking-widest" href="#">Terms of Service</a>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

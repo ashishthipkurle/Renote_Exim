@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Global Trade Platform - Partner Directory</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "electric-blue": "#2563EB",
+                        "sidebar-light": "#F0F2F5",
+                        "icon-dark": "#1F2937","background-light": "#f6f6f8",
+                        "background-dark": "#0a0a0c",
+                        "card-dark": "#161b26",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .glass {
+            background: rgba(22, 27, 38, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .sidebar-midnight {
+            background: #000000;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .map-gradient {
+            background: radial-gradient(circle at center, #161b26 0%, #0a0a0c 100%);
+        }
+        .glow-point {
+            box-shadow: 0 0 15px 2px rgba(19, 91, 236, 0.6);
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(19, 91, 236, 0.3);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(19, 91, 236, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-200 antialiased overflow-hidden">
+<div class="flex h-screen w-full overflow-hidden">
+<aside class="w-20 lg:w-24 flex flex-col items-center py-8 sidebar-midnight z-50 transition-colors duration-300">
+<div class="mb-10">
+<div class="size-12 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-white text-3xl">language</span>
+</div>
+</div>
+<nav class="flex flex-col gap-6 flex-1 w-full px-4 items-center">
+<button class="p-3 rounded-xl text-gray-400 hover:bg-white/10 hover:text-white transition-all duration-200 group relative" title="Dashboard">
+<span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">home</span>
+</button>
+<button class="p-3 rounded-xl text-gray-400 hover:bg-white/10 hover:text-white transition-all duration-200 group relative" title="Categories">
+<span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">grid_view</span>
+</button>
+<button class="p-3 rounded-xl text-gray-400 hover:bg-white/10 hover:text-white transition-all duration-200 group relative" title="Inventory">
+<span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">inventory_2</span>
+</button>
+<button class="p-3 rounded-xl text-gray-400 hover:bg-white/10 hover:text-white transition-all duration-200 group relative" title="Orders">
+<span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">local_shipping</span>
+</button>
+<button class="p-3 rounded-xl bg-electric-blue text-white shadow-[0_0_15px_rgba(37,99,235,0.5)] transition-all duration-200 relative group w-full flex justify-center" title="Directory">
+<span class="material-symbols-outlined text-2xl text-white" style="font-variation-settings: 'FILL' 1">location_on</span>
+</button>
+<button class="p-3 rounded-xl text-gray-400 hover:bg-white/10 hover:text-white transition-all duration-200 group relative" title="Analytics">
+<span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">bar_chart</span>
+</button>
+<button class="p-3 rounded-xl text-gray-400 hover:bg-white/10 hover:text-white transition-all duration-200 group relative" title="Finance">
+<span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">account_balance_wallet</span>
+</button>
+</nav>
+<div class="flex flex-col gap-6 mt-auto w-full px-4 items-center">
+<button class="p-3 rounded-xl text-gray-400 hover:bg-white/10 hover:text-white transition-all duration-200 group" title="Settings">
+<span class="material-symbols-outlined text-2xl group-hover:rotate-45 transition-transform">settings</span>
+</button>
+<div class="size-10 rounded-full border-2 border-white/20 shadow-sm p-0.5 bg-black">
+<img alt="User avatar" class="rounded-full w-full h-full object-cover" data-alt="Professional user profile picture avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5y-3m8pEjr3DCWHz2uHHZM9t4NH82hYcyBF7_NKcivlDL7_0yTtyJva5C4Mnw0SkqDBLqgg0Ud3TWUkGbYFgYzZqCpf2TVG-UQT1JM3Pb35qtQBaIcdaQmQ-EAyYUaIzqNG0k5lGbvkCmADLDH8y8xzn2B0DNPE7zmlZCgEHe-p7FYUt8DZro3VGHf3KqHday0CJqLGoIZJu4x0LfhrvXiVghsbQHBpZtadH2eTko0OjyAi9LbYSvaMKRwC12Ydv1r2U2hHR-6Jo"/>
+</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-row overflow-hidden">
+<section class="relative w-3/5 h-full map-gradient overflow-hidden flex flex-col">
+<header class="p-8 z-20">
+<h1 class="text-3xl font-extrabold tracking-tight text-white mb-2">Worldwide Partner Directory</h1>
+<p class="text-slate-400 font-medium">Real-time global connectivity and verified trade routes.</p>
+</header>
+<div class="absolute inset-0 z-10 opacity-40 mix-blend-screen pointer-events-none">
+<img alt="World Map" class="w-full h-full object-cover grayscale brightness-50" data-alt="Futuristic dark world map with data points" data-location="World Map" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAqFOhN7OR1QHCvDwKOebnKsukb-5lMlXX_mgyydVYHPvSTWtll_Vo2deMeXa0xeXsg3U_BQbbE77d6ic0vTnEo3H0rv0c7vfxfmx--2pmSkCweh3GcxaYD0PnAbiC3wG8yL2FExeyr9H42GnsiBDuM5HjNI__bv5lUk2GzOkqPNmDGHwd50SP3x9bArs2eNrHP1cx_DgPpOVDGiVenZEqBhJdsSg7xOKfSS2jbmWWIiDC7o2k7OPZ95M-8uh3f0ICkSGx-rmvA0M"/>
+</div>
+<div class="absolute inset-0 z-10 pointer-events-none">
+<div class="absolute top-[38%] left-[82%] group pointer-events-auto cursor-pointer">
+<div class="size-3 bg-primary rounded-full glow-point animate-pulse"></div>
+<div class="absolute top-6 left-1/2 -translate-x-1/2 px-3 py-1 bg-black/80 backdrop-blur-md rounded border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="text-[10px] font-bold text-white uppercase tracking-widest">Shanghai</span>
+</div>
+</div>
+<div class="absolute top-[35%] left-[28%] group pointer-events-auto cursor-pointer">
+<div class="size-3 bg-primary rounded-full glow-point animate-pulse"></div>
+<div class="absolute top-6 left-1/2 -translate-x-1/2 px-3 py-1 bg-black/80 backdrop-blur-md rounded border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="text-[10px] font-bold text-white uppercase tracking-widest">New York</span>
+</div>
+</div>
+<div class="absolute top-[28%] left-[49%] group pointer-events-auto cursor-pointer">
+<div class="size-3 bg-primary rounded-full glow-point animate-pulse"></div>
+<div class="absolute top-6 left-1/2 -translate-x-1/2 px-3 py-1 bg-black/80 backdrop-blur-md rounded border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="text-[10px] font-bold text-white uppercase tracking-widest">Rotterdam</span>
+</div>
+</div>
+</div>
+<div class="absolute bottom-8 left-8 right-8 z-20">
+<div class="glass p-6 rounded-2xl flex items-center justify-between">
+<div class="flex flex-col gap-1">
+<span class="text-xs font-bold text-primary tracking-[0.2em] uppercase">Global Coverage</span>
+<div class="text-2xl font-bold text-white">Live Node Tracking</div>
+</div>
+<div class="flex gap-8">
+<div class="flex flex-col">
+<span class="text-slate-400 text-sm font-medium">Asia Pacific</span>
+<div class="flex items-center gap-2">
+<span class="text-2xl font-bold text-white">1,240</span>
+<span class="text-emerald-400 text-xs font-bold">+12%</span>
+</div>
+</div>
+<div class="w-px h-10 bg-white/10"></div>
+<div class="flex flex-col">
+<span class="text-slate-400 text-sm font-medium">Europe</span>
+<div class="flex items-center gap-2">
+<span class="text-2xl font-bold text-white">890</span>
+<span class="text-emerald-400 text-xs font-bold">+5%</span>
+</div>
+</div>
+<div class="w-px h-10 bg-white/10"></div>
+<div class="flex flex-col">
+<span class="text-slate-400 text-sm font-medium">North America</span>
+<div class="flex items-center gap-2">
+<span class="text-2xl font-bold text-white">1,100</span>
+<span class="text-emerald-400 text-xs font-bold">+8%</span>
+</div>
+</div>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-xl font-bold transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">download</span>
+                            Export Data
+                        </button>
+</div>
+</div>
+</section>
+<section class="w-2/5 h-full bg-[#0f141f] border-l border-white/5 flex flex-col">
+<div class="p-8 border-b border-white/5 space-y-6">
+<div class="flex items-center justify-between">
+<h2 class="text-xl font-bold text-white">Verified Partners</h2>
+<span class="bg-primary/20 text-primary text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-primary/20">3,230 Active</span>
+</div>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all" placeholder="Search partners, regions, or sectors..." type="text"/>
+</div>
+<div class="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+<button class="px-4 py-2 bg-primary text-white text-xs font-bold rounded-lg whitespace-nowrap">All Partners</button>
+<button class="px-4 py-2 bg-white/5 text-slate-400 hover:text-white text-xs font-bold rounded-lg whitespace-nowrap border border-white/5 transition-colors">Logistics</button>
+<button class="px-4 py-2 bg-white/5 text-slate-400 hover:text-white text-xs font-bold rounded-lg whitespace-nowrap border border-white/5 transition-colors">Manufacturing</button>
+<button class="px-4 py-2 bg-white/5 text-slate-400 hover:text-white text-xs font-bold rounded-lg whitespace-nowrap border border-white/5 transition-colors">Technology</button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-8 space-y-4">
+<div class="glass p-5 rounded-2xl group hover:border-primary/40 transition-all hover:bg-white/[0.04]">
+<div class="flex gap-4">
+<div class="size-14 rounded-xl overflow-hidden bg-slate-800 flex-shrink-0">
+<img alt="Shanghai Steel Corp" class="w-full h-full object-cover" data-alt="Corporate headquarters building logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPiatTZ3qwDTDQNaINCoIgoylAodOJTyD1vzCrShcTuQD-_BxsSq69xHckdS-AI8pzomgDBAxDUKTpWMHQGz75YDSYHOfYs16fJ-Z-TwYLsPpHrXF4-I6tydIuREhJYfq058NVh9MI5_gycQXqdL8HjZcAt5CaBksr_azpwsf6GbGrMtAb7dlvDakPS6cUDGK1uC477VW_MunfU8V7GhxsF6bsCfaxRAT6oMVuDnUFcHwc7Nj7p3ssl4tIVn7Xv15NPZg8VQgGBow"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-2 mb-1">
+<h3 class="text-white font-bold truncate">Shanghai Steel Corp.</h3>
+<span class="material-symbols-outlined text-primary text-lg" title="Verified">verified</span>
+</div>
+<div class="flex items-center gap-3 text-xs text-slate-400">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-slate-500">location_on</span>
+                                        Shanghai, CN
+                                    </div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-yellow-500">star</span>
+                                        4.9
+                                    </div>
+</div>
+</div>
+</div>
+<div class="mt-5 flex items-center justify-between gap-3">
+<div class="flex gap-2">
+<span class="bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded border border-primary/10">PREMIUM</span>
+<span class="bg-emerald-500/10 text-emerald-500 text-[10px] font-bold px-2 py-0.5 rounded border border-emerald-500/10">ACTIVE</span>
+</div>
+<button class="bg-primary/10 hover:bg-primary text-primary hover:text-white px-4 py-2 rounded-lg text-xs font-bold transition-all border border-primary/20">
+                                Connect
+                            </button>
+</div>
+</div>
+<div class="glass p-5 rounded-2xl group hover:border-primary/40 transition-all hover:bg-white/[0.04]">
+<div class="flex gap-4">
+<div class="size-14 rounded-xl overflow-hidden bg-slate-800 flex-shrink-0">
+<img alt="TechAuto Robotics" class="w-full h-full object-cover" data-alt="Modern tech office glass architecture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtMqH5V-tDt9eWUsxWGd9f9qQcrXbYOsGy797_3-3-4R98nRLAKoUj8IQbFVamBumjaxJP-0O_JysYLCPU3CsxCmVCz3WEm6eQH4ih-CZy3ziBJxjgbauC8tqCgRfVqh9cwAoe9Qkdb4RevLfMLJajmKvps33EokKIr-Zu55V6wrhhHGeXGZsGn05dBMxILB-e-m_RZda_LnTt5rja02frSDdi3gCh64HiuR68Kg_luKDgdn6cPX4iNlRImvTfQsVhz37TN9_cyPg"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-2 mb-1">
+<h3 class="text-white font-bold truncate">TechAuto Robotics</h3>
+<span class="material-symbols-outlined text-primary text-lg" title="Verified">verified</span>
+</div>
+<div class="flex items-center gap-3 text-xs text-slate-400">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-slate-500">location_on</span>
+                                        Munich, DE
+                                    </div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-yellow-500">star</span>
+                                        5.0
+                                    </div>
+</div>
+</div>
+</div>
+<div class="mt-5 flex items-center justify-between gap-3">
+<div class="flex gap-2">
+<span class="bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded border border-primary/10">PREMIUM</span>
+</div>
+<button class="bg-primary/10 hover:bg-primary text-primary hover:text-white px-4 py-2 rounded-lg text-xs font-bold transition-all border border-primary/20">
+                                Connect
+                            </button>
+</div>
+</div>
+<div class="glass p-5 rounded-2xl group hover:border-primary/40 transition-all hover:bg-white/[0.04]">
+<div class="flex gap-4">
+<div class="size-14 rounded-xl overflow-hidden bg-slate-800 flex-shrink-0">
+<img alt="Global Logistics Ltd" class="w-full h-full object-cover" data-alt="Logistics container port aerial view" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrqDNj1nlqMyBkh7Ok1woXUc5aEZc7JVJ-hRzPcPHAy3-RtdauMolmIiMy21AI48irkbRdoqm0u35a9ooge2tspfdMUwOXc9ik_0xD_OsnMkeL0TXNJphld5HBs0Sz69UAPKyxMtkv1INyL9VMEtxUTQ_oV0BJy6KpvrohePodq8P_TYDkyIMdyi6-YTK1BS5Y_H9Wkeo4plFNMmq7Cmv35s0vtHG7WYSuLzesGK7lS0FWegubNANNvRdYbv9WhdZ3XgTzILWjXU8"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-2 mb-1">
+<h3 class="text-white font-bold truncate">Global Logistics Ltd.</h3>
+</div>
+<div class="flex items-center gap-3 text-xs text-slate-400">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-slate-500">location_on</span>
+                                        New Jersey, US
+                                    </div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-yellow-500">star</span>
+                                        4.7
+                                    </div>
+</div>
+</div>
+</div>
+<div class="mt-5 flex items-center justify-between gap-3">
+<div class="flex gap-2">
+<span class="bg-white/5 text-slate-500 text-[10px] font-bold px-2 py-0.5 rounded border border-white/5 uppercase tracking-wider">Verified Soon</span>
+</div>
+<button class="bg-primary/10 hover:bg-primary text-primary hover:text-white px-4 py-2 rounded-lg text-xs font-bold transition-all border border-primary/20">
+                                Connect
+                            </button>
+</div>
+</div>
+<div class="glass p-5 rounded-2xl group hover:border-primary/40 transition-all hover:bg-white/[0.04]">
+<div class="flex gap-4">
+<div class="size-14 rounded-xl overflow-hidden bg-slate-800 flex-shrink-0">
+<img alt="Nordic Energy" class="w-full h-full object-cover" data-alt="Clean energy research facility lab" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwQFDHLdr_X7qGF0NyJ2VHZRPf07a-ZbIN8oiEmSNoS1LX77yRPODe09bcQqfCjDru8i-G1wPbp9uSFe9QCUMuwQ40f7iDAGLkgeV_ozCXmMetk3DOS6nagPgpks8FkNp3CTLDkotC_JLOmpB79s9JE8a7kkimbEpcAHDnF1uBkBG4ctclRcQOmr-wn02xGcZCOTGnNJCUzjED3zAxcJiBFliIL-Y4TrTLKp2tbk-_aexCgwl1iN8tjCPt_L-27J7sEJQRBzW-DZA"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-2 mb-1">
+<h3 class="text-white font-bold truncate">Nordic Energy Solutions</h3>
+<span class="material-symbols-outlined text-primary text-lg" title="Verified">verified</span>
+</div>
+<div class="flex items-center gap-3 text-xs text-slate-400">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-slate-500">location_on</span>
+                                        Oslo, NO
+                                    </div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-yellow-500">star</span>
+                                        4.8
+                                    </div>
+</div>
+</div>
+</div>
+<div class="mt-5 flex items-center justify-between gap-3">
+<div class="flex gap-2">
+<span class="bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded border border-primary/10 uppercase tracking-wider">Premium Partner</span>
+</div>
+<button class="bg-primary/10 hover:bg-primary text-primary hover:text-white px-4 py-2 rounded-lg text-xs font-bold transition-all border border-primary/20">
+                                Connect
+                            </button>
+</div>
+</div>
+</div>
+<div class="p-6 border-t border-white/5 bg-background-dark/50 backdrop-blur-md">
+<button class="w-full py-4 border border-white/10 text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined">filter_list</span>
+                        Advanced Filters
+                    </button>
+</div>
+</section>
+</main>
+</div>
+</body></html>

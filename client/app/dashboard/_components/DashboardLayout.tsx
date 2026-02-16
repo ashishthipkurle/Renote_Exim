@@ -1,0 +1,166 @@
+"use client";
+
+import { ReactNode } from "react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import {
+  LayoutDashboard,
+  Package,
+  ShoppingCart,
+  Truck,
+  MessageSquare,
+  FileText,
+  Bell,
+  BarChart3,
+  Settings,
+  LogOut,
+  Globe2,
+  Menu,
+  X,
+} from "lucide-react";
+import { useState } from "react";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
+
+interface DashboardLayoutProps {
+  children: ReactNode;
+  role: "exporter" | "importer" | "admin";
+}
+
+const navigationByRole = {
+  exporter: [
+    { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/exporter" },
+    { icon: Package, label: "My Products", href: "/dashboard/exporter/products" },
+    { icon: ShoppingCart, label: "Orders", href: "/dashboard/exporter/orders" },
+    { icon: Truck, label: "Shipments", href: "/dashboard/exporter/shipments" },
+    { icon: MessageSquare, label: "Messages", href: "/dashboard/exporter/messages" },
+    { icon: FileText, label: "Documents", href: "/dashboard/exporter/documents" },
+  ],
+  importer: [
+    { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/importer" },
+    { icon: Package, label: "Browse Products", href: "/dashboard/importer/browse" },
+    { icon: ShoppingCart, label: "My Orders", href: "/dashboard/importer/orders" },
+    { icon: Truck, label: "Shipments", href: "/dashboard/importer/shipments" },
+    { icon: MessageSquare, label: "Messages", href: "/dashboard/importer/messages" },
+    { icon: FileText, label: "Documents", href: "/dashboard/importer/documents" },
+  ],
+  admin: [
+    { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/admin" },
+    { icon: Package, label: "All Products", href: "/dashboard/admin/products" },
+    { icon: ShoppingCart, label: "All Orders", href: "/dashboard/admin/orders" },
+    { icon: Truck, label: "Shipments", href: "/dashboard/admin/shipments" },
+    { icon: BarChart3, label: "Analytics", href: "/dashboard/admin/analytics" },
+    { icon: FileText, label: "Users", href: "/dashboard/admin/users" },
+    { icon: Bell, label: "Notifications", href: "/dashboard/admin/notifications" },
+  ],
+};
+
+export default function DashboardLayout({ children, role }: DashboardLayoutProps) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const navigation = navigationByRole[role];
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch {
+      // ignore
+    }
+    document.cookie = "auth_token=; path=/; max-age=0";
+    localStorage.removeItem("user");
+    router.push("/login");
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Top Bar */}
+      <header className="fixed top-0 left-0 right-0 h-16 bg-background/80 backdrop-blur border-b border-border z-30">
+        <div className="h-full px-4 flex items-center justify-between">
+          {/* Left */}
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              className="lg:hidden p-2 hover:bg-accent rounded-lg"
+            >
+              {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+
+            <Link href="/" className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                <Globe2 className="text-white" size={20} />
+              </div>
+              <span className="font-bold text-lg hidden sm:inline">
+                Renote <span className="text-blue-600">Exim</span>
+              </span>
+            </Link>
+          </div>
+
+          {/* Right */}
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
+            <button className="relative p-2 hover:bg-accent rounded-lg">
+              <Bell size={20} />
+              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+            <Link href="/dashboard/settings">
+              <button className="p-2 hover:bg-accent rounded-lg">
+                <Settings size={20} />
+              </button>
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="p-2 hover:bg-destructive/10 text-destructive rounded-lg"
+            >
+              <LogOut size={20} />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Sidebar */}
+      <aside
+        className={`fixed top-16 left-0 bottom-0 w-64 bg-background border-r border-border z-20 transition-transform lg:translate-x-0 ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <nav className="p-4 space-y-2">
+          {navigation.map((item) => {
+            const Icon = item.icon;
+            const isActive = pathname === item.href;
+
+            return (
+              <Link key={item.href} href={item.href}>
+                <motion.div
+                  whileHover={{ x: 4 }}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                    isActive
+                      ? "bg-accent text-primary"
+                      : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                  }`}
+                >
+                  <Icon size={20} />
+                  <span className="font-medium">{item.label}</span>
+                </motion.div>
+              </Link>
+            );
+          })}
+        </nav>
+      </aside>
+
+      {/* Main Content */}
+      <main className="lg:ml-64 pt-16">
+        <div className="p-6">{children}</div>
+      </main>
+
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div
+          onClick={() => setIsSidebarOpen(false)}
+          className="fixed inset-0 bg-black/50 z-10 lg:hidden"
+        />
+      )}
+    </div>
+  );
+}

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Global Trade - Discovery Marketplace</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#0a0c10",
+                        "glass-border": "rgba(255, 255, 255, 0.1)",
+                        "glass-bg": "rgba(255, 255, 255, 0.03)",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+            background: radial-gradient(circle at top right, #135bec20, transparent), #0a0c10;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .neon-glow {
+            box-shadow: 0 0 15px rgba(19, 91, 236, 0.3);
+        }
+        .neon-text {
+            text-shadow: 0 0 8px rgba(19, 91, 236, 0.6);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #135bec40;
+            border-radius: 10px;
+        }
+        .masonry {
+            column-count: 3;
+            column-gap: 1.5rem;
+        }
+        .masonry-item {
+            break-inside: avoid;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-white min-h-screen font-display overflow-x-hidden">
+<div class="flex h-screen overflow-hidden">
+<aside class="w-24 flex flex-col items-center py-8 glass border-r border-glass-border z-50">
+<div class="mb-12">
+<div class="size-12 bg-primary rounded-xl flex items-center justify-center neon-glow">
+<span class="material-symbols-outlined text-white text-3xl">deployed_code</span>
+</div>
+</div>
+<nav class="flex flex-col gap-8 flex-1">
+<button class="p-3 rounded-xl transition-all text-slate-400 hover:text-white hover:bg-white/5" title="Dashboard">
+<span class="material-symbols-outlined text-2xl">dashboard</span>
+</button>
+<button class="p-3 rounded-xl transition-all text-primary bg-primary/10 neon-glow" title="All Categories">
+<span class="material-symbols-outlined text-2xl">grid_view</span>
+</button>
+<button class="p-3 rounded-xl transition-all text-slate-400 hover:text-white hover:bg-white/5" title="Inventory">
+<span class="material-symbols-outlined text-2xl">box</span>
+</button>
+<button class="p-3 rounded-xl transition-all text-slate-400 hover:text-white hover:bg-white/5" title="Orders">
+<span class="material-symbols-outlined text-2xl">local_shipping</span>
+</button>
+<button class="p-3 rounded-xl transition-all text-slate-400 hover:text-white hover:bg-white/5" title="Analytics">
+<span class="material-symbols-outlined text-2xl">bar_chart</span>
+</button>
+<button class="p-3 rounded-xl transition-all text-slate-400 hover:text-white hover:bg-white/5" title="Finance">
+<span class="material-symbols-outlined text-2xl">account_balance_wallet</span>
+</button>
+</nav>
+<div class="mt-auto flex flex-col gap-6">
+<button class="p-3 rounded-xl transition-all text-slate-400 hover:text-white hover:bg-white/5" title="Settings">
+<span class="material-symbols-outlined text-2xl">settings</span>
+</button>
+<div class="size-10 rounded-full border-2 border-primary/50 overflow-hidden cursor-pointer hover:border-primary transition-all p-0.5" title="Profile">
+<img class="w-full h-full rounded-full object-cover" data-alt="User profile avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCj_QRT7mdkEeQan-XHVvTkQxWGY71E6mBY8FmgX6cxecTGn8INSwx17XH79Z8KdJUrXQUfo3H9yyjR9hf-A5Ty7M81NxcE2ANe5XYrfIcQNpmjwPZ1aA4bV1x1k_TNjJrF_qNh8kw_SfXBjZGxEfM5BoojL12LpdxYVrXYeurr72M42ziYpvsohTJpScNqzuNI_eur2Q59scWrJOAf148LRdkRJhUYS65CrbmdyjSKXc11DzAHrdK_BNp8KszLUWlxxOgp-iRs7_0"/>
+</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-col overflow-hidden">
+<header class="h-20 glass flex items-center justify-between px-10 border-b border-glass-border">
+<div class="flex-1 max-w-2xl">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full bg-white/5 border border-glass-border rounded-xl py-3 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-slate-500" placeholder="Search premium assets, industrial chips, raw materials..." type="text"/>
+<div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+<span class="text-[10px] border border-glass-border px-1.5 py-0.5 rounded text-slate-500 font-bold uppercase tracking-wider">Alt + K</span>
+<button class="bg-primary/20 hover:bg-primary/30 text-primary text-xs font-bold px-3 py-1.5 rounded-lg transition-all border border-primary/30">AI Search</button>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-6 ml-10">
+<div class="flex flex-col items-end">
+<span class="text-xs text-slate-500 uppercase tracking-widest font-bold">Market Status</span>
+<span class="text-xs text-green-400 flex items-center gap-1 font-bold">
+<span class="size-1.5 bg-green-400 rounded-full animate-pulse"></span>
+                            ACTIVE TRADING
+                        </span>
+</div>
+<div class="h-8 w-px bg-glass-border"></div>
+<button class="relative p-2 text-slate-400 hover:text-white transition-all">
+<span class="material-symbols-outlined text-2xl">notifications</span>
+<span class="absolute top-2 right-2 size-2 bg-primary rounded-full neon-glow"></span>
+</button>
+<button class="p-2 text-slate-400 hover:text-white transition-all">
+<span class="material-symbols-outlined text-2xl">translate</span>
+</button>
+</div>
+</header>
+<div class="flex-1 flex overflow-hidden">
+<aside class="w-80 glass border-r border-glass-border p-8 overflow-y-auto custom-scrollbar">
+<div class="flex items-center justify-between mb-8">
+<h3 class="text-lg font-bold tracking-tight">Advanced Filters</h3>
+<button class="text-xs text-primary font-bold hover:underline">Clear all</button>
+</div>
+<div class="mb-10">
+<h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Categories</h4>
+<div class="space-y-3">
+<label class="flex items-center group cursor-pointer">
+<div class="size-5 rounded border border-glass-border flex items-center justify-center mr-3 group-hover:border-primary transition-all bg-white/5">
+<div class="size-2.5 bg-primary rounded-sm opacity-0 group-hover:opacity-100 transition-opacity neon-glow"></div>
+</div>
+<span class="text-sm text-slate-300 group-hover:text-white transition-colors">Industrial Electronics</span>
+</label>
+<label class="flex items-center group cursor-pointer">
+<div class="size-5 rounded border border-primary flex items-center justify-center mr-3 transition-all bg-primary/10">
+<div class="size-2.5 bg-primary rounded-sm opacity-100 neon-glow"></div>
+</div>
+<span class="text-sm text-white font-medium">Raw Materials</span>
+</label>
+<label class="flex items-center group cursor-pointer">
+<div class="size-5 rounded border border-glass-border flex items-center justify-center mr-3 group-hover:border-primary transition-all bg-white/5">
+<div class="size-2.5 bg-primary rounded-sm opacity-0 group-hover:opacity-100 transition-opacity neon-glow"></div>
+</div>
+<span class="text-sm text-slate-300 group-hover:text-white transition-colors">Luxury Goods</span>
+</label>
+<label class="flex items-center group cursor-pointer">
+<div class="size-5 rounded border border-glass-border flex items-center justify-center mr-3 group-hover:border-primary transition-all bg-white/5">
+<div class="size-2.5 bg-primary rounded-sm opacity-0 group-hover:opacity-100 transition-opacity neon-glow"></div>
+</div>
+<span class="text-sm text-slate-300 group-hover:text-white transition-colors">Precision Machinery</span>
+</label>
+</div>
+</div>
+<div class="mb-10">
+<h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Price Range (USD)</h4>
+<div class="space-y-6">
+<div class="relative h-1 bg-white/10 rounded-full">
+<div class="absolute inset-y-0 left-1/4 right-1/4 bg-primary neon-glow"></div>
+<div class="absolute top-1/2 left-1/4 -translate-y-1/2 size-4 bg-white rounded-full border-2 border-primary shadow-lg cursor-pointer"></div>
+<div class="absolute top-1/2 right-1/4 -translate-y-1/2 size-4 bg-white rounded-full border-2 border-primary shadow-lg cursor-pointer"></div>
+</div>
+<div class="flex justify-between gap-4">
+<div class="flex-1 bg-white/5 border border-glass-border rounded-lg p-2 text-center">
+<span class="text-[10px] text-slate-500 block">MIN</span>
+<span class="text-sm font-bold">$1,200</span>
+</div>
+<div class="flex-1 bg-white/5 border border-glass-border rounded-lg p-2 text-center">
+<span class="text-[10px] text-slate-500 block">MAX</span>
+<span class="text-sm font-bold">$18,500</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mb-10">
+<h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Region of Origin</h4>
+<div class="relative h-32 w-full rounded-xl overflow-hidden border border-glass-border">
+<div class="absolute inset-0 bg-slate-900 flex items-center justify-center">
+<img class="w-full h-full object-cover opacity-40 grayscale" data-alt="Abstract world map for region filtering" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJfRRQxqBgTsEPjvWYxxST2stmME3rMKqGGx-e3tio2cH_nFUvKKp_44A18qbx9Kf_RvXEhl4Xxgt1qpIZ11bB9qHLXUZsfywvXl_bOUsGuPN3J_gid2u93IqxCZ9xFVevhM02MhOBbLsgVkleAIdwIG1ttACMPmg8pF2mKKNwbq9cz1P_ysHyzUwv2SnYjQ00A2EFePPYB3HDwFrunRpQhKJz-xIp4vg1upnjaNf7_gtitNdlv9W9LwZ31napppm7sTmIgteXS6E"/>
+<div class="absolute size-3 bg-primary rounded-full neon-glow" style="top: 30%; left: 45%;"></div>
+<div class="absolute size-2 bg-white rounded-full animate-ping" style="top: 30%; left: 45%;"></div>
+</div>
+<div class="absolute bottom-2 left-2 right-2 glass py-1 px-3 rounded-lg text-xs font-medium text-center">Global Selection</div>
+</div>
+</div>
+<div class="mb-10">
+<h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Trade Type</h4>
+<div class="grid grid-cols-2 gap-2">
+<button class="bg-primary border border-primary text-white text-xs font-bold py-2 rounded-lg neon-glow">B2B Bulk</button>
+<button class="bg-white/5 border border-glass-border text-slate-400 text-xs font-bold py-2 rounded-lg hover:text-white transition-all">Direct B2C</button>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 rounded-xl border border-glass-border bg-white/5">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary neon-text">verified</span>
+<span class="text-sm font-bold">Verified Only</span>
+</div>
+<div class="w-10 h-5 bg-primary/40 rounded-full relative cursor-pointer">
+<div class="absolute right-0.5 top-0.5 size-4 bg-white rounded-full shadow-md"></div>
+</div>
+</div>
+</aside>
+<section class="flex-1 overflow-y-auto custom-scrollbar p-10">
+<div class="flex items-end justify-between mb-8">
+<div>
+<h2 class="text-4xl font-extrabold tracking-tight mb-2">Marketplace <span class="text-primary neon-text">Discovery</span></h2>
+<p class="text-slate-400">Showing 1,284 premium industrial and commodity listings</p>
+</div>
+<div class="flex gap-4">
+<div class="flex items-center glass px-4 py-2 rounded-xl border border-glass-border text-sm">
+<span class="text-slate-500 mr-2">Sort by:</span>
+<span class="font-bold flex items-center gap-1 cursor-pointer">Relevance <span class="material-symbols-outlined text-sm">expand_more</span></span>
+</div>
+<div class="flex bg-white/5 rounded-xl border border-glass-border p-1">
+<button class="p-2 bg-primary rounded-lg shadow-lg"><span class="material-symbols-outlined">grid_view</span></button>
+<button class="p-2 text-slate-500 hover:text-white"><span class="material-symbols-outlined">view_list</span></button>
+</div>
+</div>
+</div>
+<div class="masonry">
+<div class="masonry-item">
+<div class="group relative overflow-hidden glass rounded-xl border border-glass-border transition-all duration-500 hover:border-primary/50 hover:neon-glow hover:-translate-y-1">
+<div class="aspect-[4/3] overflow-hidden relative">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="High quality macro image of a Quantum Processor chip" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDb8n42JIqkKXhtma8MQHvCv0jORbofr7u-IcYMTBOr4LtEIJKNezBM5j7LOUFjDjzsnr2HF75A4PKB0vAMZbSfBaKKHt3pbfnNHbXRqKqh0u1QEaO8PiMT1VpKnLxHWP10aBNsSZjWavGSIcKluuSzhT3S0gyrWgx8V5sWWFbfZscE1BNfIBTHVZHe83Hv3FY2OyCx5ggiTbpC2eXfXnijyBDZURfhH1RIOWKbKNOE7T5qqMQpjXAgSbYNhoc-09ed0juf9oP-8YE"/>
+<div class="absolute top-4 left-4 flex gap-2">
+<span class="bg-black/60 backdrop-blur-md text-[10px] font-bold px-2 py-1 rounded border border-white/10 uppercase tracking-widest">New Arrival</span>
+</div>
+<button class="absolute top-4 right-4 size-10 glass rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:text-red-500">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-bold text-lg group-hover:text-primary transition-colors">Quantum Processor v9</h3>
+<span class="text-xs text-slate-500">SKU: QP-900</span>
+</div>
+<div class="flex items-center gap-2 mb-4">
+<span class="text-primary text-2xl font-black">$4,500 <span class="text-xs font-normal text-slate-500">/ unit</span></span>
+</div>
+<div class="flex items-center gap-4 py-3 border-y border-glass-border mb-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-xs text-slate-400">package_2</span>
+<span class="text-[10px] text-slate-400">Min: 5 units</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-xs text-slate-400">schedule</span>
+<span class="text-[10px] text-slate-400">Lead: 14 days</span>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="size-6 bg-slate-800 rounded-full"></div>
+<span class="text-xs font-bold text-slate-300">NanoTech Gmbh</span>
+</div>
+<button class="bg-primary/10 hover:bg-primary text-primary hover:text-white px-4 py-2 rounded-lg text-xs font-bold transition-all border border-primary/30">View Details</button>
+</div>
+</div>
+</div>
+</div>
+<div class="masonry-item">
+<div class="group relative overflow-hidden glass rounded-xl border border-glass-border transition-all duration-500 hover:border-primary/50 hover:neon-glow hover:-translate-y-1">
+<div class="aspect-[4/5] overflow-hidden relative">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Rolls of industrial grade Graphene sheets" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCl2BnPCItvFhgH-E6rzTdluSMEXcGCebnb7ykUrt2H6DaI-uHCyq_Tu8id_MG857U4zjbeGjwMKYE9dt8yCbq-rtQNMPGkVAlFh7BDFQgvHf12TFmx1XQLtA618u-0sAmW50yWLkG3wbiAo_47Pxc0ieFzXGYoVhaEZaemnnsv-MorkHH24ntn2q-37Q3B-6VYmfpWK-Pwz59qmqa7_kTgYkGDgB8XfA5ZTADMydkDqe8HFhl1uChABIMokH2lZOFPl85Lo9jlSv8"/>
+<div class="absolute top-4 left-4">
+<span class="bg-primary/80 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded border border-white/20 uppercase tracking-widest">Featured</span>
+</div>
+</div>
+<div class="p-6">
+<h3 class="font-bold text-lg mb-2 group-hover:text-primary transition-colors">Ultra-Pure Graphene Sheets</h3>
+<div class="flex items-center gap-2 mb-4">
+<span class="text-primary text-2xl font-black">$12,800 <span class="text-xs font-normal text-slate-500">/ metric ton</span></span>
+</div>
+<div class="flex items-center gap-2 text-green-400 text-xs font-bold mb-4">
+<span class="material-symbols-outlined text-sm">verified</span>
+                                        Verified Supplier
+                                    </div>
+<button class="w-full bg-white/5 hover:bg-primary text-white py-3 rounded-xl text-sm font-bold transition-all border border-glass-border group-hover:border-primary">Negotiate Bulk Price</button>
+</div>
+</div>
+</div>
+<div class="masonry-item">
+<div class="group relative overflow-hidden glass rounded-xl border border-glass-border transition-all duration-500 hover:border-primary/50 hover:neon-glow hover:-translate-y-1">
+<div class="aspect-video overflow-hidden relative">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Luxury timepiece with intricate internal gears" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5aCygT_YQxCoMO-9BV4uY5PoFjuK0_FUMjz62h6MnWBMSYBICoedLiOP0PwX_ZXw_aK4GyYfwSDYz3ah8fLscTY1HzXZ-WsMN1t4pXBqKeM7MjNaHi0WjW2owsG_wBzruHi8XMZlqvbelFzmvhDFUmpGxmbJfwEwnb_8i-g4FsxCffDbw7gosUIFJNmTTrqo0vGPIh2koCibxq4ZEqOmZwyX103xcVhF3Y2OFzLWOFZmPzY-GkGZsFxV6KZK4epMNMBJ3qHOq_Oc"/>
+</div>
+<div class="p-6">
+<h3 class="font-bold text-lg mb-1">Chronos Elite V-Series</h3>
+<p class="text-xs text-slate-500 mb-4">Mastercrafted Swiss automatic movement</p>
+<div class="flex items-center gap-2 mb-4">
+<span class="text-white text-xl font-black">$18,450 <span class="text-xs font-normal text-slate-500">/ unit</span></span>
+</div>
+<div class="flex items-center justify-between mt-auto">
+<span class="text-[10px] text-slate-400 italic">Limited Production Run</span>
+<button class="bg-primary/10 text-primary p-2 rounded-lg hover:bg-primary hover:text-white transition-all"><span class="material-symbols-outlined">shopping_cart</span></button>
+</div>
+</div>
+</div>
+</div>
+<div class="masonry-item">
+<div class="group relative overflow-hidden glass rounded-xl border border-glass-border transition-all duration-500 hover:border-primary/50 hover:neon-glow hover:-translate-y-1">
+<div class="aspect-square overflow-hidden relative">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Industrial robotic arm welding precision parts" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCU4f421x_cx4sEhB724osj4xX4FiqgaIi6UaT1JO65Z8SBT3CS1qUQYDTQL9vWqejNezJzMAusciMC7oTkCZSXjqGbdAM-DrZ-zt49mJBlG9SGbBZ87UG1Ecqy5jfDgA8dp6w1IsRFYdNvW74FjwQ2xQkaj-dbKmN79r5KmgQP6trypYuIc-wJeAZ0ZwphdTKK-NN8ko-A5IdP8TRZAMUwaw-5Br8Eyziz0-gAVsVr7zmDGWyiiwnFQUUDvIX-j382hl48tGFhk8w"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-6">
+<h3 class="font-bold text-lg text-white mb-1">TX-900 Multi-Axis Robot</h3>
+<span class="text-primary font-black text-xl mb-4">$64,000</span>
+<div class="flex gap-2">
+<span class="text-[10px] bg-white/10 px-2 py-1 rounded">Automation</span>
+<span class="text-[10px] bg-white/10 px-2 py-1 rounded">B2B Only</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="masonry-item">
+<div class="group relative overflow-hidden glass rounded-xl border border-glass-border transition-all duration-500 hover:border-primary/50 hover:neon-glow hover:-translate-y-1">
+<div class="aspect-[4/3] overflow-hidden relative">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Transparent vials of rare earth elements" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcRpfLcHbSDL3o2cTFvF0wA9d_s1R19J7D5O299LGggIpxmbhoTBKnjqIui7z6q6MxL8EjON0HxrmLFLJfnuiFn9Ee88XQtAZE8Z1lOFQV75FfQTzXBAnM_Hw9fsEJXINXDNtqhUdFfHYtWYRYKqDhbFK9ehRahhVkEBWSLijtIKiRaRvgIeGXjGF4Hvkk71LKA0AJQW6YGqa6Anlwam5pGjJi8ktUeD7BSmCupxuTTU55fPhgBJ7TynZKk2YRpMhPMpchVhn3egE"/>
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-bold text-lg">Neodymium Isotopes</h3>
+<span class="bg-amber-500/20 text-amber-500 text-[10px] font-bold px-2 py-0.5 rounded">High Demand</span>
+</div>
+<div class="flex items-center gap-2 mb-4">
+<span class="text-primary text-2xl font-black">$310 <span class="text-xs font-normal text-slate-500">/ gram</span></span>
+</div>
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-xs text-slate-400">location_on</span>
+<span class="text-[10px] text-slate-400 uppercase tracking-widest">Kazakhstan Mining Zone</span>
+</div>
+<button class="w-full py-2.5 rounded-lg border border-primary text-primary font-bold text-sm hover:bg-primary hover:text-white transition-all">Request Sample</button>
+</div>
+</div>
+</div>
+<div class="masonry-item">
+<div class="group relative overflow-hidden glass rounded-xl border border-glass-border transition-all duration-500 hover:border-primary/50 hover:neon-glow hover:-translate-y-1">
+<div class="aspect-[3/4] overflow-hidden relative">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Aesthetic shot of raw obsidian slabs" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJWFhA-Bsa1hwCVR0ybIbhLtzbamslOZEqeHfqeo4YbdAff5-qjXVF8Euf7g-IhPnla1T6Mtz-dHNiqZI9MOl1oOgN8yGOMYyMhafLuNnRCc4qGsyxeVoh0QjllckmiIzCGMmb__D7M0Lb27MNfQlGaxceYIcyUv9OQt8UXWG57q0bo6YaV9gzRyeSy6sg2NzSFGLHFZk3Y1gL2E6UiqKLBl9keGaJuly9Pl8nwtCgbR-Llf4mIVCwRGil6oHm6EufHOYz_sPsgOQ"/>
+</div>
+<div class="p-6">
+<h3 class="font-bold text-lg mb-2">Raw Obsidian Architectural Slabs</h3>
+<div class="flex items-center gap-2 mb-4">
+<span class="text-primary text-2xl font-black">$850 <span class="text-xs font-normal text-slate-500">/ m²</span></span>
+</div>
+<div class="text-xs text-slate-400 leading-relaxed mb-6">
+                                        Sourced from volcanic regions, polished to mirror finish for high-end interior facades.
+                                    </div>
+<div class="flex items-center justify-between">
+<span class="text-[10px] font-bold text-slate-500">AVAILABLE: 450 m²</span>
+<button class="text-white hover:text-primary transition-colors"><span class="material-symbols-outlined">arrow_forward</span></button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-12 mb-20 flex flex-col items-center">
+<div class="w-24 h-1 bg-white/10 rounded-full mb-8 relative overflow-hidden">
+<div class="absolute inset-y-0 left-0 w-1/3 bg-primary animate-[shimmer_2s_infinite]"></div>
+</div>
+<button class="group flex items-center gap-3 glass px-8 py-4 rounded-2xl border border-glass-border hover:border-primary hover:neon-glow transition-all">
+<span class="text-sm font-bold tracking-widest uppercase">Load More Assets</span>
+<span class="material-symbols-outlined text-primary group-hover:rotate-180 transition-transform duration-500">refresh</span>
+</button>
+</div>
+</section>
+</div>
+</main>
+</div>
+<style>
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(300%); }
+        }
+    </style>
+
+</body></html>

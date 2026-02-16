@@ -1,0 +1,93 @@
+"use client";
+
+import type { ComponentType } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  Home,
+  LayoutGrid,
+  Package,
+  Truck,
+  LineChart,
+  Wallet,
+  Settings,
+} from "lucide-react";
+
+type NavItem = {
+  href: string;
+  label: string;
+  icon: ComponentType<{ className?: string }>;
+};
+
+function Item({ href, label, icon: Icon }: NavItem) {
+  const pathname = usePathname();
+  const active = pathname === href;
+
+  return (
+    <Link
+      href={href}
+      className={
+        "flex items-center gap-3 px-3 py-3 rounded-xl transition-colors group " +
+        (active
+          ? "bg-primary/10 text-primary border border-primary/20 shadow-[0_0_15px_rgba(19,91,236,0.15)]"
+          : "text-slate-400 hover:text-white hover:bg-white/5")
+      }
+    >
+      <Icon className="w-5 h-5 group-hover:text-primary transition-colors" />
+      <span className="hidden lg:block text-sm font-semibold">{label}</span>
+    </Link>
+  );
+}
+
+export default function ClientSidebar({ basePath }: { basePath: string }) {
+  const nav: NavItem[] = [
+    { href: basePath, label: "Dashboard", icon: Home },
+    { href: `${basePath}/categories`, label: "All Categories", icon: LayoutGrid },
+    { href: `${basePath}/inventory`, label: "Inventory", icon: Package },
+    { href: `${basePath}/orders`, label: "Orders", icon: Truck },
+    { href: `${basePath}/analytics`, label: "Analytics", icon: LineChart },
+    { href: `${basePath}/finance`, label: "Finance", icon: Wallet },
+  ];
+
+  return (
+    <aside className="w-20 lg:w-64 border-r border-white/5 bg-[#0b1019] flex flex-col items-center lg:items-start py-6 transition-all duration-300 relative z-20">
+      <div className="px-6 mb-10 flex items-center gap-3">
+        <div className="size-10 bg-primary rounded-lg flex items-center justify-center shadow-lg shadow-primary/20">
+          <LayoutGrid className="text-white w-5 h-5" />
+        </div>
+        <h1 className="hidden lg:block text-xl font-bold tracking-tight text-white">TradeFlow</h1>
+      </div>
+
+      <nav className="flex-1 w-full px-3 space-y-2">
+        {nav.map((n) => (
+          <Item key={n.href} href={n.href} label={n.label} icon={n.icon} />
+        ))}
+      </nav>
+
+      <div className="px-3 w-full mt-auto pt-6 border-t border-white/5 space-y-2">
+        <Link
+          href={`${basePath}/settings`}
+          className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5 transition-colors group text-slate-400 hover:text-white"
+        >
+          <Settings className="w-5 h-5 group-hover:text-primary transition-colors" />
+          <span className="hidden lg:block text-sm font-medium">Settings</span>
+        </Link>
+
+        <div className="flex items-center gap-3 px-3 py-3 rounded-xl bg-[#151c2a]/60 border border-white/5 hover:border-white/10 transition-colors cursor-pointer">
+          <div className="size-8 rounded-full bg-slate-700 overflow-hidden ring-2 ring-white/5">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              className="w-full h-full object-cover"
+              alt="User"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrZLkmqRTP7qfcm8kS-Cw4ZgzJYBIuNUoMeenXMNS7dujLfHPr6cxc_E6S3EXn5oAjGUwE1fPsHcawRos2sVBXr2_JWYnWW5xN-IdZDTk6Zogbl1H2PjM5jeHgXDUg5BolPSsd4ztGaMg91sWN-hbSlQWvf1zyScvfIY8ydGzJRLKhf0m-a3jU4Fl4VL89Uxw55JiNA963xtRgFRhGwgbxT4cnfLPpKG0oeatq1GVt1uspFa7D-jUKPSowvnZOazzpZX6nAWDgQDw"
+            />
+          </div>
+          <div className="hidden lg:block overflow-hidden">
+            <p className="text-xs font-bold truncate text-white">Alex Rivera</p>
+            <p className="text-[10px] text-slate-400 truncate">Client Account</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+  );
+}

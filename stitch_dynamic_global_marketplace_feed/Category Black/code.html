@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Global Marketplace - All Categories View</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "primary-dark": "#0f49bd",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                        "surface-dark": "#1a2332",
+                        "surface-light": "#ffffff",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>.no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }.masonry-grid {
+            column-count: 1;
+            column-gap: 1.5rem;
+        }
+        @media (min-width: 640px) {
+            .masonry-grid { column-count: 2; }
+        }
+        @media (min-width: 1024px) {
+            .masonry-grid { column-count: 3; }
+        }
+        @media (min-width: 1280px) {
+            .masonry-grid { column-count: 4; }
+        }
+        .masonry-item {
+            break-inside: avoid;
+            margin-bottom: 1.5rem;
+        }.product-card .details-overlay {
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .product-card:hover .details-overlay {
+            transform: translateY(0);
+        }
+        .product-card img {
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .product-card:hover img {
+            transform: scale(1.08);
+        }.search-input:focus ~ .search-icon {
+            color: #135bec;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-100 font-display selection:bg-primary selection:text-white transition-colors duration-300 flex overflow-hidden h-screen">
+<nav class="hidden lg:flex flex-col w-24 h-screen sticky top-0 bg-[#0b1019]/90 backdrop-blur-xl border-r border-slate-800 z-50 flex-shrink-0 items-center py-6">
+<div class="mb-10 w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center shadow-lg shadow-primary/20">
+<span class="material-icons-round text-white text-2xl">public</span>
+</div>
+<div class="flex-1 flex flex-col gap-6 w-full items-center">
+<a class="group relative w-12 h-12 flex items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all" href="#">
+<span class="material-icons-round text-2xl">dashboard</span>
+<div class="absolute left-14 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">Dashboard</div>
+</a>
+<a class="group relative w-12 h-12 flex items-center justify-center rounded-xl bg-primary text-white shadow-lg shadow-primary/30 transition-all" href="#">
+<span class="material-icons-round text-2xl">grid_view</span>
+<div class="absolute left-14 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">All Categories</div>
+</a>
+<a class="group relative w-12 h-12 flex items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all" href="#">
+<span class="material-icons-round text-2xl">inventory_2</span>
+<div class="absolute left-14 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">Inventory</div>
+</a>
+<a class="group relative w-12 h-12 flex items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all" href="#">
+<span class="material-icons-round text-2xl">contacts</span>
+<div class="absolute left-14 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">Directory</div>
+</a>
+<a class="group relative w-12 h-12 flex items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all" href="#">
+<span class="material-icons-round text-2xl">analytics</span>
+<div class="absolute left-14 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">Analytics</div>
+</a>
+<a class="group relative w-12 h-12 flex items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all" href="#">
+<div class="relative">
+<span class="material-icons-round text-2xl">notifications</span>
+<span class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#0b1019]"></span>
+</div>
+<div class="absolute left-14 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">Notifications</div>
+</a>
+</div>
+<div class="flex flex-col gap-4 items-center w-full">
+<a class="group relative w-12 h-12 flex items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all" href="#">
+<span class="material-icons-round text-2xl">settings</span>
+<div class="absolute left-14 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">Settings</div>
+</a>
+<div class="w-10 h-10 rounded-full border-2 border-slate-700 overflow-hidden cursor-pointer">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDH8L5n3RnUyHIAcOwSKknG-QuUh76bBTnmy3be1FqByXtqFR9EAOy2hTsdPGFpGHeBoUGOex2TUdiTbrAc8M2lwkXK2Jdp5hsJ5jxjGYB0gTZ0dhnHHN9-VjT8Fy1QljFBgr6pP9G0UeD-kFVQxLAsscZcvPewik1ththIF_zHSbsSsAkmZw_0JCJ9SE3lVT41N9y5_vn_ol7ecTFCRoYlceOC-gNecIFeBQW_XL0a8bLeF7CPLebrBNNmJM1mWUKE6jvlPas8rAc"/>
+</div>
+</div>
+</nav>
+<div class="flex-1 flex flex-col h-screen overflow-hidden">
+<header class="sticky top-0 z-40 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex-shrink-0">
+<div class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+<div class="flex items-center gap-4">
+<button class="lg:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-surface-dark text-slate-500 dark:text-slate-400 transition-colors">
+<span class="material-icons-round text-2xl">menu</span>
+</button>
+<h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white hidden sm:block">All Categories</h1>
+</div>
+<div class="flex-1 max-w-2xl hidden md:block px-4">
+<div class="relative group">
+<input class="search-input w-full pl-12 pr-4 py-3 rounded-full bg-slate-100 dark:bg-surface-dark border-transparent focus:border-primary focus:ring-0 focus:bg-white dark:focus:bg-[#151c2a] transition-all text-sm font-medium placeholder-slate-500" placeholder="Search for steel coils, electronics, or suppliers..." type="text"/>
+<span class="search-icon material-icons-round absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 transition-colors pointer-events-none">search</span>
+</div>
+</div>
+<div class="flex items-center gap-3 justify-end">
+<button class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-surface-dark relative">
+<span class="material-icons-round text-slate-500 dark:text-slate-400">notifications_none</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-background-dark"></span>
+</button>
+<button class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-surface-dark">
+<span class="material-icons-round text-slate-500 dark:text-slate-400">shopping_bag</span>
+</button>
+<div class="h-8 w-[1px] bg-slate-200 dark:bg-slate-700 mx-2"></div>
+<button class="flex items-center gap-2 hover:opacity-80 transition-opacity">
+<img alt="User Profile" class="w-9 h-9 rounded-full border-2 border-white dark:border-surface-dark shadow-sm" data-alt="User profile avatar placeholder" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDH8L5n3RnUyHIAcOwSKknG-QuUh76bBTnmy3be1FqByXtqFR9EAOy2hTsdPGFpGHeBoUGOex2TUdiTbrAc8M2lwkXK2Jdp5hsJ5jxjGYB0gTZ0dhnHHN9-VjT8Fy1QljFBgr6pP9G0UeD-kFVQxLAsscZcvPewik1ththIF_zHSbsSsAkmZw_0JCJ9SE3lVT41N9y5_vn_ol7ecTFCRoYlceOC-gNecIFeBQW_XL0a8bLeF7CPLebrBNNmJM1mWUKE6jvlPas8rAc"/>
+</button>
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden relative">
+<aside class="w-72 hidden xl:block h-full overflow-y-auto bg-white dark:bg-background-dark border-r border-slate-200 dark:border-slate-800 p-6 flex-shrink-0">
+<div class="flex items-center justify-between mb-8">
+<h3 class="text-lg font-bold flex items-center gap-2">
+<span class="material-icons-round text-primary">tune</span> Filters
+                </h3>
+<span class="text-xs font-medium text-primary cursor-pointer hover:underline">Reset All</span>
+</div>
+<div class="mb-8">
+<h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">Trade Type</h4>
+<div class="space-y-3">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="form-checkbox h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-primary focus:ring-primary dark:bg-surface-dark" type="checkbox"/>
+<span class="text-sm font-medium group-hover:text-primary transition-colors">B2B Wholesale</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-checkbox h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-primary focus:ring-primary dark:bg-surface-dark" type="checkbox"/>
+<span class="text-sm font-medium group-hover:text-primary transition-colors">B2C Retail</span>
+</label>
+</div>
+</div>
+<div class="mb-8">
+<h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">Price Range</h4>
+<div class="flex items-center gap-4 mb-4">
+<div class="relative flex-1">
+<span class="absolute left-3 top-2 text-slate-500 text-xs">$</span>
+<input class="w-full pl-6 py-1.5 text-sm bg-slate-50 dark:bg-surface-dark border border-slate-200 dark:border-slate-700 rounded-lg focus:border-primary focus:ring-0" type="number" value="10"/>
+</div>
+<span class="text-slate-400">-</span>
+<div class="relative flex-1">
+<span class="absolute left-3 top-2 text-slate-500 text-xs">$</span>
+<input class="w-full pl-6 py-1.5 text-sm bg-slate-50 dark:bg-surface-dark border border-slate-200 dark:border-slate-700 rounded-lg focus:border-primary focus:ring-0" type="number" value="5000"/>
+</div>
+</div>
+<input class="w-full h-1 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-primary" type="range"/>
+</div>
+<div class="mb-8">
+<h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">Origin</h4>
+<div class="relative mb-3">
+<span class="material-icons-round absolute left-3 top-2 text-slate-400 text-sm">search</span>
+<input class="w-full pl-9 py-1.5 text-sm bg-slate-50 dark:bg-surface-dark border border-slate-200 dark:border-slate-700 rounded-lg focus:border-primary focus:ring-0" placeholder="Search country..." type="text"/>
+</div>
+<div class="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-checkbox h-4 w-4 rounded border-slate-300 dark:border-slate-600 text-primary focus:ring-primary dark:bg-surface-dark" type="checkbox"/>
+<span class="text-sm text-slate-600 dark:text-slate-300">China</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-checkbox h-4 w-4 rounded border-slate-300 dark:border-slate-600 text-primary focus:ring-primary dark:bg-surface-dark" type="checkbox"/>
+<span class="text-sm text-slate-600 dark:text-slate-300">United States</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-checkbox h-4 w-4 rounded border-slate-300 dark:border-slate-600 text-primary focus:ring-primary dark:bg-surface-dark" type="checkbox"/>
+<span class="text-sm text-slate-600 dark:text-slate-300">Vietnam</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-checkbox h-4 w-4 rounded border-slate-300 dark:border-slate-600 text-primary focus:ring-primary dark:bg-surface-dark" type="checkbox"/>
+<span class="text-sm text-slate-600 dark:text-slate-300">Germany</span>
+</label>
+</div>
+</div>
+<div class="p-4 bg-primary/10 rounded-xl border border-primary/20">
+<h5 class="text-primary font-bold text-sm mb-1">Need specific sourcing?</h5>
+<p class="text-xs text-slate-600 dark:text-slate-400 mb-3">Post a Request for Quotation (RFQ) and let suppliers come to you.</p>
+<button class="w-full py-2 bg-primary hover:bg-primary-dark text-white text-xs font-bold rounded-lg transition-colors">Post RFQ</button>
+</div>
+</aside>
+<main class="flex-1 overflow-y-auto h-full p-4 sm:p-6 lg:p-8 w-full bg-background-light dark:bg-background-dark">
+<div class="max-w-[1600px] mx-auto">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+<div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 md:pb-0">
+<button class="px-5 py-2 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-sm whitespace-nowrap shadow-lg shadow-slate-200 dark:shadow-none transition-transform hover:scale-105">All Items</button>
+<button class="px-5 py-2 rounded-full bg-white dark:bg-surface-dark border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-primary hover:border-primary dark:hover:border-primary font-medium text-sm whitespace-nowrap transition-all flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+                        B2B Wholesale
+                    </button>
+<button class="px-5 py-2 rounded-full bg-white dark:bg-surface-dark border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-teal-500 hover:border-teal-500 dark:hover:border-teal-500 font-medium text-sm whitespace-nowrap transition-all flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-teal-500"></span>
+                        B2C Retail
+                    </button>
+<button class="px-5 py-2 rounded-full bg-white dark:bg-surface-dark border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-400 font-medium text-sm whitespace-nowrap transition-all">Trending</button>
+<button class="px-5 py-2 rounded-full bg-white dark:bg-surface-dark border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-400 font-medium text-sm whitespace-nowrap transition-all">New Arrivals</button>
+</div>
+<div class="flex items-center gap-2 flex-shrink-0">
+<span class="text-sm text-slate-500 dark:text-slate-400">Sort by:</span>
+<select class="bg-transparent border-none text-sm font-bold text-slate-800 dark:text-white focus:ring-0 cursor-pointer p-0 pr-8">
+<option>Recommended</option>
+<option>Price: Low to High</option>
+<option>Price: High to Low</option>
+<option>MOQ: Low to High</option>
+</select>
+</div>
+</div>
+<div class="masonry-grid w-full">
+<div class="masonry-item">
+<div class="product-card group relative rounded-xl overflow-hidden bg-white dark:bg-surface-dark shadow-sm hover:shadow-xl dark:shadow-none transition-shadow duration-300 cursor-pointer">
+<div class="absolute top-3 left-3 z-20">
+<span class="px-3 py-1 rounded-md bg-primary/90 backdrop-blur-sm text-white text-xs font-bold tracking-wide shadow-sm">B2B WHOLESALE</span>
+</div>
+<div class="relative aspect-[4/5] overflow-hidden bg-slate-200 dark:bg-slate-800">
+<img alt="Industrial steel pipes stacked in warehouse" class="w-full h-full object-cover" data-alt="Industrial steel pipes stacked in warehouse" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTG5XUV3KFllxs_vh4CnM-Kt8PzcZxXtPhy-XHCa5a6xHCLK0bUpamJokVcWKrQvszuiZ5CKUzpX5Vi_fPQ1ygzPiMt2oaI8itBPigZSkF3knk22inB3AlHIkmw8tp3WnGWAzyt_LXnQUnavKRdFgpUypD5-vQRUfctK1_prBHvDWl7Jpa0seG_NqIhvFBSdbHpmY_thReULHLC1o_TTtFFyTTJ_sFa873v6q8nXTDycfJkMtWcBUG7tbzw-QMpw28PlJb5C-IS6Y"/>
+<div class="details-overlay absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-5">
+<div class="space-y-3">
+<div class="flex items-center gap-2 text-white/90 text-sm">
+<span class="material-icons-round text-primary text-base">verified_user</span>
+<span>Shanghai Steel Corp.</span>
+</div>
+<div class="grid grid-cols-2 gap-2">
+<button class="py-2.5 bg-primary hover:bg-primary-dark text-white text-sm font-bold rounded-lg transition-colors shadow-lg">Contact</button>
+<button class="py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur text-white text-sm font-bold rounded-lg transition-colors border border-white/20">Sample</button>
+</div>
+</div>
+</div>
+</div>
+<div class="p-4 relative z-10 bg-white dark:bg-surface-dark">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-bold text-lg leading-tight line-clamp-2">Industrial Grade Seamless Steel Pipes</h3>
+<button class="text-slate-400 hover:text-red-500 transition-colors"><span class="material-icons-round">favorite_border</span></button>
+</div>
+<div class="flex items-baseline gap-1 mb-1">
+<span class="text-xl font-extrabold text-primary">$450</span>
+<span class="text-xs text-slate-500 dark:text-slate-400 font-medium">/ ton</span>
+</div>
+<div class="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+<span class="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">MOQ: 10 Tons</span>
+<span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full overflow-hidden relative"><img alt="China" class="absolute inset-0 object-cover" data-alt="Chinese flag" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2XZYO6ty0GdLtq8iCTthYYW_7dZ83GuR_ph4NVIi2ZfLeZ1pJ2Lq2Nm-Wg54HmUSBJVCpWVEIgIFuL_TWHvYVTBScuMrxb_lZNE51vYSIeDulGwSyceg31MfqVBV3ggae0u07TpIeIDJ4UEPx5-v5AUuCrpxGaZfPpiNtdhkw_orW9gCFHN9JaNogJy1EWHALDjitWTTkIOSVrSGdUnCFheZ_U2BS-ZmgyMWONI_pEy3VnnxpPmPxKKcYoNaf04Li6reMuWB1DAM"/></span> China</span>
+</div>
+</div>
+</div>
+</div>
+<div class="masonry-item">
+<div class="product-card group relative rounded-xl overflow-hidden bg-white dark:bg-surface-dark shadow-sm hover:shadow-xl dark:shadow-none transition-shadow duration-300 cursor-pointer">
+<div class="absolute top-3 left-3 z-20">
+<span class="px-3 py-1 rounded-md bg-teal-500/90 backdrop-blur-sm text-white text-xs font-bold tracking-wide shadow-sm">B2C RETAIL</span>
+</div>
+<div class="relative aspect-[4/3] overflow-hidden bg-slate-200 dark:bg-slate-800">
+<img alt="Minimalist handmade ceramic vase set" class="w-full h-full object-cover" data-alt="Minimalist handmade ceramic vase set" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLDicqsRmWv2bh7iZD_Lr2IcHw4y-69oHwCBzfdPFymj-_x0aeWyKOUflW2u4yE1zOa4ZVf39pgf-Jx5L2QbVCTXkPOUVOiIakJsVTYLxkApLxaPubaiTKb01AKhzaxh29BIjU0uFHF6v5xSEvoIm4O68H0KXpXk6OgmexucD1AdvVo2gASQlVO2apQHTcr4sA1vFvfgz10Kn6arcu2ZtOSbyjKTDZrj72f0umX_HISlo4UXwK1Q2cwmP6vBTXUxI63ZwBEZhnWrI"/>
+<div class="details-overlay absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-5">
+<button class="w-full py-2.5 bg-white text-slate-900 text-sm font-bold rounded-lg hover:bg-slate-100 transition-colors shadow-lg">Add to Cart</button>
+</div>
+</div>
+<div class="p-4 relative z-10 bg-white dark:bg-surface-dark">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-bold text-base leading-tight">Nordic Ceramic Vase Set</h3>
+<button class="text-slate-400 hover:text-red-500 transition-colors"><span class="material-icons-round">favorite_border</span></button>
+</div>
+<div class="flex items-baseline gap-1 mb-1">
+<span class="text-xl font-extrabold text-slate-800 dark:text-white">$24.99</span>
+<span class="text-xs text-slate-500 dark:text-slate-400 font-medium">/ set</span>
+</div>
+<div class="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+<span class="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">MOQ: 1 Unit</span>
+<span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full overflow-hidden relative"><img alt="Sweden" class="absolute inset-0 object-cover" data-alt="Swedish flag" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDskN8MRLuG4r8fpoI4C1laOYEP1ho7UymyAm8tBkmpMHnHM5rfw3tZJ-wFPYm6ZsnxVLaUPyD5bqOeXbpJaly1qNpalWtnfFCD5J3e9mLykupyO3DoVBIDNS7Gw1egZ_sXE3bKF0VbTnFZJX0hrQxtkwhyjTTwAjdnubD1Q5NJzDnSlGAOcfrJEAwBTe2c9tEKljkpB-DNt-A5tdSDAPFJ5mQ4gNWtdXTg4lvDzenqMmtaPzaeXvpOsXGk9qEbTwI1aEKrx4vGyFw"/></span> Sweden</span>
+</div>
+</div>
+</div>
+</div>
+<div class="masonry-item">
+<div class="product-card group relative rounded-xl overflow-hidden bg-white dark:bg-surface-dark shadow-sm hover:shadow-xl dark:shadow-none transition-shadow duration-300 cursor-pointer">
+<div class="absolute top-3 left-3 z-20">
+<span class="px-3 py-1 rounded-md bg-primary/90 backdrop-blur-sm text-white text-xs font-bold tracking-wide shadow-sm">B2B WHOLESALE</span>
+</div>
+<div class="relative aspect-square overflow-hidden bg-slate-200 dark:bg-slate-800">
+<img alt="Raw organic green coffee beans in sack" class="w-full h-full object-cover" data-alt="Raw organic green coffee beans in sack" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_Ud9A6C8C2Rsg6C6Hn63iP8Swpnh_6D2_CzW4UANNnoawIE7P57TqWOBjfViNJfIeVSAlKBvZCWv971JanG9V7uQaWfA8FbY6x3QTwsdgOmv57Q9RFdX-S1r0EoiMpEwwLHjEq00xsLyzmLxl3lLUhzRSWZGcSyh0u3m999vjeNM5oNdZ5Z1XbwiMLs06odoVr7EqvUuFl17vJH3I0N668oB7Ikw6sUal1ErwzIy5hAy62E8x27XqDPFOlcjARMPj9t3dYxQWag4"/>
+<div class="details-overlay absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-5">
+<div class="space-y-3">
+<div class="flex items-center gap-2 text-white/90 text-sm">
+<span class="material-icons-round text-primary text-base">verified_user</span>
+<span>Colombia Exports Ltd.</span>
+</div>
+<button class="w-full py-2.5 bg-primary hover:bg-primary-dark text-white text-sm font-bold rounded-lg transition-colors shadow-lg">Request Quote</button>
+</div>
+</div>
+</div>
+<div class="p-4 relative z-10 bg-white dark:bg-surface-dark">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-bold text-lg leading-tight">Organic Green Coffee Beans</h3>
+<button class="text-slate-400 hover:text-red-500 transition-colors"><span class="material-icons-round">favorite_border</span></button>
+</div>
+<div class="flex items-baseline gap-1 mb-1">
+<span class="text-xl font-extrabold text-primary">$8.50</span>
+<span class="text-xs text-slate-500 dark:text-slate-400 font-medium">/ kg</span>
+</div>
+<div class="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+<span class="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">MOQ: 500 kg</span>
+<span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full overflow-hidden relative"><img alt="Colombia" class="absolute inset-0 object-cover" data-alt="Colombian flag" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_DXggXEUzxEUlRD7GAEceQOYUlwKxO4R1suc5cMfISVFEG9czU-3AHobSy4uhR8EQs2HK8G61lXj-Z_sYYDVoNwbRIwQBa5KKwDVSZaslQSFg9-09zHEhiL1rEp3TeXreFXKQlE0XKVTe3hiViom5nvWxpCIQSLGxHx_fmtgVRDNYiMj_Vd_Z3j4EreIdqh3wxBOJEda0jq66_kF1-14dvkAqFCrNh0i5sUGejYucMOmIKanjjk-gsqsmqGJ-nyZbRj7qmLKyDKQ"/></span> Colombia</span>
+</div>
+</div>
+</div>
+</div>
+<div class="masonry-item">
+<div class="product-card group relative rounded-xl overflow-hidden bg-white dark:bg-surface-dark shadow-sm hover:shadow-xl dark:shadow-none transition-shadow duration-300 cursor-pointer">
+<div class="absolute top-3 left-3 z-20">
+<span class="px-3 py-1 rounded-md bg-primary/90 backdrop-blur-sm text-white text-xs font-bold tracking-wide shadow-sm">B2B WHOLESALE</span>
+</div>
+<div class="absolute top-3 right-3 z-20">
+<span class="px-2 py-1 rounded bg-orange-500/90 text-white text-[10px] font-bold uppercase tracking-wider shadow-sm">Best Seller</span>
+</div>
+<div class="relative aspect-[3/4] overflow-hidden bg-slate-200 dark:bg-slate-800">
+<img alt="Robotic arm assembly line automation" class="w-full h-full object-cover" data-alt="Robotic arm assembly line automation" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLgntYSy9gJlLoBD3NGE7XmHcdoTGCgRr9RP5pCP99AC2crCF_cnJtYXtmQOSYIYyNAWTwJdOqw6HcD2UsD79uHjch4eZFKq4FSesz787TsNKgmPQTO01wGNH_gdiFQE_ahsmqYxhCKGhi8I2pd2v1eA4o5KIrQQUKLft_YKfWfEdcVAhmXGBvTZKhKsKRx_dSpCjyjQTwJ5NtNbtI2wV82kiXVVkeqkYQqFRYO13bkTEA14zO2n2wcuf5YLCb2OQ2XsEy8pK9nbQ"/>
+<div class="details-overlay absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-5">
+<div class="space-y-3">
+<div class="flex items-center gap-2 text-white/90 text-sm">
+<span class="material-icons-round text-primary text-base">verified_user</span>
+<span>TechAuto Robotics</span>
+</div>
+<button class="w-full py-2.5 bg-primary hover:bg-primary-dark text-white text-sm font-bold rounded-lg transition-colors shadow-lg">Inquire Price</button>
+</div>
+</div>
+</div>
+<div class="p-4 relative z-10 bg-white dark:bg-surface-dark">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-bold text-lg leading-tight">Assembly Line Robotic Arm Series X</h3>
+<button class="text-slate-400 hover:text-red-500 transition-colors"><span class="material-icons-round">favorite_border</span></button>
+</div>
+<div class="flex items-baseline gap-1 mb-1">
+<span class="text-xl font-extrabold text-primary">$12,500</span>
+<span class="text-xs text-slate-500 dark:text-slate-400 font-medium">/ unit</span>
+</div>
+<div class="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+<span class="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">MOQ: 1 Unit</span>
+<span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full overflow-hidden relative"><img alt="Japan" class="absolute inset-0 object-cover" data-alt="Japanese flag" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCrSi_ucEJrIjV5Ke85GDFMuTpAkZ9HvPizsMeUYED08kSAqDW0S9RM1rm-poBJUe1OyiAunVBAWgK5Z4-ETe2yIret5CQA64zgee8rHGtvmv2qnNvorXuE_7hDTdj0aM5pXCDuToBVk0sHx7AKQvpdxRvpZ3ZkX0OTCA3tbuNoa3HXiplyxE2Hd7-LwvU3OvtVloTKdEvXS3gyIaCHHKrlH5rXJdnbk4_iUdHDPzQOzPOLrdDSfaOb0c3viYbMhQI7TTYbQw5Mxfk"/></span> Japan</span>
+</div>
+</div>
+</div>
+</div>
+<div class="masonry-item">
+<div class="product-card group relative rounded-xl overflow-hidden bg-white dark:bg-surface-dark shadow-sm hover:shadow-xl dark:shadow-none transition-shadow duration-300 cursor-pointer">
+<div class="absolute top-3 left-3 z-20">
+<span class="px-3 py-1 rounded-md bg-teal-500/90 backdrop-blur-sm text-white text-xs font-bold tracking-wide shadow-sm">B2C RETAIL</span>
+</div>
+<div class="relative aspect-square overflow-hidden bg-slate-200 dark:bg-slate-800">
+<img alt="Modern wireless headphones on minimal background" class="w-full h-full object-cover" data-alt="Modern wireless headphones on minimal background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7f3CQBqSSdjNnmel0hVUyx5QAEYd1GOfGD5EYKVJum8ecKjU_byOZsNtoKQ6yQfNVu3lLrBd5pt1fdjO3pm16GuVWQicptUkMGXSPz3OCGNdX3PNZIOybM0oAXwWbuYhoJL8ciR6WSQinAjHaqsWnJdzqnduKm8UvGNT4JBVJ0aAjsZwYA-EiF4HUZDS_Hy4ztW7Pq4CDRG-zX_H8xblgpKoCSuGHsj-endItN42UVZwIEUlDPS5qZJ432mC4XkEabKycxhscqmU"/>
+<div class="details-overlay absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-5">
+<button class="w-full py-2.5 bg-white text-slate-900 text-sm font-bold rounded-lg hover:bg-slate-100 transition-colors shadow-lg">Add to Cart</button>
+</div>
+</div>
+<div class="p-4 relative z-10 bg-white dark:bg-surface-dark">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-bold text-base leading-tight">Noise Cancelling Pro Headphones</h3>
+<button class="text-slate-400 hover:text-red-500 transition-colors"><span class="material-icons-round">favorite_border</span></button>
+</div>
+<div class="flex items-baseline gap-1 mb-1">
+<span class="text-xl font-extrabold text-slate-800 dark:text-white">$199</span>
+<span class="text-xs text-slate-500 dark:text-slate-400 font-medium">/ unit</span>
+</div>
+<div class="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+<span class="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">MOQ: 1 Unit</span>
+<span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full overflow-hidden relative"><img alt="USA" class="absolute inset-0 object-cover" data-alt="USA flag" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXQ1W9MSIeeBrsTTLHbwHJ2BISPhDuMlQWHgeXvoQ3p0v2ZfyVbj074PNEzEBA0Jjy5y9cQvPkkoV64axhLgVRE3ePabFyRq2od1oHGKKBfdaBUol4HGLnQb7Xk27KoUiMopM0-o3CzueqBSZHrR9EGnJDF-y8qtvsEuL4Fuxfx3BERmvntAUeHxOaTyOSfiurkLszuDVO1kwvwCIP8EV3NdxOeMQASDC8W1SitwXgNXnkzx1s_XaG2BB8tt5MoKhNibtvD1w5FZ8"/></span> USA</span>
+</div>
+</div>
+</div>
+</div>
+<div class="masonry-item">
+<div class="product-card group relative rounded-xl overflow-hidden bg-white dark:bg-surface-dark shadow-sm hover:shadow-xl dark:shadow-none transition-shadow duration-300 cursor-pointer">
+<div class="absolute top-3 left-3 z-20">
+<span class="px-3 py-1 rounded-md bg-primary/90 backdrop-blur-sm text-white text-xs font-bold tracking-wide shadow-sm">B2B WHOLESALE</span>
+</div>
+<div class="relative aspect-[16/10] overflow-hidden bg-slate-200 dark:bg-slate-800">
+<img alt="Rolls of colorful textile fabric" class="w-full h-full object-cover" data-alt="Rolls of colorful textile fabric" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgcjRSZX2s-DyjNT_48a0fe1AjPFD9pq5n_jMoKLyxVsNfD8PmMVleJckIHarnhURKS57ZZbOsu-sBbcAD-WmEQKFpqDTS1FimpRE6cctGKDfwB_PAJD86YxnVIWhF3VulocPau7ddF5Id8izzKqAHahEl4du19MenSYcV98K6jjnhcZJPCqXtFSiPFcMwfC1H-_6KnUIqVCt50wQ-ZRzfCsJ5vRW7pP2wAChg6a2MtFrBddYheH99pWTbjXEBqG4LH7eByJJoQwU"/>
+<div class="details-overlay absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-5">
+<div class="space-y-3">
+<div class="flex items-center gap-2 text-white/90 text-sm">
+<span class="material-icons-round text-primary text-base">verified_user</span>
+<span>Mumbai Textiles</span>
+</div>
+<button class="w-full py-2.5 bg-primary hover:bg-primary-dark text-white text-sm font-bold rounded-lg transition-colors shadow-lg">Request Swatches</button>
+</div>
+</div>
+</div>
+<div class="p-4 relative z-10 bg-white dark:bg-surface-dark">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-bold text-lg leading-tight">Premium Cotton Fabric Rolls</h3>
+<button class="text-slate-400 hover:text-red-500 transition-colors"><span class="material-icons-round">favorite_border</span></button>
+</div>
+<div class="flex items-baseline gap-1 mb-1">
+<span class="text-xl font-extrabold text-primary">$3.20</span>
+<span class="text-xs text-slate-500 dark:text-slate-400 font-medium">/ meter</span>
+</div>
+<div class="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+<span class="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">MOQ: 1000 M</span>
+<span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full overflow-hidden relative"><img alt="India" class="absolute inset-0 object-cover" data-alt="India flag" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9reGERq4jQJz8XjKPXgBXqxWey0ma3q7LIZyI7Tr7j5-pzv2UQENQMAUzF4rEyt96K6F7gOFey4H8YelQJZHQod0J8TypWFcrsn1qwotSxDL6JHGktlzCfQl5dyuenynm8tIeByuFDdeLHfBIk1-KfUuOaVKXuI_b6dG4m9Fn0Lk2WWPxrs8oX3duSkT0LIyKPChJus7-N9bkrRa033urH4yMLPu7FIkdPUIoFC6kbqrBqfLVw6ZdsgPbRlJS9wZwAxxkWdamTYE"/></span> India</span>
+</div>
+</div>
+</div>
+</div>
+<div class="masonry-item">
+<div class="product-card group relative rounded-xl overflow-hidden bg-white dark:bg-surface-dark shadow-sm hover:shadow-xl dark:shadow-none transition-shadow duration-300 cursor-pointer">
+<div class="absolute top-3 left-3 z-20">
+<span class="px-3 py-1 rounded-md bg-primary/90 backdrop-blur-sm text-white text-xs font-bold tracking-wide shadow-sm">B2B WHOLESALE</span>
+</div>
+<div class="relative aspect-[3/5] overflow-hidden bg-slate-200 dark:bg-slate-800">
+<img alt="Electronic circuit board microchip" class="w-full h-full object-cover" data-alt="Electronic circuit board microchip" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOMZ5kAh9c4_fsANQSiebqAMEhgQbyCaBp9bgwkfns6bXXTOYhjfueXK943r29KDDfmmlvzxY2MOtbHmmLihZtGjwb2xYzcukrEZDraeP4c3YmosTMK_6mZYIp8TVt8S_6_DTfx_HqS1xHYbTlChFqtvWnEyVMU5AR0BMJNAm5G-ov7sfQbGeXkmreU9yx6o1sQXTyV48aQVjiLv8svkBQ0XyY4wPMxrtD_QclEmbrKKA9eC3yH2Pi1Wrs6qn8MTIjPqJ4yGih81c"/>
+<div class="details-overlay absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-5">
+<div class="space-y-3">
+<div class="flex items-center gap-2 text-white/90 text-sm">
+<span class="material-icons-round text-primary text-base">verified_user</span>
+<span>Shenzhen Electronics</span>
+</div>
+<button class="w-full py-2.5 bg-primary hover:bg-primary-dark text-white text-sm font-bold rounded-lg transition-colors shadow-lg">Contact</button>
+</div>
+</div>
+</div>
+<div class="p-4 relative z-10 bg-white dark:bg-surface-dark">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-bold text-lg leading-tight">Advanced Microcontroller Chips</h3>
+<button class="text-slate-400 hover:text-red-500 transition-colors"><span class="material-icons-round">favorite_border</span></button>
+</div>
+<div class="flex items-baseline gap-1 mb-1">
+<span class="text-xl font-extrabold text-primary">$0.45</span>
+<span class="text-xs text-slate-500 dark:text-slate-400 font-medium">/ unit</span>
+</div>
+<div class="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+<span class="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">MOQ: 5000 Units</span>
+<span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full overflow-hidden relative"><img alt="China" class="absolute inset-0 object-cover" data-alt="Chinese flag" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFc7pdGF6AW4ou3PMTsNgDY0_NysAcZa62GdOexUTLOQgp6NGL408jhoMNCol5R3Xp7HEJAZQ-onpuFUOcvRyLXdN7U2i7yXSUYxbOYx_gFdk8zOKesSU9Wb7Q5upA3Rq9S27gOAVAJ9kcQIegc4soTUhh0DcZeTOo1wT5krcUCeKQquAzC6Jh0nq3Fg8BG5lMYa3rdSAb26Xl37PlOz37alit7dSYqfMQrqmxxjybxbieJHdgjvMuXdd9RXxHf0DArDmVW5ePVDE"/></span> China</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="flex justify-center mt-8 mb-12">
+<button class="flex items-center gap-2 px-6 py-3 bg-white dark:bg-surface-dark border border-slate-200 dark:border-slate-700 rounded-full text-sm font-bold text-slate-600 dark:text-slate-300 hover:border-primary dark:hover:border-primary hover:text-primary transition-all">
+<span class="animate-spin material-icons-round text-lg">refresh</span> Load More Products
+                 </button>
+</div>
+</div>
+</main>
+</div>
+</div>
+<button class="xl:hidden fixed bottom-6 right-6 w-14 h-14 bg-primary hover:bg-primary-dark text-white rounded-full shadow-lg shadow-primary/30 flex items-center justify-center z-50 transition-transform hover:scale-105 active:scale-95">
+<span class="material-icons-round text-2xl">tune</span>
+</button>
+
+</body></html>

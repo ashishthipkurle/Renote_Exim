@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NexusTrade | Access the Global Terminal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "accent-cyan": "#00f2ff",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#050505",
+                        "card-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+        .glass-panel {
+            background: rgba(16, 22, 34, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glow-input:focus {
+            box-shadow: 0 0 15px rgba(19, 91, 236, 0.4);
+            border-color: #135bec;
+        }
+        .network-gradient {
+            background: radial-gradient(circle at center, rgba(19, 91, 236, 0.15) 0%, transparent 70%);
+        }
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen overflow-x-hidden">
+<div class="flex min-h-screen w-full flex-col lg:flex-row">
+<!-- Left Side: Cinematic 3D Visualization (Visible on LG up) -->
+<div class="relative hidden lg:flex lg:w-7/12 xl:w-8/12 bg-background-dark overflow-hidden items-center justify-center border-r border-white/5">
+<!-- Background Elements -->
+<div class="absolute inset-0 network-gradient"></div>
+<div class="absolute top-0 left-0 w-full h-full opacity-30" data-alt="Digital blue circuit board nodes and connections" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA2psLs5uqWtaJ_SBxvDKrTzbjaNBjs_6zC3TDeaMepLEGjt1EUuSl4BCibLPVL-sIrQnwUfdeJj1fdcMvHZeVYnNOo_wosCflhJAlk0b4JWb3Km9xLvbRtNWypdVNGxPw3tMHbvDd5OO1AGIvmLFtDOedVQtGi5IsWDBk5bdr3xvTBY5UiYa_-gN1Jo-kANL18N70_B___HKiEjfoJx9STP78HDDnR4etmJaqBZTynSn-C4zqoSLtOAFKx2q2w5Q3bMftBk41BRNw'); background-size: cover; mix-blend-mode: overlay;"></div>
+<!-- Abstract Glow Orb -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px]"></div>
+<div class="relative z-10 px-20 text-left">
+<div class="mb-8 inline-flex items-center gap-3 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-md">
+<span class="relative flex h-3 w-3">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-cyan opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3 w-3 bg-accent-cyan"></span>
+</span>
+<span class="text-xs font-bold tracking-widest uppercase text-accent-cyan">Network Live: 14.2ms Latency</span>
+</div>
+<h1 class="text-6xl xl:text-8xl font-black tracking-tighter leading-none mb-6">
+                    TRADE AT THE <br/>
+<span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent-cyan">SPEED OF LIGHT.</span>
+</h1>
+<p class="text-xl text-slate-400 max-w-xl font-light leading-relaxed mb-10">
+                    Access the world's most advanced decentralized trading terminal. Institutional-grade liquidity, zero-knowledge security, and real-time global connectivity.
+                </p>
+<div class="flex gap-12 mt-16">
+<div>
+<div class="text-3xl font-bold text-white">$4.2B+</div>
+<div class="text-sm text-slate-500 uppercase tracking-widest font-semibold mt-1">Volume 24H</div>
+</div>
+<div>
+<div class="text-3xl font-bold text-white">99.99%</div>
+<div class="text-sm text-slate-500 uppercase tracking-widest font-semibold mt-1">Uptime SLA</div>
+</div>
+<div>
+<div class="text-3xl font-bold text-white">256-bit</div>
+<div class="text-sm text-slate-500 uppercase tracking-widest font-semibold mt-1">Encryption</div>
+</div>
+</div>
+</div>
+<!-- Floating Decoration -->
+<div class="absolute bottom-10 right-10 animate-float opacity-50">
+<div class="p-6 glass-panel rounded-xl">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-10 h-10 rounded-full bg-accent-cyan/20 flex items-center justify-center text-accent-cyan">
+<span class="material-symbols-outlined">trending_up</span>
+</div>
+<div>
+<div class="text-xs text-slate-400">BTC/USDT</div>
+<div class="font-bold text-lg text-white">$64,231.50</div>
+</div>
+</div>
+<div class="h-8 w-32 bg-primary/20 rounded relative overflow-hidden">
+<div class="absolute inset-y-0 left-0 w-2/3 bg-gradient-to-r from-primary to-accent-cyan opacity-50"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Side: Authentication Form -->
+<div class="flex-1 flex flex-col items-center justify-center p-6 sm:p-12 lg:p-20 relative bg-background-light dark:bg-background-dark">
+<!-- Mobile Background Glow -->
+<div class="lg:hidden absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+<div class="absolute -top-24 -right-24 w-96 h-96 bg-primary/20 rounded-full blur-[100px]"></div>
+<div class="absolute -bottom-24 -left-24 w-96 h-96 bg-accent-cyan/10 rounded-full blur-[100px]"></div>
+</div>
+<div class="w-full max-w-[440px] relative z-10">
+<!-- Header / Logo -->
+<div class="flex items-center gap-3 mb-12">
+<div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white shadow-[0_0_20px_rgba(19,91,236,0.5)]">
+<span class="material-symbols-outlined text-2xl font-bold">bolt</span>
+</div>
+<span class="text-2xl font-black tracking-tight dark:text-white">NexusTrade</span>
+</div>
+<!-- Toggle Switch -->
+<div class="flex p-1 bg-slate-200 dark:bg-slate-800/50 rounded-xl mb-10 w-fit">
+<button class="px-6 py-2 rounded-lg text-sm font-bold transition-all bg-white dark:bg-primary text-slate-900 dark:text-white shadow-sm">
+                        Login
+                    </button>
+<button class="px-6 py-2 rounded-lg text-sm font-bold transition-all text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+                        Sign Up
+                    </button>
+</div>
+<!-- Form Section -->
+<div class="space-y-6">
+<div class="space-y-2">
+<h2 class="text-3xl font-extrabold tracking-tight dark:text-white">Access Terminal</h2>
+<p class="text-slate-500 dark:text-slate-400">Welcome back. Enter your credentials to sync with the network.</p>
+</div>
+<form class="space-y-5" onsubmit="return false;">
+<div class="space-y-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Network ID / Email</label>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">alternate_email</span>
+<input class="w-full pl-12 pr-4 py-4 bg-white dark:bg-card-dark border border-slate-200 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 glow-input transition-all dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600" placeholder="name@network.com" type="email"/>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-center px-1">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Secure Access Key</label>
+<a class="text-xs font-bold text-primary hover:text-accent-cyan transition-colors" href="#">Lost Key?</a>
+</div>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">lock</span>
+<input class="w-full pl-12 pr-12 py-4 bg-white dark:bg-card-dark border border-slate-200 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 glow-input transition-all dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600" placeholder="••••••••••••" type="password"/>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white" type="button">
+<span class="material-symbols-outlined text-xl">visibility</span>
+</button>
+</div>
+</div>
+<div class="flex items-center gap-3 py-2">
+<input class="w-5 h-5 rounded border-slate-300 dark:border-white/10 bg-white dark:bg-card-dark text-primary focus:ring-primary/30" id="remember" type="checkbox"/>
+<label class="text-sm text-slate-600 dark:text-slate-400 select-none cursor-pointer" for="remember">Stay synced on this device</label>
+</div>
+<button class="w-full py-4 bg-primary hover:bg-primary/90 text-white rounded-xl font-bold text-lg transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 flex items-center justify-center gap-2 group">
+<span>Join the Network</span>
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</form>
+<div class="relative py-4">
+<div class="absolute inset-0 flex items-center">
+<div class="w-full border-t border-slate-200 dark:border-white/5"></div>
+</div>
+<div class="relative flex justify-center">
+<span class="bg-background-light dark:bg-background-dark px-4 text-xs font-bold text-slate-400 uppercase tracking-widest">or link identity via</span>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-4">
+<button class="flex items-center justify-center py-3 bg-white dark:bg-card-dark border border-slate-200 dark:border-white/10 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-all">
+<img alt="" class="w-5 h-5 grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all" data-alt="Google logo icon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSbEaa75N31bs1yEWkEqExjISvKpEvm0Q2HCh2DlDMTdIy08AGZyjwI94oCmcYJi4yfEep4z2sBrwXhsWdkT4YvNIZY3nbDn5NJEuG5KJyYNOWKrajJAzwKzCUhCg0Yf5BBXbiKTDjYrZW3dNWY5YYbbsERGlcmG7_FkwoumDg-VLRPoZRtKCcTbuPFqk5Vjd7SVgMbSepe2a6MfHYLdnnrMo8LPnFlGcHK6LJp_jpx02HWcldFJoaO7FV_I0hQWbg42csw5qWxfM"/>
+</button>
+<button class="flex items-center justify-center py-3 bg-white dark:bg-card-dark border border-slate-200 dark:border-white/10 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-all">
+<span class="material-symbols-outlined text-slate-400 dark:text-slate-500">terminal</span>
+</button>
+<button class="flex items-center justify-center py-3 bg-white dark:bg-card-dark border border-slate-200 dark:border-white/10 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-all">
+<span class="material-symbols-outlined text-slate-400 dark:text-slate-500">fingerprint</span>
+</button>
+</div>
+<p class="text-center text-sm text-slate-500 dark:text-slate-500 pt-4">
+                        By connecting, you agree to our <a class="text-primary hover:underline" href="#">Terms of Transmission</a> and <a class="text-primary hover:underline" href="#">Privacy Protocol</a>.
+                    </p>
+</div>
+</div>
+<!-- Subtle Bottom Decor -->
+<div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-6 text-[10px] font-bold tracking-[0.2em] text-slate-400 dark:text-slate-600 uppercase">
+<span>V4.2.0-STABLE</span>
+<span class="w-1 h-1 rounded-full bg-slate-600"></span>
+<span>NODES: 1,429 ONLINE</span>
+<span class="w-1 h-1 rounded-full bg-slate-600"></span>
+<span>GLOBAL OPS</span>
+</div>
+</div>
+</div>
+</body></html>

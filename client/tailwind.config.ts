@@ -1,0 +1,141 @@
+import type { Config } from "tailwindcss";
+
+export default {
+  darkMode: ["class"],
+  content: [
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        "background-light": "#f6f6f8",
+        "background-dark": "#0a0f18",
+        "surface-dark": "#101622",
+        "primary-light": "#4f8aff",
+        glass: "rgba(16, 22, 34, 0.6)",
+        "glass-border": "rgba(19, 91, 236, 0.2)",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        chart: {
+          "1": "hsl(var(--chart-1))",
+          "2": "hsl(var(--chart-2))",
+          "3": "hsl(var(--chart-3))",
+          "4": "hsl(var(--chart-4))",
+          "5": "hsl(var(--chart-5))",
+        },
+      },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+      },
+      keyframes: {
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+        marquee: {
+          "0%": { transform: "translateX(0%)" },
+          "100%": { transform: "translateX(-100%)" },
+        },
+        float: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-20px)" },
+        },
+        scan: {
+          "0%": { top: "-10%", opacity: "0" },
+          "10%": { opacity: "1" },
+          "90%": { opacity: "1" },
+          "100%": { top: "110%", opacity: "0" },
+        },
+        springPop: {
+          "0%": { opacity: "0", transform: "scale(0.8) translateY(20px)" },
+          "100%": { opacity: "1", transform: "scale(1) translateY(0)" },
+        },
+        liquidFill: {
+          "0%": { backgroundPosition: "0% 100%" },
+          "100%": { backgroundPosition: "0% 0%" },
+        },
+        drawBorder: {
+          "0%": { clipPath: "inset(0 100% 100% 0)" },
+          "25%": { clipPath: "inset(0 0 100% 0)" },
+          "50%": { clipPath: "inset(0 0 0 0)" },
+          "75%": { clipPath: "inset(0 0 0 0)" },
+          "100%": { clipPath: "inset(0 0 0 0)" },
+        },
+        "pulse-glow": {
+          "0%, 100%": {
+            opacity: "1",
+            boxShadow: "0 0 20px rgba(19, 91, 236, 0.3)",
+          },
+          "50%": {
+            opacity: ".7",
+            boxShadow: "0 0 40px rgba(19, 91, 236, 0.6)",
+          },
+        },
+        "scan-vertical": {
+          "0%": { transform: "translateY(-100%)" },
+          "100%": { transform: "translateY(200%)" },
+        },
+        "draw-lines": {
+          "0%": { strokeDasharray: "1000", strokeDashoffset: "1000", opacity: "0" },
+          "100%": { strokeDashoffset: "0", opacity: "1" },
+        },
+      },
+      animation: {
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
+        "spin-slow": "spin 60s linear infinite",
+        "spin-reverse-slow": "spin 45s linear reverse infinite",
+        marquee: "marquee 25s linear infinite",
+        "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        "pulse-glow": "pulse-glow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        float: "float 6s ease-in-out infinite",
+        scan: "scan 3s linear infinite",
+        "scan-vertical": "scan-vertical 3s linear infinite",
+        "draw-lines": "draw-lines 2s ease-out forwards",
+        "spring-pop": "springPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
+        "liquid-fill": "liquidFill 2s ease-in-out forwards",
+        "draw-border": "drawBorder 1s ease-out forwards",
+      },
+    },
+  },
+  plugins: [require("tailwindcss-animate")],
+} satisfies Config;

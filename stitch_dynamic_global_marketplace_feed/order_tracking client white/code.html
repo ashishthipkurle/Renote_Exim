@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Global Trade Admin - Order Tracking &amp; History</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#0a0c12",
+                        "card-dark": "#161b26",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-dark {
+            background: rgba(22, 27, 38, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .glass-light {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        }
+        .sidebar-glass {
+            background: rgba(240, 242, 245, 0.85);
+            backdrop-filter: blur(16px);
+            border-right: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 4px 0 24px rgba(0,0,0,0.02);
+        }
+        .glow-pulse {
+            box-shadow: 0 0 0 0 rgba(19, 91, 236, 0.7);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(19, 91, 236, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(19, 91, 236, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(19, 91, 236, 0); }
+        }
+        .stagger-item {
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeInSlide 0.5s ease forwards;
+        }
+        @keyframes fadeInSlide {
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-[#f8f9fc] font-display text-slate-900 antialiased overflow-x-hidden">
+<div class="flex min-h-screen">
+<aside class="w-20 lg:w-64 sidebar-glass flex flex-col items-center lg:items-start py-6 transition-all duration-300 relative z-20">
+<div class="px-6 mb-10 flex items-center gap-3">
+<div class="size-10 bg-primary rounded-lg flex items-center justify-center shadow-lg shadow-primary/20 text-white">
+<span class="material-symbols-outlined">grid_view</span>
+</div>
+<h1 class="hidden lg:block text-xl font-bold tracking-tight text-slate-900">TradeFlow</h1>
+</div>
+<nav class="flex-1 w-full px-3 space-y-2">
+<a class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/60 transition-colors group text-slate-600 hover:text-slate-900" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">home</span>
+<span class="hidden lg:block text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/60 transition-colors group text-slate-600 hover:text-slate-900" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">grid_view</span>
+<span class="hidden lg:block text-sm font-medium">All Categories</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/60 transition-colors group text-slate-600 hover:text-slate-900" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">package_2</span>
+<span class="hidden lg:block text-sm font-medium">Inventory</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-xl bg-blue-50 text-primary border border-blue-100 transition-colors group shadow-sm" href="#">
+<span class="material-symbols-outlined fill-1">local_shipping</span>
+<span class="hidden lg:block text-sm font-bold">Orders</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/60 transition-colors group text-slate-600 hover:text-slate-900" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">analytics</span>
+<span class="hidden lg:block text-sm font-medium">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/60 transition-colors group text-slate-600 hover:text-slate-900" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">account_balance_wallet</span>
+<span class="hidden lg:block text-sm font-medium">Finance</span>
+</a>
+</nav>
+<div class="px-3 w-full mt-auto pt-6 border-t border-slate-200/60 space-y-2">
+<a class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/60 transition-colors group text-slate-600 hover:text-slate-900 mb-2" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">settings</span>
+<span class="hidden lg:block text-sm font-medium">Settings</span>
+</a>
+<div class="flex items-center gap-3 px-3 py-3 rounded-xl bg-white/50 border border-slate-200/50 hover:bg-white hover:border-slate-300/50 transition-colors cursor-pointer shadow-sm">
+<div class="size-8 rounded-full bg-slate-200 overflow-hidden ring-2 ring-white">
+<img class="w-full h-full object-cover" data-alt="User profile avatar of a businessman" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrZLkmqRTP7qfcm8kS-Cw4ZgzJYBIuNUoMeenXMNS7dujLfHPr6cxc_E6S3EXn5oAjGUwE1fPsHcawRos2sVBXr2_JWYnWW5xN-IdZDTk6Zogbl1H2PjM5jeHgXDUg5BolPSsd4ztGaMg91sWN-hbSlQWvf1zyScvfIY8ydGzJRLKhf0m-a3jU4Fl4VL89Uxw55JiNA963xtRgFRhGwgbxT4cnfLPpKG0oeatq1GVt1uspFa7D-jUKPSowvnZOazzpZX6nAWDgQDw"/>
+</div>
+<div class="hidden lg:block overflow-hidden">
+<p class="text-xs font-bold truncate text-slate-900">Alex Rivera</p>
+<p class="text-[10px] text-slate-500 truncate">Admin Account</p>
+</div>
+</div>
+</div>
+</aside>
+<main class="flex-1 overflow-y-auto p-4 lg:p-8 space-y-8 bg-[#f8f9fc]">
+<header class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<h2 class="text-3xl font-black tracking-tight text-slate-900">Logistics Control</h2>
+<p class="text-slate-500 mt-1">Real-time oversight for your global supply chain network.</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="bg-primary hover:bg-primary/90 text-white font-bold py-2.5 px-6 rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-sm">add</span>
+                    New Shipment
+                </button>
+</div>
+</header>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<section class="lg:col-span-7 flex flex-col gap-6">
+<div class="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200 relative">
+<div class="p-6 flex items-center justify-between border-b border-slate-100 bg-white">
+<div class="flex items-center gap-4">
+<div class="size-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary glow-pulse">
+<span class="material-symbols-outlined">rocket_launch</span>
+</div>
+<div>
+<h3 class="text-xl font-extrabold text-slate-900">Active: TRK-9823-X</h3>
+<p class="text-xs text-primary font-bold uppercase tracking-widest">In Transit - Sea Route</p>
+</div>
+</div>
+<div class="px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold flex items-center gap-2">
+<span class="size-2 rounded-full bg-primary animate-ping"></span>
+                            LIVE UPDATING
+                        </div>
+</div>
+<div class="h-80 w-full relative group bg-slate-50">
+<div class="absolute inset-0 bg-[#eff2f6] flex items-center justify-center overflow-hidden">
+<div class="absolute inset-0 opacity-20 grayscale" data-location="Global Trade Route Map" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuChaXBV4peIrEWX4lOOwgwGl8SyVnARS95fOl9z2VqVo3IPDfn3TUzcaF-jumrdFAoMbCnyf-crnlQzWtghGoYG4LqMvPU-6EaZCZNjuVlIXVmVAP5sRXhPhxClGQmAKoUrSkvz1J-3fw6Jhj26oax1JjnUrEkIIomzxU-UMIrApvB_NTPjU9sKRU4ZJa1BBaVqZegsg6mzGlSsc3NquK9iWoerHxH8GuLLX03vlwxMOPG5TFEwB5IM2dSyyf-ahU18kadN8-3rd80'); background-size: cover; mix-blend-mode: multiply;"></div>
+<svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 1000 400">
+<path d="M100,200 Q300,50 500,200 T900,150" fill="none" opacity="0.6" stroke="#135bec" stroke-dasharray="8 4" stroke-width="2"></path>
+<circle class="glow-pulse" cx="580" cy="180" fill="#135bec" r="6"></circle>
+<text class="drop-shadow-sm" fill="#334155" font-size="12" font-weight="bold" x="595" y="185">Port of Singapore</text>
+</svg>
+</div>
+<div class="absolute bottom-6 right-6 p-4 glass-light rounded-xl border border-white/40 max-w-[200px]">
+<p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Estimated Arrival</p>
+<p class="text-lg font-black text-slate-900">Nov 12, 2024</p>
+<div class="mt-2 w-full bg-slate-200 h-1 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[72%]"></div>
+</div>
+</div>
+</div>
+<div class="p-8 space-y-8 relative bg-white">
+<div class="absolute left-12 top-0 bottom-0 w-px bg-gradient-to-b from-primary via-primary/30 to-slate-100"></div>
+<div class="flex gap-6 relative group">
+<div class="z-10 size-8 rounded-full bg-primary border-4 border-white flex items-center justify-center shadow-[0_0_15px_rgba(19,91,236,0.3)]">
+<span class="material-symbols-outlined text-[14px] text-white">check</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1">
+<h4 class="font-bold text-slate-900">Order Processed</h4>
+<span class="text-xs text-slate-500">Oct 24, 08:00 AM</span>
+</div>
+<p class="text-sm text-slate-500">Warehouse Shanghai, CN - Package scanned and ready for dispatch.</p>
+</div>
+</div>
+<div class="flex gap-6 relative group">
+<div class="z-10 size-8 rounded-full bg-primary border-4 border-white flex items-center justify-center shadow-[0_0_15px_rgba(19,91,236,0.3)]">
+<span class="material-symbols-outlined text-[14px] text-white">check</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1">
+<h4 class="font-bold text-slate-900">In Transit (Sea)</h4>
+<span class="text-xs text-slate-500">Oct 26, 11:15 AM</span>
+</div>
+<p class="text-sm text-slate-500">Vessel: 'Evergreen Nova' - Current position: Malacca Strait.</p>
+<div class="mt-3 inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-primary/10 border border-primary/20">
+<span class="material-symbols-outlined text-xs text-primary">sailing</span>
+<span class="text-[10px] font-bold text-primary uppercase">Active Segment</span>
+</div>
+</div>
+</div>
+<div class="flex gap-6 relative opacity-60">
+<div class="z-10 size-8 rounded-full bg-slate-200 border-4 border-white flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px] text-slate-400">shield</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1">
+<h4 class="font-bold text-slate-700">Customs Clearance</h4>
+<span class="text-xs text-slate-400">Pending</span>
+</div>
+<p class="text-sm text-slate-400">Estimated processing time: 24-48 hours upon port arrival.</p>
+</div>
+</div>
+<div class="flex gap-6 relative opacity-40">
+<div class="z-10 size-8 rounded-full bg-slate-100 border-4 border-white flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px] text-slate-300">home</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1">
+<h4 class="font-bold text-slate-600">Final Delivery</h4>
+<span class="text-xs text-slate-400">TBD</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="lg:col-span-5 space-y-6">
+<div class="flex items-center justify-between">
+<h3 class="text-xl font-bold text-slate-900">Order Archive</h3>
+<div class="flex gap-2">
+<button class="size-9 rounded-lg glass-light flex items-center justify-center hover:bg-slate-100 transition-colors border border-slate-200/50">
+<span class="material-symbols-outlined text-slate-400 text-sm">filter_list</span>
+</button>
+<button class="size-9 rounded-lg glass-light flex items-center justify-center hover:bg-slate-100 transition-colors border border-slate-200/50">
+<span class="material-symbols-outlined text-slate-400 text-sm">search</span>
+</button>
+</div>
+</div>
+<div class="space-y-4">
+<div class="stagger-item glass-light p-4 rounded-xl border border-slate-200/60 hover:border-primary/30 transition-all flex items-center gap-4 group" style="animation-delay: 0.1s;">
+<div class="size-16 rounded-lg bg-slate-100 flex-shrink-0 overflow-hidden relative border border-slate-100">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Silver luxury watch product thumbnail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhK5-ZR0bboC3ZDn1ayJa7wmlLT4fFdvPXlpPhYxJSUwFTYAYiYUEprCKqS4gWEj0S9_w3x0cvvjzdsGXaQ5KjJw8FwY1PS0FdVscNUXpiWlgDm-MU7ZZTyUSv6vfQbc_PvLTOPS9IlJqnVqNfBK0h8HsjYc5_4W2Us3IuBRyIScwTg3iZwROaaG8gMqloi4zfBqqcOu6YXYd_FH7BR0p90a5_TMIvhYE9UMCnZ7WCtLIQjwWnNGPVlJZd_riE1x-Q3b1IGGMU900"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start">
+<p class="text-sm font-bold text-slate-900 truncate">ORD-2094-ZZ</p>
+<span class="text-[10px] font-bold text-emerald-600 px-2 py-0.5 rounded-full bg-emerald-100">DELIVERED</span>
+</div>
+<p class="text-xs text-slate-500 mt-1">Oct 12, 2024</p>
+<div class="flex items-center justify-between mt-2">
+<p class="text-sm font-black text-slate-900">$1,240.00</p>
+<button class="text-[10px] font-bold text-primary hover:underline">REORDER</button>
+</div>
+</div>
+</div>
+<div class="stagger-item glass-light p-4 rounded-xl border border-slate-200/60 hover:border-primary/30 transition-all flex items-center gap-4 group" style="animation-delay: 0.2s;">
+<div class="size-16 rounded-lg bg-slate-100 flex-shrink-0 overflow-hidden relative border border-slate-100">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Red athletic sneakers product thumbnail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAi5kDn8vB4-LnKw58B7BYi7d6DPtn6i5YtrLOCBimVcQeld2GfUwykfUmeVTltCSKu6oOpNfts9x6uqcuEhtbIY5uUxJYmmQ9d3BtKAl3KlVX2gX6hact8TYYoNuBoJfhuC4pC5Ajb1jwGu_wKx6GT-xnWb9qbhSQg705ImgOLccpwRT1nQOWyZEIAdBVOHAI6o_TId02Bz6gFonei-hcIY8z9nd9O4rpNNuH1cxqnfXiQN_xvepb8rjbhbUeH-gLXMb4-BZKV5jg"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start">
+<p class="text-sm font-bold text-slate-900 truncate">ORD-1882-LX</p>
+<span class="text-[10px] font-bold text-emerald-600 px-2 py-0.5 rounded-full bg-emerald-100">DELIVERED</span>
+</div>
+<p class="text-xs text-slate-500 mt-1">Sep 28, 2024</p>
+<div class="flex items-center justify-between mt-2">
+<p class="text-sm font-black text-slate-900">$450.00</p>
+<button class="text-[10px] font-bold text-primary hover:underline">REORDER</button>
+</div>
+</div>
+</div>
+<div class="stagger-item glass-light p-4 rounded-xl border border-slate-200/60 hover:border-primary/30 transition-all flex items-center gap-4 group" style="animation-delay: 0.3s;">
+<div class="size-16 rounded-lg bg-slate-100 flex-shrink-0 overflow-hidden relative border border-slate-100">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Premium wireless headphones product thumbnail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvaMoglHLfvhnpkgcXiuIO9ZF42U7zu1ZNJPAbCspRG1TLOgei8zDHsMoz5SjhOhJ_NyxBymDetyKKy9KkJgkIcy0TAksFK15mXtU_v-fNhvYNniTYT_EEPMHweMywpiwqncN3IAK1oVL870Z6QBS8BdY0hm_ZuwMAWN1DdfzbebETAdwdik4FqnTeKTv4qGGZ4BprMf9egQqoBCbYt_V_kYbA1wYycHbueI0vukpkEEE1IwK4M7hW8uSdwAkR-TrLmbsvQnId2SA"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start">
+<p class="text-sm font-bold text-slate-900 truncate">ORD-1554-QR</p>
+<span class="text-[10px] font-bold text-rose-600 px-2 py-0.5 rounded-full bg-rose-100">CANCELLED</span>
+</div>
+<p class="text-xs text-slate-500 mt-1">Sep 15, 2024</p>
+<div class="flex items-center justify-between mt-2">
+<p class="text-sm font-black text-slate-900">$899.00</p>
+<button class="text-[10px] font-bold text-slate-500 hover:text-slate-700">DETAILS</button>
+</div>
+</div>
+</div>
+<div class="stagger-item glass-light p-4 rounded-xl border border-slate-200/60 hover:border-primary/30 transition-all flex items-center gap-4 group" style="animation-delay: 0.4s;">
+<div class="size-16 rounded-lg bg-slate-100 flex-shrink-0 overflow-hidden relative border border-slate-100">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="High-end coffee machine product thumbnail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBz2FlZ4ur4abzQMU04Pjopb5DVzmHhck78_ewWeES0JZiECesgECD99ijT3L801T19W8Ps3ObAXddwdyAKzxWSrPUUN9QQFmRkPWo5fmUroMkusyqUe1K8pcG2rwkIsdW2_iQW6qJ8vPEMBAcE0NBG2H1gKDzk7fk38wIl536hLsXBmCAVAzw4hoOFdEfp1dYMCdO3mulPOuGpUECKaOhSuJ5e1e7Bzs3zAnL7IYqffq435rhPBnALv737qYULE2M3V686G4Xr2qI"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start">
+<p class="text-sm font-bold text-slate-900 truncate">ORD-1221-AB</p>
+<span class="text-[10px] font-bold text-emerald-600 px-2 py-0.5 rounded-full bg-emerald-100">DELIVERED</span>
+</div>
+<p class="text-xs text-slate-500 mt-1">Aug 30, 2024</p>
+<div class="flex items-center justify-between mt-2">
+<p class="text-sm font-black text-slate-900">$2,100.00</p>
+<button class="text-[10px] font-bold text-primary hover:underline">REORDER</button>
+</div>
+</div>
+</div>
+<div class="stagger-item glass-light p-4 rounded-xl border border-slate-200/60 hover:border-primary/30 transition-all flex items-center gap-4 group" style="animation-delay: 0.5s;">
+<div class="size-16 rounded-lg bg-slate-100 flex-shrink-0 overflow-hidden relative border border-slate-100">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Modern minimalist camera product thumbnail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTXwqU4eC_I3BF3BBpNaizzEaZtysDEPlrwKHAMnXIMVj1ksI1zErzJdqhuiv-9AT4fHscfNj5G98Kh-4QVl1RInWI_7FUpDgy1DDVTdKHaAb2bey53uNE43GTCTeDgfbZ7gLjS71T6QDHW4cEvnX_axpxwOHL9KR3GThlsCJOAAamz_SkGwB8gSynqnch26z4rzFfgKC3YGdN7fV9sGzjsOPwhpgr8J_gCLaV0v35Xv46XhOUgR5q-hRKoCO4W3CCUkNJW1oX13o"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start">
+<p class="text-sm font-bold text-slate-900 truncate">ORD-0992-MM</p>
+<span class="text-[10px] font-bold text-emerald-600 px-2 py-0.5 rounded-full bg-emerald-100">DELIVERED</span>
+</div>
+<p class="text-xs text-slate-500 mt-1">Aug 12, 2024</p>
+<div class="flex items-center justify-between mt-2">
+<p class="text-sm font-black text-slate-900">$650.00</p>
+<button class="text-[10px] font-bold text-primary hover:underline">REORDER</button>
+</div>
+</div>
+</div>
+</div>
+<button class="w-full py-4 glass-light border border-dashed border-slate-300 rounded-xl text-xs font-bold text-slate-500 hover:text-primary hover:border-primary/50 hover:bg-slate-50 transition-all">
+                    LOAD MORE TRANSACTIONS
+                </button>
+<div class="grid grid-cols-2 gap-4 pt-4">
+<div class="glass-light p-4 rounded-xl border border-slate-200/60">
+<p class="text-[10px] text-slate-500 font-bold uppercase mb-1">Total Spent YTD</p>
+<p class="text-xl font-black text-slate-900">$142,500</p>
+</div>
+<div class="glass-light p-4 rounded-xl border border-slate-200/60">
+<p class="text-[10px] text-slate-500 font-bold uppercase mb-1">Total Shipments</p>
+<p class="text-xl font-black text-slate-900">482</p>
+</div>
+</div>
+</section>
+</div>
+</main>
+</div>
+</body></html>
