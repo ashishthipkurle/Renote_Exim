@@ -9,7 +9,8 @@ import { CreditCard, Landmark, Lock, Wallet } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { clearCart, getCart, type CartItem } from "@/lib/cart";
-import { getAuthToken, getStoredUser } from "@/lib/auth-client";
+import { getAuthToken } from "@/lib/auth-client";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 function getApiErrorMessage(error: unknown): string | null {
   if (!error || typeof error !== "object") return null;
@@ -39,6 +40,7 @@ function formatMoney(amount: number) {
 }
 
 export default function CheckoutPage() {
+  const { user } = useAuth();
   const [items, setItems] = useState<CartItem[]>([]);
   const [productsById, setProductsById] = useState<Record<string, Product>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -74,7 +76,6 @@ export default function CheckoutPage() {
 
   const placeOrders = async () => {
     const token = await getAuthToken();
-    const user = getStoredUser();
 
     if (!token || !user) {
       toast.error("Please login to place an order");

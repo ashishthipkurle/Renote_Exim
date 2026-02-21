@@ -8,7 +8,8 @@ import { toast } from "sonner";
 import { ArrowRight, Filter, Package, Search, Truck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { getAuthToken, getStoredUser } from "@/lib/auth-client";
+import { getAuthToken } from "@/lib/auth-client";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 function getApiErrorMessage(error: unknown): string | null {
   if (!error || typeof error !== "object") return null;
@@ -51,6 +52,7 @@ function formatMoney(amount: number) {
 }
 
 export default function OrdersPage() {
+  const { user, loading: authLoading } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -59,7 +61,6 @@ export default function OrdersPage() {
       setLoading(true);
       try {
         const token = await getAuthToken();
-        const user = getStoredUser();
         if (!token || !user) {
           setOrders([]);
           return;
@@ -78,9 +79,7 @@ export default function OrdersPage() {
     };
 
     void load();
-  }, []);
-
-  const user = typeof window !== "undefined" ? getStoredUser() : null;
+  }, [user]);
 
   const active = orders.find((o) => Boolean(o.shipment)) ?? orders[0] ?? null;
   const activeShipment = active?.shipment ?? null;

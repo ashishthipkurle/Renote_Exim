@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Globe2 } from "lucide-react";
+import { Menu, X, Globe2, User, LogOut } from "lucide-react";
 import { Button } from "./ui/button";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, loading, logout } = useAuth();
 
   const navLinks = [
     { href: "/", label: "Home" },
@@ -49,12 +51,34 @@ export default function Header() {
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center gap-2">
             <ThemeToggle />
-            <Link href="/login">
-              <Button variant="ghost">Login</Button>
-            </Link>
-            <Link href="/register">
-              <Button>Get Started</Button>
-            </Link>
+            {!loading && (
+              user ? (
+                <div className="flex items-center gap-2">
+                  <Link href={`/dashboard/${user.role?.toLowerCase()}`}>
+                    <Button variant="ghost" className="gap-2">
+                      {user.avatar ? (
+                        <img src={user.avatar as string} alt="Avatar" className="w-5 h-5 rounded-full object-cover" />
+                      ) : (
+                        <User className="w-4 h-4" />
+                      )}
+                      Dashboard
+                    </Button>
+                  </Link>
+                  <Button variant="ghost" size="icon" onClick={() => logout()}>
+                    <LogOut className="w-4 h-4" />
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <Link href="/login">
+                    <Button variant="ghost">Login</Button>
+                  </Link>
+                  <Link href="/register">
+                    <Button>Get Started</Button>
+                  </Link>
+                </>
+              )
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -93,14 +117,31 @@ export default function Header() {
                 </Link>
               ))}
               <div className="pt-4 space-y-2 border-t border-border">
-                <Link href="/login" className="block">
-                  <Button variant="ghost" className="w-full">
-                    Login
-                  </Button>
-                </Link>
-                <Link href="/register" className="block">
-                  <Button className="w-full">Get Started</Button>
-                </Link>
+                {!loading && (
+                  user ? (
+                    <>
+                      <Link href={`/dashboard/${user.role?.toLowerCase()}`} className="block">
+                        <Button className="w-full gap-2">
+                          <User className="w-4 h-4" /> Dashboard
+                        </Button>
+                      </Link>
+                      <Button variant="ghost" className="w-full gap-2" onClick={() => logout()}>
+                        <LogOut className="w-4 h-4" /> Logout
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Link href="/login" className="block">
+                        <Button variant="ghost" className="w-full">
+                          Login
+                        </Button>
+                      </Link>
+                      <Link href="/register" className="block">
+                        <Button className="w-full">Get Started</Button>
+                      </Link>
+                    </>
+                  )
+                )}
               </div>
             </div>
           </motion.div>

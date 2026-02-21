@@ -3,6 +3,7 @@ import { Manrope } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { AuthProvider } from "@/components/auth/AuthProvider";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -34,8 +35,10 @@ export default function RootLayout({
       </head>
       <body className={`${manrope.variable} font-sans antialiased`}>
         <ThemeProvider>
-          {children}
-          <Toaster position="top-right" richColors />
+          <AuthProvider>
+            {children}
+            <Toaster position="top-right" richColors />
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

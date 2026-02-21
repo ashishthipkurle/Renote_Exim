@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
@@ -15,7 +15,8 @@ import {
   Zap,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useAuth } from "@/components/auth/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import axios from "axios";
@@ -33,6 +34,9 @@ function getApiErrorMessage(error: unknown): string | null {
 
 export default function RegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { refreshUser } = useAuth();
+  const didInitRole = useRef(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -45,6 +49,20 @@ export default function RegisterPage() {
     phone: "",
     website: "",
   });
+
+  useEffect(() => {
+    if (didInitRole.current) return;
+    const roleParam = (searchParams.get("role") ?? "").toLowerCase();
+    if (roleParam === "exporter") {
+      setFormData((prev) => ({ ...prev, role: "EXPORTER" }));
+      didInitRole.current = true;
+      return;
+    }
+    if (roleParam === "importer" || roleParam === "customer") {
+      setFormData((prev) => ({ ...prev, role: "IMPORTER" }));
+      didInitRole.current = true;
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,8 +87,8 @@ export default function RegisterPage() {
       });
 
       if (response.data?.user) {
-        // Store user data in localStorage
-        localStorage.setItem("user", JSON.stringify(response.data.user));
+        // Refresh global auth context
+        await refreshUser();
 
         toast.success("Registration successful! Welcome aboard!");
 
@@ -183,11 +201,10 @@ export default function RegisterPage() {
                     <button
                       type="button"
                       onClick={() => setFormData({ ...formData, role: "IMPORTER" })}
-                      className={`p-4 border rounded-xl text-left transition-colors ${
-                        formData.role === "IMPORTER"
+                      className={`p-4 border rounded-xl text-left transition-colors ${formData.role === "IMPORTER"
                           ? "border-primary bg-primary/10"
                           : "border-border hover:bg-accent"
-                      }`}
+                        }`}
                     >
                       <div className="font-semibold">Import Products</div>
                       <div className="text-sm text-muted-foreground mt-1">Buy from exporters</div>
@@ -195,11 +212,10 @@ export default function RegisterPage() {
                     <button
                       type="button"
                       onClick={() => setFormData({ ...formData, role: "EXPORTER" })}
-                      className={`p-4 border rounded-xl text-left transition-colors ${
-                        formData.role === "EXPORTER"
+                      className={`p-4 border rounded-xl text-left transition-colors ${formData.role === "EXPORTER"
                           ? "border-primary bg-primary/10"
                           : "border-border hover:bg-accent"
-                      }`}
+                        }`}
                     >
                       <div className="font-semibold">Export Products</div>
                       <div className="text-sm text-muted-foreground mt-1">Sell to importers</div>

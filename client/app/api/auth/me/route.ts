@@ -6,33 +6,45 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
-        function isRecord(value: unknown): value is Record<string, unknown> {
-          return typeof value === "object" && value !== null;
-        }
+    function isRecord(value: unknown): value is Record<string, unknown> {
+      return typeof value === "object" && value !== null;
+    }
 
-        function getString(record: Record<string, unknown>, key: string): string | null {
-          const value = record[key];
-          return typeof value === "string" && value.length > 0 ? value : null;
-        }
+    function getString(record: Record<string, unknown>, key: string): string | null {
+      const value = record[key];
+      return typeof value === "string" && value.length > 0 ? value : null;
+    }
 
-        function getBoolean(record: Record<string, unknown>, key: string): boolean | null {
-          const value = record[key];
-          return typeof value === "boolean" ? value : null;
-        }
+    function getBoolean(record: Record<string, unknown>, key: string): boolean | null {
+      const value = record[key];
+      return typeof value === "boolean" ? value : null;
+    }
 
     const { supabase, applyCookies } = createSupabaseRouteClient(request);
 
     // Prefer bearer token if provided, else use cookie session.
     const authHeader = request.headers.get("authorization");
-    const bearer = authHeader?.startsWith("Bearer ")
+    let token = authHeader?.startsWith("Bearer ")
       ? authHeader.slice("Bearer ".length)
       : null;
 
-    const { data: userData, error: userError } = bearer
-      ? await supabase.auth.getUser(bearer)
-      : await supabase.auth.getUser();
+    let userDetailsResponse;
 
-    if (userError || !userData.user) {
+    if (token) {
+      userDetailsResponse = await supabase.auth.getUser(token);
+    } else {
+      const sessionRes = await supabase.auth.getSession();
+      if (sessionRes.data.session) {
+        token = sessionRes.data.session.access_token;
+        userDetailsResponse = await supabase.auth.getUser(token);
+      } else {
+        userDetailsResponse = { data: { user: null }, error: new Error("No session") };
+      }
+    }
+
+    const { data: userData, error: userError } = userDetailsResponse;
+
+    if (userError || !userData?.user) {
       const res = NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -40,26 +52,12 @@ export async function GET(request: NextRequest) {
       return applyCookies(res);
     }
 
-    let user:
-      | {
-          id: string;
-          name: string | null;
-          email: string;
-          role: string;
-          companyName: string | null;
-          country: string | null;
-          phone: string | null;
-          website: string | null;
-          verified: boolean | null;
-          avatar: string | null;
-          createdAt?: string;
-          updatedAt?: string;
-        }
-      | null = null;
+    let profile = null;
 
+    // 1. Try Prisma First
     try {
-      const prismaModule = await import("@/lib/prisma");
-      const prismaUser = await prismaModule.prisma.user.findUnique({
+      const { prisma } = await import("@/lib/prisma");
+      const prismaUser = await prisma.user.findUnique({
         where: { id: userData.user.id },
         select: {
           id: true,
@@ -78,7 +76,7 @@ export async function GET(request: NextRequest) {
       });
 
       if (prismaUser) {
-        user = {
+        profile = {
           ...prismaUser,
           role: String(prismaUser.role),
           createdAt: prismaUser.createdAt.toISOString(),
@@ -86,10 +84,11 @@ export async function GET(request: NextRequest) {
         };
       }
     } catch (e) {
-      console.warn("Prisma user lookup failed:", e);
+      console.warn("Prisma user lookup failed in /me:", e);
     }
 
-    if (!user) {
+    // 2. Fallback to Supabase Database
+    if (!profile) {
       const { data: supaUser, error: supaError } = await supabase
         .from("users")
         .select("id,name,email,role,companyName,country,phone,website,verified,avatar,createdAt,updatedAt")
@@ -99,7 +98,7 @@ export async function GET(request: NextRequest) {
       if (!supaError && supaUser) {
         const row = isRecord(supaUser) ? supaUser : {};
         const meta = isRecord(userData.user.user_metadata) ? userData.user.user_metadata : {};
-        user = {
+        profile = {
           id: getString(row, "id") ?? userData.user.id,
           name: getString(row, "name"),
           email: getString(row, "email") ?? userData.user.email ?? "",
@@ -113,14 +112,13 @@ export async function GET(request: NextRequest) {
           createdAt: getString(row, "createdAt") ?? undefined,
           updatedAt: getString(row, "updatedAt") ?? undefined,
         };
-      } else {
-        if (supaError) console.warn("Supabase user lookup failed:", supaError.message);
       }
     }
 
-    if (!user) {
+    // 3. Absolute Fallback to Supabase Auth Metadata
+    if (!profile) {
       const meta = isRecord(userData.user.user_metadata) ? userData.user.user_metadata : {};
-      user = {
+      profile = {
         id: userData.user.id,
         name: getString(meta, "name"),
         email: userData.user.email ?? "",
@@ -134,7 +132,7 @@ export async function GET(request: NextRequest) {
       };
     }
 
-    const res = NextResponse.json({ user });
+    const res = NextResponse.json({ user: profile });
     return applyCookies(res);
 
   } catch (error) {

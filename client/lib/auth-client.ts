@@ -13,13 +13,3 @@ export type StoredUser = {
   role: "EXPORTER" | "IMPORTER" | "ADMIN";
 } & Record<string, unknown>;
 
-export function getStoredUser(): StoredUser | null {
-  if (typeof window === "undefined") return null;
-  const raw = window.localStorage.getItem("user");
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw) as StoredUser;
-  } catch {
-    return null;
-  }
-}

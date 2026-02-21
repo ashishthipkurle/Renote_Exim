@@ -62,6 +62,69 @@ export async function POST(request: NextRequest) {
       return applyCookies(res);
     }
 
+    // Persist the profile (especially role) using Prisma when available. This avoids relying on
+    // Supabase RLS policies for writes to the `users` table (which would otherwise leave role at
+    // the Prisma default).
+    let prismaProfile:
+      | {
+        id: string;
+        name: string | null;
+        email: string;
+        role: unknown;
+        companyName: string | null;
+        country: string | null;
+        phone: string | null;
+        website: string | null;
+        verified: boolean;
+        avatar: string | null;
+        createdAt: Date;
+        updatedAt: Date;
+      }
+      | null = null;
+
+    try {
+      const prismaModule = await import("@/lib/prisma");
+      prismaProfile = await prismaModule.prisma.user.upsert({
+        where: { id: data.user.id },
+        update: {
+          name: validatedData.name,
+          email: validatedData.email,
+          role: validatedData.role,
+          companyName: validatedData.companyName,
+          country: validatedData.country,
+          phone: validatedData.phone,
+          website: validatedData.website,
+        },
+        create: {
+          id: data.user.id,
+          name: validatedData.name,
+          email: validatedData.email,
+          role: validatedData.role,
+          companyName: validatedData.companyName,
+          country: validatedData.country,
+          phone: validatedData.phone,
+          website: validatedData.website,
+          verified: false,
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          companyName: true,
+          country: true,
+          phone: true,
+          website: true,
+          verified: true,
+          avatar: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
+    } catch (e) {
+      console.warn("Prisma upsert skipped/unavailable:", e);
+    }
+
     // Best-effort update to profile row (created via DB trigger). If RLS/trigger isn't
     // installed yet, we still want the registration flow to succeed.
     const { error: profileUpdateError } = await supabase
@@ -80,101 +143,12 @@ export async function POST(request: NextRequest) {
       console.warn("Profile update skipped/failed:", profileUpdateError.message);
     }
 
-    // Prefer Prisma profile (if DATABASE_URL is configured). Otherwise fall back to Supabase.
-    let profile:
-      | {
-          id: string;
-          name: string | null;
-          email: string;
-          role: string;
-          companyName: string | null;
-          country: string | null;
-          phone: string | null;
-          website: string | null;
-          verified: boolean | null;
-          avatar: string | null;
-          createdAt?: string;
-          updatedAt?: string;
-        }
-      | null = null;
-
-    try {
-      const prismaModule = await import("@/lib/prisma");
-      const prisma = prismaModule.prisma;
-
-      const prismaProfile = await prisma.user.findUnique({
-        where: { id: data.user.id },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          role: true,
-          companyName: true,
-          country: true,
-          phone: true,
-          website: true,
-          verified: true,
-          avatar: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-      });
-
-      if (prismaProfile) {
-        profile = {
-          ...prismaProfile,
-          role: String(prismaProfile.role),
-          createdAt: prismaProfile.createdAt.toISOString(),
-          updatedAt: prismaProfile.updatedAt.toISOString(),
-        };
-      }
-    } catch (e) {
-      console.warn("Prisma unavailable; using Supabase profile fallback:", e);
-    }
-
-    if (!profile) {
-      const { data: supaProfile, error: supaError } = await supabase
-        .from("users")
-        .select("id,name,email,role,companyName,country,phone,website,verified,avatar,createdAt,updatedAt")
-        .eq("id", data.user.id)
-        .maybeSingle();
-
-      if (!supaError && supaProfile) {
-        const row = isRecord(supaProfile) ? supaProfile : {};
-        profile = {
-          id: getString(row, "id") ?? data.user.id,
-          name: getString(row, "name"),
-          email: getString(row, "email") ?? data.user.email ?? validatedData.email,
-          role: getString(row, "role") ?? validatedData.role,
-          companyName: getString(row, "companyName"),
-          country: getString(row, "country"),
-          phone: getString(row, "phone"),
-          website: getString(row, "website"),
-          verified: getBoolean(row, "verified"),
-          avatar: getString(row, "avatar"),
-          createdAt: getString(row, "createdAt") ?? undefined,
-          updatedAt: getString(row, "updatedAt") ?? undefined,
-        };
-      } else {
-        if (supaError) console.warn("Supabase profile lookup failed:", supaError.message);
-      }
-    }
-
-    if (!profile) {
-      // Last-resort: construct a minimal profile from the signup payload so the UI can proceed.
-      profile = {
-        id: data.user.id,
-        name: validatedData.name ?? null,
-        email: data.user.email ?? validatedData.email,
-        role: validatedData.role,
-        companyName: validatedData.companyName ?? null,
-        country: validatedData.country ?? null,
-        phone: validatedData.phone ?? null,
-        website: validatedData.website ?? null,
-        verified: null,
-        avatar: null,
-      };
-    }
+    const profile = {
+      id: data.user.id,
+      name: validatedData.name ?? null,
+      email: data.user.email ?? validatedData.email,
+      role: validatedData.role,
+    };
 
     // Optional welcome notification (best-effort; skip if Prisma isn't configured)
     try {

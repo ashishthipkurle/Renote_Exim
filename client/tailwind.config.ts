@@ -75,6 +75,10 @@ export default {
           "0%": { transform: "translateX(0%)" },
           "100%": { transform: "translateX(-100%)" },
         },
+        marqueeReverse: {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(0%)" },
+        },
         float: {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-20px)" },
@@ -118,6 +122,14 @@ export default {
           "0%": { strokeDasharray: "1000", strokeDashoffset: "1000", opacity: "0" },
           "100%": { strokeDashoffset: "0", opacity: "1" },
         },
+        pathMove: {
+          "0%": { strokeDashoffset: "100" },
+          "100%": { strokeDashoffset: "0" },
+        },
+        flyUp: {
+          "0%": { transform: "translateY(120vh) translateX(-5vw)" },
+          "100%": { transform: "translateY(-120vh) translateX(5vw)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -125,6 +137,7 @@ export default {
         "spin-slow": "spin 60s linear infinite",
         "spin-reverse-slow": "spin 45s linear reverse infinite",
         marquee: "marquee 25s linear infinite",
+        "marquee-reverse": "marqueeReverse 25s linear infinite",
         "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         "pulse-glow": "pulse-glow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         float: "float 6s ease-in-out infinite",
@@ -134,6 +147,8 @@ export default {
         "spring-pop": "springPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
         "liquid-fill": "liquidFill 2s ease-in-out forwards",
         "draw-border": "drawBorder 1s ease-out forwards",
+        "path-move": "pathMove 3s linear infinite",
+        "fly-up": "flyUp 12s linear infinite",
       },
     },
   },

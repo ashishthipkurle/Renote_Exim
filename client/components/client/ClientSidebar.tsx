@@ -11,7 +11,9 @@ import {
   LineChart,
   Wallet,
   Settings,
+  User,
 } from "lucide-react";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 type NavItem = {
   href: string;
@@ -40,6 +42,7 @@ function Item({ href, label, icon: Icon }: NavItem) {
 }
 
 export default function ClientSidebar({ basePath }: { basePath: string }) {
+  const { user } = useAuth();
   const nav: NavItem[] = [
     { href: basePath, label: "Dashboard", icon: Home },
     { href: `${basePath}/categories`, label: "All Categories", icon: LayoutGrid },
@@ -74,17 +77,23 @@ export default function ClientSidebar({ basePath }: { basePath: string }) {
         </Link>
 
         <div className="flex items-center gap-3 px-3 py-3 rounded-xl bg-[#151c2a]/60 border border-white/5 hover:border-white/10 transition-colors cursor-pointer">
-          <div className="size-8 rounded-full bg-slate-700 overflow-hidden ring-2 ring-white/5">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              className="w-full h-full object-cover"
-              alt="User"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrZLkmqRTP7qfcm8kS-Cw4ZgzJYBIuNUoMeenXMNS7dujLfHPr6cxc_E6S3EXn5oAjGUwE1fPsHcawRos2sVBXr2_JWYnWW5xN-IdZDTk6Zogbl1H2PjM5jeHgXDUg5BolPSsd4ztGaMg91sWN-hbSlQWvf1zyScvfIY8ydGzJRLKhf0m-a3jU4Fl4VL89Uxw55JiNA963xtRgFRhGwgbxT4cnfLPpKG0oeatq1GVt1uspFa7D-jUKPSowvnZOazzpZX6nAWDgQDw"
-            />
+          <div className="size-8 rounded-full bg-slate-700 overflow-hidden ring-2 ring-white/5 flex items-center justify-center text-slate-400">
+            {user?.avatar ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                className="w-full h-full object-cover"
+                alt="User"
+                src={user.avatar as string}
+              />
+            ) : (
+              <User className="size-5" />
+            )}
           </div>
           <div className="hidden lg:block overflow-hidden">
-            <p className="text-xs font-bold truncate text-white">Alex Rivera</p>
-            <p className="text-[10px] text-slate-400 truncate">Client Account</p>
+            <p className="text-xs font-bold truncate text-white">{user?.name ?? "User"}</p>
+            <p className="text-[10px] text-slate-400 truncate capitalize">
+              {user?.role?.toLowerCase() ?? "Account"}
+            </p>
           </div>
         </div>
       </div>

@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/components/auth/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import axios from "axios";
@@ -29,6 +30,7 @@ function getApiErrorMessage(error: unknown): string | null {
 
 export default function LoginPage() {
   const router = useRouter();
+  const { refreshUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -42,8 +44,8 @@ export default function LoginPage() {
     try {
       const response = await axios.post("/api/auth/login", formData);
 
-      // Store user data in localStorage
-      localStorage.setItem("user", JSON.stringify(response.data.user));
+      // Refresh global auth context
+      await refreshUser();
 
       toast.success("Login successful!");
 

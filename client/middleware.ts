@@ -17,6 +17,32 @@ const roleRoutes = {
 
 type CookieToSet = { name: string; value: string; options: CookieOptions };
 
+type AppRole = "EXPORTER" | "IMPORTER" | "ADMIN";
+
+function normalizeRole(value: unknown): AppRole | undefined {
+  if (typeof value !== "string") return undefined;
+  const upper = value.toUpperCase();
+  if (upper === "EXPORTER" || upper === "IMPORTER" || upper === "ADMIN") return upper;
+  return undefined;
+}
+
+function chooseEffectiveRole(profileRole?: AppRole, metaRole?: AppRole, appMetaRole?: AppRole): AppRole | undefined {
+  // DB role is authoritative for ADMIN.
+  if (profileRole === "ADMIN") return "ADMIN";
+
+  // Never allow ADMIN escalation via user/app metadata.
+  const safeMetaRole = metaRole === "ADMIN" ? undefined : metaRole;
+  const safeAppMetaRole = appMetaRole === "ADMIN" ? undefined : appMetaRole;
+
+  // If DB role is present but mismatches metadata (common right after signup when DB write is blocked),
+  // prefer metadata for EXPORTER/IMPORTER.
+  if (profileRole && safeMetaRole && profileRole !== safeMetaRole) {
+    return safeMetaRole;
+  }
+
+  return profileRole ?? safeMetaRole ?? safeAppMetaRole;
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -91,9 +117,11 @@ export async function middleware(request: NextRequest) {
   }
 
   const role =
-    (profile?.role as string | undefined) ??
-    ((user.user_metadata as any)?.role as string | undefined) ??
-    ((user.app_metadata as any)?.role as string | undefined);
+    chooseEffectiveRole(
+      normalizeRole(profile?.role as unknown),
+      normalizeRole((user.user_metadata as any)?.role as unknown),
+      normalizeRole((user.app_metadata as any)?.role as unknown)
+    );
   const allowed = role ? roleRoutes[matchedPrefix].includes(role) : false;
 
   if (!allowed) {

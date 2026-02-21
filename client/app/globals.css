@@ -60,6 +60,28 @@
 }
 
 @layer base {
+  /* Sleek Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+  }
+  .dark ::-webkit-scrollbar-thumb {
+    background: #475569;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+  }
+
   * {
     @apply border-border;
   }
@@ -525,4 +547,21 @@
     opacity: 1;
     transform: scale(1) translateY(0);
   }
+}
+
+.map-dot {
+  width: 6px;
+  height: 6px;
+  background-color: #135bec;
+  border-radius: 50%;
+  position: absolute;
+  box-shadow: 0 0 10px #135bec;
+}
+
+.map-line {
+  position: absolute;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #135bec, transparent);
+  transform-origin: left center;
+  opacity: 0.4;
 }
