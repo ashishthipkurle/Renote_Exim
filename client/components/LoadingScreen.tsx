@@ -85,7 +85,7 @@ export default function LoadingScreen() {
             className="text-center"
           >
             <h1 className="text-4xl font-bold text-white mb-2">
-              Renote <span className="text-blue-400">Exim</span>
+              Ranote <span className="text-blue-400">Exim</span>
             </h1>
             <p className="text-slate-400 text-sm">Global Trade Platform</p>
           </motion.div>

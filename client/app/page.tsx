@@ -189,7 +189,7 @@ export default function HomePage() {
               <span className="material-icons text-sm">public</span>
             </div>
             <span className="text-xl font-bold tracking-wide text-slate-900 dark:text-white">
-              RENOTE<span className="text-primary">EXIM</span>
+              RANOTE<span className="text-primary">EXIM</span>
             </span>
           </div>
 
@@ -887,7 +887,7 @@ export default function HomePage() {
                   <span className="material-icons text-sm">public</span>
                 </div>
                 <span className="text-xl font-bold tracking-wide text-slate-900 dark:text-white">
-                  RENOTE<span className="text-primary">EXIM</span>
+                  RANOTE<span className="text-primary">EXIM</span>
                 </span>
               </div>
               <p className="text-slate-600 dark:text-slate-500 text-sm leading-relaxed mb-6">

@@ -52,7 +52,7 @@ export default function MarketplaceHeader() {
               <Globe2 className="h-5 w-5" />
             </div>
             <span className="text-xl font-extrabold tracking-tight hidden md:inline">
-              Renote <span className="text-primary">Exim</span>
+              Ranote <span className="text-primary">Exim</span>
             </span>
           </Link>
 

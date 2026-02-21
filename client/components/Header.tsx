@@ -31,7 +31,7 @@ export default function Header() {
               <Globe2 className="w-8 h-8 text-primary relative z-10" />
             </div>
             <span className="text-xl font-bold">
-              Renote <span className="text-primary">Exim</span>
+              Ranote <span className="text-primary">Exim</span>
             </span>
           </Link>
 

@@ -16,7 +16,7 @@ export default function Footer() {
                 <Globe2 className="text-white" size={24} />
               </div>
               <span className="text-xl font-bold text-white">
-                Renote <span className="text-blue-400">Exim</span>
+                Ranote <span className="text-blue-400">Exim</span>
               </span>
             </div>
             <p className="text-sm leading-relaxed mb-6">
@@ -153,7 +153,7 @@ export default function Footer() {
         <div className="border-t border-slate-800 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-slate-400">
-              © {currentYear} Renote Exim. All rights reserved.
+              © {currentYear} Ranote Exim. All rights reserved.
             </p>
             <div className="flex gap-6">
               <Link

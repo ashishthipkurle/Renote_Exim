@@ -13,7 +13,7 @@ const testimonials = [
     country: "India",
     image: "https://i.pravatar.cc/150?img=12",
     rating: 5,
-    text: "Renote Exim has transformed our export business. We've connected with reliable importers from 15 countries in just 6 months. The platform is intuitive and the support team is exceptional.",
+    text: "Ranote Exim has transformed our export business. We've connected with reliable importers from 15 countries in just 6 months. The platform is intuitive and the support team is exceptional.",
   },
   {
     name: "Maria Santos",
@@ -56,7 +56,7 @@ export default function Testimonials() {
             Trusted Worldwide
           </h2>
           <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-            See what our customers say about their experience with Renote Exim.
+            See what our customers say about their experience with Ranote Exim.
           </p>
         </motion.div>
 
