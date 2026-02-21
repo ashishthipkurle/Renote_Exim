@@ -13,10 +13,7 @@ function getString(record: Record<string, unknown>, key: string): string | null 
   return typeof value === "string" && value.length > 0 ? value : null;
 }
 
-function getBoolean(record: Record<string, unknown>, key: string): boolean | null {
-  const value = record[key];
-  return typeof value === "boolean" ? value : null;
-}
+
 
 export async function POST(request: NextRequest) {
   try {

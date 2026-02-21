@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Globe2, User, LogOut } from "lucide-react";
@@ -57,7 +58,7 @@ export default function Header() {
                   <Link href={`/dashboard/${user.role?.toLowerCase()}`}>
                     <Button variant="ghost" className="gap-2">
                       {user.avatar ? (
-                        <img src={user.avatar as string} alt="Avatar" className="w-5 h-5 rounded-full object-cover" />
+                        <Image src={user.avatar as string} alt="Avatar" width={32} height={32} className="w-8 h-8 rounded-full object-cover" unoptimized />
                       ) : (
                         <User className="w-4 h-4" />
                       )}

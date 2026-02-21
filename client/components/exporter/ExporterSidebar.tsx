@@ -2,6 +2,7 @@
 
 import type { ComponentType } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   Bell,
@@ -101,11 +102,12 @@ export default function ExporterSidebar() {
 
         <div className="w-10 h-10 rounded-full border-2 border-slate-700 overflow-hidden cursor-pointer hover:border-primary transition-colors flex items-center justify-center bg-slate-800 text-slate-400">
           {user?.avatar ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               alt="User"
+              width={40} height={40}
               className="w-full h-full object-cover"
               src={user.avatar as string}
+              unoptimized
             />
           ) : (
             <User className="size-6" />

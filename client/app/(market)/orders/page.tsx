@@ -52,7 +52,7 @@ function formatMoney(amount: number) {
 }
 
 export default function OrdersPage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 

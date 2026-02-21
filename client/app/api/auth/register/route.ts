@@ -4,19 +4,7 @@ import { z } from "zod";
 import { registerSchema } from "@/lib/validations";
 import { createSupabaseRouteClient } from "@/lib/supabase/route";
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
 
-function getString(record: Record<string, unknown>, key: string): string | null {
-  const value = record[key];
-  return typeof value === "string" && value.length > 0 ? value : null;
-}
-
-function getBoolean(record: Record<string, unknown>, key: string): boolean | null {
-  const value = record[key];
-  return typeof value === "boolean" ? value : null;
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -65,26 +53,9 @@ export async function POST(request: NextRequest) {
     // Persist the profile (especially role) using Prisma when available. This avoids relying on
     // Supabase RLS policies for writes to the `users` table (which would otherwise leave role at
     // the Prisma default).
-    let prismaProfile:
-      | {
-        id: string;
-        name: string | null;
-        email: string;
-        role: unknown;
-        companyName: string | null;
-        country: string | null;
-        phone: string | null;
-        website: string | null;
-        verified: boolean;
-        avatar: string | null;
-        createdAt: Date;
-        updatedAt: Date;
-      }
-      | null = null;
-
     try {
       const prismaModule = await import("@/lib/prisma");
-      prismaProfile = await prismaModule.prisma.user.upsert({
+      await prismaModule.prisma.user.upsert({
         where: { id: data.user.id },
         update: {
           name: validatedData.name,

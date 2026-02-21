@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, Suspense } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
@@ -32,7 +32,7 @@ function getApiErrorMessage(error: unknown): string | null {
   return typeof message === "string" ? message : null;
 }
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { refreshUser } = useAuth();
@@ -202,8 +202,8 @@ export default function RegisterPage() {
                       type="button"
                       onClick={() => setFormData({ ...formData, role: "IMPORTER" })}
                       className={`p-4 border rounded-xl text-left transition-colors ${formData.role === "IMPORTER"
-                          ? "border-primary bg-primary/10"
-                          : "border-border hover:bg-accent"
+                        ? "border-primary bg-primary/10"
+                        : "border-border hover:bg-accent"
                         }`}
                     >
                       <div className="font-semibold">Import Products</div>
@@ -213,8 +213,8 @@ export default function RegisterPage() {
                       type="button"
                       onClick={() => setFormData({ ...formData, role: "EXPORTER" })}
                       className={`p-4 border rounded-xl text-left transition-colors ${formData.role === "EXPORTER"
-                          ? "border-primary bg-primary/10"
-                          : "border-border hover:bg-accent"
+                        ? "border-primary bg-primary/10"
+                        : "border-border hover:bg-accent"
                         }`}
                     >
                       <div className="font-semibold">Export Products</div>
@@ -386,5 +386,13 @@ export default function RegisterPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <RegisterForm />
+    </Suspense>
   );
 }

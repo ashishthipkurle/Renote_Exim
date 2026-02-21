@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import gsap from "gsap";
 
 const CATEGORIES = [
@@ -16,7 +17,7 @@ const CATEGORIES = [
         subtitle: "Electronics",
         tag: "Tech & Innovation",
         desc: "Next-generation components and consumer tech directly from verified manufacturers across the globe.",
-        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAjhrW_UQDgwqVE-6aMBLYLbQv6i5N5y7bC5SajqSjHPzt8UJUqbZ8a-7CbQBS5ZcMxeADv1LPgaIZcXs4D7xYqYlmKxuOZDFp6Wl-AdWq4sEEXVGkGURIO8IXEhMFjBxAIUpp_8HAfhfSSw-e5aknVjxqGYf3jiyfl0h5rBHLYBkf6CAPQnchcVDlTZzGiYbDn-4NCCykQgqaACpE53XGjDC7NgbYcMcm7dGI4dioMptR_CfI6Rg4EIwaZ3T1TkPlP-xl7tJ0YHAQ",
+        image: "/assets/consumer-electronics.jpg",
     },
     {
         title: "Raw",
@@ -37,14 +38,13 @@ const CATEGORIES = [
         subtitle: "Solutions",
         tag: "Sustainable Grid",
         desc: "Solar panels, high-efficiency turbines, and sustainable grid infrastructure powering a green tomorrow.",
-        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCKDuMTrjpqWo8FRBuZ06sZv7g4mVUM074B_OW3YN8eybb1EJy9zSfE1IT20me_gEqThJjuMlIOtP0LA1Kz-JMWj5bmuDA3n7T0ne1eNTfFMcRSop_ggfcAzVxe-3bojKG0t_BtGmwap0WWc1HuDGxWO6IRA5VQgVTsNdYDbcZj7mgzcCCl90L_4FHSd3A-nogm9j_ktZReAHaW6fXUvROclC3GAVj4_G7XaeJhdu9ZDjyI0vid5J1y3dJX9rWTYgQATZ4SSc9jZI0",
+        image: "/assets/energy-solution.png",
     }
 ];
 
 export default function TrendingCategories() {
     const containerRef = useRef<HTMLDivElement>(null);
     const isAnimating = useRef(false);
-    const [activeIdx, setActiveIdx] = useState(0);
 
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
     const handleNextRef = useRef<(() => void) | null>(null);
@@ -53,7 +53,7 @@ export default function TrendingCategories() {
         if (intervalRef.current) clearInterval(intervalRef.current);
         intervalRef.current = setInterval(() => {
             handleNextRef.current?.();
-        }, 5000);
+        }, 10000);
     };
 
     useEffect(() => {
@@ -88,73 +88,92 @@ export default function TrendingCategories() {
         }
     }, []);
 
-    const handleNext = () => {
-        if (isAnimating.current || !containerRef.current) return;
+    const handleSelect = (idx: number) => {
+        if (isAnimating.current || !containerRef.current || idx === 0) return;
         isAnimating.current = true;
 
         const items = containerRef.current.querySelectorAll('.carousel-item');
-        if (items.length < 2) return;
-        const firstItem = items[0] as HTMLElement;
-        const secondItem = items[1] as HTMLElement;
+        if (idx >= items.length) return;
 
-        gsap.set(secondItem, { zIndex: 10 });
+        const firstItem = items[0] as HTMLElement;
+        const targetItem = items[idx] as HTMLElement;
+
+        gsap.set(targetItem, { zIndex: 10 });
         gsap.set(firstItem, { zIndex: 1 });
 
-        // Hide thumbnail content, expand to full screen
-        gsap.to(secondItem.querySelector('.item-content-thumb'), { opacity: 0, duration: 0.3 });
-        gsap.to(secondItem, {
-            top: 0, left: 0, width: "100%", height: "100%", borderRadius: 0, y: 0,
-            duration: 0.8, ease: "power3.inOut"
-        });
-        // Show full content
-        gsap.to(secondItem.querySelector('.item-content-full'), { opacity: 1, y: 0, duration: 0.6, delay: 0.4 });
-
-        // Hide full content of previous full screen
-        gsap.to(firstItem.querySelector('.item-content-full'), { opacity: 0, y: -40, duration: 0.4 });
-        const width = (firstItem as HTMLElement).offsetWidth;
-
-        // Slide previous full screen out to left
-        gsap.to(firstItem, {
-            x: -(width * 0.3),
-            opacity: 0,
-            duration: 0.8,
-            ease: "power3.inOut",
+        const tl = gsap.timeline({
             onComplete: () => {
-                containerRef.current?.appendChild(firstItem); // Move to end of DOM
+                for (let j = 0; j < idx; j++) {
+                    containerRef.current?.appendChild(items[j]);
+                }
 
-                // Reset as thumbnail at the end of the line
-                gsap.set(firstItem, {
-                    x: 0,
-                    opacity: 1,
-                    top: "70%",
-                    left: `calc(50% + ${(items.length - 2) * 240}px)`,
-                    width: 220,
-                    height: 320,
-                    y: "-50%",
-                    borderRadius: 20,
-                    zIndex: 2
-                });
-                gsap.set(firstItem.querySelector('.item-content-thumb'), { opacity: 1 });
-                gsap.set(firstItem.querySelector('.item-content-full'), { opacity: 0, y: 40 });
+                for (let j = 0; j < idx; j++) {
+                    const resetEl = items[j] as HTMLElement;
+                    const newIndex = items.length - idx + j;
+                    gsap.set(resetEl, {
+                        x: 0,
+                        opacity: 1,
+                        top: "70%",
+                        left: `calc(50% + ${(newIndex - 1) * 240}px)`,
+                        width: 220,
+                        height: 320,
+                        y: "-50%",
+                        borderRadius: 20,
+                        zIndex: 2
+                    });
+                    gsap.set(resetEl.querySelector('.item-content-thumb'), { opacity: 1 });
+                    gsap.set(resetEl.querySelector('.item-content-full'), { opacity: 0, y: 40 });
+                }
 
                 const updatedItems = containerRef.current?.querySelectorAll('.carousel-item');
                 updatedItems?.forEach(el => gsap.set(el, { zIndex: 2 }));
                 if (updatedItems?.length) gsap.set(updatedItems[0], { zIndex: 1 });
 
-                setActiveIdx((prev) => (prev + 1) % CATEGORIES.length);
                 isAnimating.current = false;
             }
         });
 
-        // Shift remaining thumbnails left
-        for (let i = 2; i < items.length; i++) {
-            gsap.to(items[i], {
-                left: `calc(50% + ${(i - 2) * 240}px)`,
+        // Hide thumbnail content, expand to full screen
+        tl.to(targetItem.querySelector('.item-content-thumb'), { opacity: 0, duration: 0.3 }, 0);
+        tl.to(targetItem, {
+            top: 0, left: 0, width: "100%", height: "100%", borderRadius: 0, y: 0,
+            duration: 0.8, ease: "power3.inOut"
+        }, 0);
+        // Show full content
+        tl.to(targetItem.querySelector('.item-content-full'), { opacity: 1, y: 0, duration: 0.6 }, 0.4);
+
+        // Hide full content of previous full screen
+        tl.to(firstItem.querySelector('.item-content-full'), { opacity: 0, y: -40, duration: 0.4 }, 0);
+        const width = (firstItem as HTMLElement).offsetWidth;
+
+        // Slide out passed items (from 0 to idx - 1)
+        for (let i = 0; i < idx; i++) {
+            const el = items[i] as HTMLElement;
+            // First item hides full content (done above), others hide thumb content
+            if (i > 0) {
+                tl.to(el.querySelector('.item-content-thumb'), { opacity: 0, duration: 0.3 }, 0);
+            }
+
+            tl.to(el, {
+                x: -(width * 0.3),
+                opacity: 0,
                 duration: 0.8,
                 ease: "power3.inOut"
-            });
+            }, 0);
+        }
+
+        // Shift remaining thumbnails
+        for (let i = idx + 1; i < items.length; i++) {
+            const newIndex = i - idx;
+            tl.to(items[i], {
+                left: `calc(50% + ${(newIndex - 1) * 240}px)`,
+                duration: 0.8,
+                ease: "power3.inOut"
+            }, 0);
         }
     };
+
+    const handleNext = () => handleSelect(1);
 
     useEffect(() => {
         handleNextRef.current = handleNext;
@@ -169,12 +188,16 @@ export default function TrendingCategories() {
             <div ref={containerRef} className="absolute inset-0 w-full h-full list-container">
                 {CATEGORIES.map((cat, idx) => (
                     <div key={`slide-${idx}`} className="carousel-item absolute overflow-hidden shadow-2xl bg-white dark:bg-[#0B0E14] rounded-2xl cursor-pointer" onClick={(e) => {
-                        if (e.currentTarget === containerRef.current?.querySelectorAll('.carousel-item')[1]) {
-                            handleNext();
+                        const items = containerRef.current?.querySelectorAll('.carousel-item');
+                        if (!items) return;
+                        const itemArray = Array.from(items);
+                        const itemIndex = itemArray.indexOf(e.currentTarget);
+                        if (itemIndex > 0) {
+                            handleSelect(itemIndex);
                             startAutoPlay();
                         }
                     }}>
-                        <img src={cat.image} className="absolute inset-0 w-full h-full object-cover filter brightness-[0.7] contrast-125" alt={cat.title} />
+                        <Image src={cat.image} fill className="absolute inset-0 object-cover filter brightness-[0.7] contrast-125" alt={cat.title} />
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 dark:from-[#0A0E17]/90 via-slate-900/40 dark:via-[#0A0E17]/40 to-transparent" />
                         <div className="absolute inset-0 bg-black/10 transition-opacity hover:bg-transparent duration-500" />
 

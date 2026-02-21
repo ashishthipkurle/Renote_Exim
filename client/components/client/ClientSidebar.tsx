@@ -2,6 +2,7 @@
 
 import type { ComponentType } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   Home,
@@ -79,11 +80,12 @@ export default function ClientSidebar({ basePath }: { basePath: string }) {
         <div className="flex items-center gap-3 px-3 py-3 rounded-xl bg-[#151c2a]/60 border border-white/5 hover:border-white/10 transition-colors cursor-pointer">
           <div className="size-8 rounded-full bg-slate-700 overflow-hidden ring-2 ring-white/5 flex items-center justify-center text-slate-400">
             {user?.avatar ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Image
                 className="w-full h-full object-cover"
                 alt="User"
+                width={32} height={32}
                 src={user.avatar as string}
+                unoptimized
               />
             ) : (
               <User className="size-5" />

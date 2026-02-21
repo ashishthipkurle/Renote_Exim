@@ -1,9 +1,11 @@
 "use client";
 
+import { TrendingDown, TrendingUp, Anchor, Package, Building2, Store, Briefcase, Globe, Factory, Zap, Gem, Tractor, ShieldCheck, Check, ArrowRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Image from "next/image";
 import { useAuth } from "@/components/auth/AuthProvider";
 import TrendingCategories from "@/components/ui/TrendingCategories";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
@@ -22,19 +24,7 @@ export default function HomePage() {
   const bulkHeadingRef = useRef<HTMLDivElement>(null);
   const bulkMainCardRef = useRef<HTMLDivElement>(null);
   const bulkSubCardsRef = useRef<HTMLDivElement>(null);
-  const setPokerReadyAfterAnimation = () => {
-    if (pokerReadyTimeoutRef.current) window.clearTimeout(pokerReadyTimeoutRef.current);
-    pokerDeckRef.current?.classList.remove("poker-ready");
-    pokerReadyTimeoutRef.current = window.setTimeout(() => {
-      pokerDeckRef.current?.classList.add("poker-ready");
-    }, 1600);
-  };
 
-  const clearPokerReady = () => {
-    if (pokerReadyTimeoutRef.current) window.clearTimeout(pokerReadyTimeoutRef.current);
-    pokerReadyTimeoutRef.current = null;
-    pokerDeckRef.current?.classList.remove("poker-ready");
-  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -118,7 +108,6 @@ export default function HomePage() {
       scrollObserver.disconnect();
       window.removeEventListener("scroll", onScroll);
       document.removeEventListener("mousedown", handleClickOutside);
-      if (pokerReadyTimeoutRef.current) window.clearTimeout(pokerReadyTimeoutRef.current);
     };
   }, []);
 
@@ -228,7 +217,7 @@ export default function HomePage() {
                   className="w-10 h-10 rounded-full border-2 border-primary/40 flex items-center justify-center overflow-hidden hover:border-primary transition-colors focus:outline-none bg-slate-100 dark:bg-transparent"
                 >
                   {user.avatar ? (
-                    <img src={user.avatar as string} alt="Profile" className="w-full h-full object-cover" />
+                    <Image src={user.avatar as string} alt="Profile" width={40} height={40} className="w-full h-full object-cover" unoptimized />
                   ) : (
                     <span className="material-icons text-slate-600 dark:text-white text-lg">person</span>
                   )}
@@ -438,12 +427,13 @@ export default function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="glass-card bg-white dark:bg-transparent rounded-2xl p-8 relative group overflow-hidden h-[450px] flex flex-col justify-end hover:shadow-lg dark:hover:shadow-[0_0_40px_rgba(19,91,236,0.15)] reveal-trigger" style={{ transitionDelay: "0ms" }}>
-              <div className="absolute inset-0 z-0 opacity-20 dark:opacity-50 group-hover:opacity-10 dark:group-hover:opacity-30 transition-opacity">
-                <img
-                  alt="Shipping containers stacked in a modern port"
-                  className="w-full h-full object-cover grayscale mix-blend-overlay"
+            <div className="bg-slate-900 border border-slate-800 dark:bg-transparent rounded-2xl p-8 relative group overflow-hidden h-[450px] flex flex-col justify-end hover:shadow-2xl dark:hover:shadow-[0_0_40px_rgba(19,91,236,0.15)] reveal-trigger" style={{ transitionDelay: "0ms" }}>
+              <div className="absolute inset-0 z-0">
+                <Image
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdACOt5E6X3UdwnFb8tiSClZI5sFRnyDfjOc9oLAun06nw-9LllRIlSrJvBskhY4ylHulzIxDGMJ_fb9U6momci6kMKvXDjBQURIQGu_jC-oeuyeLB7SajYmhGTeeDNMoUunSpwXInqwJUPqafyddm8cqfsEHI-t8UFj8EKTZ-xoISuMGiXdXGZwwhOsAFU-iB0ioFhqSmmOLv-TFjUTyJDCk4xxHvaxCDs7aTW3Ob-fQrOEmB5YO1J8MYBVO4PvAWSIdvIer2wUs"
+                  alt="Shipping containers stacked in a modern port"
+                  width={800} height={600}
+                  className="w-full h-full object-cover"
                 />
               </div>
               <div className="relative z-10">
@@ -452,18 +442,19 @@ export default function HomePage() {
                     <path className="blueprint-path" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Real-time Tracking</h3>
-                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6 group-hover:text-slate-800 dark:group-hover:text-slate-200 transition-colors">Precision monitoring of your cargo via satellite and IoT sensors across air, sea, and land routes.</p>
+                <h3 className="text-2xl font-bold text-white mb-2 drop-shadow-md">Real-time Tracking</h3>
+                <p className="text-slate-200 text-sm leading-relaxed mb-6 drop-shadow-md group-hover:text-white transition-colors">Precision monitoring of your cargo via satellite and IoT sensors across air, sea, and land routes.</p>
                 <div className="h-[1px] w-full bg-gradient-to-r from-primary/50 to-transparent mb-4 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-700" />
               </div>
             </div>
 
-            <div className="glass-card bg-white dark:bg-transparent rounded-2xl p-8 relative group overflow-hidden h-[450px] flex flex-col justify-end hover:shadow-lg dark:hover:shadow-[0_0_40px_rgba(19,91,236,0.15)] reveal-trigger" style={{ transitionDelay: "150ms" }}>
-              <div className="absolute inset-0 z-0 opacity-20 dark:opacity-50 group-hover:opacity-10 dark:group-hover:opacity-30 transition-opacity">
-                <img
-                  alt="Financial data graphs"
-                  className="w-full h-full object-cover grayscale mix-blend-overlay"
+            <div className="bg-slate-900 border border-slate-800 dark:bg-transparent rounded-2xl p-8 relative group overflow-hidden h-[450px] flex flex-col justify-end hover:shadow-2xl dark:hover:shadow-[0_0_40px_rgba(19,91,236,0.15)] reveal-trigger" style={{ transitionDelay: "150ms" }}>
+              <div className="absolute inset-0 z-0">
+                <Image
                   src="/home/financial-graphs.png"
+                  alt="Financial data graphs"
+                  width={800} height={600}
+                  className="w-full h-full object-cover"
                 />
               </div>
               <div className="relative z-10">
@@ -472,18 +463,19 @@ export default function HomePage() {
                     <path className="blueprint-path" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Secure Escrow</h3>
-                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6 group-hover:text-slate-800 dark:group-hover:text-slate-200 transition-colors">Smart contracts hold funds securely until delivery conditions are met and verified by digital BOLs.</p>
+                <h3 className="text-2xl font-bold text-white mb-2 drop-shadow-md">Secure Escrow</h3>
+                <p className="text-slate-200 text-sm leading-relaxed mb-6 drop-shadow-md group-hover:text-white transition-colors">Smart contracts hold funds securely until delivery conditions are met and verified by digital BOLs.</p>
                 <div className="h-[1px] w-full bg-gradient-to-r from-primary/50 to-transparent mb-4 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-700" />
               </div>
             </div>
 
-            <div className="glass-card bg-white dark:bg-transparent rounded-2xl p-8 relative group overflow-hidden h-[450px] flex flex-col justify-end hover:shadow-lg dark:hover:shadow-[0_0_40px_rgba(19,91,236,0.15)] reveal-trigger" style={{ transitionDelay: "300ms" }}>
-              <div className="absolute inset-0 z-0 opacity-20 dark:opacity-50 group-hover:opacity-10 dark:group-hover:opacity-30 transition-opacity">
-                <img
+            <div className="bg-slate-900 border border-slate-800 dark:bg-transparent rounded-2xl p-8 relative group overflow-hidden h-[450px] flex flex-col justify-end hover:shadow-2xl dark:hover:shadow-[0_0_40px_rgba(19,91,236,0.15)] reveal-trigger" style={{ transitionDelay: "300ms" }}>
+              <div className="absolute inset-0 z-0">
+                <Image
+                  src="/assets/compliance-abstract.jpg"
                   alt="Abstract compliance"
-                  className="w-full h-full object-cover grayscale mix-blend-overlay"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKDuMTrjpqWo8FRBuZ06sZv7g4mVUM074B_OW3YN8eybb1EJy9zSfE1IT20me_gEqThJjuMlIOtP0LA1Kz-JMWj5bmuDA3n7T0ne1eNTfFMcRSop_ggfcAzVxe-3bojKG0t_BtGmwap0WWc1HuDGxWO6IRA5VQgVTsNdYDbcZj7mgzcCCl90L_4FHSd3A-nogm9j_ktZReAHW6fXUvROclC3GAVj4_G7XaeJhdu9ZDjyI0vid5J1y3dJX9rWTYgQATZ4SSc9jZI0"
+                  width={800} height={600}
+                  className="w-full h-full object-cover"
                 />
               </div>
               <div className="relative z-10">
@@ -495,8 +487,8 @@ export default function HomePage() {
                     <line className="blueprint-path" x1="3" y1="10" x2="21" y2="10" />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Global Compliance</h3>
-                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6 group-hover:text-slate-800 dark:group-hover:text-slate-200 transition-colors">Automated customs documentation and regulatory checks for over 190 jurisdictions.</p>
+                <h3 className="text-2xl font-bold text-white mb-2 drop-shadow-md">Global Compliance</h3>
+                <p className="text-slate-200 text-sm leading-relaxed mb-6 drop-shadow-md group-hover:text-white transition-colors">Automated customs documentation and regulatory checks for over 190 jurisdictions.</p>
                 <div className="h-[1px] w-full bg-gradient-to-r from-primary/50 to-transparent mb-4 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-700" />
               </div>
             </div>
@@ -509,20 +501,23 @@ export default function HomePage() {
         <div className="absolute top-0 right-0 w-full md:w-[60%] h-full z-0">
           <div className="absolute inset-0 bg-gradient-to-r from-slate-50 dark:from-[#0A0E17] via-slate-50/80 dark:via-[#0A0E17]/80 to-transparent z-10" />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-50 dark:from-[#0A0E17] via-transparent to-slate-50 dark:to-[#0A0E17] z-10 opacity-60" />
-          <img
+          <Image
             src="https://images.unsplash.com/photo-1586528116311-ad8ed7c80a30?q=80&w=2070"
             alt="Container Port"
+            width={1200} height={800}
             className="w-full h-full object-cover opacity-20 dark:opacity-30 mix-blend-luminosity filter contrast-125"
           />
         </div>
 
         {/* Animated Custom Cargo Ship */}
         <div className="absolute inset-0 pointer-events-none z-[5] flex justify-center items-center opacity-90 overflow-visible">
-          <img
+          <Image
             ref={shipRef}
             src="/custom-ship-2.png"
             alt="Cargo Ship"
+            width={1200} height={800}
             className="w-[1200px] max-w-none object-contain drop-shadow-[0_30px_60px_rgba(0,0,0,0.8)]"
+            unoptimized
           />
         </div>
 
@@ -632,76 +627,101 @@ export default function HomePage() {
       </div>
 
       {/* Bulk Procurement Solutions */}
-      <section ref={bulkSectionRef} className="py-24 bg-slate-50 dark:bg-[#0B0E14] border-b border-slate-200 dark:border-white/5 relative z-20 overflow-hidden" style={{ perspective: '1500px' }}>
-        <div className="max-w-7xl mx-auto px-6">
+      <section ref={bulkSectionRef} className="relative z-20 overflow-hidden border-b border-slate-200 dark:border-white/5" style={{ perspective: '1500px' }}>
+        {/* Split Background Layer */}
+        <div className="absolute inset-0 flex flex-col lg:flex-row pointer-events-none -z-10 bg-slate-50 dark:bg-[#0B0E14]">
+          <div
+            className="w-full lg:w-1/2 h-full relative"
+            style={{
+              WebkitMaskImage: 'linear-gradient(to right, black 70%, transparent 100%)',
+              maskImage: 'linear-gradient(to right, black 70%, transparent 100%)'
+            }}
+          >
+            <Image
+              src="/bulk-warehouse.png"
+              alt="Warehouse Operations"
+              fill
+              className="object-cover"
+              priority
+            />
+            {/* Mobile overlay for contrast */}
+            <div className="absolute inset-0 bg-white/60 dark:bg-[#0B0E14]/70 lg:hidden"></div>
+            {/* Top mask for the title so text remains ultra-legible */}
+            <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-white to-transparent dark:from-[#0B0E14] dark:to-transparent opacity-80"></div>
+          </div>
+        </div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-6 py-24">
           <div ref={bulkHeadingRef} className="text-center mb-16 opacity-0">
             <span className="text-primary text-sm font-bold uppercase tracking-widest mb-2 block">Enterprise Sourcing</span>
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white">BULK PROCUREMENT <br /><span className="text-primary">SOLUTIONS</span></h2>
+            <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white">BULK PROCUREMENT <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-600">SOLUTIONS</span></h2>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div ref={bulkMainCardRef} className="glass-card bg-white dark:bg-transparent p-8 md:p-12 rounded-2xl border border-slate-200 dark:border-white/10 relative overflow-hidden group shadow-lg dark:shadow-none opacity-0">
-              <div className="absolute -right-20 -top-20 w-64 h-64 bg-primary/10 dark:bg-primary/20 rounded-full blur-[80px] group-hover:bg-primary/20 dark:group-hover:bg-primary/30 transition-colors duration-700"></div>
-              <div className="relative z-10">
-                <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-slate-100 dark:from-white/10 to-transparent border border-slate-200 dark:border-white/10 flex items-center justify-center mb-8">
-                  <span className="material-symbols-outlined text-3xl text-primary dark:text-white">verified_user</span>
-                </div>
-                <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">Verified Global Suppliers</h3>
-                <p className="text-slate-600 dark:text-slate-400 text-lg leading-relaxed mb-8">
-                  Access a curated network of 50,000+ manufacturers. We audit every factory for compliance, capacity, and financial stability so you can source with total confidence.
-                </p>
-                <ul className="space-y-4 mb-10">
-                  <li className="flex items-center gap-3 text-slate-700 dark:text-slate-300">
-                    <span className="material-icons text-green-500 dark:text-green-400 text-sm">check_circle</span>
-                    <span>Factory Audits &amp; Certifications</span>
-                  </li>
-                  <li className="flex items-center gap-3 text-slate-700 dark:text-slate-300">
-                    <span className="material-icons text-green-500 dark:text-green-400 text-sm">check_circle</span>
-                    <span>Quality Control Inspections</span>
-                  </li>
-                  <li className="flex items-center gap-3 text-slate-700 dark:text-slate-300">
-                    <span className="material-icons text-green-500 dark:text-green-400 text-sm">check_circle</span>
-                    <span>Trade Finance Support</span>
-                  </li>
-                </ul>
-                <button className="bg-primary hover:bg-primary/90 text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 font-bold py-4 px-8 rounded-xl transition-all duration-300 flex items-center gap-2 group/btn">
+            <div ref={bulkMainCardRef} className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-8 md:p-10 rounded-3xl border border-white/50 dark:border-white/10 relative overflow-hidden shadow-2xl opacity-0 flex flex-col justify-center h-full max-w-xl mx-auto lg:mr-auto">
+              <div className="w-12 h-12 rounded-xl bg-white dark:bg-slate-800 border border-blue-100 dark:border-slate-700 flex items-center justify-center mb-6 shadow-sm relative z-10">
+                <ShieldCheck className="w-6 h-6 text-blue-600 dark:text-blue-400 stroke-[1.5]" />
+              </div>
+              <h3 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white mb-4 relative z-10">Verified Global Suppliers</h3>
+              <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-8 max-w-sm relative z-10">
+                Access a curated network of 50,000+ top-tier manufacturers. We audit every factory for compliance, capacity, and financial stability so you can source with total confidence.
+              </p>
+              <ul className="space-y-4 mb-8 relative z-10">
+                <li className="flex items-center gap-3">
+                  <Check className="w-4 h-4 text-green-600 dark:text-green-500 shrink-0 stroke-[3]" />
+                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">Factory Audits &amp; Certifications</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <Check className="w-4 h-4 text-green-600 dark:text-green-500 shrink-0 stroke-[3]" />
+                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">Quality Control Inspections</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <Check className="w-4 h-4 text-green-600 dark:text-green-500 shrink-0 stroke-[3]" />
+                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">Trade Finance Support</span>
+                </li>
+              </ul>
+              <div className="mt-auto relative z-10">
+                <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center gap-2 group/btn max-w-max text-sm shadow-lg shadow-blue-500/20">
                   Request Bulk Quote
-                  <span className="material-icons group-hover/btn:translate-x-1 transition-transform text-sm">arrow_forward</span>
+                  <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
                 </button>
               </div>
             </div>
 
             <div ref={bulkSubCardsRef} className="grid grid-cols-1 gap-4" style={{ perspective: '1000px' }}>
-              <div className="p-6 rounded-xl bg-white/5 border border-white/5 hover:border-primary/50 transition-all duration-300 flex items-center gap-6 group cursor-pointer hover:bg-white/10 opacity-0">
+              <div className="p-6 rounded-2xl bg-white dark:bg-white/5 border border-slate-100 shadow-sm dark:border-white/5 dark:shadow-none hover:border-primary/50 transition-all duration-300 flex items-center gap-6 group cursor-pointer hover:bg-slate-50 dark:hover:bg-white/10 opacity-0 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
                 <div className="w-14 h-14 rounded-lg bg-slate-800 flex items-center justify-center relative">
                   <span className="absolute inset-0 bg-primary/20 animate-pulse rounded-lg"></span>
                   <span className="material-symbols-outlined text-2xl text-white relative z-10">diamond</span>
                 </div>
                 <div className="flex-1">
-                  <h4 className="text-white font-bold text-lg group-hover:text-primary transition-colors">Raw Metals &amp; Minerals</h4>
+                  <h4 className="text-slate-900 dark:text-white font-bold text-lg group-hover:text-primary transition-colors">Raw Metals &amp; Minerals</h4>
                   <p className="text-xs text-slate-500 mt-1">Copper, Lithium, Rare Earths</p>
                 </div>
                 <span className="material-icons text-slate-600 group-hover:text-white transition-colors">chevron_right</span>
               </div>
 
-              <div className="p-6 rounded-xl bg-white/5 border border-white/5 hover:border-primary/50 transition-all duration-300 flex items-center gap-6 group cursor-pointer hover:bg-white/10 opacity-0">
+              <div className="p-6 rounded-2xl bg-white dark:bg-white/5 border border-slate-100 shadow-sm dark:border-white/5 dark:shadow-none hover:border-primary/50 transition-all duration-300 flex items-center gap-6 group cursor-pointer hover:bg-slate-50 dark:hover:bg-white/10 opacity-0 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
                 <div className="w-14 h-14 rounded-lg bg-slate-800 flex items-center justify-center relative">
                   <span className="absolute inset-0 bg-yellow-500/20 animate-pulse rounded-lg" style={{ animationDelay: '0.5s' }}></span>
                   <span className="material-symbols-outlined text-2xl text-white relative z-10">agriculture</span>
                 </div>
                 <div className="flex-1">
-                  <h4 className="text-white font-bold text-lg group-hover:text-primary transition-colors">Global Agriculture</h4>
+                  <h4 className="text-slate-900 dark:text-white font-bold text-lg group-hover:text-primary transition-colors">Global Agriculture</h4>
                   <p className="text-xs text-slate-500 mt-1">Wheat, Soy, Coffee, Cotton</p>
                 </div>
                 <span className="material-icons text-slate-600 group-hover:text-white transition-colors">chevron_right</span>
               </div>
 
-              <div className="p-6 rounded-xl bg-white/5 border border-white/5 hover:border-primary/50 transition-all duration-300 flex items-center gap-6 group cursor-pointer hover:bg-white/10 opacity-0">
+              <div className="p-6 rounded-2xl bg-white dark:bg-white/5 border border-slate-100 shadow-sm dark:border-white/5 dark:shadow-none hover:border-primary/50 transition-all duration-300 flex items-center gap-6 group cursor-pointer hover:bg-slate-50 dark:hover:bg-white/10 opacity-0 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
                 <div className="w-14 h-14 rounded-lg bg-slate-800 flex items-center justify-center relative">
                   <span className="absolute inset-0 bg-blue-500/20 animate-pulse rounded-lg" style={{ animationDelay: '1s' }}></span>
                   <span className="material-symbols-outlined text-2xl text-white relative z-10">bolt</span>
                 </div>
                 <div className="flex-1">
-                  <h4 className="text-white font-bold text-lg group-hover:text-primary transition-colors">Energy Solutions</h4>
+                  <h4 className="text-slate-900 dark:text-white font-bold text-lg group-hover:text-primary transition-colors">Energy Solutions</h4>
                   <p className="text-xs text-slate-500 mt-1">Solar Panels, Batteries, Biofuels</p>
                 </div>
                 <span className="material-icons text-slate-600 group-hover:text-white transition-colors">chevron_right</span>
@@ -715,7 +735,7 @@ export default function HomePage() {
       <section ref={connectivitySectionRef} className="py-24 bg-slate-50 dark:bg-background-dark relative z-20 reveal-on-scroll overflow-hidden">
         {/* Animated Airplane */}
         <div className="absolute inset-0 pointer-events-none z-50 flex items-center justify-start overflow-visible">
-          <img ref={airplaneRef} src="/assets/airplane.png" alt="Airplane" className="w-[1400px] max-w-none h-auto object-contain drop-shadow-[0_45px_65px_rgba(0,0,0,0.5)] -ml-[300px]" />
+          <Image ref={airplaneRef} src="/assets/airplane.png" alt="Airplane" width={1400} height={400} className="w-[1400px] max-w-none h-auto object-contain drop-shadow-[0_45px_65px_rgba(0,0,0,0.5)] -ml-[300px]" unoptimized />
         </div>
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="flex flex-col md:flex-row justify-between items-end mb-12">
