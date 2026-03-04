@@ -6,7 +6,10 @@
         "build": "npm run build --prefix client",
         "preview": "npm run preview --prefix client",
         "server": "npm run dev --prefix server",
-        "install:all": "npm install --prefix client && npm install --prefix server"
+        "install:all": "npm install --prefix client && npm install --prefix server",
+        "setup": "cd client && npm install && npx prisma generate && npx prisma db push --accept-data-loss",
+        "db:push": "cd client && npx prisma db push --accept-data-loss",
+        "db:studio": "cd client && npx prisma studio"
     },
     "devDependencies": {
         "concurrently": "^8.0.0"

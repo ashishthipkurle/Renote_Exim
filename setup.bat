@@ -1,45 +1,35 @@
 @echo off
 echo ========================================
-echo Ranote Exim - Quick Setup Script (Windows)
+echo Ranote Exim - Setup Script (Windows)
 echo ========================================
 echo.
 
 cd client
 
-echo Installing dependencies...
+echo [1/4] Installing dependencies...
 call npm install
-
-if not exist .env (
-    echo Creating .env file...
-    copy .env.example .env
-    echo.
-    echo WARNING: Please edit .env with your database credentials
-    echo.
-)
-
-echo Generating Prisma Client...
-call npx prisma generate
-
-set /p SETUP_DB="Do you want to push the schema to the database now? (y/n): "
-if /i "%SETUP_DB%"=="y" (
-    echo Setting up database...
-    call npx prisma db push
-    echo Database schema created!
-) else (
-    echo Skipping database setup
-    echo Run 'npx prisma db push' when ready
-)
-
 echo.
+
+echo [2/4] Generating Prisma Client...
+call npx prisma generate
+echo.
+
+echo [3/4] Fixing Supabase cross-schema FK...
+echo ALTER TABLE public.users DROP CONSTRAINT IF EXISTS users_id_fkey_auth; | call npx prisma db execute --stdin --schema prisma/schema.prisma
+echo.
+
+echo [4/4] Pushing database schema to Supabase...
+call npx prisma db push --accept-data-loss
+echo.
+
 echo ========================================
 echo Setup complete!
 echo ========================================
 echo.
-echo Next steps:
-echo 1. Edit client\.env with your database credentials
-echo 2. Run 'npx prisma db push' to create database tables
-echo 3. Run 'npm run dev' to start the development server
-echo 4. Open http://localhost:3000 in your browser
+echo The .env.local file with Supabase + DB credentials
+echo is already included in the repo.
 echo.
-echo Happy trading!
+echo Run 'npm run dev' to start the development server
+echo Open http://localhost:3000 in your browser
+echo.
 pause

@@ -16,6 +16,13 @@
 # Misc
 .DS_Store
 *.pem
+tmpclaude-*
+deno.lock
+
+# Build/lint logs
+build-log.txt
+lint-output.txt
+eslint-report.json
 
 # Debug
 npm-debug.log*
@@ -23,11 +30,18 @@ yarn-debug.log*
 yarn-error.log*
 
 # Local env files
-.env*.local
-.env
+# NOTE: .env.local is NOT ignored — it is committed so collaborators
+# get the shared Supabase + DB credentials on pull.
+# Do NOT put personal secrets in .env.local; use .env.development.local instead.
+.env.development.local
+.env.test.local
+.env.production.local
 
 # Vercel
 .vercel
+
+# Netlify
+.netlify
 
 # Typescript
 *.tsbuildinfo
