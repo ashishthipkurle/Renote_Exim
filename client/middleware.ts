@@ -13,16 +13,17 @@ const roleRoutes = {
   '/dashboard/exporter': ['EXPORTER', 'ADMIN'],
   '/dashboard/importer': ['IMPORTER', 'ADMIN'],
   '/dashboard/admin': ['ADMIN'],
+  '/dashboard/user': ['USER', 'ADMIN'],
 };
 
 type CookieToSet = { name: string; value: string; options: CookieOptions };
 
-type AppRole = "EXPORTER" | "IMPORTER" | "ADMIN";
+type AppRole = "USER" | "EXPORTER" | "IMPORTER" | "ADMIN";
 
 function normalizeRole(value: unknown): AppRole | undefined {
   if (typeof value !== "string") return undefined;
   const upper = value.toUpperCase();
-  if (upper === "EXPORTER" || upper === "IMPORTER" || upper === "ADMIN") return upper;
+  if (upper === "USER" || upper === "EXPORTER" || upper === "IMPORTER" || upper === "ADMIN") return upper;
   return undefined;
 }
 
@@ -43,6 +44,12 @@ function chooseEffectiveRole(profileRole?: AppRole, metaRole?: AppRole, appMetaR
   return profileRole ?? safeMetaRole ?? safeAppMetaRole;
 }
 
+function extractRoleFromUnknownMeta(value: unknown): AppRole | undefined {
+  if (typeof value !== "object" || value === null) return undefined;
+  const role = (value as Record<string, unknown>).role;
+  return normalizeRole(role);
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -61,7 +68,6 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const response = NextResponse.next();
   const env = tryGetSupabaseEnv();
   if (!env) {
     const url = request.nextUrl.clone();
@@ -71,23 +77,46 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // ---------- Supabase SSR middleware pattern ----------
+  // CRITICAL: When Supabase refreshes tokens, we must:
+  //   1. Update the REQUEST cookies (so server components see them)
+  //   2. Create NextResponse.next({ request }) with the modified request
+  //   3. Set cookies on the RESPONSE (so the browser gets them)
+  // Without step 1+2, server components read stale/expired cookies.
   const { url, anonKey } = env;
+  let supabaseResponse = NextResponse.next({ request });
+
   const supabase = createServerClient(url, anonKey, {
     cookies: {
       getAll() {
         return request.cookies.getAll();
       },
-      setAll(cookies: CookieToSet[]) {
-        for (const cookie of cookies) {
-          response.cookies.set(cookie.name, cookie.value, cookie.options);
-        }
+      setAll(cookiesToSet: CookieToSet[]) {
+        // Step 1: Update request cookies so server components see the new values
+        cookiesToSet.forEach(({ name, value }) => {
+          request.cookies.set(name, value);
+        });
+        // Step 2: Create a fresh response with the modified request
+        supabaseResponse = NextResponse.next({ request });
+        // Step 3: Set cookies on the response for the browser
+        cookiesToSet.forEach(({ name, value, options }) => {
+          supabaseResponse.cookies.set(name, value, options);
+        });
       },
     },
   });
 
-  const {
+  let {
     data: { user },
   } = await supabase.auth.getUser();
+
+  if (!user) {
+    const fallbackAccessToken = request.cookies.get("sb_access_token")?.value;
+    if (fallbackAccessToken) {
+      const { data: fallbackData } = await supabase.auth.getUser(fallbackAccessToken);
+      user = fallbackData.user;
+    }
+  }
 
   if (!user) {
     const url = request.nextUrl.clone();
@@ -102,7 +131,7 @@ export async function middleware(request: NextRequest) {
   );
 
   if (!matchedPrefix) {
-    return response;
+    return supabaseResponse;
   }
 
   const { data: profile, error: profileError } = await supabase
@@ -119,18 +148,23 @@ export async function middleware(request: NextRequest) {
   const role =
     chooseEffectiveRole(
       normalizeRole(profile?.role as unknown),
-      normalizeRole((user.user_metadata as any)?.role as unknown),
-      normalizeRole((user.app_metadata as any)?.role as unknown)
+      extractRoleFromUnknownMeta(user.user_metadata),
+      extractRoleFromUnknownMeta(user.app_metadata)
     );
   const allowed = role ? roleRoutes[matchedPrefix].includes(role) : false;
 
   if (!allowed) {
     const url = request.nextUrl.clone();
-    url.pathname = role ? `/dashboard/${role.toLowerCase()}` : "/login";
+    // USER role has no dashboard — redirect to marketplace
+    if (role === "USER") {
+      url.pathname = "/products";
+    } else {
+      url.pathname = role ? `/dashboard/${role.toLowerCase()}` : "/login";
+    }
     return NextResponse.redirect(url);
   }
 
-  return response;
+  return supabaseResponse;
 }
 
 export const config = {

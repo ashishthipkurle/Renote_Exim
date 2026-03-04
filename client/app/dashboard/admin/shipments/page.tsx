@@ -1,105 +1,142 @@
-"use client";
+import Link from "next/link";
+import { prisma } from "@/lib/prisma";
 
-import { motion } from "framer-motion";
-import { MapPin, Navigation, Search, Truck } from "lucide-react";
+export const dynamic = "force-dynamic";
 
-import DashboardLayout from "@/app/dashboard/_components/DashboardLayout";
+const PAGE_SIZE = 20;
 
-const routes = [
-  {
-    id: "SH-8902",
-    origin: "Shanghai",
-    destination: "Los Angeles",
-    status: "CUSTOMS",
-    eta: "Nov 14",
-  },
-  {
-    id: "SH-1147",
-    origin: "Mumbai",
-    destination: "Rotterdam",
-    status: "IN_TRANSIT",
-    eta: "Nov 19",
-  },
-  {
-    id: "SH-2201",
-    origin: "Hamburg",
-    destination: "Dubai",
-    status: "DELAYED",
-    eta: "Nov 22",
-  },
-];
+function statusColor(status: string) {
+  switch (status) {
+    case "IN_TRANSIT":
+      return "bg-blue-500/10 text-blue-700 dark:text-blue-400";
+    case "CUSTOMS":
+      return "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400";
+    case "DELIVERED":
+      return "bg-green-500/10 text-green-700 dark:text-green-400";
+    case "DELAYED":
+      return "bg-red-500/10 text-red-700 dark:text-red-400";
+    default:
+      return "bg-primary/10 text-primary";
+  }
+}
 
-export default function AdminShipmentsPage() {
+export default async function AdminShipmentsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const params = await searchParams;
+  const page = Math.max(1, parseInt(params.page || "1", 10) || 1);
+
+  const [shipments, total] = await Promise.all([
+    prisma.shipment.findMany({
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+      orderBy: { createdAt: "desc" },
+      include: {
+        order: {
+          select: {
+            orderNumber: true,
+            product: { select: { name: true } },
+            importer: { select: { name: true, companyName: true } },
+          },
+        },
+      },
+    }),
+    prisma.shipment.count(),
+  ]);
+
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
   return (
-    <DashboardLayout role="admin">
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight">Live Shipment Routes</h1>
-            <p className="text-sm text-muted-foreground">Monitor routes, ETAs, and exceptions.</p>
-          </div>
-          <div className="relative w-full sm:w-[320px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <input
-              className="h-11 w-full rounded-xl border border-input bg-background pl-10 pr-4 text-sm outline-none focus:ring-2 focus:ring-ring/20"
-              placeholder="Search shipment ID, port..."
-            />
-          </div>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight">All Shipments</h1>
+          <p className="text-sm text-muted-foreground">Track all shipments across the platform.</p>
         </div>
-
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-          <div className="xl:col-span-7 rounded-2xl border border-border bg-card p-6 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-lg font-black">Route map</div>
-                <div className="text-sm text-muted-foreground">Map visualization placeholder.</div>
-              </div>
-              <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary grid place-items-center">
-                <Navigation className="h-5 w-5" />
-              </div>
-            </div>
-
-            <div className="mt-6 h-[360px] rounded-xl border border-border bg-muted/40 grid place-items-center text-sm text-muted-foreground">
-              Replace with a real map (Mapbox/Leaflet) when ready.
-            </div>
-          </div>
-
-          <div className="xl:col-span-5 space-y-4">
-            {routes.map((r, idx) => (
-              <motion.div
-                key={r.id}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.06 }}
-                className="rounded-2xl border border-border bg-card p-5 shadow-sm"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <div className="text-xs font-black uppercase tracking-widest text-muted-foreground">
-                      Shipment {r.id}
-                    </div>
-                    <div className="mt-2 flex items-center gap-2 text-sm font-black">
-                      <MapPin className="h-4 w-4 text-primary" />
-                      {r.origin} → {r.destination}
-                    </div>
-                    <div className="mt-1 text-xs text-muted-foreground">ETA {r.eta}</div>
-                  </div>
-                  <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary grid place-items-center">
-                    <Truck className="h-5 w-5" />
-                  </div>
-                </div>
-
-                <div className="mt-4 rounded-xl border border-border bg-muted/40 p-4 flex items-center justify-between">
-                  <div className="text-xs font-black uppercase tracking-widest text-muted-foreground">Status</div>
-                  <span className="rounded-full bg-primary/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-primary">
-                    {r.status}
-                  </span>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
+        <span className="text-sm text-muted-foreground">{total} total</span>
       </div>
-    </DashboardLayout>
+
+      <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/40 text-muted-foreground">
+              <tr>
+                <th className="text-left px-4 py-3 font-black uppercase tracking-widest text-[11px]">Tracking</th>
+                <th className="text-left px-4 py-3 font-black uppercase tracking-widest text-[11px]">Order</th>
+                <th className="text-left px-4 py-3 font-black uppercase tracking-widest text-[11px]">Product</th>
+                <th className="text-left px-4 py-3 font-black uppercase tracking-widest text-[11px]">Carrier</th>
+                <th className="text-left px-4 py-3 font-black uppercase tracking-widest text-[11px]">Route</th>
+                <th className="text-left px-4 py-3 font-black uppercase tracking-widest text-[11px]">ETA</th>
+                <th className="text-left px-4 py-3 font-black uppercase tracking-widest text-[11px]">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {shipments.map((s) => (
+                <tr key={s.id} className="border-t border-border">
+                  <td className="px-4 py-3 font-semibold font-mono text-xs">{s.trackingNumber}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{s.order.orderNumber}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{s.order.product.name}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{s.carrier || "—"}</td>
+                  <td className="px-4 py-3 text-muted-foreground">
+                    {s.origin && s.destination ? `${s.origin} → ${s.destination}` : "—"}
+                  </td>
+                  <td className="px-4 py-3 text-muted-foreground">
+                    {s.estimatedDelivery
+                      ? new Date(s.estimatedDelivery).toLocaleDateString()
+                      : "—"}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={
+                        "rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest " +
+                        statusColor(s.status)
+                      }
+                    >
+                      {s.status.replace("_", " ")}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+              {shipments.length === 0 && (
+                <tr>
+                  <td className="px-4 py-10 text-center text-muted-foreground" colSpan={7}>
+                    No shipments yet.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between border-t border-border px-4 py-3 text-sm">
+            <span className="text-muted-foreground">
+              Page {page} of {totalPages}
+            </span>
+            <div className="flex gap-2">
+              {page > 1 && (
+                <Link
+                  href={`/dashboard/admin/shipments?page=${page - 1}`}
+                  className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold hover:bg-muted transition-colors"
+                >
+                  ← Previous
+                </Link>
+              )}
+              {page < totalPages && (
+                <Link
+                  href={`/dashboard/admin/shipments?page=${page + 1}`}
+                  className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold hover:bg-muted transition-colors"
+                >
+                  Next →
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

@@ -12,7 +12,6 @@ import {
   LayoutDashboard,
   LineChart,
   Package,
-  Radio,
   Settings,
   User,
 } from "lucide-react";
@@ -20,11 +19,11 @@ import { useAuth } from "@/components/auth/AuthProvider";
 
 const nav = [
   { href: "/dashboard/admin", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/dashboard/admin/feed", label: "Marketplace Feed", icon: Radio },
-  { href: "/dashboard/admin/categories", label: "All Categories", icon: FolderTree },
-  { href: "/dashboard/admin/inventory", label: "Inventory", icon: Boxes },
-  { href: "/dashboard/admin/directory", label: "Directory", icon: Globe },
-  { href: "/dashboard/admin/trends", label: "Trends", icon: LineChart },
+  { href: "/dashboard/admin/users", label: "Users", icon: Globe },
+  { href: "/dashboard/admin/products", label: "Products", icon: Package },
+  { href: "/dashboard/admin/orders", label: "Orders", icon: Boxes },
+  { href: "/dashboard/admin/shipments", label: "Shipments", icon: FolderTree },
+  { href: "/dashboard/admin/analytics", label: "Analytics", icon: LineChart },
   { href: "/dashboard/admin/notifications", label: "Notifications", icon: Bell },
 ];
 
@@ -38,7 +37,7 @@ function Item({
   icon: ComponentType<{ className?: string }>;
 }) {
   const pathname = usePathname();
-  const active = pathname === href;
+  const active = pathname === href || (href !== "/dashboard/admin" && pathname.startsWith(href + "/"));
 
   return (
     <Link

@@ -70,7 +70,7 @@ function FeatureCard({ feature, index }: { feature: typeof features[0]; index: n
       transition={{ duration: 0.5, delay: index * 0.1 }}
       className="group relative"
     >
-      <div className="relative h-full p-8 bg-white rounded-2xl border border-slate-200 hover:border-slate-300 transition-all duration-300 hover:shadow-xl">
+      <div className="relative h-full p-8 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-300 hover:shadow-xl">
         {/* Icon */}
         <div className="relative mb-6">
           <div
@@ -84,8 +84,8 @@ function FeatureCard({ feature, index }: { feature: typeof features[0]; index: n
         </div>
 
         {/* Content */}
-        <h3 className="text-2xl font-bold text-slate-900 mb-3">{feature.title}</h3>
-        <p className="text-slate-600 leading-relaxed">{feature.description}</p>
+        <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">{feature.title}</h3>
+        <p className="text-slate-600 dark:text-slate-300 leading-relaxed">{feature.description}</p>
 
         {/* Hover Effect Line */}
         <div className="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-blue-600 to-purple-600 group-hover:w-full transition-all duration-500 rounded-full" />
@@ -99,7 +99,7 @@ export default function Features() {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section className="py-24 bg-slate-50">
+    <section className="py-24 bg-slate-50 dark:bg-slate-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           ref={ref}
@@ -108,13 +108,13 @@ export default function Features() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <div className="inline-block px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium mb-4">
+          <div className="inline-block px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm font-medium mb-4">
             Why Choose Us
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">
             Built for Modern Trade
           </h2>
-          <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+          <p className="text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto">
             Everything you need to succeed in international import-export business,
             powered by cutting-edge technology.
           </p>

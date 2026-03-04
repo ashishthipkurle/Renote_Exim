@@ -49,9 +49,13 @@ export default function LoginPage() {
 
       toast.success("Login successful!");
 
-      // Redirect based on role
-      const role = response.data.user.role.toLowerCase();
-      router.push(`/dashboard/${role}`);
+      // Redirect based on role — USER goes to marketplace, others to dashboard
+      const role = response.data.user.role;
+      if (role === "USER") {
+        router.push("/products");
+      } else {
+        router.push(`/dashboard/${role.toLowerCase()}`);
+      }
     } catch (error: unknown) {
       toast.error(getApiErrorMessage(error) ?? "Login failed");
     } finally {

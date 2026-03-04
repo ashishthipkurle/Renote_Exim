@@ -43,7 +43,7 @@ function RegisterForm() {
     email: "",
     password: "",
     confirmPassword: "",
-    role: "IMPORTER" as "IMPORTER" | "EXPORTER",
+    role: "USER" as "USER" | "IMPORTER" | "EXPORTER",
     companyName: "",
     country: "",
     phone: "",
@@ -60,6 +60,11 @@ function RegisterForm() {
     }
     if (roleParam === "importer" || roleParam === "customer") {
       setFormData((prev) => ({ ...prev, role: "IMPORTER" }));
+      didInitRole.current = true;
+      return;
+    }
+    if (roleParam === "user") {
+      setFormData((prev) => ({ ...prev, role: "USER" }));
       didInitRole.current = true;
     }
   }, [searchParams]);
@@ -92,15 +97,25 @@ function RegisterForm() {
 
         toast.success("Registration successful! Welcome aboard!");
 
-        // Redirect based on role
-        const role = response.data.user.role.toLowerCase();
-        router.push(`/dashboard/${role}`);
+        // Redirect based on role — USER goes to marketplace, others to dashboard
+        const role = response.data.user.role;
+        if (role === "USER") {
+          router.push("/products");
+        } else {
+          router.push(`/dashboard/${role.toLowerCase()}`);
+        }
       } else {
         toast.success(response.data?.message ?? "Registration successful. Please log in.");
         router.push("/login");
       }
     } catch (error: unknown) {
-      toast.error(getApiErrorMessage(error) ?? "Registration failed");
+      // Show detailed validation errors if available
+      const resp = (error as { response?: { data?: { error?: string; details?: Array<{ message: string; path?: string[] }> } } }).response;
+      if (resp?.data?.details?.length) {
+        resp.data.details.forEach((d) => toast.error(d.message));
+      } else {
+        toast.error(getApiErrorMessage(error) ?? "Registration failed");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -197,7 +212,18 @@ function RegisterForm() {
                   <label className="block text-sm font-semibold text-muted-foreground mb-3">
                     I want to
                   </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, role: "USER" })}
+                      className={`p-4 border rounded-xl text-left transition-colors ${formData.role === "USER"
+                        ? "border-primary bg-primary/10"
+                        : "border-border hover:bg-accent"
+                        }`}
+                    >
+                      <div className="font-semibold">Shop Products</div>
+                      <div className="text-sm text-muted-foreground mt-1">Browse & buy directly</div>
+                    </button>
                     <button
                       type="button"
                       onClick={() => setFormData({ ...formData, role: "IMPORTER" })}
@@ -207,7 +233,7 @@ function RegisterForm() {
                         }`}
                     >
                       <div className="font-semibold">Import Products</div>
-                      <div className="text-sm text-muted-foreground mt-1">Buy from exporters</div>
+                      <div className="text-sm text-muted-foreground mt-1">Buy in bulk (B2B)</div>
                     </button>
                     <button
                       type="button"
@@ -218,7 +244,7 @@ function RegisterForm() {
                         }`}
                     >
                       <div className="font-semibold">Export Products</div>
-                      <div className="text-sm text-muted-foreground mt-1">Sell to importers</div>
+                      <div className="text-sm text-muted-foreground mt-1">Sell to importers (B2B)</div>
                     </button>
                   </div>
                 </div>
@@ -285,20 +311,6 @@ function RegisterForm() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-muted-foreground ml-1">Company Name</label>
-                    <div className="relative group">
-                      <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors w-5 h-5" />
-                      <input
-                        type="text"
-                        value={formData.companyName}
-                        onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                        className="w-full pl-12 pr-4 py-4 bg-background border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-ring/20 transition-all placeholder:text-muted-foreground"
-                        placeholder="Acme Corp"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
                     <label className="text-sm font-semibold text-muted-foreground ml-1">Country *</label>
                     <div className="relative group">
                       <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors w-5 h-5" />
@@ -327,19 +339,38 @@ function RegisterForm() {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-muted-foreground ml-1">Website</label>
-                    <div className="relative group">
-                      <GlobeIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors w-5 h-5" />
-                      <input
-                        type="url"
-                        value={formData.website}
-                        onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                        className="w-full pl-12 pr-4 py-4 bg-background border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-ring/20 transition-all placeholder:text-muted-foreground"
-                        placeholder="https://company.com"
-                      />
-                    </div>
-                  </div>
+                  {/* B2B fields — only for Importer/Exporter */}
+                  {formData.role !== "USER" && (
+                    <>
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-muted-foreground ml-1">Company Name</label>
+                        <div className="relative group">
+                          <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors w-5 h-5" />
+                          <input
+                            type="text"
+                            value={formData.companyName}
+                            onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
+                            className="w-full pl-12 pr-4 py-4 bg-background border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-ring/20 transition-all placeholder:text-muted-foreground"
+                            placeholder="Acme Corp"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-muted-foreground ml-1">Website</label>
+                        <div className="relative group">
+                          <GlobeIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors w-5 h-5" />
+                          <input
+                            type="url"
+                            value={formData.website}
+                            onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                            className="w-full pl-12 pr-4 py-4 bg-background border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-ring/20 transition-all placeholder:text-muted-foreground"
+                            placeholder="https://company.com"
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 <div className="flex items-start gap-3">

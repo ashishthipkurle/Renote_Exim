@@ -21,10 +21,11 @@ const basePath = "/dashboard/exporter";
 
 const nav = [
   { href: basePath, label: "Dashboard", icon: LayoutDashboard },
-  { href: `${basePath}/categories`, label: "All Categories", icon: FolderTree },
   { href: `${basePath}/inventory`, label: "Inventory", icon: Boxes },
-  { href: `${basePath}/directory`, label: "Directory", icon: Globe },
+  { href: `${basePath}/orders`, label: "Orders", icon: FolderTree },
+  { href: `${basePath}/shipments`, label: "Shipments", icon: Globe },
   { href: `${basePath}/analytics`, label: "Analytics", icon: LineChart },
+  { href: `${basePath}/finance`, label: "Finance", icon: Bell },
   { href: `${basePath}/notifications`, label: "Notifications", icon: Bell },
 ];
 
@@ -40,7 +41,7 @@ function Item({
   showBadge?: boolean;
 }) {
   const pathname = usePathname();
-  const active = pathname === href;
+  const active = pathname === href || (href !== basePath && pathname.startsWith(href + "/"));
 
   return (
     <Link

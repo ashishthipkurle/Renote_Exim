@@ -68,9 +68,11 @@ function AnimatedCounter({ value, prefix, suffix }: { value: number; prefix: str
   return (
     <span ref={ref}>
       {prefix}
-      {value > 1000000
-        ? (count / 1000000).toFixed(1) + "B"
-        : value > 1000
+      {value >= 1000000000
+        ? (count / 1000000000).toFixed(1) + "B"
+        : value >= 1000000
+        ? (count / 1000000).toFixed(1) + "M"
+        : value >= 1000
         ? (count / 1000).toFixed(count >= value ? 0 : 1) + "K"
         : count}
       {suffix}

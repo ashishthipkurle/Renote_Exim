@@ -32,7 +32,7 @@ export default function HowItWorks() {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section className="py-24 bg-white">
+    <section className="py-24 bg-white dark:bg-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           ref={ref}
@@ -41,13 +41,13 @@ export default function HowItWorks() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <div className="inline-block px-4 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-medium mb-4">
+          <div className="inline-block px-4 py-2 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-sm font-medium mb-4">
             Simple Process
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">
             How It Works
           </h2>
-          <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+          <p className="text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto">
             Get started in 4 simple steps and join thousands of successful traders.
           </p>
         </motion.div>
@@ -76,14 +76,14 @@ export default function HowItWorks() {
                     {/* Icon Container */}
                     <div className="relative mb-6 group">
                       <div className="absolute inset-0 bg-blue-500/20 blur-xl group-hover:bg-blue-500/30 transition-all rounded-full" />
-                      <div className="relative w-24 h-24 bg-white border-4 border-slate-200 rounded-full flex items-center justify-center hover:border-blue-400 transition-all duration-300">
+                      <div className="relative w-24 h-24 bg-white dark:bg-slate-800 border-4 border-slate-200 dark:border-slate-600 rounded-full flex items-center justify-center hover:border-blue-400 transition-all duration-300">
                         <Icon className="text-blue-600" size={40} />
                       </div>
                     </div>
 
                     {/* Content */}
-                    <h3 className="text-xl font-bold text-slate-900 mb-2">{step.title}</h3>
-                    <p className="text-slate-600">{step.description}</p>
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{step.title}</h3>
+                    <p className="text-slate-600 dark:text-slate-300">{step.description}</p>
                   </div>
                 </motion.div>
               );

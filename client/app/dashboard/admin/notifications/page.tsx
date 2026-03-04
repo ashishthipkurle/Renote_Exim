@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-import DashboardLayout from "@/app/dashboard/_components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 
 type AlertItem = {
@@ -89,7 +88,6 @@ function AlertIcon({ type }: { type: AlertItem["type"] }) {
 
 export default function AdminNotificationsPage() {
   return (
-    <DashboardLayout role="admin">
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
@@ -123,7 +121,6 @@ export default function AdminNotificationsPage() {
           <Section title="Documents" badge="1 missing" items={docAlerts} />
         </div>
       </div>
-    </DashboardLayout>
   );
 }
 

@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 function NavLink({
   href,
@@ -43,6 +44,13 @@ function NavLink({
 }
 
 export default function MarketplaceHeader() {
+  const { user } = useAuth();
+  const dashboardPath = user?.role === "USER"
+    ? "/products"
+    : user?.role
+      ? `/dashboard/${user.role.toLowerCase()}`
+      : "/dashboard/importer";
+
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/70 backdrop-blur">
       <div className="mx-auto flex h-20 max-w-[1920px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-10">
@@ -114,7 +122,7 @@ export default function MarketplaceHeader() {
           </button>
 
           <ThemeToggle />
-          <NavLink href="/dashboard/importer" label="Dashboard" icon={LayoutDashboard} />
+          <NavLink href={dashboardPath} label="Dashboard" icon={LayoutDashboard} />
         </div>
       </div>
 

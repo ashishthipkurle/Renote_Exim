@@ -38,6 +38,7 @@ model User {
 }
 
 enum Role {
+  USER
   EXPORTER
   IMPORTER
   ADMIN

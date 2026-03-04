@@ -40,7 +40,7 @@ export default function Testimonials() {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section className="py-24 bg-white">
+    <section className="py-24 bg-white dark:bg-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           ref={ref}
@@ -49,13 +49,13 @@ export default function Testimonials() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <div className="inline-block px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-medium mb-4">
+          <div className="inline-block px-4 py-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full text-sm font-medium mb-4">
             Testimonials
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">
             Trusted Worldwide
           </h2>
-          <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+          <p className="text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto">
             See what our customers say about their experience with Ranote Exim.
           </p>
         </motion.div>
@@ -69,7 +69,7 @@ export default function Testimonials() {
               transition={{ duration: 0.5, delay: index * 0.15 }}
               className="group"
             >
-              <div className="relative h-full p-8 bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl border border-slate-200 hover:border-blue-300 hover:shadow-xl transition-all duration-300">
+                <div className="relative h-full p-8 bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-xl transition-all duration-300">
                 {/* Quote Icon */}
                 <div className="absolute top-6 right-6 opacity-10 group-hover:opacity-20 transition-opacity">
                   <Quote size={48} className="text-blue-600" />
@@ -83,13 +83,13 @@ export default function Testimonials() {
                 </div>
 
                 {/* Testimonial Text */}
-                <p className="text-slate-700 leading-relaxed mb-6 relative z-10">
+                <p className="text-slate-700 dark:text-slate-300 leading-relaxed mb-6 relative z-10">
                   {testimonial.text}
                 </p>
 
                 {/* Author */}
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full overflow-hidden bg-slate-200 relative">
+                  <div className="w-12 h-12 rounded-full overflow-hidden bg-slate-200 dark:bg-slate-700 relative">
                     <Image
                       src={testimonial.image}
                       alt={testimonial.name}
@@ -99,9 +99,9 @@ export default function Testimonials() {
                     />
                   </div>
                   <div>
-                    <p className="font-bold text-slate-900">{testimonial.name}</p>
-                    <p className="text-sm text-slate-600">{testimonial.role}</p>
-                    <p className="text-xs text-slate-500">
+                    <p className="font-bold text-slate-900 dark:text-white">{testimonial.name}</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">{testimonial.role}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-500">
                       {testimonial.company} • {testimonial.country}
                     </p>
                   </div>

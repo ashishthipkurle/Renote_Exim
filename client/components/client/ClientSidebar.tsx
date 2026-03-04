@@ -22,9 +22,9 @@ type NavItem = {
   icon: ComponentType<{ className?: string }>;
 };
 
-function Item({ href, label, icon: Icon }: NavItem) {
+function Item({ href, label, icon: Icon, basePath }: NavItem & { basePath: string }) {
   const pathname = usePathname();
-  const active = pathname === href;
+  const active = pathname === href || (href !== basePath && pathname.startsWith(href + "/"));
 
   return (
     <Link
@@ -46,9 +46,9 @@ export default function ClientSidebar({ basePath }: { basePath: string }) {
   const { user } = useAuth();
   const nav: NavItem[] = [
     { href: basePath, label: "Dashboard", icon: Home },
-    { href: `${basePath}/categories`, label: "All Categories", icon: LayoutGrid },
-    { href: `${basePath}/inventory`, label: "Inventory", icon: Package },
     { href: `${basePath}/orders`, label: "Orders", icon: Truck },
+    { href: `${basePath}/shipments`, label: "Shipments", icon: Package },
+    { href: `${basePath}/inventory`, label: "Inventory", icon: LayoutGrid },
     { href: `${basePath}/analytics`, label: "Analytics", icon: LineChart },
     { href: `${basePath}/finance`, label: "Finance", icon: Wallet },
   ];
@@ -59,12 +59,12 @@ export default function ClientSidebar({ basePath }: { basePath: string }) {
         <div className="size-10 bg-primary rounded-lg flex items-center justify-center shadow-lg shadow-primary/20">
           <LayoutGrid className="text-white w-5 h-5" />
         </div>
-        <h1 className="hidden lg:block text-xl font-bold tracking-tight text-white">TradeFlow</h1>
+        <h1 className="hidden lg:block text-xl font-bold tracking-tight text-white">Ranote <span className="text-primary">Exim</span></h1>
       </div>
 
       <nav className="flex-1 w-full px-3 space-y-2">
         {nav.map((n) => (
-          <Item key={n.href} href={n.href} label={n.label} icon={n.icon} />
+          <Item key={n.href} href={n.href} label={n.label} icon={n.icon} basePath={basePath} />
         ))}
       </nav>
 

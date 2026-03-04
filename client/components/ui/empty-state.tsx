@@ -22,11 +22,11 @@ export function EmptyState({ icon: Icon, title, description, action }: EmptyStat
       transition={{ duration: 0.3 }}
       className="flex flex-col items-center justify-center py-16 px-4"
     >
-      <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-4">
-        <Icon className="w-10 h-10 text-slate-400" />
+      <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
+        <Icon className="w-10 h-10 text-slate-400 dark:text-slate-500" />
       </div>
-      <h3 className="text-xl font-semibold text-slate-900 mb-2">{title}</h3>
-      <p className="text-slate-600 text-center max-w-md mb-6">{description}</p>
+      <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">{title}</h3>
+      <p className="text-slate-600 dark:text-slate-400 text-center max-w-md mb-6">{description}</p>
       {action && (
         <Button onClick={action.onClick}>{action.label}</Button>
       )}

@@ -8,7 +8,7 @@ export const registerSchema = z.object({
     .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
     .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
     .regex(/[0-9]/, 'Password must contain at least one number'),
-  role: z.enum(['EXPORTER', 'IMPORTER']),
+  role: z.enum(['USER', 'EXPORTER', 'IMPORTER']),
   companyName: z.string().optional(),
   country: z.string().min(2, 'Country is required'),
   phone: z.string().optional(),

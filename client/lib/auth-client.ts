@@ -10,6 +10,6 @@ export type StoredUser = {
   id: string;
   name: string | null;
   email: string;
-  role: "EXPORTER" | "IMPORTER" | "ADMIN";
+  role: "USER" | "EXPORTER" | "IMPORTER" | "ADMIN";
 } & Record<string, unknown>;
 

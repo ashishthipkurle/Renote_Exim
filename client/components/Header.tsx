@@ -52,33 +52,33 @@ export default function Header() {
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center gap-2">
             <ThemeToggle />
-            {!loading && (
-              user ? (
-                <div className="flex items-center gap-2">
-                  <Link href={`/dashboard/${user.role?.toLowerCase()}`}>
-                    <Button variant="ghost" className="gap-2">
-                      {user.avatar ? (
-                        <Image src={user.avatar as string} alt="Avatar" width={32} height={32} className="w-8 h-8 rounded-full object-cover" unoptimized />
-                      ) : (
-                        <User className="w-4 h-4" />
-                      )}
-                      Dashboard
-                    </Button>
-                  </Link>
-                  <Button variant="ghost" size="icon" onClick={() => logout()}>
-                    <LogOut className="w-4 h-4" />
+            {loading ? (
+              <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
+            ) : user ? (
+              <div className="flex items-center gap-2">
+                <Link href={user.role === "USER" ? "/products" : `/dashboard/${user.role?.toLowerCase()}`}>
+                  <Button variant="ghost" className="gap-2">
+                    {user.avatar ? (
+                      <Image src={user.avatar as string} alt="Avatar" width={32} height={32} className="w-8 h-8 rounded-full object-cover" unoptimized />
+                    ) : (
+                      <User className="w-4 h-4" />
+                    )}
+                    Dashboard
                   </Button>
-                </div>
-              ) : (
-                <>
-                  <Link href="/login">
-                    <Button variant="ghost">Login</Button>
-                  </Link>
-                  <Link href="/register">
-                    <Button>Get Started</Button>
-                  </Link>
-                </>
-              )
+                </Link>
+                <Button variant="ghost" size="icon" onClick={() => logout()}>
+                  <LogOut className="w-4 h-4" />
+                </Button>
+              </div>
+            ) : (
+              <>
+                <Link href="/login">
+                  <Button variant="ghost">Login</Button>
+                </Link>
+                <Link href="/register">
+                  <Button>Get Started</Button>
+                </Link>
+              </>
             )}
           </div>
 
@@ -121,7 +121,7 @@ export default function Header() {
                 {!loading && (
                   user ? (
                     <>
-                      <Link href={`/dashboard/${user.role?.toLowerCase()}`} className="block">
+                      <Link href={user.role === "USER" ? "/products" : `/dashboard/${user.role?.toLowerCase()}`} className="block">
                         <Button className="w-full gap-2">
                           <User className="w-4 h-4" /> Dashboard
                         </Button>

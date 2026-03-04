@@ -3,11 +3,8 @@
 import { motion } from "framer-motion";
 import { BarChart3, CalendarDays, Radar, TrendingUp } from "lucide-react";
 
-import DashboardLayout from "@/app/dashboard/_components/DashboardLayout";
-
 export default function AdminAnalyticsPage() {
   return (
-    <DashboardLayout role="admin">
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
@@ -76,7 +73,6 @@ export default function AdminAnalyticsPage() {
           </div>
         </div>
       </div>
-    </DashboardLayout>
   );
 }
 

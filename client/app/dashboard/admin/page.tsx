@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { CalendarDays, Search, Plus, TrendingUp, Truck, Users, LineChart, Bell } from "lucide-react";
 
-export default function AdminDashboardPage() {
+export default function AdminDashboard() {
   return (
     <div className="relative h-dvh flex flex-col overflow-hidden bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/20 via-[#0b1019] to-[#0b1019]">
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f2937_1px,transparent_1px),linear-gradient(to_bottom,#1f2937_1px,transparent_1px)] bg-[length:40px_40px] opacity-[0.03] pointer-events-none" />

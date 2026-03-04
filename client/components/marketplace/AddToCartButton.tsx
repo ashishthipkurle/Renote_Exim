@@ -1,6 +1,7 @@
 "use client";
 
-import { ShoppingCart } from "lucide-react";
+import { useState } from "react";
+import { ShoppingCart, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -15,17 +16,33 @@ export default function AddToCartButton({
   quantity?: number;
   className?: string;
 }) {
+  const [loading, setLoading] = useState(false);
+
+  const handleClick = async () => {
+    setLoading(true);
+    try {
+      addToCart(productId, quantity);
+      toast.success("Added to cart");
+    } catch (err) {
+      toast.error("Failed to add to cart. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Button
       type="button"
       className={className}
-      onClick={() => {
-        addToCart(productId, quantity);
-        toast.success("Added to cart");
-      }}
+      disabled={loading}
+      onClick={handleClick}
     >
-      <ShoppingCart className="h-4 w-4" />
-      Add to cart
+      {loading ? (
+        <Loader2 className="h-4 w-4 animate-spin" />
+      ) : (
+        <ShoppingCart className="h-4 w-4" />
+      )}
+      {loading ? "Adding..." : "Add to cart"}
     </Button>
   );
 }

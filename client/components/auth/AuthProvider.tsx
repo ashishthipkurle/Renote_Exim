@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { getSupabaseBrowserClient } from "@/lib/supabase/browser";
+import type { Session } from "@supabase/supabase-js";
 import type { StoredUser } from "@/lib/auth-client";
 
 type AuthContextType = {
@@ -23,6 +24,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<StoredUser | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const clearMiddlewareTokenCookie = () => {
+    if (typeof document === "undefined") return;
+    document.cookie = "sb_access_token=; Path=/; Max-Age=0; SameSite=Lax";
+  };
+
+  const syncMiddlewareTokenCookie = (session: Session | null) => {
+    if (typeof document === "undefined") return;
+
+    if (!session?.access_token) {
+      clearMiddlewareTokenCookie();
+      return;
+    }
+
+    const now = Math.floor(Date.now() / 1000);
+    const maxAge = Math.max(0, (session.expires_at ?? now + 3600) - now);
+    const secure = window.location.protocol === "https:" ? "; Secure" : "";
+    document.cookie = `sb_access_token=${encodeURIComponent(session.access_token)}; Path=/; Max-Age=${maxAge}; SameSite=Lax${secure}`;
+  };
+
   const fetchUser = async (token?: string) => {
     try {
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
@@ -41,8 +61,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const supabase = getSupabaseBrowserClient();
     const { data } = await supabase.auth.getSession();
     if (data.session?.access_token) {
+      syncMiddlewareTokenCookie(data.session);
       await fetchUser(data.session.access_token);
     } else {
+      clearMiddlewareTokenCookie();
       setUser(null);
       setLoading(false);
     }
@@ -61,6 +83,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (typeof window !== "undefined") {
         window.localStorage.removeItem("user");
       }
+
+      clearMiddlewareTokenCookie();
       
       setUser(null);
     } catch (error) {
@@ -76,8 +100,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Initial fetch
     supabase.auth.getSession().then(({ data }) => {
       if (data.session?.access_token) {
+        syncMiddlewareTokenCookie(data.session);
         fetchUser(data.session.access_token);
       } else {
+        clearMiddlewareTokenCookie();
         setLoading(false);
       }
     });
@@ -86,9 +112,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (event === "SIGNED_OUT") {
+          clearMiddlewareTokenCookie();
           setUser(null);
           setLoading(false);
         } else if (session?.access_token) {
+          syncMiddlewareTokenCookie(session);
           fetchUser(session.access_token);
         }
       }
