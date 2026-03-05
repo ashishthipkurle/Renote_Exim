@@ -565,3 +565,45 @@
   transform-origin: left center;
   opacity: 0.4;
 }
+
+/* Loading Spinner Animations */
+@keyframes spin-smooth {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spin-pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(19, 91, 236, 0.3), inset 0 0 15px rgba(19, 91, 236, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(19, 91, 236, 0.6), inset 0 0 20px rgba(19, 91, 236, 0.2);
+  }
+}
+
+@keyframes float-up {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-spin-smooth {
+  animation: spin-smooth 2.5s linear infinite;
+}
+
+.animate-spin-pulse-glow {
+  animation: spin-pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-float-up {
+  animation: float-up 0.3s ease-out;
+}

@@ -1,13 +1,17 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function GlobalHubsSection() {
   const shipRef = useRef<HTMLImageElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
+  const [loadingItems, setLoadingItems] = useState<{
+    [key: string]: boolean;
+  }>({});
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -29,6 +33,16 @@ export default function GlobalHubsSection() {
       );
     }
   }, []);
+
+  const handleItemClick = (itemId: string) => {
+    // Start loading animation
+    setLoadingItems((prev) => ({ ...prev, [itemId]: true }));
+
+    // Simulate async operation (replace with actual API call)
+    setTimeout(() => {
+      setLoadingItems((prev) => ({ ...prev, [itemId]: false }));
+    }, 2000);
+  };
 
   return (
     <section ref={sectionRef} className="py-24 relative bg-slate-50 dark:bg-[#0A0E17] overflow-hidden flex items-center min-h-[90vh]">
@@ -92,20 +106,50 @@ export default function GlobalHubsSection() {
 
         <div className="w-full md:w-[55%] space-y-8 reveal-trigger pl-0 md:pl-10" style={{ transitionDelay: "200ms" }}>
           <h2 className="text-5xl md:text-6xl font-bold text-slate-900 dark:text-white leading-tight">STRATEGIC <br /><span className="text-primary">GLOBAL HUBS</span></h2>
-          <p className="text-slate-600 dark:text-slate-300 text-lg leading-relaxed max-w-xl">Our physical presence in 40+ major logistical hubs ensures your goods are handled with priority. From Singapore to Rotterdam, we provide on-ground support.</p>
+          <p className="text-slate-300 dark:text-slate-300 text-lg leading-relaxed max-w-xl">Our physical presence in 40+ major logistical hubs ensures your goods are handled with priority. From Singapore to Rotterdam, we provide on-ground support.</p>
           <div className="space-y-4 pt-4 max-w-xl">
-            <div className="group flex items-center gap-6 p-6 rounded-2xl bg-white/40 dark:bg-[#0A0E17]/40 backdrop-blur-sm border border-slate-200 dark:border-white/5 hover:border-primary/50 transition-all cursor-pointer">
-              <div className="w-12 h-12 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary font-bold shadow-sm dark:shadow-[0_0_15px_rgba(19,91,236,0.3)]">01</div>
+            <div
+              onClick={() => handleItemClick("expedited")}
+              className="group flex items-center gap-6 p-6 rounded-2xl bg-white/40 dark:bg-[#0A0E17]/40 backdrop-blur-sm border border-slate-200 dark:border-white/5 hover:border-primary/50 transition-all cursor-pointer hover:shadow-lg hover:shadow-primary/20 dark:hover:shadow-primary/10"
+            >
+              {loadingItems["expedited"] ? (
+                <div className="flex items-center justify-center w-12 h-12">
+                  <LoadingSpinner size="sm" />
+                </div>
+              ) : (
+                <div className="w-12 h-12 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary font-bold shadow-sm dark:shadow-[0_0_15px_rgba(19,91,236,0.3)]">
+                  01
+                </div>
+              )}
               <div>
-                <h4 className="text-slate-900 dark:text-white font-bold text-lg">Expedited Clearance</h4>
-                <p className="text-sm text-slate-600 dark:text-slate-400">Average 4 hours processing time</p>
+                <h4 className="text-slate-900 dark:text-white font-bold text-lg">
+                  Expedited Clearance
+                </h4>
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  Average 4 hours processing time
+                </p>
               </div>
             </div>
-            <div className="group flex items-center gap-6 p-6 rounded-2xl bg-white/40 dark:bg-[#0A0E17]/40 backdrop-blur-sm border border-slate-200 dark:border-white/5 hover:border-primary/50 transition-all cursor-pointer">
-              <div className="w-12 h-12 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary font-bold shadow-sm dark:shadow-[0_0_15px_rgba(19,91,236,0.3)]">02</div>
+            <div
+              onClick={() => handleItemClick("warehousing")}
+              className="group flex items-center gap-6 p-6 rounded-2xl bg-white/40 dark:bg-[#0A0E17]/40 backdrop-blur-sm border border-slate-200 dark:border-white/5 hover:border-primary/50 transition-all cursor-pointer hover:shadow-lg hover:shadow-primary/20 dark:hover:shadow-primary/10"
+            >
+              {loadingItems["warehousing"] ? (
+                <div className="flex items-center justify-center w-12 h-12">
+                  <LoadingSpinner size="sm" />
+                </div>
+              ) : (
+                <div className="w-12 h-12 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary font-bold shadow-sm dark:shadow-[0_0_15px_rgba(19,91,236,0.3)]">
+                  02
+                </div>
+              )}
               <div>
-                <h4 className="text-slate-900 dark:text-white font-bold text-lg">Warehousing Network</h4>
-                <p className="text-sm text-slate-600 dark:text-slate-400">2.5M sq ft of secure storage</p>
+                <h4 className="text-slate-900 dark:text-white font-bold text-lg">
+                  Warehousing Network
+                </h4>
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  2.5M sq ft of secure storage
+                </p>
               </div>
             </div>
           </div>
