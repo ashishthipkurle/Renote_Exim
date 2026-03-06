@@ -9,7 +9,9 @@ import {
   PackageSearch,
   ShoppingCart,
   Globe2,
-  Languages,
+  User,
+  LogOut,
+  ChevronDown,
 } from "lucide-react";
 
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
@@ -44,7 +46,7 @@ function NavLink({
 }
 
 export default function MarketplaceHeader() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const dashboardPath = user?.role === "USER"
     ? "/products"
     : user?.role
@@ -65,8 +67,6 @@ export default function MarketplaceHeader() {
           </Link>
 
           <nav className="hidden lg:flex items-center gap-2">
-            <NavLink href="/products" label="Marketplace" icon={PackageSearch} />
-            <NavLink href="/cart" label="Cart" icon={ShoppingCart} />
             <NavLink href="/orders" label="Orders" icon={ListOrdered} />
           </nav>
         </div>
@@ -93,17 +93,7 @@ export default function MarketplaceHeader() {
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="hidden lg:flex flex-col items-end">
-            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-black">
-              Market Status
-            </span>
-            <span className="text-xs text-emerald-500 flex items-center gap-2 font-black">
-              <span className="size-1.5 bg-emerald-500 rounded-full animate-pulse" />
-              ACTIVE
-            </span>
-          </div>
 
-          <div className="hidden lg:block h-8 w-px bg-border" />
 
           <button
             type="button"
@@ -113,22 +103,56 @@ export default function MarketplaceHeader() {
             <Bell className="h-4 w-4" />
             <span className="absolute top-2 right-2 size-2 bg-primary rounded-full" />
           </button>
-          <button
-            type="button"
+          <Link
+            href="/cart"
             className="h-10 w-10 inline-flex items-center justify-center rounded-xl border border-border bg-background/60 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-            aria-label="Language"
+            aria-label="Cart"
           >
-            <Languages className="h-4 w-4" />
-          </button>
+            <ShoppingCart className="h-4 w-4" />
+          </Link>
 
           <ThemeToggle />
-          <NavLink href={dashboardPath} label="Dashboard" icon={LayoutDashboard} />
+
+          {user ? (
+            <div className="relative group">
+              <button className="flex items-center gap-2 rounded-xl border border-border bg-background/60 px-3 py-2 text-sm font-semibold transition-colors hover:bg-accent hover:text-foreground">
+                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/20 text-primary">
+                  <User className="h-4 w-4" />
+                </div>
+                <span className="hidden sm:inline-block max-w-[100px] truncate">{user.name || "Profile"}</span>
+                <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 group-hover:rotate-180" />
+              </button>
+
+              {/* Profile Dropdown Menu */}
+              <div className="absolute right-0 top-full mt-2 w-48 origin-top-right transform opacity-0 scale-95 transition-all duration-200 invisible group-hover:visible group-hover:opacity-100 group-hover:scale-100">
+                <div className="rounded-xl border border-border bg-card p-1 shadow-lg">
+                  <div className="px-2 py-2 border-b border-border/60 mb-1">
+                    <p className="text-sm font-medium">{user.name || "User"}</p>
+                    <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      await logout();
+                      window.location.href = "/login";
+                    }}
+                    className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-red-500 hover:bg-red-500/10 transition-colors"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Logout
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <Link href="/login" className="rounded-xl bg-primary px-4 py-2 text-sm font-bold text-primary-foreground hover:bg-primary/90 transition-colors">
+              Sign In
+            </Link>
+          )}
         </div>
       </div>
 
       <div className="lg:hidden px-4 sm:px-6 pb-3 flex items-center gap-2">
-        <NavLink href="/products" label="Marketplace" icon={PackageSearch} />
-        <NavLink href="/cart" label="Cart" icon={ShoppingCart} />
         <NavLink href="/orders" label="Orders" icon={ListOrdered} />
       </div>
     </header>
