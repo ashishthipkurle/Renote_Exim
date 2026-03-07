@@ -14,6 +14,8 @@ import {
   Package,
   Settings,
   User,
+  Wallet,
+  LogOut,
 } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 
@@ -25,7 +27,7 @@ const nav = [
   { href: `${basePath}/orders`, label: "Orders", icon: FolderTree },
   { href: `${basePath}/shipments`, label: "Shipments", icon: Globe },
   { href: `${basePath}/analytics`, label: "Analytics", icon: LineChart },
-  { href: `${basePath}/finance`, label: "Finance", icon: Bell },
+  { href: `${basePath}/finance`, label: "Finance", icon: Wallet },
   { href: `${basePath}/notifications`, label: "Notifications", icon: Bell },
 ];
 
@@ -67,7 +69,7 @@ function Item({
 }
 
 export default function ExporterSidebar() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   return (
     <aside className="hidden lg:flex flex-col w-24 h-dvh sticky top-0 bg-[#0b1019]/90 backdrop-blur-xl border-r border-white/5 z-50 flex-shrink-0 items-center py-6">
@@ -101,18 +103,36 @@ export default function ExporterSidebar() {
           </div>
         </Link>
 
-        <div className="w-10 h-10 rounded-full border-2 border-slate-700 overflow-hidden cursor-pointer hover:border-primary transition-colors flex items-center justify-center bg-slate-800 text-slate-400">
-          {user?.avatar ? (
-            <Image
-              alt="User"
-              width={40} height={40}
-              className="w-full h-full object-cover"
-              src={user.avatar as string}
-              unoptimized
-            />
-          ) : (
-            <User className="size-6" />
-          )}
+        {/* User Info & Dropdown */}
+        <div className="relative group flex justify-center w-full">
+          <button className="flex h-12 w-12 items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+            <User className="w-6 h-6" />
+          </button>
+
+          {/* Profile Dropdown Menu */}
+          <div className="absolute left-14 bottom-0 ml-2 w-48 origin-bottom-left transform opacity-0 scale-95 transition-all duration-200 invisible group-hover:visible group-hover:opacity-100 group-hover:scale-100 z-50">
+            <div className="rounded-x1 border border-border bg-card p-1 shadow-lg">
+              <div className="px-2 py-2 border-b border-border/60 mb-1">
+                <p className="text-sm font-medium truncate">{user?.name || "User"}</p>
+                <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+              </div>
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    await logout();
+                    window.location.href = "/login";
+                  } catch (error) {
+                    console.error("Logout failed", error);
+                  }
+                }}
+                className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-red-500 hover:bg-red-500/10 transition-colors"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </aside>

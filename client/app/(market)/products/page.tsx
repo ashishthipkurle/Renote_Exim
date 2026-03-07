@@ -384,7 +384,7 @@ export default async function ProductsPage({
           <input type="checkbox" id="desktop-filter-toggle" className="peer/desktop-filter hidden" />
 
           {/* ─── Desktop Sidebar ─── */}
-          <aside className="hidden lg:flex flex-col w-0 opacity-0 peer-checked/desktop-filter:w-80 peer-checked/desktop-filter:opacity-100 peer-checked/desktop-filter:ml-6 shrink-0 sticky top-24 h-[calc(100vh-8rem)] overflow-y-auto overflow-x-hidden order-1 lg:order-2 transition-all duration-500 ease-in-out">
+          <aside className="hidden lg:flex flex-col w-0 opacity-0 peer-checked/desktop-filter:w-80 peer-checked/desktop-filter:opacity-100 peer-checked/desktop-filter:ml-6 shrink-0 sticky top-24 h-[calc(100vh-8rem)] overflow-visible order-1 lg:order-2 transition-all duration-500 ease-in-out">
             <div className="rounded-2xl border border-border bg-card shadow-sm p-6 w-80 shrink-0">
               <div className="flex items-center justify-between pb-4 border-b border-border/40">
                 <h2 className="text-lg font-extrabold tracking-tight">Filters</h2>
