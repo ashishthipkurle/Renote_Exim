@@ -86,8 +86,8 @@
 | 24  | **Build Exporter Shipments page** — shipment tracking table, create shipment form, status updates, timeline view      | Stub          | ☐      |
 | 25  | **Build Exporter Finance page** — revenue summary, payment history, invoice generation, pending payments              | Stub          | ☐      |
 | 26  | **Build Exporter Categories page** — product category breakdown, performance per category                             | Stub          | ☐      |
-| 27  | **Build Exporter Directory page** — importer/partner list, contact info, trade history per partner                    | Stub          | ☐      |
-| 28  | **Build Exporter Notifications page** — notification list with read/unread, mark all read, filters by type            | Stub          | ☐      |
+| 27  | **Build Exporter Directory page** — importer/partner list, contact info, trade history per partner                    | Complete      | [x]    |
+| 28  | **Build Exporter Notifications page** — notification list with read/unread, mark all read, filters by type            | Complete      | [x]    |
 | 29  | **Build Exporter Settings page** — profile edit, company info edit, avatar upload, password change, email preferences | Stub          | ☐      |
 
 **What happens after these tasks are done:**
