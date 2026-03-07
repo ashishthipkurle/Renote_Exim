@@ -17,10 +17,8 @@ import {
   Package,
   Settings,
   User,
-  Users,
-  Handshake,
-  ChevronRight,
-  ChevronLeft,
+  Wallet,
+  LogOut,
 } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 
@@ -34,7 +32,8 @@ const nav = [
   { href: `${basePath}/directory`, label: "Buyers", icon: Users },
   { href: `${basePath}/suppliers`, label: "Dealers", icon: Handshake },
   { href: `${basePath}/analytics`, label: "Analytics", icon: LineChart },
-  { href: `${basePath}/finance`, label: "Finance", icon: CreditCard },
+  { href: `${basePath}/finance`, label: "Finance", icon: Wallet },
+  { href: `${basePath}/notifications`, label: "Notifications", icon: Bell },
 ];
 
 function Item({
@@ -93,84 +92,70 @@ function Item({
 }
 
 export default function ExporterSidebar() {
-  const { user } = useAuth();
-  const pathname = usePathname();
-  const { isExpanded } = useSidebar();
+  const { user, logout } = useAuth();
 
   return (
-    <>
-      {/* Desktop Sidebar */}
-      <motion.aside
-        initial={false}
-        animate={{ width: isExpanded ? 240 : 80 }}
-        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        className="hidden lg:flex flex-col h-[calc(100dvh-80px)] sticky top-20 bg-[#0b1019]/60 backdrop-blur-xl border-r border-white/5 z-[60] flex-shrink-0 pt-0 pb-0 overflow-hidden"
-      >
-        {/* Nav */}
-        <div className="flex-1 flex flex-col gap-0.5 w-full items-center overflow-hidden pt-1 px-2">
-          {nav.map((n) => (
-            <Item
-              key={n.href}
-              href={n.href}
-              label={n.label}
-              icon={n.icon}
-              showBadge={n.label === "Notifications"}
-              isExpanded={isExpanded}
-            />
-          ))}
-        </div>
+    <aside className="hidden lg:flex flex-col w-24 h-dvh sticky top-0 bg-[#0b1019]/90 backdrop-blur-xl border-r border-white/5 z-50 flex-shrink-0 items-center py-6">
+      {/* Logo */}
+      <div className="mb-10 w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center shadow-lg shadow-primary/20">
+        <Package className="text-white w-6 h-6" />
+      </div>
 
-        {/* Bottom Section (Settings Only) */}
-        <div className={`flex flex-col gap-0 items-center w-full pb-2 border-t border-white/5 px-2 pt-2`}>
-          <Link
-            href={`${basePath}/settings`}
-            className={`group relative flex items-center rounded-xl transition-all duration-300 h-11 w-full px-3 ${pathname === `${basePath}/settings`
-              ? "bg-primary text-white"
-              : "text-slate-400 hover:text-white hover:bg-white/5"
-              }`}
-          >
-            <Settings className="w-5 h-5 flex-shrink-0" />
-            <AnimatePresence>
-              {isExpanded && (
-                <motion.span
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -10 }}
-                  className="ml-3 text-[11px] font-bold uppercase tracking-wider whitespace-nowrap"
-                >
-                  Settings
-                </motion.span>
-              )}
-            </AnimatePresence>
-            {!isExpanded && (
-              <div className="absolute left-14 bg-[#151c2a] border border-white/10 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-[70] shadow-2xl">
-                Settings
-              </div>
-            )}
-          </Link>
-        </div>
-      </motion.aside>
+      {/* Nav */}
+      <div className="flex-1 flex flex-col gap-6 w-full items-center">
+        {nav.map((n) => (
+          <Item
+            key={n.href}
+            href={n.href}
+            label={n.label}
+            icon={n.icon}
+            showBadge={n.label === "Notifications"}
+          />
+        ))}
+      </div>
 
-      {/* Mobile Bottom Navigation Bar */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-[#0b1019]/95 backdrop-blur-xl border-t border-white/5 z-[100] grid grid-cols-5 items-center px-2">
-        {nav.slice(0, 4).map((n) => {
-          const active = pathname === n.href || (n.href !== basePath && pathname.startsWith(n.href + "/"));
-          return (
-            <Link key={n.href} href={n.href} className="flex flex-col items-center justify-center gap-1 h-full relative">
-              <n.icon className={`w-5 h-5 ${active ? "text-primary" : "text-slate-500"}`} />
-              <span className={`text-[9px] font-bold uppercase tracking-tighter ${active ? "text-primary" : "text-slate-500"}`}>{n.label === "Dashboard" ? "Home" : n.label}</span>
-              {active && <span className="absolute bottom-0 w-8 h-0.5 bg-primary rounded-t-full" />}
-            </Link>
-          );
-        })}
-        {/* Menu Link (simplified for space) */}
-        <div className="group flex flex-col items-center justify-center gap-1 h-full relative border-l border-white/5">
-          <div className="relative">
-            <Handshake className={`w-5 h-5 ${pathname.includes('/suppliers') ? 'text-primary' : 'text-slate-500'}`} />
-            <Link href={`${basePath}/suppliers`} className="absolute inset-0 z-10" />
+      {/* Bottom */}
+      <div className="flex flex-col gap-4 items-center w-full">
+        <Link
+          href={`${basePath}/settings`}
+          className="group relative w-12 h-12 flex items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all"
+        >
+          <Settings className="w-6 h-6" />
+          <div className="absolute left-14 bg-[#151c2a] border border-white/10 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50 shadow-xl">
+            Settings
           </div>
-          <span className={`text-[9px] font-bold uppercase tracking-tighter ${pathname.includes('/suppliers') ? 'text-primary' : 'text-slate-500'}`}>Dealers</span>
-          {pathname.includes('/suppliers') && <span className="absolute bottom-0 w-8 h-0.5 bg-primary rounded-t-full" />}
+        </Link>
+
+        {/* User Info & Dropdown */}
+        <div className="relative group flex justify-center w-full">
+          <button className="flex h-12 w-12 items-center justify-center rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+            <User className="w-6 h-6" />
+          </button>
+
+          {/* Profile Dropdown Menu */}
+          <div className="absolute left-14 bottom-0 ml-2 w-48 origin-bottom-left transform opacity-0 scale-95 transition-all duration-200 invisible group-hover:visible group-hover:opacity-100 group-hover:scale-100 z-50">
+            <div className="rounded-x1 border border-border bg-card p-1 shadow-lg">
+              <div className="px-2 py-2 border-b border-border/60 mb-1">
+                <p className="text-sm font-medium truncate">{user?.name || "User"}</p>
+                <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+              </div>
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    await logout();
+                    window.location.href = "/login";
+                  } catch (error) {
+                    console.error("Logout failed", error);
+                  }
+                }}
+                className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-red-500 hover:bg-red-500/10 transition-colors"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </>
