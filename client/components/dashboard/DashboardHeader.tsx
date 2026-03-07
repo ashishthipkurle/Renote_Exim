@@ -7,15 +7,25 @@ import {
     ChevronLeft,
     ChevronRight,
     Package,
-    User
+    User,
+    Sun,
+    Moon
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useSidebar } from "@/lib/contexts/SidebarContext";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { useTheme } from "next-themes";
 
 export default function DashboardHeader() {
     const { isExpanded, toggleSidebar } = useSidebar();
     const { user } = useAuth();
+    const { theme, setTheme } = useTheme();
+    const [mounted, setMounted] = React.useState(false);
+
+    React.useEffect(() => {
+        setMounted(true);
+    }, []);
 
     return (
         <header className="h-16 lg:h-20 bg-[#0b1019]/80 backdrop-blur-xl border-b border-white/5 sticky top-0 z-[100] flex items-center px-4 lg:px-8">
@@ -41,8 +51,8 @@ export default function DashboardHeader() {
                 {isExpanded ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
             </button>
 
-            {/* Center Search Bar */}
-            <div className="flex-1 max-w-2xl mx-auto px-4 lg:px-12 hidden md:block">
+            {/* Center Search Bar - Shifted slightly left to look more centered in the remaining layout */}
+            <div className="flex-1 max-w-xl ml-8 lg:ml-20 hidden md:block">
                 <div className="relative group">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-primary transition-colors" />
                     <input
@@ -55,11 +65,25 @@ export default function DashboardHeader() {
 
             {/* Right Actions */}
             <div className="flex items-center gap-2 lg:gap-4 ml-auto">
+                {/* Theme Toggle */}
+                {mounted && (
+                    <button
+                        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                        className="size-9 lg:size-10 bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl flex items-center justify-center text-slate-400 hover:text-white transition-all active:scale-95"
+                        title="Toggle Theme"
+                    >
+                        {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                    </button>
+                )}
+
                 {/* Notifications */}
-                <button className="relative size-9 lg:size-10 bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl flex items-center justify-center text-slate-400 hover:text-white transition-all active:scale-95 group">
+                <Link
+                    href="/dashboard/exporter/notifications"
+                    className="relative size-9 lg:size-10 bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl flex items-center justify-center text-slate-400 hover:text-white transition-all active:scale-95 group"
+                >
                     <Bell className="w-5 h-5 group-hover:animate-bounce" />
                     <span className="absolute top-2.5 right-2.5 size-2 bg-primary rounded-full border-2 border-[#0b1019] shadow-[0_0_8px_rgba(19,91,236,0.6)]" />
-                </button>
+                </Link>
 
                 {/* Profile Circle */}
                 <div className="h-4 lg:h-6 w-px bg-white/5 mx-1 hidden sm:block" />

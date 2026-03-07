@@ -35,7 +35,6 @@ const nav = [
   { href: `${basePath}/suppliers`, label: "Dealers", icon: Handshake },
   { href: `${basePath}/analytics`, label: "Analytics", icon: LineChart },
   { href: `${basePath}/finance`, label: "Finance", icon: CreditCard },
-  { href: `${basePath}/notifications`, label: "Notifications", icon: Bell },
 ];
 
 function Item({
