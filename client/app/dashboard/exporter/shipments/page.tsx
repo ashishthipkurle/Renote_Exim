@@ -17,132 +17,147 @@ function formatDate(d: Date) {
   return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(d);
 }
 
-export default async function ExporterShipmentsPage() {
+import Link from "next/link";
+import { Prisma } from "@prisma/client";
+import ShipmentsTable from "./ShipmentsTable";
+
+export default async function ExporterShipmentsPage({
+  searchParams,
+}: {
+  searchParams: { search?: string; page?: string };
+}) {
   const auth = await getServerAuth();
   if (!auth) redirect("/login");
   if (auth.role !== "EXPORTER" && auth.role !== "ADMIN") {
     redirect(`/dashboard/${auth.role.toLowerCase()}`);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let shipments: any[] = [];
-  try {
-    shipments = await prisma.shipment.findMany({
-      where: { order: { product: { exporterId: auth.userId } } },
-      include: {
-        order: {
-          include: {
-            product: { select: { name: true } },
-            importer: { select: { name: true, companyName: true, country: true } },
-          },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-      take: 50,
-    });
-  } catch (e) {
-    console.warn("Failed to fetch exporter shipments (DB may be unavailable):", e);
+  const page = parseInt(searchParams.page || "1");
+  const limit = 10;
+  const skip = (page - 1) * limit;
+
+  // Build where clause
+  const where: Prisma.ShipmentWhereInput = {
+    order: { product: { exporterId: auth.userId } },
+  };
+
+  if (searchParams.search) {
+    where.OR = [
+      { trackingNumber: { contains: searchParams.search, mode: "insensitive" } },
+      { carrier: { contains: searchParams.search, mode: "insensitive" } },
+      { order: { product: { name: { contains: searchParams.search, mode: "insensitive" } } } },
+      { order: { importer: { name: { contains: searchParams.search, mode: "insensitive" } } } },
+      { order: { importer: { companyName: { contains: searchParams.search, mode: "insensitive" } } } },
+    ];
   }
 
-  const activeCount = shipments.filter((s) =>
-    ["PREPARING", "IN_TRANSIT", "CUSTOMS", "OUT_FOR_DELIVERY"].includes(s.status)
-  ).length;
-  const deliveredCount = shipments.filter((s) => s.status === "DELIVERED").length;
+  let shipments: any[] = [];
+  let total = 0;
+  let activeCount = 0;
+  let deliveredCount = 0;
+
+  try {
+    [shipments, total] = await Promise.all([
+      prisma.shipment.findMany({
+        where,
+        include: {
+          order: {
+            include: {
+              product: { select: { name: true } },
+              importer: { select: { name: true, companyName: true, country: true } },
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+        skip,
+        take: limit,
+      }),
+      prisma.shipment.count({ where }),
+    ]);
+
+    // Summary stats (unfiltered by search, but filtered by exporter)
+    const baseWhere = { order: { product: { exporterId: auth.userId } } };
+    [activeCount, deliveredCount] = await Promise.all([
+      prisma.shipment.count({
+        where: {
+          ...baseWhere,
+          status: { in: ["PREPARING", "IN_TRANSIT", "CUSTOMS", "OUT_FOR_DELIVERY"] },
+        },
+      }),
+      prisma.shipment.count({
+        where: { ...baseWhere, status: "DELIVERED" },
+      }),
+    ]);
+  } catch (e) {
+    console.warn("Failed to fetch exporter shipments:", e);
+  }
+
+  const totalPages = Math.ceil(total / limit);
 
   return (
-    <div className="h-dvh overflow-hidden flex flex-col bg-gradient-to-br from-[#0a0c12] via-[#0d1017] to-[#0a0c12]">
+    <div className="h-full overflow-hidden flex flex-col bg-gradient-to-br from-[#0a0c12] via-[#0d1017] to-[#0a0c12]">
       <header className="flex-shrink-0 p-6 lg:p-8 border-b border-white/5">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-white">Shipment Tracking</h1>
+            <h1 className="text-3xl font-black tracking-tight text-white uppercase italic">Shipment Tracking</h1>
             <p className="text-slate-400 mt-1">
-              {shipments.length} shipments — {activeCount} active, {deliveredCount} delivered
+              {total} shipments found — {activeCount} active, {deliveredCount} delivered
             </p>
           </div>
           <div className="flex gap-2">
-            <span className="px-3 py-1.5 rounded-lg bg-cyan-400/10 border border-cyan-400/20 text-cyan-400 text-xs font-bold">
+            <span className="px-3 py-1.5 rounded-lg bg-cyan-400/10 border border-cyan-400/20 text-cyan-400 text-xs font-bold uppercase">
               {activeCount} Active
             </span>
-            <span className="px-3 py-1.5 rounded-lg bg-emerald-400/10 border border-emerald-400/20 text-emerald-400 text-xs font-bold">
+            <span className="px-3 py-1.5 rounded-lg bg-emerald-400/10 border border-emerald-400/20 text-emerald-400 text-xs font-bold uppercase">
               {deliveredCount} Delivered
             </span>
           </div>
         </div>
       </header>
 
-      <div className="flex-1 overflow-y-auto p-6 lg:p-8">
-        <div className="max-w-[1600px] mx-auto space-y-4">
-          {shipments.length === 0 ? (
-            <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-xl rounded-2xl p-12 text-center">
-              <Truck className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-              <h2 className="text-xl font-bold text-white mb-2">No shipments yet</h2>
-              <p className="text-slate-400 text-sm">
-                Shipments will appear here once orders are fulfilled.
-              </p>
-            </div>
-          ) : (
-            <>
-              <div className="hidden lg:grid grid-cols-12 gap-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                <div className="col-span-3">Tracking / Product</div>
-                <div className="col-span-2">Buyer</div>
-                <div className="col-span-2">Carrier</div>
-                <div className="col-span-2">Status</div>
-                <div className="col-span-1">ETA</div>
-                <div className="col-span-2 text-right">Created</div>
+      <div className="flex-1 overflow-y-auto p-6 lg:p-8 custom-scrollbar">
+        <div className="max-w-[1600px] mx-auto space-y-8">
+          <ShipmentsTable shipments={shipments} />
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 pb-12">
+              <Link
+                href={`?${new URLSearchParams({ ...searchParams, page: (page - 1).toString() })}`}
+                className={`px-4 py-2 rounded-xl border border-white/5 text-xs font-bold transition-all ${page <= 1 ? "opacity-50 pointer-events-none" : "hover:bg-white/5"
+                  }`}
+              >
+                Previous
+              </Link>
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }).map((_, i) => {
+                  const p = i + 1;
+                  if (p === 1 || p === totalPages || (p >= page - 1 && p <= page + 1)) {
+                    return (
+                      <Link
+                        key={p}
+                        href={`?${new URLSearchParams({ ...searchParams, page: p.toString() })}`}
+                        className={`w-10 h-10 flex items-center justify-center rounded-xl border text-xs font-bold transition-all ${page === p ? "bg-primary border-primary text-white" : "border-white/5 hover:bg-white/5 text-slate-400"
+                          }`}
+                      >
+                        {p}
+                      </Link>
+                    );
+                  }
+                  if (p === page - 2 || p === page + 2) {
+                    return <span key={p} className="text-slate-600 px-1">...</span>;
+                  }
+                  return null;
+                })}
               </div>
-
-              {shipments.map((shipment) => {
-                const cfg = SHIPMENT_STATUS[shipment.status] ?? SHIPMENT_STATUS.PREPARING;
-                return (
-                  <div
-                    key={shipment.id}
-                    className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 hover:border-primary/30 transition-colors shadow-xl rounded-2xl p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4 items-center"
-                  >
-                    <div className="lg:col-span-3">
-                      <div className="text-sm font-bold text-white font-mono">
-                        {shipment.trackingNumber}
-                      </div>
-                      <div className="text-xs text-slate-400 mt-0.5">
-                        {shipment.order.product.name}
-                      </div>
-                    </div>
-
-                    <div className="lg:col-span-2">
-                      <div className="text-sm text-slate-300">
-                        {shipment.order.importer.companyName || shipment.order.importer.name}
-                      </div>
-                      <div className="text-[10px] text-slate-500 flex items-center gap-1">
-                        <MapPin className="w-3 h-3" />
-                        {shipment.order.importer.country ?? "N/A"}
-                      </div>
-                    </div>
-
-                    <div className="lg:col-span-2">
-                      <div className="text-sm text-slate-300">{shipment.carrier ?? "—"}</div>
-                    </div>
-
-                    <div className="lg:col-span-2">
-                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wide ${cfg.color}`}>
-                        <span className="size-1.5 rounded-full bg-current" />
-                        {cfg.label}
-                      </span>
-                    </div>
-
-                    <div className="lg:col-span-1">
-                      <div className="text-sm text-slate-300">
-                        {shipment.estimatedArrival
-                          ? formatDate(shipment.estimatedArrival)
-                          : "TBD"}
-                      </div>
-                    </div>
-
-                    <div className="lg:col-span-2 text-right">
-                      <div className="text-sm text-slate-400">{formatDate(shipment.createdAt)}</div>
-                    </div>
-                  </div>
-                );
-              })}
-            </>
+              <Link
+                href={`?${new URLSearchParams({ ...searchParams, page: (page + 1).toString() })}`}
+                className={`px-4 py-2 rounded-xl border border-white/5 text-xs font-bold transition-all ${page >= totalPages ? "opacity-50 pointer-events-none" : "hover:bg-white/5"
+                  }`}
+              >
+                Next
+              </Link>
+            </div>
           )}
         </div>
       </div>

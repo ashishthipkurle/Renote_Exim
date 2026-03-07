@@ -105,7 +105,7 @@ export default function ExporterSuppliersPage() {
     );
 
     return (
-        <div className="h-dvh overflow-hidden flex flex-col bg-gradient-to-br from-[#0a0c12] via-[#0d1017] to-[#0a0c12]">
+        <div className="h-full overflow-hidden flex flex-col bg-gradient-to-br from-[#0a0c12] via-[#0d1017] to-[#0a0c12]">
             <header className="flex-shrink-0 p-6 lg:p-8 border-b border-white/5">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
@@ -138,7 +138,7 @@ export default function ExporterSuppliersPage() {
                 </div>
             </header>
 
-            <div className="flex-1 overflow-y-auto p-6 lg:p-8">
+            <div className="flex-1 overflow-y-auto p-6 lg:p-8 custom-scrollbar">
                 {loading ? (
                     <div className="flex flex-col items-center justify-center h-64 text-slate-500">
                         <Loader2 className="w-8 h-8 animate-spin mb-4" />

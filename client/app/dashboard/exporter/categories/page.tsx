@@ -35,21 +35,21 @@ export default function ExporterCategoriesPage() {
   useEffect(() => {
     authFetch<CategoriesResponse>("/api/dashboard/categories")
       .then(setData)
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLoading(false));
   }, []);
 
   const maxRev = Math.max(...(data?.categories?.map((c) => c.revenue) ?? [1]), 1);
 
   return (
-    <div className="h-dvh overflow-hidden flex flex-col bg-gradient-to-br from-[#0a0c12] via-[#0d1017] to-[#0a0c12]">
+    <div className="h-full overflow-hidden flex flex-col bg-gradient-to-br from-[#0a0c12] via-[#0d1017] to-[#0a0c12]">
       <header className="flex-shrink-0 p-6 lg:p-8 border-b border-white/5">
         <div>
           <h1 className="text-3xl font-black tracking-tight text-white">Product Categories</h1>
           <p className="text-slate-400 mt-1">Overview of your product categories and their performance.</p>
         </div>
       </header>
-      <div className="flex-1 overflow-y-auto p-6 lg:p-8">
+      <div className="flex-1 overflow-y-auto p-6 lg:p-8 custom-scrollbar">
         <div className="max-w-[1200px] mx-auto">
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import type { ComponentType } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSidebar } from "@/lib/contexts/SidebarContext";
 import {
   Bell,
   Boxes,
@@ -96,7 +96,7 @@ function Item({
 export default function ExporterSidebar() {
   const { user } = useAuth();
   const pathname = usePathname();
-  const [isExpanded, setIsExpanded] = useState(false);
+  const { isExpanded } = useSidebar();
 
   return (
     <>
@@ -105,37 +105,10 @@ export default function ExporterSidebar() {
         initial={false}
         animate={{ width: isExpanded ? 240 : 80 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        className="hidden lg:flex flex-col h-dvh sticky top-0 bg-[#0b1019]/90 backdrop-blur-xl border-r border-white/5 z-[60] flex-shrink-0 items-center py-6 overflow-hidden"
+        className="hidden lg:flex flex-col h-[calc(100dvh-80px)] sticky top-20 bg-[#0b1019]/60 backdrop-blur-xl border-r border-white/5 z-[60] flex-shrink-0 pt-0 pb-0 overflow-hidden"
       >
-        {/* Toggle Button */}
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="absolute -right-3 top-20 w-6 h-6 bg-primary rounded-full border-2 border-[#0b1019] flex items-center justify-center text-white hover:scale-110 transition-transform z-[70] shadow-lg shadow-primary/20"
-        >
-          {isExpanded ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-        </button>
-
-        {/* Logo */}
-        <div className={`mb-10 flex items-center transition-all duration-300 ${isExpanded ? "w-full px-6 justify-start" : "w-10 h-10 justify-center"}`}>
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center shadow-lg shadow-primary/20 flex-shrink-0">
-            <Package className="text-white w-5 h-5" />
-          </div>
-          <AnimatePresence>
-            {isExpanded && (
-              <motion.span
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -10 }}
-                className="ml-3 text-lg font-black text-white whitespace-nowrap"
-              >
-                RANOTE <span className="text-primary">EXIM</span>
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </div>
-
         {/* Nav */}
-        <div className="flex-1 flex flex-col gap-2 w-full items-center overflow-y-auto no-scrollbar pb-6 px-3">
+        <div className="flex-1 flex flex-col gap-0.5 w-full items-center overflow-hidden pt-1 px-2">
           {nav.map((n) => (
             <Item
               key={n.href}
@@ -148,8 +121,8 @@ export default function ExporterSidebar() {
           ))}
         </div>
 
-        {/* Bottom */}
-        <div className={`flex flex-col gap-4 items-center w-full pt-6 border-t border-white/5 px-3`}>
+        {/* Bottom Section (Settings Only) */}
+        <div className={`flex flex-col gap-0 items-center w-full pb-2 border-t border-white/5 px-2 pt-2`}>
           <Link
             href={`${basePath}/settings`}
             className={`group relative flex items-center rounded-xl transition-all duration-300 h-11 w-full px-3 ${pathname === `${basePath}/settings`
@@ -176,35 +149,6 @@ export default function ExporterSidebar() {
               </div>
             )}
           </Link>
-
-          <div className={`flex items-center w-full transition-all duration-300 ${isExpanded ? "px-1 justify-start" : "justify-center"}`}>
-            <div className="w-10 h-10 rounded-full border-2 border-white/5 overflow-hidden cursor-pointer hover:border-primary transition-colors flex items-center justify-center bg-slate-800 text-slate-400 flex-shrink-0">
-              {user?.avatar ? (
-                <Image
-                  alt="User"
-                  width={40} height={40}
-                  className="w-full h-full object-cover"
-                  src={user.avatar as string}
-                  unoptimized
-                />
-              ) : (
-                <User className="size-5" />
-              )}
-            </div>
-            <AnimatePresence>
-              {isExpanded && (
-                <motion.div
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -10 }}
-                  className="ml-3 overflow-hidden"
-                >
-                  <p className="text-[11px] font-bold text-white truncate max-w-[120px]">{user?.name || "Exporter"}</p>
-                  <p className="text-[9px] text-slate-500 truncate max-w-[120px]">{user?.email}</p>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
         </div>
       </motion.aside>
 

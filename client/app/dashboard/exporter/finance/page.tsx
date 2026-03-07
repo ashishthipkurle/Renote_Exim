@@ -33,7 +33,7 @@ export default function ExporterFinancePage() {
   useEffect(() => {
     authFetch<FinanceData>("/api/dashboard/finance")
       .then(setData)
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLoading(false));
   }, []);
 
@@ -44,7 +44,7 @@ export default function ExporterFinancePage() {
   ];
 
   return (
-    <div className="h-dvh overflow-hidden flex flex-col bg-gradient-to-br from-[#0a0c12] via-[#0d1017] to-[#0a0c12]">
+    <div className="h-full overflow-hidden flex flex-col bg-gradient-to-br from-[#0a0c12] via-[#0d1017] to-[#0a0c12]">
       <header className="flex-shrink-0 p-6 lg:p-8 border-b border-white/5">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -56,7 +56,7 @@ export default function ExporterFinancePage() {
           </button>
         </div>
       </header>
-      <div className="flex-1 overflow-y-auto p-6 lg:p-8">
+      <div className="flex-1 overflow-y-auto p-6 lg:p-8 custom-scrollbar">
         <div className="max-w-[1600px] mx-auto space-y-6">
           {/* Summary Cards */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

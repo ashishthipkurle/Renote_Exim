@@ -1,10 +1,19 @@
 import ExporterSidebar from "@/components/exporter/ExporterSidebar";
+import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import { SidebarProvider } from "@/lib/contexts/SidebarContext";
 
 export default function ExporterLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="bg-[#0a0c12] text-slate-100 min-h-dvh overflow-hidden flex">
-      <ExporterSidebar />
-      <div className="flex-1 min-w-0 h-dvh overflow-hidden">{children}</div>
-    </div>
+    <SidebarProvider>
+      <div className="bg-[#0a0c12] text-slate-100 h-dvh flex flex-col overflow-hidden">
+        <DashboardHeader />
+        <div className="flex flex-1 overflow-hidden">
+          <ExporterSidebar />
+          <main className="flex-1 min-w-0 h-full overflow-hidden">
+            {children}
+          </main>
+        </div>
+      </div>
+    </SidebarProvider>
   );
 }

@@ -26,6 +26,9 @@ export async function GET(request: NextRequest) {
         website: true,
         verified: true,
         avatar: true,
+        description: true,
+        socialLinks: true,
+        businessHours: true,
         createdAt: true,
       },
     });
@@ -48,6 +51,9 @@ const updateProfileSchema = z.object({
   phone: z.string().max(30).optional().nullable(),
   website: z.string().url().or(z.literal('')).optional().nullable(),
   avatar: z.string().url().or(z.literal('')).optional().nullable(),
+  description: z.string().max(2000).optional().nullable(),
+  socialLinks: z.record(z.string()).optional().nullable(),
+  businessHours: z.record(z.any()).optional().nullable(),
 });
 
 // PATCH /api/user/profile — Update user profile
@@ -90,6 +96,9 @@ export async function PATCH(request: NextRequest) {
         website: true,
         verified: true,
         avatar: true,
+        description: true,
+        socialLinks: true,
+        businessHours: true,
         createdAt: true,
       },
     });

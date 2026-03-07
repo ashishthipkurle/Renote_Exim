@@ -162,96 +162,102 @@ export default function InventoryTable({ products }: { products: Product[] }) {
 
             <div className="space-y-4 relative">
                 {isPending && (
-                    <div className="absolute inset-0 bg-[#0a0c12]/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl">
+                    <div className="absolute inset-0 bg-[#0a0c12]/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-[2rem]">
                         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
                     </div>
                 )}
 
-                <div className="hidden lg:grid grid-cols-12 gap-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                    <div className="col-span-4">Product</div>
-                    <div className="col-span-2">Category</div>
-                    <div className="col-span-2">Price</div>
-                    <div className="col-span-2">MOQ / Origin</div>
-                    <div className="col-span-1 text-center">Status</div>
+                <div className="hidden lg:grid grid-cols-12 gap-4 px-8 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] italic">
+                    <div className="col-span-4 text-primary opacity-50">Global Market Identity</div>
+                    <div className="col-span-2">Sector</div>
+                    <div className="col-span-2">Economics</div>
+                    <div className="col-span-2">Threshold / Origin</div>
+                    <div className="col-span-1 text-center">Protocol</div>
                     <div className="col-span-1 text-right">Actions</div>
                 </div>
 
                 {products.length === 0 ? (
-                    <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-xl rounded-2xl p-12 text-center">
-                        <Package className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-                        <h2 className="text-xl font-bold text-white mb-2">No products found</h2>
-                        <p className="text-slate-400 text-sm mb-4">
-                            Try adjusting your search or filter criteria.
+                    <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-2xl rounded-[2rem] p-16 text-center">
+                        <Package className="w-16 h-16 text-slate-700 mx-auto mb-6" />
+                        <h2 className="text-2xl font-black text-white mb-3 uppercase italic">No Assets Identified</h2>
+                        <p className="text-slate-400 text-sm mb-8 max-w-md mx-auto leading-relaxed">
+                            Your global inventory is currently empty. Initialize your trade presence by deploying your first product listing.
                         </p>
+                        <Link
+                            href="/dashboard/exporter/inventory/new"
+                            className="inline-flex items-center gap-2 bg-primary hover:bg-[#0f49bd] text-white font-black text-[10px] uppercase tracking-widest py-4 px-8 rounded-2xl shadow-2xl shadow-primary/20 transition-all active:scale-95"
+                        >
+                            Deploy First Listing
+                        </Link>
                     </div>
                 ) : (
                     products.map((product) => (
                         <div
                             key={product.id}
-                            className={`bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 hover:border-primary/30 transition-colors shadow-xl rounded-2xl p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4 items-center ${isDeletingId === product.id ? "opacity-50 pointer-events-none" : ""
+                            className={`bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 hover:border-primary/40 transition-all duration-500 shadow-2xl rounded-[2rem] p-5 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4 items-center group ${isDeletingId === product.id ? "opacity-30 pointer-events-none scale-95" : "hover:scale-[1.01]"
                                 }`}
                         >
-                            <div className="lg:col-span-4 flex items-center gap-4">
-                                <div className="size-14 rounded-xl bg-slate-800 border border-white/5 flex-shrink-0 overflow-hidden flex items-center justify-center">
+                            <div className="lg:col-span-4 flex items-center gap-5">
+                                <div className="size-16 rounded-2xl bg-slate-900 border border-white/5 flex-shrink-0 overflow-hidden flex items-center justify-center shadow-lg group-hover:border-primary/20 transition-colors">
                                     {product.images?.[0] ? (
-                                        <img src={product.images[0]} alt="" className="w-full h-full object-cover" />
+                                        <img src={product.images[0]} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                     ) : (
-                                        <Package className="w-5 h-5 text-slate-500" />
+                                        <Package className="w-6 h-6 text-slate-700" />
                                     )}
                                 </div>
-                                <div>
-                                    <div className="text-sm font-bold text-white">{product.name}</div>
-                                    <div className="text-xs text-slate-400 mt-0.5 line-clamp-1">
-                                        {product.description || "No description"}
+                                <div className="min-w-0">
+                                    <div className="text-base font-black text-white truncate group-hover:text-primary transition-colors">{product.name}</div>
+                                    <div className="text-[10px] text-slate-500 mt-1 line-clamp-1 font-medium italic group-hover:text-slate-400">
+                                        {product.description || "NO MARKET DESCRIPTION PROVIDED"}
                                     </div>
                                 </div>
                             </div>
 
                             <div className="lg:col-span-2">
-                                <span className="px-2 py-0.5 rounded-lg bg-slate-800 border border-white/5 text-[10px] text-slate-400 font-medium whitespace-nowrap overflow-hidden text-ellipsis block w-fit max-w-full">
+                                <span className="inline-flex items-center px-3 py-1 rounded-xl bg-slate-900/50 border border-white/5 text-[9px] text-slate-400 font-black uppercase tracking-[0.15em]">
                                     {product.category}
                                 </span>
                             </div>
 
                             <div className="lg:col-span-2">
-                                <div className="text-white font-bold">{formatCurrency(product.price)}</div>
-                                <div className="text-[10px] text-slate-500">per {product.unit}</div>
+                                <div className="text-white font-black text-lg tracking-tight">{formatCurrency(product.price)}</div>
+                                <div className="text-[9px] text-slate-600 font-bold uppercase tracking-wider mt-0.5">per {product.unit}</div>
                             </div>
 
                             <div className="lg:col-span-2">
-                                <div className="text-sm text-slate-300">
+                                <div className="text-sm font-black text-slate-300">
                                     {product.minOrderQty} {product.unit}
                                 </div>
-                                <div className="text-[10px] text-slate-500">{product.originCountry}</div>
+                                <div className="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-0.5 italic">{product.originCountry}</div>
                             </div>
 
                             <div className="lg:col-span-1 flex justify-start lg:justify-center">
                                 <span
                                     className={
-                                        "inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wide " +
+                                        "inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-[9px] font-black uppercase tracking-[0.2em] shadow-sm transition-all " +
                                         (product.available
-                                            ? "text-emerald-400 bg-emerald-400/10 border-emerald-400/20"
-                                            : "text-red-400 bg-red-400/10 border-red-400/20")
+                                            ? "text-emerald-400 bg-emerald-400/5 border-emerald-400/20 shadow-emerald-400/5"
+                                            : "text-red-400 bg-red-400/5 border-red-400/20 shadow-red-400/5")
                                     }
                                 >
-                                    <span className="size-1.5 rounded-full bg-current" />
-                                    {product.available ? "Active" : "Inactive"}
+                                    <span className={`size-1.5 rounded-full bg-current ${product.available ? "animate-pulse" : ""}`} />
+                                    {product.available ? "Active" : "Halted"}
                                 </span>
                             </div>
 
-                            <div className="lg:col-span-1 flex justify-end gap-2 mt-4 lg:mt-0">
+                            <div className="lg:col-span-1 flex justify-end gap-3 mt-4 lg:mt-0">
                                 <Link
                                     href={`/dashboard/exporter/inventory/${product.id}/edit`}
-                                    className="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
-                                    title="Edit Product"
+                                    className="p-3 bg-white/5 text-slate-500 hover:text-white hover:bg-white/10 border border-white/5 rounded-2xl transition-all active:scale-90"
+                                    title="Edit Protocol"
                                 >
                                     <Edit2 className="w-4 h-4" />
                                 </Link>
                                 <button
                                     onClick={() => deleteProduct(product.id, product.name)}
                                     disabled={isDeletingId === product.id}
-                                    className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors"
-                                    title="Delete Product"
+                                    className="p-3 bg-white/5 text-slate-500 hover:text-red-400 hover:bg-red-400/10 border border-white/5 rounded-2xl transition-all active:scale-90"
+                                    title="Purge Asset"
                                 >
                                     {isDeletingId === product.id ? (
                                         <div className="w-4 h-4 border-2 border-red-400 border-t-transparent rounded-full animate-spin" />

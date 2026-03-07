@@ -104,7 +104,7 @@ export default function ExporterNotificationsPage() {
   });
 
   return (
-    <div className="h-dvh overflow-hidden flex flex-col bg-gradient-to-br from-[#0a0c12] via-[#0d1017] to-[#0a0c12]">
+    <div className="h-full overflow-hidden flex flex-col bg-gradient-to-br from-[#0a0c12] via-[#0d1017] to-[#0a0c12]">
       <header className="flex-shrink-0 p-6 lg:p-8 border-b border-white/5">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
@@ -181,8 +181,8 @@ export default function ExporterNotificationsPage() {
                 key={n.id}
                 onClick={() => markOneRead(n.id, n.read)}
                 className={`group relative bg-[#151c2a]/60 backdrop-blur-xl border rounded-2xl p-5 flex gap-5 transition-all cursor-pointer overflow-hidden ${n.read
-                    ? "border-white/5 hover:bg-[#1a2236]/80 text-slate-400"
-                    : "border-primary/30 shadow-lg shadow-primary/5 hover:border-primary/50 text-white"
+                  ? "border-white/5 hover:bg-[#1a2236]/80 text-slate-400"
+                  : "border-primary/30 shadow-lg shadow-primary/5 hover:border-primary/50 text-white"
                   }`}
               >
                 {!n.read && (
