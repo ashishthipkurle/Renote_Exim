@@ -35,6 +35,7 @@ model User {
   receivedMessages Message[]          @relation("Receiver")
   documents        Document[]
   notifications    Notification[]
+  suppliers        Supplier[]
 
   @@map("users")
 }
@@ -251,6 +252,27 @@ model Notification {
   createdAt DateTime  @default(now())
 
   @@map("notifications")
+}
+
+// Supplier/Dealer Management for Exporters
+model Supplier {
+  id              String      @id @default(uuid())
+  userId          String
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name            String
+  contactPerson   String?
+  email           String?
+  phone           String?
+  address         String?     @db.Text
+  country         String?
+  category        String?     // e.g. "Raw Materials", "Logistics", "Packaging"
+  notes           String?     @db.Text
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@map("suppliers")
 }
 
 enum NotificationType {

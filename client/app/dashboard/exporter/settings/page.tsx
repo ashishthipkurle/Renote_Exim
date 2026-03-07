@@ -32,8 +32,9 @@ export default function ExporterSettingsPage() {
   });
 
   useEffect(() => {
-    authFetch<ProfileData>("/api/user/profile")
-      .then((d) => {
+    authFetch<{ user: ProfileData }>("/api/user/profile")
+      .then((res) => {
+        const d = res.user;
         setProfile(d);
         setForm({
           name: d.name || "",
@@ -43,7 +44,7 @@ export default function ExporterSettingsPage() {
           website: d.website || "",
         });
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLoading(false));
   }, []);
 
@@ -51,11 +52,11 @@ export default function ExporterSettingsPage() {
     setSaving(true);
     setMsg(null);
     try {
-      const res = await authFetch<ProfileData>("/api/user/profile", {
+      const res = await authFetch<{ user: ProfileData }>("/api/user/profile", {
         method: "PATCH",
         body: JSON.stringify(form),
       });
-      setProfile(res);
+      setProfile(res.user);
       setMsg({ type: "ok", text: "Profile updated successfully" });
       refreshUser();
     } catch {

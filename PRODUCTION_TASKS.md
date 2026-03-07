@@ -80,12 +80,12 @@
 
 | #   | Task                                                                                                                  | Current State | Status |
 | --- | --------------------------------------------------------------------------------------------------------------------- | ------------- | ------ |
-| 21  | **Build Exporter Analytics page** — revenue trends chart, order volume chart, top products, geographic breakdown      | Stub          | ☐      |
+| 21  | **Build Exporter Analytics page** — revenue trends chart, order volume chart, top products, geographic breakdown      | Complete      | [x]    |
 | 22  | **Build Exporter Orders page** — orders table with status filters, order detail modal, accept/reject/ship actions     | Stub          | ☐      |
 | 23  | **Build Exporter Inventory page** — product CRUD table, add/edit product modal with image upload, stock management    | Stub          | ☐      |
 | 24  | **Build Exporter Shipments page** — shipment tracking table, create shipment form, status updates, timeline view      | Stub          | ☐      |
 | 25  | **Build Exporter Finance page** — revenue summary, payment history, invoice generation, pending payments              | Stub          | ☐      |
-| 26  | **Build Exporter Categories page** — product category breakdown, performance per category                             | Stub          | ☐      |
+| 26  | **Build Exporter Categories page** — product category breakdown, performance per category                             | Complete      | [x]    |
 | 27  | **Build Exporter Directory page** — importer/partner list, contact info, trade history per partner                    | Complete      | [x]    |
 | 28  | **Build Exporter Notifications page** — notification list with read/unread, mark all read, filters by type            | Complete      | [x]    |
 | 29  | **Build Exporter Settings page** — profile edit, company info edit, avatar upload, password change, email preferences | Stub          | ☐      |
