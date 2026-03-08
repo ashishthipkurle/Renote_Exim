@@ -3,12 +3,19 @@ import type { NextRequest } from "next/server";
 
 import { prisma } from "@/lib/prisma";
 import { getSupabaseEnv } from "@/lib/supabase/shared";
+import { createSupabaseRouteClient } from "@/lib/supabase/route";
 import type { Role } from "@prisma/client";
 
 export type ApiAuthContext = {
   userId: string;
   role: Role;
 };
+
+const VALID_ROLES: Role[] = ["USER", "EXPORTER", "IMPORTER", "ADMIN"];
+
+function isValidRole(value: unknown): value is Role {
+  return typeof value === "string" && VALID_ROLES.includes(value as Role);
+}
 
 function extractBearerToken(request: NextRequest): string | null {
   const authHeader = request.headers.get("authorization");
@@ -17,28 +24,75 @@ function extractBearerToken(request: NextRequest): string | null {
   return authHeader.slice("Bearer ".length).trim() || null;
 }
 
-export async function getApiAuthContext(request: NextRequest): Promise<ApiAuthContext | null> {
+/**
+ * Resolves the Supabase user from the request.
+ * Tries Bearer token first, then falls back to SSR cookies.
+ * Returns the Supabase user object or null.
+ */
+async function resolveSupabaseUser(request: NextRequest) {
   const token = extractBearerToken(request);
-  if (!token) return null;
 
-  const { url, anonKey } = getSupabaseEnv();
-  const supabase = createClient(url, anonKey, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-      detectSessionInUrl: false,
-    },
-  });
+  if (token) {
+    const { url, anonKey } = getSupabaseEnv();
+    const supabase = createClient(url, anonKey, {
+      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+    });
+    const { data, error } = await supabase.auth.getUser(token);
+    if (!error && data.user) return data.user;
+  }
 
-  const { data, error } = await supabase.auth.getUser(token);
-  if (error || !data.user) return null;
+  // Fallback: cookie-based session
+  const { supabase } = createSupabaseRouteClient(request);
+  const { data: sessionData } = await supabase.auth.getSession();
+  if (sessionData.session) {
+    const { data, error } = await supabase.auth.getUser(sessionData.session.access_token);
+    if (!error && data.user) return data.user;
+  }
 
-  const profile = await prisma.user.findUnique({
-    where: { id: data.user.id },
+  return null;
+}
+
+export async function getApiAuthContext(request: NextRequest): Promise<ApiAuthContext | null> {
+  const user = await resolveSupabaseUser(request);
+  if (!user) return null;
+
+  // Try to find existing profile
+  let profile = await prisma.user.findUnique({
+    where: { id: user.id },
     select: { id: true, role: true },
   });
 
-  if (!profile) return null;
+  // If no profile exists, auto-create from Supabase auth metadata.
+  // This handles the case where registration's Prisma upsert silently failed.
+  if (!profile) {
+    const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
+    const rawRole = typeof meta.role === "string" ? meta.role.toUpperCase() : "IMPORTER";
+    const role: Role = isValidRole(rawRole) ? rawRole : "IMPORTER";
+
+    console.log(`[getApiAuthContext] Auto-creating missing profile for user ${user.id} with role ${role}`);
+
+    try {
+      profile = await prisma.user.upsert({
+        where: { id: user.id },
+        update: {},
+        create: {
+          id: user.id,
+          email: user.email ?? "",
+          name: typeof meta.name === "string" ? meta.name : null,
+          role,
+          companyName: typeof meta.companyName === "string" ? meta.companyName : null,
+          country: typeof meta.country === "string" ? meta.country : null,
+          phone: typeof meta.phone === "string" ? meta.phone : null,
+          website: typeof meta.website === "string" ? meta.website : null,
+          verified: false,
+        },
+        select: { id: true, role: true },
+      });
+    } catch (e) {
+      console.error("[getApiAuthContext] Failed to auto-create profile:", e);
+      return null;
+    }
+  }
 
   return { userId: profile.id, role: profile.role };
 }
