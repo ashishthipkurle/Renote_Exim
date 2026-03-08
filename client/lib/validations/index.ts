@@ -28,27 +28,17 @@ export type LoginInput = z.infer<typeof loginSchema>;
 // Product Schema
 export const productSchema = z.object({
   name: z.string().min(3, 'Product name must be at least 3 characters'),
-  category: z.enum([
-    'CHEMICALS',
-    'MACHINES',
-    'TEXTILES',
-    'MEDICAL',
-    'HANDICRAFTS',
-    'FOOD',
-    'ELECTRONICS',
-    'AUTOMOTIVE',
-    'CONSTRUCTION',
-    'AGRICULTURE',
-    'OTHER',
-  ]),
+  category: z.string().min(1, 'Category is required'),
   description: z.string().min(20, 'Description must be at least 20 characters'),
   price: z.number().positive('Price must be positive'),
   minOrderQty: z.number().int().positive('Minimum order quantity must be positive'),
   unit: z.string().min(1, 'Unit is required'),
   originCountry: z.string().min(2, 'Origin country is required'),
   hsCode: z.string().optional(),
-  images: z.array(z.string().url()).min(1, 'At least one image is required'),
+  images: z.array(z.string().url()).optional().default([]),
   certifications: z.array(z.string()).optional().default([]),
+  quantity: z.number().int().min(0, 'Quantity cannot be negative').default(0),
+  available: z.boolean().optional().default(true),
 });
 
 export type ProductInput = z.infer<typeof productSchema>;

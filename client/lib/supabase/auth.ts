@@ -1,29 +1,29 @@
 import { createClient } from "@supabase/supabase-js";
 import type { NextRequest } from "next/server";
- 
+
 import { prisma } from "@/lib/prisma";
 import { getSupabaseEnv } from "@/lib/supabase/shared";
 import { createSupabaseRouteClient } from "@/lib/supabase/route";
 import type { Role } from "@prisma/client";
- 
+
 export type ApiAuthContext = {
   userId: string;
   role: Role;
 };
- 
+
 const VALID_ROLES: Role[] = ["USER", "EXPORTER", "IMPORTER", "ADMIN"];
- 
+
 function isValidRole(value: unknown): value is Role {
   return typeof value === "string" && VALID_ROLES.includes(value as Role);
 }
- 
+
 function extractBearerToken(request: NextRequest): string | null {
   const authHeader = request.headers.get("authorization");
   if (!authHeader) return null;
   if (!authHeader.startsWith("Bearer ")) return null;
   return authHeader.slice("Bearer ".length).trim() || null;
 }
- 
+
 /**
  * Resolves the Supabase user from the request.
  * Tries Bearer token first, then falls back to SSR cookies.
@@ -31,7 +31,7 @@ function extractBearerToken(request: NextRequest): string | null {
  */
 async function resolveSupabaseUser(request: NextRequest) {
   const token = extractBearerToken(request);
- 
+
   if (token) {
     const { url, anonKey } = getSupabaseEnv();
     const supabase = createClient(url, anonKey, {
@@ -40,7 +40,7 @@ async function resolveSupabaseUser(request: NextRequest) {
     const { data, error } = await supabase.auth.getUser(token);
     if (!error && data.user) return data.user;
   }
- 
+
   // Fallback: cookie-based session
   const { supabase } = createSupabaseRouteClient(request);
   const { data: sessionData } = await supabase.auth.getSession();
@@ -48,30 +48,29 @@ async function resolveSupabaseUser(request: NextRequest) {
     const { data, error } = await supabase.auth.getUser(sessionData.session.access_token);
     if (!error && data.user) return data.user;
   }
- 
+
   return null;
 }
- 
+
 export async function getApiAuthContext(request: NextRequest): Promise<ApiAuthContext | null> {
   const user = await resolveSupabaseUser(request);
   if (!user) return null;
- 
-  // Try to find existing profile
-  let profile = await prisma.user.findUnique({
-    where: { id: user.id },
-    select: { id: true, role: true },
-  });
- 
-  // If no profile exists, auto-create from Supabase auth metadata.
-  // This handles the case where registration's Prisma upsert silently failed.
-  if (!profile) {
-    const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
-    const rawRole = typeof meta.role === "string" ? meta.role.toUpperCase() : "IMPORTER";
-    const role: Role = isValidRole(rawRole) ? rawRole : "IMPORTER";
- 
-    console.log(`[getApiAuthContext] Auto-creating missing profile for user ${user.id} with role ${role}`);
- 
-    try {
+
+  // Try Prisma first
+  try {
+    let profile = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { id: true, role: true },
+    });
+
+    // If no profile exists, auto-create from Supabase auth metadata.
+    if (!profile) {
+      const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
+      const rawRole = typeof meta.role === "string" ? meta.role.toUpperCase() : "IMPORTER";
+      const role: Role = isValidRole(rawRole) ? rawRole : "IMPORTER";
+
+      console.log(`[getApiAuthContext] Auto-creating missing profile for user ${user.id} with role ${role}`);
+
       profile = await prisma.user.upsert({
         where: { id: user.id },
         update: {},
@@ -88,13 +87,20 @@ export async function getApiAuthContext(request: NextRequest): Promise<ApiAuthCo
         },
         select: { id: true, role: true },
       });
-    } catch (e) {
-      console.error("[getApiAuthContext] Failed to auto-create profile:", e);
-      return null;
     }
+
+    return { userId: profile.id, role: profile.role };
+  } catch (prismaError) {
+    console.warn("[getApiAuthContext] Prisma failed, falling back to auth metadata:", prismaError);
   }
- 
-  return { userId: profile.id, role: profile.role };
+
+  // Fallback: use Supabase auth metadata (same approach as /api/auth/me)
+  // This works even when the database is completely unreachable
+  const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
+  const rawRole = typeof meta.role === "string" ? meta.role.toUpperCase() : "IMPORTER";
+  const role: Role = isValidRole(rawRole) ? rawRole : "IMPORTER";
+
+  console.log(`[getApiAuthContext] Using auth metadata fallback for user ${user.id} with role ${role}`);
+  return { userId: user.id, role };
 }
- 
- 
+

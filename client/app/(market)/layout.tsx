@@ -6,9 +6,10 @@ export default function MarketplaceLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-dvh bg-background">
+    <div className="h-dvh overflow-y-auto custom-scrollbar bg-background">
       <MarketplaceHeader />
       <div className="w-full">{children}</div>
     </div>
   );
 }
+

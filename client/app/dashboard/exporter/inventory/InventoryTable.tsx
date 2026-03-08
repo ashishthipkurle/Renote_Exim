@@ -18,6 +18,7 @@ type Product = {
     originCountry: string;
     category: string;
     available: boolean;
+    quantity: number;
     images: string[];
 };
 
@@ -51,6 +52,26 @@ export default function InventoryTable({ products }: { products: Product[] }) {
         startTransition(() => {
             router.push(`?${params.toString()}`);
         });
+    };
+
+    const updateQuantity = async (id: string, newQuantity: number, newAvailable?: boolean) => {
+        if (newQuantity < 0) return;
+
+        try {
+            await authFetch(`/api/products/${id}`, {
+                method: "PUT",
+                body: JSON.stringify({
+                    quantity: newQuantity,
+                    available: newAvailable !== undefined ? newAvailable : undefined
+                }),
+            });
+            toast.success(newAvailable !== undefined ? `Market status: ${newAvailable ? 'ACTIVE' : 'HALTED'}` : "Stock updated");
+            startTransition(() => {
+                router.refresh();
+            });
+        } catch (e: any) {
+            toast.error(e.message || "Failed to update item");
+        }
     };
 
     const deleteProduct = async (id: string, name: string) => {
@@ -171,7 +192,7 @@ export default function InventoryTable({ products }: { products: Product[] }) {
                     <div className="col-span-4 text-primary opacity-50">Global Market Identity</div>
                     <div className="col-span-2">Sector</div>
                     <div className="col-span-2">Economics</div>
-                    <div className="col-span-2">Threshold / Origin</div>
+                    <div className="col-span-2 text-center">Stock Level</div>
                     <div className="col-span-1 text-center">Protocol</div>
                     <div className="col-span-1 text-right">Actions</div>
                 </div>
@@ -224,25 +245,40 @@ export default function InventoryTable({ products }: { products: Product[] }) {
                                 <div className="text-[9px] text-slate-600 font-bold uppercase tracking-wider mt-0.5">per {product.unit}</div>
                             </div>
 
-                            <div className="lg:col-span-2">
-                                <div className="text-sm font-black text-slate-300">
-                                    {product.minOrderQty} {product.unit}
+                            <div className="lg:col-span-2 flex flex-col items-center">
+                                <div className="flex items-center gap-2 bg-slate-900/80 border border-white/5 rounded-xl p-1 shadow-inner">
+                                    <button
+                                        onClick={() => updateQuantity(product.id, product.quantity - 1)}
+                                        className="size-7 flex items-center justify-center rounded-lg hover:bg-white/5 text-slate-500 hover:text-white transition-colors text-lg font-bold"
+                                    >
+                                        -
+                                    </button>
+                                    <div className="min-w-[40px] text-center text-sm font-black text-white">
+                                        {product.quantity}
+                                    </div>
+                                    <button
+                                        onClick={() => updateQuantity(product.id, product.quantity + 1)}
+                                        className="size-7 flex items-center justify-center rounded-lg hover:bg-white/5 text-slate-500 hover:text-white transition-colors text-lg font-bold"
+                                    >
+                                        +
+                                    </button>
                                 </div>
-                                <div className="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-0.5 italic">{product.originCountry}</div>
+                                <div className="text-[9px] text-slate-600 font-bold uppercase tracking-widest mt-2 italic">Unit: {product.unit}</div>
                             </div>
 
                             <div className="lg:col-span-1 flex justify-start lg:justify-center">
-                                <span
+                                <button
+                                    onClick={() => updateQuantity(product.id, product.quantity, !product.available)}
                                     className={
-                                        "inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-[9px] font-black uppercase tracking-[0.2em] shadow-sm transition-all " +
+                                        "inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-[9px] font-black uppercase tracking-[0.2em] shadow-sm transition-all hover:scale-105 active:scale-95 " +
                                         (product.available
-                                            ? "text-emerald-400 bg-emerald-400/5 border-emerald-400/20 shadow-emerald-400/5"
-                                            : "text-red-400 bg-red-400/5 border-red-400/20 shadow-red-400/5")
+                                            ? "text-emerald-400 bg-emerald-400/5 border-emerald-400/20 shadow-emerald-400/5 hover:bg-emerald-400/10"
+                                            : "text-red-400 bg-red-400/5 border-red-400/20 shadow-red-400/5 hover:bg-red-400/10")
                                     }
                                 >
                                     <span className={`size-1.5 rounded-full bg-current ${product.available ? "animate-pulse" : ""}`} />
                                     {product.available ? "Active" : "Halted"}
-                                </span>
+                                </button>
                             </div>
 
                             <div className="lg:col-span-1 flex justify-end gap-3 mt-4 lg:mt-0">
