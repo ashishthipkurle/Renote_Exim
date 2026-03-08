@@ -1,46 +1,173 @@
-// Ranote Exim Database Schema
-// DATABASE_URL connects to Supabase Postgres
-// DIRECT_URL is used for Prisma migrations
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
-// User model with role-based access
 model User {
-  id            String    @id @default(uuid())
-  name          String?
-  email         String    @unique
-  password      String?
-  role          Role      @default(IMPORTER)
-  companyName   String?
-  country       String?
-  phone         String?
-  website       String?
-  verified      Boolean   @default(false)
-  avatar        String?
-  description   String?   @db.Text
-  socialLinks   Json?     @default("{}")
-  businessHours Json?     @default("{}")
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  // Relations
-  exportedProducts Product[]          @relation("ExporterProducts")
-  orders           Order[]            @relation("ImporterOrders")
-  shipments        Shipment[]
-  sentMessages     Message[]          @relation("Sender")
-  receivedMessages Message[]          @relation("Receiver")
+  id               String         @id @default(uuid())
+  name             String?
+  email            String         @unique
+  password         String?
+  role             Role           @default(IMPORTER)
+  companyName      String?
+  country          String?
+  phone            String?
+  website          String?
+  verified         Boolean        @default(false)
+  avatar           String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  businessHours    Json?          @default("{}")
+  description      String?
+  socialLinks      Json?          @default("{}")
   documents        Document[]
+  receivedMessages Message[]      @relation("Receiver")
+  sentMessages     Message[]      @relation("Sender")
   notifications    Notification[]
+  orders           Order[]        @relation("ImporterOrders")
+  exportedProducts Product[]      @relation("ExporterProducts")
+  shipments        Shipment[]
   suppliers        Supplier[]
 
   @@map("users")
+}
+
+model Product {
+  id             String          @id @default(uuid())
+  exporterId     String
+  name           String
+  category       String
+  description    String
+  price          Float
+  minOrderQty    Int
+  unit           String
+  originCountry  String
+  hsCode         String?
+  images         String[]
+  certifications String[]
+  available      Boolean         @default(true)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  quantity       Int             @default(0)
+  orders         Order[]
+  exporter       User            @relation("ExporterProducts", fields: [exporterId], references: [id], onDelete: Cascade)
+
+  @@map("products")
+}
+
+model Order {
+  id            String        @id @default(uuid())
+  orderNumber   String        @unique
+  productId     String
+  importerId    String
+  quantity      Int
+  totalPrice    Float
+  currency      String        @default("USD")
+  status        OrderStatus   @default(PENDING)
+  paymentStatus PaymentStatus @default(PENDING)
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  messages      Message[]
+  importer      User          @relation("ImporterOrders", fields: [importerId], references: [id])
+  product       Product       @relation(fields: [productId], references: [id])
+  shipment      Shipment?
+
+  @@map("orders")
+}
+
+model Shipment {
+  id                String         @id @default(uuid())
+  orderId           String         @unique
+  userId            String
+  trackingNumber    String         @unique
+  carrier           String
+  origin            String
+  destination       String
+  estimatedDelivery DateTime
+  actualDelivery    DateTime?
+  status            ShipmentStatus @default(PREPARING)
+  currentLocation   String?
+  statusHistory     Json[]
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  order             Order          @relation(fields: [orderId], references: [id])
+  user              User           @relation(fields: [userId], references: [id])
+
+  @@map("shipments")
+}
+
+model Message {
+  id         String   @id @default(uuid())
+  senderId   String
+  receiverId String
+  orderId    String?
+  subject    String?
+  content    String
+  read       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  order      Order?   @relation(fields: [orderId], references: [id])
+  receiver   User     @relation("Receiver", fields: [receiverId], references: [id])
+  sender     User     @relation("Sender", fields: [senderId], references: [id])
+
+  @@map("messages")
+}
+
+model Document {
+  id          String       @id @default(uuid())
+  ownerId     String
+  type        DocumentType
+  fileName    String
+  fileUrl     String
+  fileSize    Int
+  mimeType    String
+  verified    Boolean      @default(false)
+  verifiedAt  DateTime?
+  verifiedBy  String?
+  description String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  owner       User         @relation(fields: [ownerId], references: [id])
+
+  @@map("documents")
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  link      String?
+  read      Boolean          @default(false)
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [id])
+
+  @@map("notifications")
+}
+
+model Supplier {
+  id            String   @id @default(uuid())
+  userId        String
+  name          String
+  contactPerson String?
+  email         String?
+  phone         String?
+  address       String?
+  country       String?
+  category      String?
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("suppliers")
 }
 
 enum Role {
@@ -48,33 +175,6 @@ enum Role {
   EXPORTER
   IMPORTER
   ADMIN
-}
-
-// Product model for exporters
-model Product {
-  id              String    @id @default(uuid())
-  exporterId      String
-  exporter        User      @relation("ExporterProducts", fields: [exporterId], references: [id], onDelete: Cascade)
-
-  name            String
-  category        ProductCategory
-  description     String    @db.Text
-  price           Float
-  minOrderQty     Int
-  unit            String
-  originCountry   String
-  hsCode          String?
-  images          String[]
-  certifications  String[]
-
-  available       Boolean   @default(true)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-
-  // Relations
-  orders          Order[]
-
-  @@map("products")
 }
 
 enum ProductCategory {
@@ -89,36 +189,6 @@ enum ProductCategory {
   CONSTRUCTION
   AGRICULTURE
   OTHER
-}
-
-// Order model
-model Order {
-  id              String      @id @default(uuid())
-  orderNumber     String      @unique
-
-  productId       String
-  product         Product     @relation(fields: [productId], references: [id])
-
-  importerId      String
-  importer        User        @relation("ImporterOrders", fields: [importerId], references: [id])
-
-  quantity        Int
-  totalPrice      Float
-  currency        String      @default("USD")
-
-  status          OrderStatus @default(PENDING)
-  paymentStatus   PaymentStatus @default(PENDING)
-
-  notes           String?     @db.Text
-
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-
-  // Relations
-  shipment        Shipment?
-  messages        Message[]
-
-  @@map("orders")
 }
 
 enum OrderStatus {
@@ -138,35 +208,6 @@ enum PaymentStatus {
   REFUNDED
 }
 
-// Shipment tracking
-model Shipment {
-  id                  String    @id @default(uuid())
-  orderId             String    @unique
-  order               Order     @relation(fields: [orderId], references: [id])
-
-  userId              String
-  user                User      @relation(fields: [userId], references: [id])
-
-  trackingNumber      String    @unique
-  carrier             String
-
-  origin              String
-  destination         String
-
-  estimatedDelivery   DateTime
-  actualDelivery      DateTime?
-
-  status              ShipmentStatus @default(PREPARING)
-
-  currentLocation     String?
-  statusHistory       Json[]
-
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
-
-  @@map("shipments")
-}
-
 enum ShipmentStatus {
   PREPARING
   IN_TRANSIT
@@ -175,53 +216,6 @@ enum ShipmentStatus {
   DELIVERED
   DELAYED
   RETURNED
-}
-
-// Messaging system
-model Message {
-  id          String    @id @default(uuid())
-
-  senderId    String
-  sender      User      @relation("Sender", fields: [senderId], references: [id])
-
-  receiverId  String
-  receiver    User      @relation("Receiver", fields: [receiverId], references: [id])
-
-  orderId     String?
-  order       Order?    @relation(fields: [orderId], references: [id])
-
-  subject     String?
-  content     String    @db.Text
-  read        Boolean   @default(false)
-
-  createdAt   DateTime  @default(now())
-
-  @@map("messages")
-}
-
-// Document management
-model Document {
-  id          String    @id @default(uuid())
-
-  ownerId     String
-  owner       User      @relation(fields: [ownerId], references: [id])
-
-  type        DocumentType
-  fileName    String
-  fileUrl     String
-  fileSize    Int
-  mimeType    String
-
-  verified    Boolean   @default(false)
-  verifiedAt  DateTime?
-  verifiedBy  String?
-
-  description String?
-
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  @@map("documents")
 }
 
 enum DocumentType {
@@ -235,47 +229,6 @@ enum DocumentType {
   PACKING_LIST
   BILL_OF_LADING
   OTHER
-}
-
-// Notification system
-model Notification {
-  id        String    @id @default(uuid())
-
-  userId    String
-  user      User      @relation(fields: [userId], references: [id])
-
-  type      NotificationType
-  title     String
-  message   String    @db.Text
-  link      String?
-
-  read      Boolean   @default(false)
-  readAt    DateTime?
-
-  createdAt DateTime  @default(now())
-
-  @@map("notifications")
-}
-
-// Supplier/Dealer Management for Exporters
-model Supplier {
-  id              String      @id @default(uuid())
-  userId          String
-  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  name            String
-  contactPerson   String?
-  email           String?
-  phone           String?
-  address         String?     @db.Text
-  country         String?
-  category        String?     // e.g. "Raw Materials", "Logistics", "Packaging"
-  notes           String?     @db.Text
-
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-
-  @@map("suppliers")
 }
 
 enum NotificationType {

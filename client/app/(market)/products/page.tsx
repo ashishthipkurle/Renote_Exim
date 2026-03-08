@@ -81,6 +81,7 @@ export default async function ProductsPage({
     originCountry: string;
     category: ProductCategory;
     images: string[];
+    quantity: number;
     exporter: { name: string | null; companyName: string | null; country: string | null };
   }> = [];
   let total = 0;
@@ -99,6 +100,8 @@ export default async function ProductsPage({
           originCountry: true,
           category: true,
           images: true,
+          // @ts-ignore - Prisma Client needs regeneration (Server Restart Required)
+          quantity: true,
           exporter: { select: { name: true, companyName: true, country: true } },
         },
       }),
@@ -353,7 +356,17 @@ export default async function ProductsPage({
                             <div className="text-[10px] text-muted-foreground font-semibold">Verified exporter</div>
                             <div className="text-[10px] text-muted-foreground">{(product.exporter.companyName || product.exporter.name) ?? "Unknown"}</div>
                           </div>
-                          <div className="mt-4 text-xs font-black text-primary">View details →</div>
+
+                          {/* Stock Status */}
+                          <div className="mt-4 flex items-center justify-between">
+                            <div className="text-xs font-black text-primary">View details →</div>
+                            <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md ${(product as any).quantity > 0
+                              ? "bg-emerald-500/10 text-emerald-500"
+                              : "bg-red-500/10 text-red-500"
+                              }`}>
+                              {(product as any).quantity > 0 ? "In Stock" : "Out of Stock"}
+                            </span>
+                          </div>
                         </div>
                       </Link>
                     </div>

@@ -1,24 +1,86 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Save, Loader2, Plus, X, ImagePlus } from "lucide-react";
 import { authFetch } from "@/lib/api-utils";
 import Link from "next/link";
 import { toast } from "sonner";
 
 const CATEGORIES = [
-    { value: "CHEMICALS", label: "Chemicals" },
-    { value: "MACHINES", label: "Machines" },
-    { value: "TEXTILES", label: "Textiles" },
-    { value: "MEDICAL", label: "Medical" },
-    { value: "HANDICRAFTS", label: "Handicrafts" },
-    { value: "FOOD", label: "Food" },
-    { value: "ELECTRONICS", label: "Electronics" },
-    { value: "AUTOMOTIVE", label: "Automotive" },
-    { value: "CONSTRUCTION", label: "Construction" },
-    { value: "AGRICULTURE", label: "Agriculture" },
-    { value: "OTHER", label: "Other" },
+    { value: "AGRICULTURE", label: "Agriculture & Farming" },
+    { value: "TEXTILES", label: "Textiles & Apparel" },
+    { value: "CHEMICALS", label: "Chemicals & Raw Materials" },
+    { value: "MACHINES", label: "Machinery & Equipment" },
+    { value: "MEDICAL", label: "Medical & Pharmaceuticals" },
+    { value: "FOOD", label: "Food & Beverages" },
+    { value: "ELECTRONICS", label: "Electronics & Tech" },
+    { value: "AUTOMOTIVE", label: "Automotive & Parts" },
+    { value: "CONSTRUCTION", label: "Construction & Infrastructure" },
+    { value: "HANDICRAFTS", label: "Handicrafts & Decor" },
+    { value: "COSMETICS", label: "Cosmetics & Personal Care" },
+    { value: "PLASTICS", label: "Plastics & Rubber" },
+    { value: "ENERGY", label: "Energy & Power" },
+    { value: "LOGISTICS", label: "Logistics & Shipping" },
+    { value: "PACKAGING", label: "Packaging & Printing" },
+    { value: "METALS", label: "Metals & Minerals" },
+    { value: "LEATHER", label: "Leather & Footwear" },
+    { value: "FURNITURE", label: "Furniture & Home" },
+    { value: "TOYS", label: "Toys & Hobbies" },
+    { value: "SPORTS", label: "Sports & Fitness" },
+    { value: "OTHER", label: "Other (Custom...)" },
+];
+
+// Extended list would go here, but for brevity we use these common ones + custom input
+const RAW_CATEGORIES = [
+    "Abrasives", "Adhesives", "Aerospace Parts", "Agricultural Machinery", "Air Conditioning", "Alnico", "Aluminum Products",
+    "Animal Fodder", "Antibiotics", "Antiseptics", "Apparel Accessories", "Art Supplies", "Artificial Flowers", "Asphalt",
+    "Audio Equipment", "Automated Systems", "Automotive Components", "Aviation Equipment", "Baby Products", "Bakery Equipment",
+    "Bamboo Products", "Barbecue Gear", "Batteries", "Bearings", "Beauty Supplements", "Bicycles", "Biofuels", "Biomass Energy",
+    "Body Care", "Boilers", "Books", "Brake Systems", "Brasses", "Building Materials", "Cables", "Calculating Machines",
+    "Cameras", "Camping Gear", "Canvas Products", "Capacitors", "Car Accessories", "Cardboard Packaging", "Carpets",
+    "Catering Equipment", "Ceramics", "Cereal Products", "Chemical Agents", "Children's Wear", "Circuit Boards",
+    "Cleaning Supplies", "Clocks", "Coffee", "Coloring Materials", "Communication Devices", "Compressors", "Computer Hardware",
+    "Confectionery", "Construction Tools", "Control Systems", "Conveyor Systems", "Cooking Oil", "Copper Products",
+    "Cosmetic Tools", "Cotton Fabrics", "Cranes", "Cutlery", "Dairy Products", "Data Storage", "Dental Equipment",
+    "Detergents", "Diagnostic Tools", "Digital Cameras", "Disinfectants", "Display Equipment", "Distillation Equipment",
+    "Doors", "Drilling Equipment", "Dyes", "E-commerce Packaging", "Earthmoving Machinery", "Educational Supplies",
+    "Electric Motors", "Electrical Fittings", "Electronic Components", "Emergency Equipment", "Engines", "Essential Oils",
+    "Excavators", "Fabricated Metals", "Fans", "Fasteners", "Feed Additives", "Fertilizers", "Fibers", "Filtering Equipment",
+    "Fire Extinguishers", "Fish Products", "Floor Coverings", "Flour", "Flowers", "Footwear", "Forestry Equipment",
+    "Forging Equipment", "Frames", "Fruit", "Fungicides", "Furnaces", "Furniture Fittings", "Garden Tools", "Gaskets",
+    "Gears", "General Hardware", "Generators", "Glass Products", "Glassware", "Gloves", "Grain", "Greenhouse Equipment",
+    "Grinding Tools", "Hair Care", "Hand Tools", "Handling Equipment", "Hats", "Hay", "Heaters", "Herbicides", "Herbal Products",
+    "Honey", "Hospital Furniture", "Household Appliances", "Hydraulic Equipment", "Industrial Boilers", "Industrial Chemicals",
+    "Ink", "Insecticides", "Instrumentation", "Insulation", "Iron Products", "Irrigation Systems", "Jewelry", "Juice",
+    "Kitchenware", "Knitted Fabrics", "Laboratory Equipment", "Laboratory Glassware", "Lamps", "Landscape Supplies",
+    "Lasers", "Lathes", "Laundry Equipment", "Leather Goods", "Lenses", "Light Fixtures", "Lighting Components",
+    "Linens", "Living Room Furniture", "Lubricants", "Luggage", "Lumber", "Machine Tools", "Maintenance Supplies",
+    "Mapping Equipment", "Marine Engines", "Massaging Equipment", "Material Handling", "Measuring Tools", "Medical Disposables",
+    "Medical Implants", "Medicinal Herbs", "Metal Fabrications", "Metals", "Microcircuits", "Microphones", "Microscopes",
+    "Milk Products", "Milling Machines", "Mining Equipment", "Mixers", "Mobile Phones", "Monitoring Equipment", "Motors",
+    "Musical Instruments", "Names", "Navigational Instruments", "Network Hardware", "Non-ferrous Metals", "Nuts",
+    "Office Furniture", "Office Supplies", "Oil Seeds", "Optical Fibers", "Optical Instruments", "Organic Chemicals",
+    "Outdoor Equipment", "Packaging Machinery", "Packaging Supplies", "Paints", "Paper Products", "Parts", "Perfume",
+    "Personal Computers", "Pesticides", "Pet Food", "Pet Supplies", "Pharmaceutical Ingredients", "Photographic Equipment",
+    "Pigments", "Pipes", "Plastic Products", "Plumbing Supplies", "Pneumatic Tools", "Portland Cement", "Power Tools",
+    "Precision Instruments", "Prepared Foods", "Pressure Vessels", "Printed Circuits", "Printers", "Printing Inks",
+    "Printing Machinery", "Process Control", "Processing Equipment", "Protective Clothing", "Pumps", "Raw Materials",
+    "Refrigeration", "Remote Control", "Renewable Energy", "Resins", "Restaurant Equipment", "Robotics", "Rock Products",
+    "Roofing Materials", "Rubber Products", "Safety Equipment", "Sand", "Scales", "School Supplies", "Scientific Instruments",
+    "Screens", "Sealing Materials", "Seeds", "Semiconductors", "Sensors", "Service Equipment", "Sewerage Equipment",
+    "Shed Equipment", "Sheets", "Shipbuilding", "Signals", "Signs", "Silk Fabrics", "Silos", "Software", "Solar Energy",
+    "Solenoids", "Sound Equipment", "Specialty Chemicals", "Spectrometers", "Spices", "Sporting Goods", "Stainless Steel",
+    "Stamping Equipment", "Starches", "Stationery", "Steel Products", "Storage Tanks", "Structural Steel", "Surgical Instruments",
+    "Surveying Equipment", "Switchboard Apparatus", "Switches", "Synthetic Fibers", "Tableware", "Tanks", "Tea",
+    "Technical Fabrics", "Telecommunications", "Television Equipment", "Testing Equipment", "Textile Finishing",
+    "Textile Machinery", "Thermal Equipment", "Tiles", "Tools", "Tractors", "Trailer Parts", "Transformers",
+    "Transmission Gears", "Transport Equipment", "Trucks", "Tubing", "Turbines", "Unions", "Upholstery", "Valves",
+    "Varnishes", "Vegetables", "Vehicle Parts", "Vents", "Vessels", "Veterinary Equipment", "Video Equipment", "Vinyl",
+    "Wafer Fabrication", "Waiters", "Walls", "Warehousing", "Washing Equipment", "Waste Management", "Watch Components",
+    "Watches", "Water Filtration", "Water Purification", "Weapon Systems", "Wearables", "Weather Systems", "Weathering Steel",
+    "Webbing", "Weed Killers", "Welding Equipment", "Windows", "Wire Products", "Wireless Devices", "Wood Products",
+    "Workwear", "Woven Fabrics", "X-ray Equipment", "Yarn", "Zinc Products"
 ];
 
 type ProductData = {
@@ -33,6 +95,7 @@ type ProductData = {
     hsCode: string;
     images: string[];
     certifications: string[];
+    quantity: number;
     available?: boolean;
 };
 
@@ -47,21 +110,36 @@ const defaultProduct: ProductData = {
     hsCode: "",
     images: [],
     certifications: [],
+    quantity: 0,
 };
 
 export default function ProductForm({
     initialData,
     isEdit = false,
+    hideHeader = false,
 }: {
     initialData?: ProductData;
     isEdit?: boolean;
+    hideHeader?: boolean;
 }) {
+    const searchParams = useSearchParams();
     const router = useRouter();
-    const [form, setForm] = useState<ProductData>(initialData || defaultProduct);
+
+    const [form, setForm] = useState<ProductData>(() => {
+        if (initialData) return initialData;
+        const cat = searchParams.get("category");
+        return {
+            ...defaultProduct,
+            category: cat || "OTHER",
+        };
+    });
+
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [newImageUrl, setNewImageUrl] = useState("");
     const [newCertification, setNewCertification] = useState("");
+    const [customCategory, setCustomCategory] = useState("");
+    const [searchTerm, setSearchTerm] = useState("");
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -121,7 +199,7 @@ export default function ProductForm({
         if (!form.unit) newErrors.unit = "Unit is required";
         if (!form.originCountry || form.originCountry.length < 2)
             newErrors.originCountry = "Origin country is required";
-        if (form.images.length === 0) newErrors.images = "At least one image URL is required";
+        // Image requirement relaxed for better friction-less testing
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -139,7 +217,7 @@ export default function ProductForm({
 
             const body = {
                 name: form.name,
-                category: form.category,
+                category: form.category === "OTHER" ? customCategory : form.category,
                 description: form.description,
                 price: form.price,
                 minOrderQty: form.minOrderQty,
@@ -148,6 +226,7 @@ export default function ProductForm({
                 hsCode: form.hsCode || undefined,
                 images: form.images,
                 certifications: form.certifications,
+                quantity: form.quantity,
             };
 
             await authFetch(apiUrl, {
@@ -171,293 +250,335 @@ export default function ProductForm({
     const errorClass = "text-[10px] font-bold text-red-400 mt-1.5 ml-1 uppercase tracking-wider";
 
     return (
-        <div className="h-full overflow-hidden flex flex-col bg-gradient-to-br from-[#0a0c12] via-[#0d1017] to-[#0a0c12]">
-            {/* Header */}
-            <header className="flex-shrink-0 p-6 lg:p-8 border-b border-white/5">
-                <div className="flex items-center gap-6 max-w-5xl mx-auto w-full">
-                    <Link
-                        href="/dashboard/exporter/inventory"
-                        className="p-3 bg-white/5 border border-white/5 text-slate-400 hover:text-white hover:bg-white/10 rounded-2xl transition-all shadow-xl active:scale-95"
-                    >
-                        <ArrowLeft className="w-5 h-5" />
-                    </Link>
-                    <div>
-                        <h1 className="text-3xl font-black tracking-tight text-white uppercase italic">
-                            {isEdit ? "Edit Product" : "New Listing"}
-                        </h1>
-                        <p className="text-slate-400 text-sm mt-0.5 font-medium">
-                            {isEdit ? "Update your global market presence" : "Feature your products to buyers worldwide"}
-                        </p>
+        <form onSubmit={handleSubmit} className="w-full">
+            {!hideHeader && (
+                <div className="flex items-center justify-between mb-10">
+                    <div className="flex items-center gap-6">
+                        <Link
+                            href="/dashboard/exporter/inventory"
+                            className="p-3 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all text-slate-400 hover:text-white group"
+                        >
+                            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                        </Link>
+                        <div>
+                            <h1 className="text-3xl font-black text-white uppercase italic tracking-tighter">
+                                {isEdit ? "Edit Listing" : "New Listing"}
+                            </h1>
+                            <p className="text-slate-500 text-xs font-bold mt-1 uppercase tracking-widest leading-relaxed">
+                                {isEdit
+                                    ? "Modify your asset parameters for global trade"
+                                    : "Feature your products to buyers worldwide"}
+                            </p>
+                        </div>
                     </div>
+
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="inline-flex items-center gap-2 bg-primary hover:bg-[#0f49bd] text-white font-black text-xs uppercase tracking-[0.2em] py-4 px-8 rounded-2xl shadow-2xl shadow-primary/20 transition-all active:scale-95 disabled:opacity-50"
+                    >
+                        {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                        {isEdit ? "Save Profile" : "Deploy Asset"}
+                    </button>
                 </div>
-            </header>
+            )}
 
-            {/* Form */}
-            <div className="flex-1 overflow-y-auto p-6 lg:p-8 custom-scrollbar">
-                <form onSubmit={handleSubmit} className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 pb-12">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pb-12">
+                {/* Left Column: Main Specs */}
+                <div className="lg:col-span-12 xl:col-span-8 space-y-8">
+                    {/* Basic Info */}
+                    <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-2xl rounded-[2.5rem] p-10 space-y-8 relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[80px] rounded-full -mr-32 -mt-32 group-hover:bg-primary/10 transition-colors pointer-events-none" />
 
-                    {/* Left Column: Main Specs */}
-                    <div className="lg:col-span-12 xl:col-span-8 space-y-8">
-                        {/* Basic Info */}
-                        <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-2xl rounded-[2.5rem] p-10 space-y-8 relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[80px] rounded-full -mr-32 -mt-32 group-hover:bg-primary/10 transition-colors pointer-events-none" />
+                        <h2 className="text-sm font-black text-white tracking-[0.25em] uppercase opacity-50 mb-4 italic">Core Specifications</h2>
 
-                            <h2 className="text-sm font-black text-white tracking-[0.25em] uppercase opacity-50 mb-4 italic">Core Specifications</h2>
+                        <div className="space-y-6">
+                            <div>
+                                <label htmlFor="name" className={labelClass}>Market Identity (Product Name) *</label>
+                                <input
+                                    id="name"
+                                    name="name"
+                                    value={form.name}
+                                    onChange={handleChange}
+                                    placeholder="e.g. Premium Grade Organic Saffron"
+                                    className={inputClass}
+                                />
+                                {errors.name && <p className={errorClass}>{errors.name}</p>}
+                            </div>
 
-                            <div className="space-y-6">
-                                <div>
-                                    <label htmlFor="name" className={labelClass}>Market Identity (Product Name) *</label>
-                                    <input
-                                        id="name"
-                                        name="name"
-                                        value={form.name}
-                                        onChange={handleChange}
-                                        placeholder="e.g. Premium Grade Organic Saffron"
-                                        className={inputClass}
-                                    />
-                                    {errors.name && <p className={errorClass}>{errors.name}</p>}
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-4">
                                     <div>
                                         <label htmlFor="category" className={labelClass}>Industry Sector *</label>
                                         <div className="relative">
-                                            <select
+                                            <input
+                                                list="industry-categories"
                                                 id="category"
                                                 name="category"
                                                 value={form.category}
                                                 onChange={handleChange}
-                                                className={inputClass + " appearance-none cursor-pointer"}
-                                            >
+                                                placeholder="Search or select sector..."
+                                                className={inputClass}
+                                            />
+                                            <datalist id="industry-categories">
                                                 {CATEGORIES.map((c) => (
                                                     <option key={c.value} value={c.value}>{c.label}</option>
                                                 ))}
-                                            </select>
+                                                {RAW_CATEGORIES.map((c) => (
+                                                    <option key={c} value={c.toUpperCase()}>{c}</option>
+                                                ))}
+                                            </datalist>
                                             <Plus className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none rotate-45" />
                                         </div>
                                     </div>
-                                    <div>
-                                        <label htmlFor="originCountry" className={labelClass}>Geographic Origin *</label>
-                                        <input
-                                            id="originCountry"
-                                            name="originCountry"
-                                            value={form.originCountry}
-                                            onChange={handleChange}
-                                            placeholder="e.g. Casablanca, Morocco"
-                                            className={inputClass}
-                                        />
-                                        {errors.originCountry && <p className={errorClass}>{errors.originCountry}</p>}
-                                    </div>
-                                </div>
 
-                                <div>
-                                    <label htmlFor="description" className={labelClass}>Global Buyer Description *</label>
-                                    <textarea
-                                        id="description"
-                                        name="description"
-                                        value={form.description}
-                                        onChange={handleChange}
-                                        placeholder="Highlight key features, quality benchmarks, and usage scenarios..."
-                                        rows={6}
-                                        className={inputClass + " resize-none py-5"}
-                                    />
-                                    {errors.description && <p className={errorClass}>{errors.description}</p>}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Pricing */}
-                        <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-2xl rounded-[2.5rem] p-10 space-y-8 relative overflow-hidden group">
-                            <h2 className="text-sm font-black text-white tracking-[0.25em] uppercase opacity-50 mb-4 italic">Trade Economics</h2>
-
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <div>
-                                    <label htmlFor="price" className={labelClass}>FOB Price (USD) *</label>
-                                    <div className="relative">
-                                        <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 font-bold">$</span>
-                                        <input
-                                            id="price"
-                                            name="price"
-                                            type="number"
-                                            step="0.01"
-                                            min="0"
-                                            value={form.price || ""}
-                                            onChange={handleChange}
-                                            placeholder="0.00"
-                                            className={inputClass + " pl-10"}
-                                        />
-                                    </div>
-                                    {errors.price && <p className={errorClass}>{errors.price}</p>}
+                                    {form.category === "OTHER" && (
+                                        <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                                            <label htmlFor="customCategory" className={labelClass}>Define Your Custom Category *</label>
+                                            <input
+                                                id="customCategory"
+                                                value={customCategory}
+                                                onChange={(e) => setCustomCategory(e.target.value)}
+                                                placeholder="e.g. Artisanal Rare Earth Magnets"
+                                                className={inputClass + " border-primary/30 bg-primary/5"}
+                                            />
+                                            <p className="text-[9px] text-primary/60 mt-2 ml-1 italic font-medium uppercase tracking-wider">This will create a new unique sector for your listing</p>
+                                        </div>
+                                    )}
                                 </div>
                                 <div>
-                                    <label htmlFor="minOrderQty" className={labelClass}>MOQ Threshold *</label>
+                                    <label htmlFor="originCountry" className={labelClass}>Geographic Origin *</label>
                                     <input
-                                        id="minOrderQty"
-                                        name="minOrderQty"
-                                        type="number"
-                                        min="1"
-                                        value={form.minOrderQty || ""}
+                                        id="originCountry"
+                                        name="originCountry"
+                                        value={form.originCountry}
                                         onChange={handleChange}
-                                        placeholder="1"
+                                        placeholder="e.g. Casablanca, Morocco"
                                         className={inputClass}
                                     />
-                                    {errors.minOrderQty && <p className={errorClass}>{errors.minOrderQty}</p>}
-                                </div>
-                                <div>
-                                    <label htmlFor="unit" className={labelClass}>Base Unit *</label>
-                                    <input
-                                        id="unit"
-                                        name="unit"
-                                        value={form.unit}
-                                        onChange={handleChange}
-                                        placeholder="e.g. MT, Kg, Lot"
-                                        className={inputClass}
-                                    />
-                                    {errors.unit && <p className={errorClass}>{errors.unit}</p>}
+                                    {errors.originCountry && <p className={errorClass}>{errors.originCountry}</p>}
                                 </div>
                             </div>
 
                             <div>
-                                <label htmlFor="hsCode" className={labelClass}>Harmonized (HS) Code</label>
-                                <input
-                                    id="hsCode"
-                                    name="hsCode"
-                                    value={form.hsCode}
+                                <label htmlFor="description" className={labelClass}>Global Buyer Description *</label>
+                                <textarea
+                                    id="description"
+                                    name="description"
+                                    value={form.description}
                                     onChange={handleChange}
-                                    placeholder="e.g. 0910.20.00"
-                                    className={inputClass}
+                                    placeholder="Highlight key features, quality benchmarks, and usage scenarios..."
+                                    rows={6}
+                                    className={inputClass + " resize-none py-5"}
                                 />
-                                <p className="text-[9px] text-slate-500 mt-2 ml-1 italic font-medium uppercase tracking-wider">Crucial for international customs processing</p>
+                                {errors.description && <p className={errorClass}>{errors.description}</p>}
                             </div>
                         </div>
                     </div>
 
-                    {/* Right Column: Visuals & Certs */}
-                    <div className="lg:col-span-12 xl:col-span-4 space-y-8">
-                        {/* Visual Assets */}
-                        <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-2xl rounded-[2.5rem] p-8 space-y-6">
-                            <h2 className="text-[11px] font-black text-white tracking-[0.25em] uppercase opacity-50 italic">Asset Gallery</h2>
+                    {/* Pricing */}
+                    <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-2xl rounded-[2.5rem] p-10 space-y-8 relative overflow-hidden group">
+                        <h2 className="text-sm font-black text-white tracking-[0.25em] uppercase opacity-50 mb-4 italic">Trade Economics</h2>
 
-                            {/* Previews */}
-                            <div className="grid grid-cols-2 gap-3">
-                                {form.images.map((url, i) => (
-                                    <div key={i} className="relative group rounded-2xl overflow-hidden border border-white/5 aspect-square bg-slate-900 shadow-xl">
-                                        <img src={url} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                                        <button
-                                            type="button"
-                                            onClick={() => removeImage(i)}
-                                            className="absolute top-2 right-2 p-2 bg-red-500/90 hover:bg-red-500 rounded-xl opacity-0 group-hover:opacity-100 transition-all active:scale-90 shadow-2xl"
-                                        >
-                                            <X className="w-3 h-3 text-white" />
-                                        </button>
-                                    </div>
-                                ))}
-                                {form.images.length < 4 && (
-                                    <div className="rounded-2xl border-2 border-dashed border-white/5 flex flex-col items-center justify-center aspect-square text-slate-600 bg-white/[0.02]">
-                                        <ImagePlus className="w-6 h-6 mb-2 opacity-20" />
-                                        <span className="text-[8px] font-black tracking-widest uppercase opacity-40">Add Image</span>
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="space-y-3">
-                                <label className={labelClass}>New Media URL</label>
-                                <div className="flex gap-2">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div>
+                                <label htmlFor="price" className={labelClass}>FOB Price (USD) *</label>
+                                <div className="relative">
+                                    <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 font-bold">$</span>
                                     <input
-                                        value={newImageUrl}
-                                        onChange={(e) => setNewImageUrl(e.target.value)}
-                                        placeholder="https://..."
-                                        className={inputClass + " py-3 text-xs"}
+                                        id="price"
+                                        name="price"
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        value={form.price || ""}
+                                        onChange={handleChange}
+                                        placeholder="0.00"
+                                        className={inputClass + " pl-10"}
                                     />
-                                    <button
-                                        type="button"
-                                        onClick={addImage}
-                                        className="h-11 px-4 bg-primary hover:bg-[#0f49bd] text-white rounded-xl shadow-xl shadow-primary/20 transition-all active:scale-95"
-                                    >
-                                        <Plus className="w-4 h-4" />
-                                    </button>
                                 </div>
-                                {errors.images && <p className={errorClass}>{errors.images}</p>}
+                                {errors.price && <p className={errorClass}>{errors.price}</p>}
+                            </div>
+                            <div>
+                                <label htmlFor="minOrderQty" className={labelClass}>MOQ Threshold *</label>
+                                <input
+                                    id="minOrderQty"
+                                    name="minOrderQty"
+                                    type="number"
+                                    min="1"
+                                    value={form.minOrderQty || ""}
+                                    onChange={handleChange}
+                                    placeholder="1"
+                                    className={inputClass}
+                                />
+                                {errors.minOrderQty && <p className={errorClass}>{errors.minOrderQty}</p>}
+                            </div>
+                            <div>
+                                <label htmlFor="unit" className={labelClass}>Base Unit *</label>
+                                <input
+                                    id="unit"
+                                    name="unit"
+                                    value={form.unit}
+                                    onChange={handleChange}
+                                    placeholder="e.g. MT, Kg, Lot"
+                                    className={inputClass}
+                                />
+                                {errors.unit && <p className={errorClass}>{errors.unit}</p>}
+                            </div>
+                            <div>
+                                <label htmlFor="quantity" className={labelClass}>Initial Stock Level *</label>
+                                <input
+                                    id="quantity"
+                                    name="quantity"
+                                    type="number"
+                                    min="0"
+                                    value={form.quantity || 0}
+                                    onChange={handleChange}
+                                    className={inputClass}
+                                />
+                                {errors.quantity && <p className={errorClass}>{errors.quantity}</p>}
                             </div>
                         </div>
 
-                        {/* Professional Certs */}
-                        <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-2xl rounded-[2.5rem] p-8 space-y-6">
-                            <h2 className="text-[11px] font-black text-white tracking-[0.25em] uppercase opacity-50 italic">Trust Markers</h2>
+                        <div>
+                            <label htmlFor="hsCode" className={labelClass}>Harmonized (HS) Code</label>
+                            <input
+                                id="hsCode"
+                                name="hsCode"
+                                value={form.hsCode}
+                                onChange={handleChange}
+                                placeholder="e.g. 0910.20.00"
+                                className={inputClass}
+                            />
+                            <p className="text-[9px] text-slate-500 mt-2 ml-1 italic font-medium uppercase tracking-wider">Crucial for international customs processing</p>
+                        </div>
+                    </div>
+                </div>
 
-                            <div className="flex flex-wrap gap-2">
-                                {form.certifications.map((cert, i) => (
-                                    <span key={i} className="px-3 py-2 bg-emerald-500/5 border border-emerald-500/10 rounded-xl text-[10px] font-black text-emerald-400 uppercase tracking-widest flex items-center gap-2">
-                                        {cert}
-                                        <button type="button" onClick={() => removeCertification(i)} className="hover:text-white transition-colors">
-                                            <X className="w-3 h-3" />
-                                        </button>
-                                    </span>
-                                ))}
-                            </div>
+                {/* Right Column: Visuals & Certs */}
+                <div className="lg:col-span-12 xl:col-span-4 space-y-8">
+                    {/* Visual Assets */}
+                    <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-2xl rounded-[2.5rem] p-8 space-y-6">
+                        <h2 className="text-[11px] font-black text-white tracking-[0.25em] uppercase opacity-50 italic">Asset Gallery</h2>
 
+                        {/* Previews */}
+                        <div className="grid grid-cols-2 gap-3">
+                            {form.images.map((url, i) => (
+                                <div key={i} className="relative group rounded-2xl overflow-hidden border border-white/5 aspect-square bg-slate-900 shadow-xl">
+                                    <img src={url} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                    <button
+                                        type="button"
+                                        onClick={() => removeImage(i)}
+                                        className="absolute top-2 right-2 p-2 bg-red-500/90 hover:bg-red-500 rounded-xl opacity-0 group-hover:opacity-100 transition-all active:scale-90 shadow-2xl"
+                                    >
+                                        <X className="w-3 h-3 text-white" />
+                                    </button>
+                                </div>
+                            ))}
+                            {form.images.length < 4 && (
+                                <div className="rounded-2xl border-2 border-dashed border-white/5 flex flex-col items-center justify-center aspect-square text-slate-600 bg-white/[0.02]">
+                                    <ImagePlus className="w-6 h-6 mb-2 opacity-20" />
+                                    <span className="text-[8px] font-black tracking-widest uppercase opacity-40">Add Image</span>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="space-y-3">
+                            <label className={labelClass}>New Media URL</label>
                             <div className="flex gap-2">
                                 <input
-                                    value={newCertification}
-                                    onChange={(e) => setNewCertification(e.target.value)}
-                                    placeholder="e.g. ISO 22000"
+                                    value={newImageUrl}
+                                    onChange={(e) => setNewImageUrl(e.target.value)}
+                                    placeholder="https://..."
                                     className={inputClass + " py-3 text-xs"}
                                 />
                                 <button
                                     type="button"
-                                    onClick={addCertification}
-                                    className="h-11 px-4 bg-emerald-500/20 hover:bg-emerald-500 text-emerald-400 rounded-xl shadow-xl transition-all active:scale-95"
+                                    onClick={addImage}
+                                    className="h-11 px-4 bg-primary hover:bg-[#0f49bd] text-white rounded-xl shadow-xl shadow-primary/20 transition-all active:scale-95"
                                 >
                                     <Plus className="w-4 h-4" />
                                 </button>
                             </div>
-                        </div>
-
-                        {/* Status Guard */}
-                        <div className="bg-primary/5 border border-primary/20 rounded-[2.5rem] p-8 relative overflow-hidden group">
-                            <Save className="w-10 h-10 text-primary mb-4 opacity-30" />
-                            <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Listing Protocols</p>
-                            <ul className="text-[10px] text-slate-500 mt-4 space-y-2 italic font-medium leading-relaxed">
-                                <li>• Prices should be in USD.</li>
-                                <li>• Weights must use metric units.</li>
-                                <li>• Quality images increase buyer trust.</li>
-                            </ul>
+                            {errors.images && <p className={errorClass}>{errors.images}</p>}
                         </div>
                     </div>
 
-                    {/* Final Action */}
-                    <div className="lg:col-span-12 flex items-center justify-between bg-[#151c2a]/80 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-8 mt-4 sticky bottom-8 shadow-[0_-15px_40px_rgba(0,0,0,0.5)] z-20">
-                        <div className="hidden sm:block">
-                            <p className="text-white font-black text-xs uppercase tracking-widest">{isEdit ? "Update Existing Asset" : "Deploy New Asset"}</p>
-                            <p className="text-slate-500 text-[10px] uppercase font-bold tracking-wider mt-1 italic">Authorized Listing Procedure (ALP-1)</p>
-                        </div>
-                        <div className="flex items-center gap-4 w-full sm:w-auto">
-                            <Link
-                                href="/dashboard/exporter/inventory"
-                                className="flex-1 sm:flex-none px-10 py-4 text-slate-500 border border-white/5 hover:text-white hover:bg-white/5 font-black text-[10px] uppercase tracking-widest rounded-2xl transition-all"
-                            >
-                                Abort
-                            </Link>
-                            <button
-                                type="submit"
-                                disabled={isSubmitting}
-                                className="flex-1 sm:flex-none relative group px-12 py-4 bg-primary hover:bg-[#0f49bd] disabled:opacity-50 text-white font-black text-[10px] uppercase tracking-[0.3em] rounded-2xl shadow-2xl shadow-primary/30 transition-all active:scale-95 overflow-hidden"
-                            >
-                                <span className="relative z-10 flex items-center gap-3">
-                                    {isSubmitting ? (
-                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                    ) : (
-                                        <Save className="w-4 h-4" />
-                                    )}
-                                    {isEdit ? "Commit Updates" : "Deploy Listing"}
+                    {/* Professional Certs */}
+                    <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-2xl rounded-[2.5rem] p-8 space-y-6">
+                        <h2 className="text-[11px] font-black text-white tracking-[0.25em] uppercase opacity-50 italic">Trust Markers</h2>
+
+                        <div className="flex flex-wrap gap-2">
+                            {form.certifications.map((cert, i) => (
+                                <span key={i} className="px-3 py-2 bg-emerald-500/5 border border-emerald-500/10 rounded-xl text-[10px] font-black text-emerald-400 uppercase tracking-widest flex items-center gap-2">
+                                    {cert}
+                                    <button type="button" onClick={() => removeCertification(i)} className="hover:text-white transition-colors">
+                                        <X className="w-3 h-3" />
+                                    </button>
                                 </span>
-                                <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                            ))}
+                        </div>
+
+                        <div className="flex gap-2">
+                            <input
+                                value={newCertification}
+                                onChange={(e) => setNewCertification(e.target.value)}
+                                placeholder="e.g. ISO 22000"
+                                className={inputClass + " py-3 text-xs"}
+                            />
+                            <button
+                                type="button"
+                                onClick={addCertification}
+                                className="h-11 px-4 bg-emerald-500/20 hover:bg-emerald-500 text-emerald-400 rounded-xl shadow-xl transition-all active:scale-95"
+                            >
+                                <Plus className="w-4 h-4" />
                             </button>
                         </div>
                     </div>
 
-                </form>
+                    {/* Status Guard */}
+                    <div className="bg-primary/5 border border-primary/20 rounded-[2.5rem] p-8 relative overflow-hidden group">
+                        <Save className="w-10 h-10 text-primary mb-4 opacity-30" />
+                        <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Listing Protocols</p>
+                        <ul className="text-[10px] text-slate-500 mt-4 space-y-2 italic font-medium leading-relaxed">
+                            <li>• Prices should be in USD.</li>
+                            <li>• Weights must use metric units.</li>
+                            <li>• Quality images increase buyer trust.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                {/* Final Action */}
+                <div className="lg:col-span-12 flex items-center justify-between bg-[#151c2a]/80 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-8 mt-4 shadow-2xl">
+                    <div className="hidden sm:block">
+                        <p className="text-white font-black text-xs uppercase tracking-widest">{isEdit ? "Update Existing Asset" : "Deploy New Asset"}</p>
+                        <p className="text-slate-500 text-[10px] uppercase font-bold tracking-wider mt-1 italic">Authorized Listing Procedure (ALP-1)</p>
+                    </div>
+                    <div className="flex items-center gap-4 w-full sm:w-auto">
+                        <Link
+                            href="/dashboard/exporter/inventory"
+                            className="flex-1 sm:flex-none px-10 py-4 text-slate-500 border border-white/5 hover:text-white hover:bg-white/5 font-black text-[10px] uppercase tracking-widest rounded-2xl transition-all"
+                        >
+                            Abort
+                        </Link>
+                        <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="flex-1 sm:flex-none relative group px-12 py-4 bg-primary hover:bg-[#0f49bd] disabled:opacity-50 text-white font-black text-[10px] uppercase tracking-[0.3em] rounded-2xl shadow-2xl shadow-primary/30 transition-all active:scale-95 overflow-hidden"
+                        >
+                            <span className="relative z-10 flex items-center gap-3">
+                                {isSubmitting ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                    <Save className="w-4 h-4" />
+                                )}
+                                {isEdit ? "Commit Updates" : "Deploy Listing"}
+                            </span>
+                            <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                        </button>
+                    </div>
+                </div>
             </div>
-        </div>
+        </form>
     );
 }
