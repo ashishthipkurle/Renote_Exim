@@ -104,10 +104,10 @@ export default function ExporterSidebar() {
         initial={false}
         animate={{ width: isExpanded ? 240 : 80 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        className="hidden lg:flex flex-col h-[calc(100dvh-80px)] sticky top-20 bg-[#0b1019]/60 backdrop-blur-xl border-r border-white/5 z-[60] flex-shrink-0 pt-0 pb-0 overflow-hidden"
+        className="hidden lg:flex flex-col h-[calc(100dvh-80px)] sticky top-20 bg-[#0b1019]/60 backdrop-blur-xl border-r border-white/5 z-[60] flex-shrink-0 pt-0 pb-0"
       >
         {/* Nav */}
-        <div className="flex-1 flex flex-col gap-0.5 w-full items-center overflow-hidden pt-1 px-2">
+        <div className="flex-1 flex flex-col gap-0.5 w-full items-center pt-1 px-2">
           {nav.map((n) => (
             <Item
               key={n.href}
