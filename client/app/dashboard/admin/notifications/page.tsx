@@ -1,191 +1,237 @@
 "use client";
 
-import { motion } from "framer-motion";
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Bell,
-  CheckCheck,
+  Send,
+  Users,
+  ShieldAlert,
+  Mail,
+  Search,
+  CheckCircle2,
   Clock,
-  FileText,
-  HelpCircle,
-  Ship,
-  Truck,
+  MoreVertical,
+  Trash2,
+  Zap,
+  Volume2
 } from "lucide-react";
+import { useAuthFetch } from "@/lib/hooks/useAuthFetch";
+import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
+import clsx from "clsx";
 
-import { Button } from "@/components/ui/button";
-
-type AlertItem = {
+type Notification = {
   id: string;
-  type: "shipment" | "payment" | "documents";
   title: string;
   message: string;
-  time: string;
-  statusLabel: string;
+  type: string;
+  createdAt: string;
+  user?: { name: string; email: string };
 };
 
-const shipmentAlerts: AlertItem[] = [
-  {
-    id: "a1",
-    type: "shipment",
-    title: "Shipment #SH-8902 Arrived",
-    message: "Cargo has arrived at destination port and is pending clearance.",
-    time: "2 min ago",
-    statusLabel: "Arrived",
-  },
-  {
-    id: "a2",
-    type: "shipment",
-    title: "Shipment Delayed",
-    message: "Port congestion detected. Updated ETA applied.",
-    time: "2 hrs ago",
-    statusLabel: "Delayed",
-  },
-  {
-    id: "a3",
-    type: "shipment",
-    title: "Packed for Delivery",
-    message: "Order packed and ready for pickup from origin warehouse.",
-    time: "5 hrs ago",
-    statusLabel: "Ready",
-  },
-];
-
-const paymentAlerts: AlertItem[] = [
-  {
-    id: "p1",
-    type: "payment",
-    title: "Payment Action Needed",
-    message: "Pending payment approval for Order #ORD-2023-11.",
-    time: "1 hr ago",
-    statusLabel: "Action",
-  },
-  {
-    id: "p2",
-    type: "payment",
-    title: "Invoice Issued",
-    message: "Invoice generated and sent to importer.",
-    time: "8 hrs ago",
-    statusLabel: "Issued",
-  },
-];
-
-const docAlerts: AlertItem[] = [
-  {
-    id: "d1",
-    type: "documents",
-    title: "Compliance Doc Missing",
-    message: "Certificate required for customs processing.",
-    time: "30 min ago",
-    statusLabel: "Missing",
-  },
-];
-
-function AlertIcon({ type }: { type: AlertItem["type"] }) {
-  if (type === "shipment") return <Truck className="h-5 w-5" />;
-  if (type === "payment") return <Ship className="h-5 w-5" />;
-  return <FileText className="h-5 w-5" />;
-}
-
 export default function AdminNotificationsPage() {
+  const authFetch = useAuthFetch();
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [broadcasting, setBroadcasting] = useState(false);
+  const [form, setForm] = useState({
+    title: "",
+    message: "",
+    targetRole: "",
+    type: "GENERAL"
+  });
+
+  const fetchNotifications = async () => {
+    try {
+      const data = await authFetch("/api/admin/notifications");
+      setNotifications(data.notifications || []);
+    } catch (error) {
+      toast.error("Failed to fetch notification history.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
+  const handleBroadcast = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.title || !form.message) return;
+
+    setBroadcasting(true);
+    try {
+      await authFetch("/api/admin/notifications", {
+        method: "POST",
+        body: JSON.stringify(form)
+      });
+      toast.success("Broadcast successfully dispatched.");
+      setForm({ title: "", message: "", targetRole: "", type: "GENERAL" });
+      fetchNotifications();
+    } catch (error) {
+      toast.error("Failed to dispatch broadcast.");
+    } finally {
+      setBroadcasting(false);
+    }
+  };
+
   return (
-      <div className="space-y-6">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight">Notifications & Alerts</h1>
-            <p className="text-sm text-muted-foreground">Shipments, payments, and compliance signals.</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              onClick={() => toast.message("Filter UI-only in this pass")}
-            >
-              <Bell className="h-4 w-4" />
-              Filter
-            </Button>
-            <Button
-              onClick={() => toast.success("Marked all as read")}
-            >
-              <CheckCheck className="h-4 w-4" />
-              Mark all as read
-            </Button>
-            <Button variant="ghost" onClick={() => toast.message("Help coming soon")}
-            >
-              <HelpCircle className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+    <div className="h-dvh flex flex-col bg-[#0b1019] relative overflow-hidden">
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f2937_1px,transparent_1px),linear-gradient(to_bottom,#1f2937_1px,transparent_1px)] bg-[length:40px_40px] opacity-[0.03] pointer-events-none" />
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Section title="Shipment updates" badge="3 new" items={shipmentAlerts} />
-          <Section title="Payments" badge="1 action" items={paymentAlerts} />
-          <Section title="Documents" badge="1 missing" items={docAlerts} />
+      {/* Header */}
+      <header className="flex-shrink-0 h-20 px-8 flex items-center justify-between border-b border-white/5 bg-[#0b1019]/30 backdrop-blur-md z-30">
+        <div>
+          <h1 className="text-xl font-black text-white uppercase tracking-widest flex items-center gap-2">
+            Signal Broadcaster
+            <span className="text-[10px] bg-primary/20 text-primary border border-primary/30 px-2 py-0.5 rounded">
+              NODE_COMMS
+            </span>
+          </h1>
+          <p className="text-slate-500 text-xs font-medium italic">Broadcast high-priority alerts and system updates to target sectors.</p>
         </div>
-      </div>
-  );
-}
+      </header>
 
-function Section({
-  title,
-  badge,
-  items,
-}: {
-  title: string;
-  badge: string;
-  items: AlertItem[];
-}) {
-  return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <div className="text-sm font-black uppercase tracking-widest text-muted-foreground">
-          {title}
-        </div>
-        <span className="rounded-full border border-border bg-muted px-3 py-1 text-xs font-black text-muted-foreground">
-          {badge}
-        </span>
-      </div>
+      {/* Main Content */}
+      <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-8">
 
-      <div className="space-y-3">
-        {items.map((a, idx) => (
-          <motion.div
-            key={a.id}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.06 }}
-            className="rounded-2xl border border-border bg-card p-5 shadow-sm hover:shadow-md transition-shadow"
-          >
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex items-start gap-3">
-                <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary grid place-items-center">
-                  <AlertIcon type={a.type} />
+          {/* Dispatch Center */}
+          <div className="space-y-6">
+            <div className="bg-[#151c2a]/40 backdrop-blur-xl border border-white/5 p-8 rounded-3xl relative overflow-hidden shadow-2xl">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="size-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                  <Send className="w-5 h-5" />
                 </div>
-                <div>
-                  <div className="text-sm font-black">{a.title}</div>
-                  <div className="mt-1 text-xs text-muted-foreground leading-relaxed">
-                    {a.message}
+                <h2 className="text-white font-black text-lg uppercase tracking-widest">Global Dispatch</h2>
+              </div>
+
+              <form onSubmit={handleBroadcast} className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Signal Title</label>
+                  <input
+                    type="text"
+                    placeholder="Enter urgent title..."
+                    className="w-full bg-[#0b1019]/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all"
+                    value={form.title}
+                    onChange={(e) => setForm({ ...form, title: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Transmission Message</label>
+                  <textarea
+                    rows={4}
+                    placeholder="Compose system announcement..."
+                    className="w-full bg-[#0b1019]/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all resize-none"
+                    value={form.message}
+                    onChange={(e) => setForm({ ...form, message: e.target.value })}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Target Sector</label>
+                    <select
+                      className="w-full bg-[#0b1019]/50 border border-white/10 rounded-xl px-4 py-3 text-xs text-slate-300 outline-none focus:border-primary/50"
+                      value={form.targetRole}
+                      onChange={(e) => setForm({ ...form, targetRole: e.target.value })}
+                    >
+                      <option value="">ALL ENTITIES</option>
+                      <option value="EXPORTER">EXPORTERS</option>
+                      <option value="IMPORTER">IMPORTERS</option>
+                      <option value="ADMIN">ADMINS</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Signal Protocol</label>
+                    <select
+                      className="w-full bg-[#0b1019]/50 border border-white/10 rounded-xl px-4 py-3 text-xs text-slate-300 outline-none focus:border-primary/50"
+                      value={form.type}
+                      onChange={(e) => setForm({ ...form, type: e.target.value })}
+                    >
+                      <option value="GENERAL">STANDARD SIGNAL</option>
+                      <option value="ALERT">URGENT ALERT</option>
+                      <option value="SUCCESS">SYSTEM SUCCESS</option>
+                      <option value="WARNING">MAINTENANCE WARNING</option>
+                    </select>
                   </div>
                 </div>
-              </div>
 
-              <div className="flex items-center gap-1 text-xs text-muted-foreground whitespace-nowrap">
-                <Clock className="h-3.5 w-3.5" />
-                {a.time}
-              </div>
+                <button
+                  type="submit"
+                  disabled={broadcasting || !form.title || !form.message}
+                  className="w-full bg-primary text-white py-4 rounded-2xl text-xs font-black uppercase tracking-[0.2em] shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-3"
+                >
+                  {broadcasting ? <Zap className="w-4 h-4 animate-spin" /> : <Volume2 className="w-4 h-4" />}
+                  {broadcasting ? "DISPATCHING..." : "DISPATCH BROADCAST"}
+                </button>
+              </form>
+            </div>
+          </div>
+
+          {/* Historical Logs */}
+          <div className="space-y-6">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-white font-black text-[10px] uppercase tracking-[0.3em] flex items-center gap-2">
+                <Clock className="w-3.5 h-3.5 text-slate-500" />
+                Transmission Log
+              </h2>
+              <span className="text-[9px] text-slate-600 font-mono tracking-widest">RE-SYS // COMMS_v2.0</span>
             </div>
 
-            <div className="mt-4 flex items-center justify-between">
-              <span className="rounded-full bg-muted px-3 py-1 text-[10px] font-black uppercase tracking-widest text-primary">
-                {a.statusLabel}
-              </span>
-              <button
-                type="button"
-                className="text-xs font-black text-muted-foreground hover:text-primary transition-colors"
-                onClick={() => toast.message("Details view not wired yet")}
-              >
-                View details →
-              </button>
+            <div className="space-y-4">
+              {loading ? (
+                Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="h-24 bg-white/5 rounded-2xl animate-pulse" />
+                ))
+              ) : notifications.length === 0 ? (
+                <div className="h-64 flex items-center justify-center border border-dashed border-white/10 rounded-3xl text-slate-500 italic text-xs">
+                  No historical transmissions detected.
+                </div>
+              ) : (
+                notifications.map((n, i) => (
+                  <motion.div
+                    key={n.id}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                    className="bg-[#151c2a]/40 backdrop-blur-xl border border-white/5 p-5 rounded-2xl group hover:border-primary/20 transition-all shadow-xl"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex gap-3">
+                        <div className={clsx(
+                          "size-8 rounded-lg flex items-center justify-center border",
+                          n.type === "ALERT" ? "bg-red-500/10 text-red-500 border-red-500/20" :
+                            n.type === "SUCCESS" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" :
+                              "bg-blue-500/10 text-blue-400 border-blue-500/20"
+                        )}>
+                          <Bell className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <div className="text-sm font-bold text-white group-hover:text-primary transition-colors">{n.title}</div>
+                          <div className="text-[9px] text-slate-500 font-mono flex items-center gap-1.5 mt-0.5">
+                            <Clock className="w-2.5 h-2.5" />
+                            {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })}
+                          </div>
+                        </div>
+                      </div>
+                      <span className="text-[8px] font-black tracking-widest bg-white/5 text-slate-400 px-2 py-0.5 rounded border border-white/10 uppercase">
+                        {n.type}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-400 font-medium leading-relaxed pl-11">
+                      {n.message}
+                    </p>
+                  </motion.div>
+                ))
+              )}
             </div>
-          </motion.div>
-        ))}
+          </div>
+
+        </div>
       </div>
     </div>
   );

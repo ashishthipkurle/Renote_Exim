@@ -1,122 +1,217 @@
-import Link from "next/link";
-import { prisma } from "@/lib/prisma";
+"use client";
 
-export const dynamic = "force-dynamic";
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  ShoppingCart,
+  Search,
+  Filter,
+  Eye,
+  ChevronLeft,
+  ChevronRight,
+  TrendingUp,
+  Building2,
+  Clock,
+  CheckCircle2,
+  AlertCircle,
+  Truck,
+  Hash,
+  DollarSign,
+  Briefcase
+} from "lucide-react";
+import { useAuthFetch } from "@/lib/hooks/useAuthFetch";
+import { format } from "date-fns";
+import { toast } from "sonner";
+import clsx from "clsx";
 
-const PAGE_SIZE = 20;
+type Order = {
+  id: string;
+  total: number;
+  status: string;
+  createdAt: string;
+  user: {
+    name: string;
+    companyName: string;
+  };
+};
 
-function formatMoney(amount: number) {
-  return new Intl.NumberFormat(undefined, {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
+export default function AdminOrdersPage() {
+  const authFetch = useAuthFetch();
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
 
-export default async function AdminOrdersPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ page?: string }>;
-}) {
-  const params = await searchParams;
-  const page = Math.max(1, parseInt(params.page || "1", 10) || 1);
+  const fetchOrders = async () => {
+    setLoading(true);
+    try {
+      const url = `/api/admin/orders?page=${page}&q=${encodeURIComponent(search)}&status=${statusFilter}`;
+      const data = await authFetch(url);
+      setOrders(data.orders || []);
+      setTotal(data.total || 0);
+      setTotalPages(data.totalPages || 1);
+    } catch (error) {
+      toast.error("Failed to fetch orders");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const [orders, total] = await Promise.all([
-    prisma.order.findMany({
-      skip: (page - 1) * PAGE_SIZE,
-      take: PAGE_SIZE,
-      orderBy: { createdAt: "desc" },
-      include: {
-        product: { select: { name: true } },
-        importer: { select: { name: true, companyName: true } },
-        shipment: { select: { trackingNumber: true, status: true } },
-      },
-    }),
-    prisma.order.count(),
-  ]);
-
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  useEffect(() => {
+    const timer = setTimeout(fetchOrders, 300);
+    return () => clearTimeout(timer);
+  }, [page, search, statusFilter]);
 
   return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight">All Orders</h1>
-            <p className="text-sm text-muted-foreground">Global order monitoring across the platform.</p>
-          </div>
-          <span className="text-sm text-muted-foreground">{total} total</span>
+    <div className="h-dvh flex flex-col bg-[#0b1019] relative overflow-hidden">
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f2937_1px,transparent_1px),linear-gradient(to_bottom,#1f2937_1px,transparent_1px)] bg-[length:40px_40px] opacity-[0.03] pointer-events-none" />
+
+      {/* Header */}
+      <header className="flex-shrink-0 h-20 px-8 flex items-center justify-between border-b border-white/5 bg-[#0b1019]/30 backdrop-blur-md z-30">
+        <div>
+          <h1 className="text-xl font-black text-white uppercase tracking-widest flex items-center gap-2">
+            Transaction Logistics
+            <span className="text-[10px] bg-primary/20 text-primary border border-primary/30 px-2 py-0.5 rounded">
+              {total} OPERATIONS
+            </span>
+          </h1>
+          <p className="text-slate-500 text-xs font-medium italic font-mono uppercase tracking-tighter">Monitoring platform-wide commerce activity.</p>
         </div>
 
-        <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-sm">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-muted/40 text-muted-foreground">
-                <tr>
-                  <th className="text-left px-4 py-3 font-black uppercase tracking-widest text-[11px]">Order</th>
-                  <th className="text-left px-4 py-3 font-black uppercase tracking-widest text-[11px]">Product</th>
-                  <th className="text-left px-4 py-3 font-black uppercase tracking-widest text-[11px]">Importer</th>
-                  <th className="text-right px-4 py-3 font-black uppercase tracking-widest text-[11px]">Total</th>
-                  <th className="text-left px-4 py-3 font-black uppercase tracking-widest text-[11px]">Status</th>
-                  <th className="text-left px-4 py-3 font-black uppercase tracking-widest text-[11px]">Shipment</th>
-                </tr>
-              </thead>
-              <tbody>
-                {orders.map((o) => (
-                  <tr key={o.id} className="border-t border-border">
-                    <td className="px-4 py-3 font-semibold">{o.orderNumber}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{o.product.name}</td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {o.importer.companyName || o.importer.name}
-                    </td>
-                    <td className="px-4 py-3 text-right font-bold">{formatMoney(o.totalPrice)}</td>
-                    <td className="px-4 py-3">
-                      <span className="rounded-full bg-primary/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-primary">
-                        {o.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {o.shipment ? `${o.shipment.trackingNumber} (${o.shipment.status})` : "—"}
-                    </td>
-                  </tr>
-                ))}
-                {orders.length === 0 && (
-                  <tr>
-                    <td className="px-4 py-10 text-center text-muted-foreground" colSpan={6}>
-                      No orders yet.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+        <div className="flex items-center gap-4">
+          <div className="relative group">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-primary transition-colors" />
+            <input
+              type="text"
+              placeholder="Search Order ID, Company..."
+              className="bg-[#151c2a]/50 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-sm text-white focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none w-64 transition-all"
+              value={search}
+              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            />
           </div>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between border-t border-border px-4 py-3 text-sm">
-              <span className="text-muted-foreground">
-                Page {page} of {totalPages}
-              </span>
-              <div className="flex gap-2">
-                {page > 1 && (
-                  <Link
-                    href={`/dashboard/admin/orders?page=${page - 1}`}
-                    className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold hover:bg-muted transition-colors"
-                  >
-                    ← Previous
-                  </Link>
-                )}
-                {page < totalPages && (
-                  <Link
-                    href={`/dashboard/admin/orders?page=${page + 1}`}
-                    className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold hover:bg-muted transition-colors"
-                  >
-                    Next →
-                  </Link>
-                )}
-              </div>
+          <select
+            className="bg-[#151c2a]/50 border border-white/10 rounded-xl px-3 py-2 text-xs text-slate-300 outline-none focus:border-primary/50"
+            value={statusFilter}
+            onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
+          >
+            <option value="">All Statuses</option>
+            {["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"].map(s => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
+        </div>
+      </header>
+
+      {/* Table Area */}
+      <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+        <div className="bg-[#151c2a]/40 backdrop-blur-xl border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-white/5 bg-white/5">
+                <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Operation ID</th>
+                <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Client Entity</th>
+                <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Fiscal Value</th>
+                <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Status Vector</th>
+                <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest text-right">Time Log</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {loading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={i} className="animate-pulse">
+                    <td colSpan={5} className="px-6 py-8"><div className="h-4 bg-white/5 rounded w-full" /></td>
+                  </tr>
+                ))
+              ) : orders.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-12 text-center text-slate-500 text-sm font-medium italic">No transactions detected in current sector.</td>
+                </tr>
+              ) : (
+                orders.map((o) => (
+                  <tr key={o.id} className="group hover:bg-white/[0.02] transition-colors cursor-pointer">
+                    <td className="px-6 py-5">
+                      <div className="flex items-center gap-3">
+                        <div className="size-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                          <Hash className="w-4 h-4" />
+                        </div>
+                        <div className="text-xs font-mono font-black text-white group-hover:text-primary transition-colors">
+                          {o.id.substring(0, 12).toUpperCase()}...
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="flex flex-col">
+                        <div className="text-sm font-bold text-slate-300 flex items-center gap-1.5">
+                          <Building2 className="w-3.5 h-3.5 text-slate-500" />
+                          {o.user?.companyName || o.user?.name}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="flex items-center gap-1 text-emerald-400 font-black text-sm">
+                        <DollarSign className="w-3.5 h-3.5" />
+                        {o.total.toLocaleString()}
+                      </div>
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="flex justify-center">
+                        <span className={clsx(
+                          "text-[9px] font-black tracking-[0.2em] px-3 py-1 rounded border uppercase",
+                          o.status === "DELIVERED" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" :
+                            o.status === "PENDING" ? "bg-blue-500/10 text-blue-400 border-blue-500/20" :
+                              o.status === "CANCELLED" ? "bg-red-500/10 text-red-500 border-red-500/20" :
+                                "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                        )}>
+                          {o.status}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-5 text-right">
+                      <div className="flex flex-col items-end">
+                        <div className="text-[10px] text-white font-bold">{format(new Date(o.createdAt), "dd MMM yyyy")}</div>
+                        <div className="text-[9px] text-slate-500 font-medium flex items-center gap-1 mt-0.5">
+                          <Clock className="w-2.5 h-2.5" />
+                          {format(new Date(o.createdAt), "HH:mm")}
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        <div className="mt-8 flex items-center justify-between">
+          <p className="text-[10px] text-slate-500 font-mono font-black uppercase tracking-widest">
+            Scan range: <span className="text-white">{(page - 1) * 20 + 1}</span> - <span className="text-white">{Math.min(page * 20, total)}</span> / <span className="text-white">{total}</span>
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              disabled={page === 1}
+              onClick={() => setPage(p => p - 1)}
+              className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#151c2a]/60 border border-white/5 text-slate-400 hover:text-white hover:border-primary/50 transition-all disabled:opacity-30 disabled:pointer-events-none"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <div className="h-10 px-4 flex items-center rounded-xl bg-primary text-white text-[10px] font-black shadow-lg shadow-primary/20">
+              {page}
             </div>
-          )}
+            <button
+              disabled={page >= totalPages}
+              onClick={() => setPage(p => p + 1)}
+              className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#151c2a]/60 border border-white/5 text-slate-400 hover:text-white hover:border-primary/50 transition-all disabled:opacity-30 disabled:pointer-events-none"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
         </div>
       </div>
+    </div>
   );
 }
