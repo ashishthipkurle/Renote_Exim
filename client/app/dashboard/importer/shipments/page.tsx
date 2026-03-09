@@ -1,30 +1,17 @@
 import { redirect } from "next/navigation";
-import { Truck, MapPin } from "lucide-react";
-
+import { Truck, Archive, PackageCheck } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getServerAuth } from "@/lib/supabase/server";
-
-const SHIPMENT_STATUS: Record<string, { label: string; color: string }> = {
-  PREPARING: { label: "Preparing", color: "text-yellow-500 bg-yellow-500/10 border-yellow-500/20" },
-  IN_TRANSIT: { label: "In Transit", color: "text-cyan-400 bg-cyan-400/10 border-cyan-400/20" },
-  CUSTOMS: { label: "Customs", color: "text-purple-400 bg-purple-400/10 border-purple-400/20" },
-  OUT_FOR_DELIVERY: { label: "Out for Delivery", color: "text-blue-400 bg-blue-400/10 border-blue-400/20" },
-  DELIVERED: { label: "Delivered", color: "text-emerald-400 bg-emerald-400/10 border-emerald-400/20" },
-  RETURNED: { label: "Returned", color: "text-red-400 bg-red-400/10 border-red-400/20" },
-};
-
-function formatDate(d: Date) {
-  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(d);
-}
+import ShipmentCard from "@/components/dashboard/ShipmentCard";
 
 export default async function ImporterShipmentsPage() {
   const auth = await getServerAuth();
   if (!auth) redirect("/login");
+
   if (auth.role !== "IMPORTER" && auth.role !== "ADMIN") {
     redirect(`/dashboard/${auth.role.toLowerCase()}`);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let shipments: any[] = [];
   try {
     shipments = await prisma.shipment.findMany({
@@ -33,17 +20,16 @@ export default async function ImporterShipmentsPage() {
         order: {
           include: {
             product: {
-              select: { name: true },
+              select: { name: true, images: true, price: true },
               include: { exporter: { select: { name: true, companyName: true } } },
             },
           },
         },
       },
       orderBy: { createdAt: "desc" },
-      take: 50,
     });
   } catch (e) {
-    console.warn("Failed to fetch shipments (DB may be unavailable):", e);
+    console.warn("Shipment fetch error:", e);
   }
 
   const activeShipments = shipments.filter((s) =>
@@ -54,120 +40,99 @@ export default async function ImporterShipmentsPage() {
   return (
     <div className="h-dvh overflow-hidden flex flex-col bg-gradient-to-br from-[#0a0c12] via-[#0d1017] to-[#0a0c12]">
       <header className="flex-shrink-0 p-6 lg:p-8 border-b border-white/5">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-white">Order Tracking</h1>
-            <p className="text-slate-400 mt-1">
-              Track your shipments — {activeShipments.length} active, {deliveredShipments.length} delivered
-            </p>
+            <h1 className="text-3xl font-black tracking-tight text-white flex items-center gap-3">
+              Global Logistics
+              <div className="flex -space-x-2">
+                <div className="size-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse" />
+                <div className="size-2 rounded-full bg-emerald-500/50" />
+              </div>
+            </h1>
+            <p className="text-slate-400 mt-1">Real-time status of your inbound international shipments.</p>
+          </div>
+
+          <div className="flex gap-4">
+            <div className="bg-[#151c2a]/60 px-5 py-3 rounded-2xl border border-white/5 flex items-center gap-3">
+              <Truck className="w-5 h-5 text-primary" />
+              <div>
+                <div className="text-[10px] font-black text-slate-500 uppercase">Active</div>
+                <div className="text-sm font-black text-white">{activeShipments.length}</div>
+              </div>
+            </div>
+            <div className="bg-[#151c2a]/60 px-5 py-3 rounded-2xl border border-white/5 flex items-center gap-3">
+              <PackageCheck className="w-5 h-5 text-emerald-400" />
+              <div>
+                <div className="text-[10px] font-black text-slate-500 uppercase">Received</div>
+                <div className="text-sm font-black text-white">{deliveredShipments.length}</div>
+              </div>
+            </div>
           </div>
         </div>
       </header>
 
       <div className="flex-1 overflow-y-auto p-6 lg:p-8">
-        <div className="max-w-[1600px] mx-auto grid grid-cols-1 xl:grid-cols-12 gap-6">
-          {/* Active shipments */}
-          <section className="xl:col-span-7 space-y-4">
-            <h2 className="text-lg font-bold text-white">Active Shipments</h2>
+        <div className="max-w-[1600px] mx-auto grid grid-cols-1 xl:grid-cols-12 gap-8">
+          {/* Active Shipments Section */}
+          <div className="xl:col-span-8 space-y-6">
+            <h2 className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
+              <div className="size-1.5 rounded-full bg-primary" />
+              In Transit Monitoring
+            </h2>
+
             {activeShipments.length === 0 ? (
-              <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-xl rounded-2xl p-8 text-center">
-                <Truck className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-                <p className="text-slate-400 text-sm">No active shipments</p>
+              <div className="bg-[#151c2a]/40 backdrop-blur-xl border border-dashed border-white/10 rounded-3xl p-20 text-center">
+                <Archive className="w-12 h-12 text-slate-700 mx-auto mb-4" />
+                <h3 className="text-lg font-bold text-white mb-1">No Active Shipments</h3>
+                <p className="text-slate-500 text-sm">Your inbound logistics pipeline is currently empty.</p>
               </div>
             ) : (
-              activeShipments.map((shipment) => {
-                const cfg = SHIPMENT_STATUS[shipment.status] ?? SHIPMENT_STATUS.PREPARING;
-                const steps = ["Order Processed", "In Transit", "Customs Clearance", "Final Delivery"];
-                const activeStep =
-                  shipment.status === "PREPARING" ? 0
-                  : shipment.status === "IN_TRANSIT" ? 1
-                  : shipment.status === "CUSTOMS" ? 2
-                  : 3;
-
-                return (
-                  <div
-                    key={shipment.id}
-                    className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-xl rounded-2xl overflow-hidden"
-                  >
-                    <div className="p-6 border-b border-white/10 flex items-center justify-between">
-                      <div>
-                        <div className="text-white font-bold tracking-tight font-mono">
-                          {shipment.trackingNumber}
-                        </div>
-                        <div className="text-slate-400 text-xs mt-1">
-                          {shipment.order.product.name} —{" "}
-                          {shipment.order.product.exporter.companyName || shipment.order.product.exporter.name}
-                        </div>
-                      </div>
-                      <span className={`px-3 py-1.5 rounded-full border text-xs font-bold ${cfg.color}`}>
-                        {cfg.label}
-                      </span>
-                    </div>
-
-                    <div className="p-6">
-                      <div className="flex items-center justify-between text-xs text-slate-400 mb-4">
-                        <span>Carrier: {shipment.carrier ?? "TBD"}</span>
-                        <span>
-                          ETA: {shipment.estimatedArrival ? formatDate(shipment.estimatedArrival) : "TBD"}
-                        </span>
-                      </div>
-
-                      <div className="space-y-3">
-                        {steps.map((step, idx) => (
-                          <div
-                            key={step}
-                            className={
-                              "rounded-xl border border-white/10 px-4 py-3 flex items-center justify-between " +
-                              (idx > activeStep ? "opacity-40 bg-transparent" : "bg-white/5")
-                            }
-                          >
-                            <div className="text-white font-semibold text-sm">{step}</div>
-                            <div className="text-xs text-slate-400">
-                              {idx < activeStep ? "Completed" : idx === activeStep ? "Current" : "Pending"}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="mt-4 w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
-                        <div
-                          className="bg-primary h-full rounded-full transition-all"
-                          style={{ width: `${((activeStep + 1) / steps.length) * 100}%` }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                );
-              })
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {activeShipments.map((shipment) => (
+                  <ShipmentCard key={shipment.id} shipment={shipment} />
+                ))}
+              </div>
             )}
-          </section>
+          </div>
 
-          {/* Delivered shipments archive */}
-          <section className="xl:col-span-5 space-y-4">
-            <h2 className="text-lg font-bold text-white">Delivered</h2>
+          {/* Delivered Archive */}
+          <div className="xl:col-span-4 space-y-6">
+            <h2 className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
+              <div className="size-1.5 rounded-full bg-emerald-500" />
+              Delivery History
+            </h2>
+
             {deliveredShipments.length === 0 ? (
-              <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-xl rounded-2xl p-8 text-center">
-                <p className="text-slate-400 text-sm">No delivered shipments yet</p>
+              <div className="bg-[#151c2a]/40 border border-white/5 rounded-3xl p-8 text-center">
+                <p className="text-slate-600 text-xs font-bold uppercase tracking-widest">Archive Empty</p>
               </div>
             ) : (
-              <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-xl rounded-2xl p-6 space-y-3">
+              <div className="space-y-4">
                 {deliveredShipments.map((s) => (
                   <div
                     key={s.id}
-                    className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 flex items-center justify-between"
+                    className="group bg-[#151c2a]/60 backdrop-blur-md border border-white/5 hover:border-emerald-500/20 transition-all rounded-2xl p-4 flex items-center justify-between"
                   >
-                    <div>
-                      <div className="text-white text-sm font-bold font-mono">{s.trackingNumber}</div>
-                      <div className="text-slate-400 text-xs">{s.order.product.name}</div>
+                    <div className="flex items-center gap-3">
+                      <div className="size-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
+                        <PackageCheck className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <div className="text-xs font-mono font-black text-white uppercase">{s.trackingNumber}</div>
+                        <div className="text-[10px] text-slate-500 font-bold truncate max-w-[150px]">{s.order.product.name}</div>
+                      </div>
                     </div>
-                    <div className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-400/10 border border-emerald-400/20 text-emerald-400">
-                      DELIVERED
+                    <div className="text-right">
+                      <div className="text-emerald-400 font-black text-[10px] uppercase tracking-widest leading-none">Delivered</div>
+                      <div className="text-slate-600 text-[10px] font-bold mt-1">
+                        {s.actualArrival ? new Date(s.actualArrival).toLocaleDateString() : "Historical"}
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
             )}
-          </section>
+          </div>
         </div>
       </div>
     </div>

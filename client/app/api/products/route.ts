@@ -154,21 +154,33 @@ export async function POST(request: NextRequest) {
 
     // Try Prisma first
     try {
-      const product = await prisma.product.create({
-        data: {
-          ...validatedData,
-          exporterId: auth.userId,
-        },
-        include: {
-          exporter: {
-            select: {
-              id: true,
-              name: true,
-              companyName: true,
-              country: true,
+      const product = await prisma.$transaction(async (tx) => {
+        const newProduct = await tx.product.create({
+          data: {
+            ...validatedData,
+            exporterId: auth.userId,
+          },
+          include: {
+            exporter: {
+              select: {
+                id: true,
+                name: true,
+                companyName: true,
+                country: true,
+              },
             },
           },
-        },
+        });
+
+        // Record initial price in history
+        await tx.priceHistory.create({
+          data: {
+            productId: newProduct.id,
+            price: newProduct.price,
+          },
+        });
+
+        return newProduct;
       });
 
       return NextResponse.json({ product }, { status: 201 });

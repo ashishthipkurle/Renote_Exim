@@ -72,47 +72,85 @@ export async function GET(request: NextRequest) {
     }
 
     if (auth.role === 'IMPORTER') {
-      const [totalOrders, totalShipments, activeShipments, customsHolds, totalSpent, uniqueRegions, monthlySpend] =
-        await Promise.all([
-          prisma.order.count({ where: { importerId: auth.userId } }),
-          prisma.shipment.count({ where: { order: { importerId: auth.userId } } }),
-          prisma.shipment.count({
-            where: {
-              order: { importerId: auth.userId },
-              status: { in: ['PREPARING', 'IN_TRANSIT', 'OUT_FOR_DELIVERY'] },
-            },
-          }),
-          prisma.shipment.count({
-            where: {
-              order: { importerId: auth.userId },
-              status: 'CUSTOMS',
-            },
-          }),
-          prisma.order.aggregate({
-            where: { importerId: auth.userId, paymentStatus: { in: ['PAID', 'PARTIAL'] } },
-            _sum: { totalPrice: true },
-          }),
-          // Unique origin countries from products ordered
-          prisma.$queryRaw`
-            SELECT COUNT(DISTINCT p."originCountry") as count
-            FROM orders o
-            JOIN products p ON o."productId" = p.id
-            WHERE o."importerId" = ${auth.userId}
-          ` as Promise<Array<{ count: number }>>,
-          // Monthly spending for last 6 months
-          prisma.$queryRaw`
-            SELECT 
-              DATE_TRUNC('month', o."createdAt") as month,
-              COALESCE(SUM(o."totalPrice"), 0) as spent,
-              COUNT(o.id) as "orderCount"
-            FROM orders o
-            WHERE o."importerId" = ${auth.userId}
-              AND o."paymentStatus" IN ('PAID', 'PARTIAL')
-              AND o."createdAt" >= NOW() - INTERVAL '6 months'
-            GROUP BY DATE_TRUNC('month', o."createdAt")
-            ORDER BY month ASC
-          ` as Promise<Array<{ month: Date; spent: number; orderCount: number }>>,
-        ]);
+      const [
+        totalOrders,
+        totalShipments,
+        activeShipments,
+        customsHolds,
+        totalSpent,
+        uniqueRegions,
+        monthlySpend,
+        supplierBreakdown,
+        categorySpending,
+      ] = await Promise.all([
+        prisma.order.count({ where: { importerId: auth.userId } }),
+        prisma.shipment.count({ where: { order: { importerId: auth.userId } } }),
+        prisma.shipment.count({
+          where: {
+            order: { importerId: auth.userId },
+            status: { in: ['PREPARING', 'IN_TRANSIT', 'OUT_FOR_DELIVERY'] },
+          },
+        }),
+        prisma.shipment.count({
+          where: {
+            order: { importerId: auth.userId },
+            status: 'CUSTOMS',
+          },
+        }),
+        prisma.order.aggregate({
+          where: { importerId: auth.userId, paymentStatus: { in: ['PAID', 'PARTIAL'] } },
+          _sum: { totalPrice: true },
+        }),
+        // Unique origin countries from products ordered
+        prisma.$queryRaw`
+          SELECT COUNT(DISTINCT p."originCountry") as count
+          FROM orders o
+          JOIN products p ON o."productId" = p.id
+          WHERE o."importerId" = ${auth.userId}
+        ` as Promise<Array<{ count: number }>>,
+        // Monthly spending for last 6 months
+        prisma.$queryRaw`
+          SELECT 
+            DATE_TRUNC('month', o."createdAt") as month,
+            COALESCE(SUM(o."totalPrice"), 0) as spent,
+            COUNT(o.id) as "orderCount"
+          FROM orders o
+          WHERE o."importerId" = ${auth.userId}
+            AND o."paymentStatus" IN ('PAID', 'PARTIAL')
+            AND o."createdAt" >= NOW() - INTERVAL '6 months'
+          GROUP BY DATE_TRUNC('month', o."createdAt")
+          ORDER BY month ASC
+        ` as Promise<Array<{ month: Date; spent: number; orderCount: number }>>,
+        // Supplier breakdown (who they buy from most)
+        prisma.$queryRaw`
+          SELECT 
+            u.name as supplier,
+            u."companyName",
+            COALESCE(SUM(o."totalPrice"), 0) as spent,
+            COUNT(o.id) as "orderCount"
+          FROM orders o
+          JOIN products p ON o."productId" = p.id
+          JOIN users u ON p."exporterId" = u.id
+          WHERE o."importerId" = ${auth.userId}
+            AND o."paymentStatus" IN ('PAID', 'PARTIAL')
+          GROUP BY u.id, u.name, u."companyName"
+          ORDER BY spent DESC
+          LIMIT 5
+        ` as Promise<Array<{ supplier: string; companyName: string | null; spent: number; orderCount: number }>>,
+        // Spending by category
+        prisma.$queryRaw`
+          SELECT 
+            p.category,
+            COALESCE(SUM(o."totalPrice"), 0) as spent,
+            COUNT(o.id) as "orderCount"
+          FROM orders o
+          JOIN products p ON o."productId" = p.id
+          WHERE o."importerId" = ${auth.userId}
+            AND o."paymentStatus" IN ('PAID', 'PARTIAL')
+          GROUP BY p.category
+          ORDER BY spent DESC
+        ` as Promise<Array<{ category: string; spent: number; orderCount: number }>>,
+      ]);
 
       return NextResponse.json({
         role: 'IMPORTER',
@@ -126,6 +164,16 @@ export async function GET(request: NextRequest) {
           month: m.month,
           spent: Number(m.spent),
           orderCount: Number(m.orderCount),
+        })),
+        supplierBreakdown: (supplierBreakdown || []).map((s) => ({
+          name: s.companyName || s.supplier,
+          spent: Number(s.spent),
+          orderCount: Number(s.orderCount),
+        })),
+        categorySpending: (categorySpending || []).map((c) => ({
+          category: c.category,
+          spent: Number(c.spent),
+          orderCount: Number(c.orderCount),
         })),
       });
     }

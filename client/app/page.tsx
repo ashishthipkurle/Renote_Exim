@@ -94,7 +94,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-display selection:bg-primary selection:text-white overflow-x-hidden">
+    <div className="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-display selection:bg-primary selection:text-white">
       <HomeNavbar />
       <HomeHero />
       <ForwardMarquee />

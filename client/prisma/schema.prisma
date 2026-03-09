@@ -18,12 +18,17 @@ model User {
   country          String?
   phone            String?
   website          String?
+  businessType     String?
+  taxId            String?
+  address          String?
   verified         Boolean        @default(false)
   avatar           String?
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
   businessHours    Json?          @default("{}")
   description      String?
+  monthlyBudget    Float           @default(0)
+  preferredCategories String[]      @default([])
   socialLinks      Json?          @default("{}")
   documents        Document[]
   receivedMessages Message[]      @relation("Receiver")
@@ -33,6 +38,7 @@ model User {
   exportedProducts Product[]      @relation("ExporterProducts")
   shipments        Shipment[]
   suppliers        Supplier[]
+  wishlist         Wishlist[]
 
   @@map("users")
 }
@@ -56,6 +62,8 @@ model Product {
   quantity       Int             @default(0)
   orders         Order[]
   exporter       User            @relation("ExporterProducts", fields: [exporterId], references: [id], onDelete: Cascade)
+  wishlistedBy   Wishlist[]
+  priceHistory   PriceHistory[]
 
   @@map("products")
 }
@@ -168,6 +176,28 @@ model Supplier {
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("suppliers")
+}
+
+model Wishlist {
+  id        String   @id @default(uuid())
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@map("wishlists")
+}
+
+model PriceHistory {
+  id        String   @id @default(uuid())
+  productId String
+  price     Float
+  createdAt DateTime @default(now())
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("price_history")
 }
 
 enum Role {

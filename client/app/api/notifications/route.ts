@@ -14,12 +14,16 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const unreadOnly = searchParams.get('unread') === 'true';
+    const type = searchParams.get('type');
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
 
-    const where: Record<string, unknown> = { userId: auth.userId };
+    const where: Record<string, any> = { userId: auth.userId };
     if (unreadOnly) {
       where.read = false;
+    }
+    if (type && type !== 'all') {
+      where.type = type;
     }
 
     const [notifications, total, unreadCount] = await Promise.all([

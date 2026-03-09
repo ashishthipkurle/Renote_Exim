@@ -77,19 +77,33 @@ export async function PUT(
     const body = await request.json();
     const validatedData = productSchema.partial().parse(body);
 
-    const product = await prisma.product.update({
-      where: { id: params.id },
-      data: validatedData,
-      include: {
-        exporter: {
-          select: {
-            id: true,
-            name: true,
-            companyName: true,
-            country: true,
+    const product = await prisma.$transaction(async (tx) => {
+      const updatedProduct = await tx.product.update({
+        where: { id: params.id },
+        data: validatedData,
+        include: {
+          exporter: {
+            select: {
+              id: true,
+              name: true,
+              companyName: true,
+              country: true,
+            },
           },
         },
-      },
+      });
+
+      // If price was updated, record in history
+      if (validatedData.price !== undefined && validatedData.price !== existingProduct.price) {
+        await tx.priceHistory.create({
+          data: {
+            productId: updatedProduct.id,
+            price: validatedData.price,
+          },
+        });
+      }
+
+      return updatedProduct;
     });
 
     return NextResponse.json({ product });
