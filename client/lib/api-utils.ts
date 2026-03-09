@@ -79,3 +79,13 @@ export function getInitials(name: string | null | undefined): string {
     .toUpperCase()
     .slice(0, 2);
 }
+
+/** Format a date object or string into a standard readable format */
+export function formatDate(date: Date | string): string {
+  const d = new Date(date);
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(d);
+}

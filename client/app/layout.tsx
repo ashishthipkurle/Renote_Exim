@@ -5,6 +5,8 @@ import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 
+import CinematicPreloader from "@/components/ui/CinematicPreloader";
+
 const manrope = Manrope({
   subsets: ["latin"],
   variable: "--font-manrope",
@@ -37,6 +39,7 @@ export default function RootLayout({
       <body className={`${manrope.variable} font-sans antialiased`}>
         <ThemeProvider>
           <AuthProvider>
+            <CinematicPreloader />
             {children}
             <Toaster position="top-right" richColors />
           </AuthProvider>

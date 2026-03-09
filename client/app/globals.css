@@ -66,10 +66,6 @@
   }
   
   html, body {
-    height: 100dvh;
-    width: 100vw;
-    overflow: hidden !important;
-    position: fixed;
     scrollbar-width: none;
     -ms-overflow-style: none;
   }

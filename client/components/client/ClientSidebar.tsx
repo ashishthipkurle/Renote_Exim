@@ -55,13 +55,6 @@ export default function ClientSidebar({ basePath }: { basePath: string }) {
 
   return (
     <aside className="w-20 lg:w-64 border-r border-white/5 bg-[#0b1019] flex flex-col items-center lg:items-start py-6 transition-all duration-300 relative z-20">
-      <div className="px-6 mb-10 flex items-center gap-3">
-        <div className="size-10 bg-primary rounded-lg flex items-center justify-center shadow-lg shadow-primary/20">
-          <LayoutGrid className="text-white w-5 h-5" />
-        </div>
-        <h1 className="hidden lg:block text-xl font-bold tracking-tight text-white">Ranote <span className="text-primary">Exim</span></h1>
-      </div>
-
       <nav className="flex-1 w-full px-3 space-y-2">
         {nav.map((n) => (
           <Item key={n.href} href={n.href} label={n.label} icon={n.icon} basePath={basePath} />

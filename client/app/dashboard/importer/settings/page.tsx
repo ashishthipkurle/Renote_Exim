@@ -3,6 +3,25 @@
 import { useEffect, useState } from "react";
 import { authFetch } from "@/lib/api-utils";
 import { useAuth } from "@/components/auth/AuthProvider";
+import {
+  User,
+  Building2,
+  MapPin,
+  Globe,
+  Phone,
+  Mail,
+  Camera,
+  ShieldCheck,
+  Lock,
+  BellRing,
+  CreditCard,
+  Briefcase,
+  FileText,
+  Save,
+  Loader2,
+  CheckCircle2
+} from "lucide-react";
+import { toast } from "sonner";
 
 interface ProfileData {
   id: string;
@@ -12,6 +31,9 @@ interface ProfileData {
   country: string | null;
   phone: string | null;
   website: string | null;
+  businessType: string | null;
+  taxId: string | null;
+  address: string | null;
   avatar: string | null;
   role: string;
 }
@@ -21,7 +43,7 @@ export default function ImporterSettingsPage() {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+  const [activeTab, setActiveTab] = useState<"profile" | "business" | "security">("profile");
 
   const [form, setForm] = useState({
     name: "",
@@ -29,112 +51,197 @@ export default function ImporterSettingsPage() {
     country: "",
     phone: "",
     website: "",
+    businessType: "",
+    taxId: "",
+    address: "",
   });
 
   useEffect(() => {
-    authFetch<ProfileData>("/api/user/profile")
-      .then((d) => {
-        setProfile(d);
+    authFetch<{ user: ProfileData }>("/api/user/profile")
+      .then(({ user }) => {
+        setProfile(user);
         setForm({
-          name: d.name || "",
-          companyName: d.companyName || "",
-          country: d.country || "",
-          phone: d.phone || "",
-          website: d.website || "",
+          name: user.name || "",
+          companyName: user.companyName || "",
+          country: user.country || "",
+          phone: user.phone || "",
+          website: user.website || "",
+          businessType: user.businessType || "",
+          taxId: user.taxId || "",
+          address: user.address || "",
         });
       })
-      .catch(() => {})
+      .catch(() => toast.error("Failed to load profile"))
       .finally(() => setLoading(false));
   }, []);
 
   const handleSave = async () => {
     setSaving(true);
-    setMsg(null);
     try {
-      const res = await authFetch<ProfileData>("/api/user/profile", {
+      const res = await authFetch<{ user: ProfileData }>("/api/user/profile", {
         method: "PATCH",
         body: JSON.stringify(form),
       });
-      setProfile(res);
-      setMsg({ type: "ok", text: "Profile updated successfully" });
+      setProfile(res.user);
+      toast.success("Profile updated successfully");
       refreshUser();
     } catch {
-      setMsg({ type: "err", text: "Failed to update profile" });
+      toast.error("Update failed. Please try again.");
     } finally {
       setSaving(false);
     }
   };
 
-  const fields: { label: string; key: keyof typeof form; type?: string; placeholder: string }[] = [
-    { label: "Full Name", key: "name", placeholder: "John Doe" },
-    { label: "Company Name", key: "companyName", placeholder: "Global Imports Inc." },
-    { label: "Country", key: "country", placeholder: "United States" },
-    { label: "Phone Number", key: "phone", type: "tel", placeholder: "+1 555 123 4567" },
-    { label: "Website", key: "website", type: "url", placeholder: "https://example.com" },
-  ];
+  if (loading) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <Loader2 className="w-10 h-10 text-primary animate-spin" />
+      </div>
+    );
+  }
 
   return (
-    <div className="h-dvh overflow-hidden flex flex-col bg-gradient-to-br from-[#0a0c12] via-[#0d1017] to-[#0a0c12]">
+    <div className="h-dvh overflow-hidden flex flex-col bg-[#0a0c12]">
       <header className="flex-shrink-0 p-6 lg:p-8 border-b border-white/5">
-        <div>
-          <h1 className="text-3xl font-black tracking-tight text-white">Account Settings</h1>
-          <p className="text-slate-400 mt-1">Manage your profile and preferences.</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-black tracking-tight text-white italic">OPERATIONAL SETTINGS</h1>
+            <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-1">Configure your global procurement identity</p>
+          </div>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="bg-primary hover:bg-[#0f49bd] disabled:opacity-50 text-white font-black px-8 py-3.5 rounded-2xl flex items-center gap-2 transition-all shadow-xl shadow-primary/20 active:scale-95"
+          >
+            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+            Save Manifest
+          </button>
         </div>
       </header>
-      <div className="flex-1 overflow-y-auto p-6 lg:p-8">
-        <div className="max-w-[700px] mx-auto space-y-6">
-          {loading ? (
-            <div className="space-y-4">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="h-16 bg-[#151c2a]/60 rounded-xl animate-pulse border border-white/5" />
-              ))}
-            </div>
-          ) : (
-            <>
-              {/* Avatar + Email */}
-              <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6 flex items-center gap-5">
-                <div className="w-16 h-16 rounded-full bg-[#00f0ff]/20 flex items-center justify-center text-[#00f0ff] font-black text-xl">
-                  {form.name ? form.name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2) : "?"}
-                </div>
-                <div>
-                  <div className="text-white font-bold text-lg">{profile?.name || "—"}</div>
-                  <div className="text-slate-400 text-sm">{profile?.email}</div>
-                  <div className="text-xs text-[#00f0ff] font-bold mt-0.5 uppercase">{profile?.role}</div>
-                </div>
-              </div>
 
-              {/* Form */}
-              <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 rounded-2xl p-6 space-y-5">
-                {fields.map((f) => (
-                  <div key={f.key}>
-                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">{f.label}</label>
-                    <input
-                      type={f.type || "text"}
-                      value={form[f.key]}
-                      onChange={(e) => setForm((prev) => ({ ...prev, [f.key]: e.target.value }))}
-                      placeholder={f.placeholder}
-                      className="w-full bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-[#00f0ff] transition-colors"
-                    />
+      <div className="flex-1 flex overflow-hidden">
+        {/* Nav Sidebar */}
+        <aside className="w-72 border-r border-white/5 p-6 space-y-2 overflow-y-auto hidden lg:block">
+          <TabButton active={activeTab === "profile"} onClick={() => setActiveTab("profile")} icon={User} label="Profile Persona" />
+          <TabButton active={activeTab === "business"} onClick={() => setActiveTab("business")} icon={Building2} label="Entity Details" />
+          <TabButton active={activeTab === "security"} onClick={() => setActiveTab("security")} icon={Lock} label="Security Core" />
+        </aside>
+
+        <main className="flex-1 overflow-y-auto p-6 lg:p-12">
+          <div className="max-w-[800px] mx-auto space-y-12 pb-20">
+
+            {activeTab === "profile" && (
+              <section className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-10">
+                {/* Header Section */}
+                <div className="flex items-center gap-8">
+                  <div className="relative group">
+                    <div className="size-32 rounded-[2.5rem] bg-gradient-to-br from-primary/20 to-indigo-500/10 border-2 border-white/5 flex items-center justify-center text-4xl shadow-2xl relative overflow-hidden">
+                      {profile?.avatar ? (
+                        <img src={profile.avatar} className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="font-black text-white">{form.name?.[0]?.toUpperCase() || "I"}</span>
+                      )}
+                    </div>
+                    <button className="absolute -bottom-2 -right-2 size-10 rounded-2xl bg-primary text-white flex items-center justify-center shadow-xl border-4 border-[#0a0c12] group-hover:scale-110 transition-transform">
+                      <Camera className="w-4 h-4" />
+                    </button>
                   </div>
-                ))}
-
-                {msg && (
-                  <div className={`text-sm font-bold px-4 py-2.5 rounded-lg ${msg.type === "ok" ? "bg-emerald-500/20 text-emerald-400" : "bg-red-500/20 text-red-400"}`}>
-                    {msg.text}
+                  <div>
+                    <h2 className="text-2xl font-black text-white px-1">Institutional Profile</h2>
+                    <p className="text-slate-500 text-sm mt-1 px-1">How your entity appears to global exporters.</p>
+                    <div className="flex items-center gap-3 mt-4">
+                      <span className="px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest">Importer</span>
+                      <span className="flex items-center gap-1.5 text-slate-500 text-[10px] font-black uppercase tracking-widest italic">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-500" /> Verified Node
+                      </span>
+                    </div>
                   </div>
-                )}
+                </div>
 
-                <button
-                  onClick={handleSave}
-                  disabled={saving}
-                  className="w-full bg-primary hover:bg-[#0f49bd] disabled:opacity-50 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-primary/20 transition-colors"
-                >
-                  {saving ? "Saving…" : "Save Changes"}
-                </button>
-              </div>
-            </>
-          )}
-        </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <InputGroup label="Display Name" value={form.name} onChange={(v) => setForm({ ...form, name: v })} icon={User} placeholder="Operations Lead" />
+                  <InputGroup label="Institutional Email" value={profile?.email || ""} readOnly icon={Mail} />
+                  <InputGroup label="Direct Link (Website)" value={form.website} onChange={(v) => setForm({ ...form, website: v })} icon={Globe} placeholder="https://imports.global" />
+                  <InputGroup label="Phone Sequence" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} icon={Phone} placeholder="+1 (555) 000-0000" />
+                </div>
+              </section>
+            )}
+
+            {activeTab === "business" && (
+              <section className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-10">
+                <div className="flex items-center gap-4 border-b border-white/5 pb-6">
+                  <Building2 className="w-6 h-6 text-primary" />
+                  <h2 className="text-xl font-black text-white uppercase tracking-tighter">Corporate Identity</h2>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="md:col-span-2">
+                    <InputGroup label="Legal Entity Name" value={form.companyName} onChange={(v) => setForm({ ...form, companyName: v })} icon={Building2} placeholder="Acme Logistics International" />
+                  </div>
+                  <InputGroup label="Business Classification" value={form.businessType} onChange={(v) => setForm({ ...form, businessType: v })} icon={Briefcase} placeholder="Wholesale / Distribution" />
+                  <InputGroup label="Tax Identification Number" value={form.taxId} onChange={(v) => setForm({ ...form, taxId: v })} icon={FileText} placeholder="TAX-990-2211" />
+                  <div className="md:col-span-2">
+                    <InputGroup label="Global Headquarter Address" value={form.address} onChange={(v) => setForm({ ...form, address: v })} icon={MapPin} placeholder="123 Trade Circle, Port Elizabeth" />
+                  </div>
+                  <InputGroup label="Operational Region" value={form.country} onChange={(v) => setForm({ ...form, country: v })} icon={Globe} placeholder="Select Country" />
+                </div>
+              </section>
+            )}
+
+            {activeTab === "security" && (
+              <section className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-10">
+                <div className="flex items-center gap-4 border-b border-white/5 pb-6">
+                  <ShieldCheck className="w-6 h-6 text-primary" />
+                  <h2 className="text-xl font-black text-white uppercase tracking-tighter">Security Protocols</h2>
+                </div>
+
+                <div className="p-8 rounded-[2.5rem] bg-white/5 border border-white/5 border-dashed text-center space-y-4">
+                  <Lock className="w-12 h-12 text-slate-700 mx-auto" />
+                  <h3 className="text-white font-black uppercase tracking-widest text-sm">Access Credential Management</h3>
+                  <p className="text-slate-500 text-xs max-w-sm mx-auto">Update your security passcodes to maintain integrity within the global marketplace network.</p>
+                  <button className="px-6 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-white font-black text-[10px] uppercase tracking-widest transition-all">
+                    Initialize Password Reset
+                  </button>
+                </div>
+              </section>
+            )}
+
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
+
+function TabButton({ active, onClick, icon: Icon, label }: { active: boolean; onClick: () => void; icon: any; label: string }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`w-full flex items-center gap-4 p-4 rounded-2xl transition-all group ${active
+          ? "bg-primary text-white shadow-xl shadow-primary/20"
+          : "text-slate-500 hover:bg-white/5 hover:text-slate-200"
+        }`}
+    >
+      <Icon className={`w-4 h-4 ${active ? "animate-pulse" : ""}`} />
+      <span className="text-xs font-black uppercase tracking-widest">{label}</span>
+    </button>
+  );
+}
+
+function InputGroup({ label, value, onChange, icon: Icon, placeholder, readOnly }: { label: string; value: string; onChange?: (v: string) => void; icon: any; placeholder?: string; readOnly?: boolean }) {
+  return (
+    <div className="space-y-2.5">
+      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">{label}</label>
+      <div className="relative group/input">
+        <Icon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600 transition-colors group-focus-within/input:text-primary" />
+        <input
+          type="text"
+          value={value}
+          readOnly={readOnly}
+          onChange={(e) => onChange?.(e.target.value)}
+          placeholder={placeholder}
+          className={`w-full bg-white/5 border border-white/5 rounded-2xl py-4 pl-12 pr-6 text-white font-bold text-sm focus:ring-2 focus:ring-primary/40 outline-none transition-all placeholder:text-slate-700 ${readOnly ? "opacity-60 cursor-not-allowed" : "hover:border-white/10"}`}
+        />
       </div>
     </div>
   );
