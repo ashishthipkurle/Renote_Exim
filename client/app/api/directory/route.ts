@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
                     { companyName: { contains: search, mode: 'insensitive' } },
                 ],
                 ...(category && category !== 'all' ? {
-                    products: {
+                    exportedProducts: {
                         some: { category }
                     }
                 } : {})
@@ -33,11 +33,11 @@ export async function GET(request: NextRequest) {
                 id: true,
                 name: true,
                 companyName: true,
-                image: true,
+                avatar: true,
                 description: true,
                 _count: {
                     select: {
-                        products: true,
+                        exportedProducts: true,
                     }
                 },
             }

@@ -2,7 +2,20 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { prisma } from "@/lib/prisma";
-import { ProductCategory, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+
+type ProductCategory =
+  | "ELECTRONICS"
+  | "TEXTILES"
+  | "FOOD"
+  | "CHEMICALS"
+  | "MACHINES"
+  | "MEDICAL"
+  | "HANDICRAFTS"
+  | "AUTOMOTIVE"
+  | "CONSTRUCTION"
+  | "AGRICULTURE"
+  | "OTHER";
 
 export const dynamic = "force-dynamic";
 
@@ -79,7 +92,7 @@ export default async function ProductsPage({
     name: string;
     price: number;
     originCountry: string;
-    category: ProductCategory;
+    category: string;
     images: string[];
     quantity: number;
     exporter: { name: string | null; companyName: string | null; country: string | null };

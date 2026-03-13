@@ -38,6 +38,7 @@ export default async function EditProductPage({
         images: product.images,
         certifications: product.certifications,
         available: product.available,
+        quantity: product.quantity,
     };
 
     return <ProductForm initialData={productData} isEdit />;

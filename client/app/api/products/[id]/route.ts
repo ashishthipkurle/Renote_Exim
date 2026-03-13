@@ -6,11 +6,12 @@ import { z } from 'zod';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const product = await prisma.product.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         exporter: {
           select: {
@@ -46,9 +47,10 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const auth = await getApiAuthContext(request);
 
     if (!auth) {
@@ -57,7 +59,7 @@ export async function PUT(
 
     // Check if product exists and belongs to user
     const existingProduct = await prisma.product.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!existingProduct) {
@@ -79,7 +81,7 @@ export async function PUT(
 
     const product = await prisma.$transaction(async (tx) => {
       const updatedProduct = await tx.product.update({
-        where: { id: params.id },
+        where: { id },
         data: validatedData,
         include: {
           exporter: {
@@ -126,9 +128,10 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const auth = await getApiAuthContext(request);
 
     if (!auth) {
@@ -137,7 +140,7 @@ export async function DELETE(
 
     // Check if product exists and belongs to user
     const existingProduct = await prisma.product.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!existingProduct) {
@@ -155,7 +158,7 @@ export async function DELETE(
     }
 
     await prisma.product.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ message: 'Product deleted successfully' });

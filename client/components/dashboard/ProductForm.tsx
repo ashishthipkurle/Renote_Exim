@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, Save, Loader2, Plus, X, ImagePlus } from "lucide-react";
+import { ArrowLeft, Save, Loader2, Plus, X } from "lucide-react";
 import { authFetch } from "@/lib/api-utils";
 import Link from "next/link";
 import { toast } from "sonner";
+import ImageUploader from "./ImageUploader";
+
 
 const CATEGORIES = [
     { value: "AGRICULTURE", label: "Agriculture & Farming" },
@@ -136,10 +138,10 @@ export default function ProductForm({
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
-    const [newImageUrl, setNewImageUrl] = useState("");
     const [newCertification, setNewCertification] = useState("");
     const [customCategory, setCustomCategory] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -152,20 +154,6 @@ export default function ProductForm({
         } else {
             setForm((prev) => ({ ...prev, [name]: value }));
         }
-    };
-
-    const addImage = () => {
-        const url = newImageUrl.trim();
-        if (!url) return;
-        try {
-            new URL(url);
-        } catch {
-            setErrors((prev) => ({ ...prev, images: "Please enter a valid URL" }));
-            return;
-        }
-        setForm((prev) => ({ ...prev, images: [...prev.images, url] }));
-        setNewImageUrl("");
-        setErrors((prev) => ({ ...prev, images: "" }));
     };
 
     const removeImage = (index: number) => {
@@ -212,6 +200,8 @@ export default function ProductForm({
         try {
             setIsSubmitting(true);
 
+
+
             const apiUrl = isEdit ? `/api/products/${form.id}` : "/api/products";
             const method = isEdit ? "PUT" : "POST";
 
@@ -226,6 +216,7 @@ export default function ProductForm({
                 hsCode: form.hsCode || undefined,
                 images: form.images,
                 certifications: form.certifications,
+
                 quantity: form.quantity,
             };
 
@@ -462,46 +453,37 @@ export default function ProductForm({
                         <h2 className="text-[11px] font-black text-white tracking-[0.25em] uppercase opacity-50 italic">Asset Gallery</h2>
 
                         {/* Previews */}
-                        <div className="grid grid-cols-2 gap-3">
-                            {form.images.map((url, i) => (
-                                <div key={i} className="relative group rounded-2xl overflow-hidden border border-white/5 aspect-square bg-slate-900 shadow-xl">
-                                    <img src={url} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                                    <button
-                                        type="button"
-                                        onClick={() => removeImage(i)}
-                                        className="absolute top-2 right-2 p-2 bg-red-500/90 hover:bg-red-500 rounded-xl opacity-0 group-hover:opacity-100 transition-all active:scale-90 shadow-2xl"
+                        <ImageUploader 
+                            images={form.images} 
+                            onChange={(urls) => {
+                                setForm(prev => ({ ...prev, images: urls }));
+                                setErrors(prev => ({ ...prev, images: "" }));
+                            }} 
+                            maxFiles={4}
+                        />
+                        {/* Make sure we can still remove completed images from the main form state */}
+                        {form.images.length > 0 && (
+                            <div className="grid grid-cols-2 gap-3 mt-4">
+                                {form.images.map((url, i) => (
+                                    <div 
+                                        key={i} 
+                                        className="relative group rounded-xl overflow-hidden border border-white/10 aspect-square bg-slate-900 shadow-xl cursor-zoom-in"
+                                        onClick={() => setPreviewImage(url)}
                                     >
-                                        <X className="w-3 h-3 text-white" />
-                                    </button>
-                                </div>
-                            ))}
-                            {form.images.length < 4 && (
-                                <div className="rounded-2xl border-2 border-dashed border-white/5 flex flex-col items-center justify-center aspect-square text-slate-600 bg-white/[0.02]">
-                                    <ImagePlus className="w-6 h-6 mb-2 opacity-20" />
-                                    <span className="text-[8px] font-black tracking-widest uppercase opacity-40">Add Image</span>
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="space-y-3">
-                            <label className={labelClass}>New Media URL</label>
-                            <div className="flex gap-2">
-                                <input
-                                    value={newImageUrl}
-                                    onChange={(e) => setNewImageUrl(e.target.value)}
-                                    placeholder="https://..."
-                                    className={inputClass + " py-3 text-xs"}
-                                />
-                                <button
-                                    type="button"
-                                    onClick={addImage}
-                                    className="h-11 px-4 bg-primary hover:bg-[#0f49bd] text-white rounded-xl shadow-xl shadow-primary/20 transition-all active:scale-95"
-                                >
-                                    <Plus className="w-4 h-4" />
-                                </button>
+                                        <img src={url} alt="asset" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                        <button
+                                            type="button"
+                                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); removeImage(i); }}
+                                            className="absolute top-2 right-2 p-1.5 bg-red-500/90 hover:bg-red-500 rounded-lg shadow-xl opacity-0 md:group-hover:opacity-100 transition-all active:scale-90"
+                                            title="Remove image"
+                                        >
+                                            <X className="w-3 h-3 text-white" />
+                                        </button>
+                                    </div>
+                                ))}
                             </div>
-                            {errors.images && <p className={errorClass}>{errors.images}</p>}
-                        </div>
+                        )}
+                        {errors.images && <p className={errorClass}>{errors.images}</p>}
                     </div>
 
                     {/* Professional Certs */}
@@ -519,7 +501,7 @@ export default function ProductForm({
                             ))}
                         </div>
 
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 mb-6">
                             <input
                                 value={newCertification}
                                 onChange={(e) => setNewCertification(e.target.value)}
@@ -534,6 +516,8 @@ export default function ProductForm({
                                 <Plus className="w-4 h-4" />
                             </button>
                         </div>
+
+
                     </div>
 
                     {/* Status Guard */}
@@ -579,6 +563,28 @@ export default function ProductForm({
                     </div>
                 </div>
             </div>
+
+            {/* Image Preview Modal */}
+            {previewImage && (
+                <div 
+                    className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 animate-in fade-in zoom-in-95 duration-200"
+                    onClick={() => setPreviewImage(null)}
+                >
+                    <button 
+                        type="button" 
+                        onClick={() => setPreviewImage(null)}
+                        className="absolute top-4 right-4 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors shadow-2xl"
+                    >
+                        <X className="w-6 h-6" />
+                    </button>
+                    <img 
+                        src={previewImage} 
+                        alt="Expanded Preview" 
+                        className="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl"
+                        onClick={(e) => e.stopPropagation()} 
+                    />
+                </div>
+            )}
         </form>
     );
 }

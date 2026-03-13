@@ -37,6 +37,7 @@ export const productSchema = z.object({
   hsCode: z.string().optional(),
   images: z.array(z.string().url()).optional().default([]),
   certifications: z.array(z.string()).optional().default([]),
+
   quantity: z.number().int().min(0, 'Quantity cannot be negative').default(0),
   available: z.boolean().optional().default(true),
 });
