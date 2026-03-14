@@ -1,0 +1,145 @@
+﻿<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Blood Bestow - Image Editor</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'corporate-blue': '#0047AB',
+                        'corporate-blue-dark': '#003380',
+                        'accent-blue-light': '#E6F0FF',
+                        'soft-white': '#F9FAFB',
+                        'editor-bg': '#F3F4F6'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+<style type="text/tailwindcss">
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #0047AB;
+        }
+        .aspect-canvas {
+            aspect-ratio: 4 / 3;
+        }
+        .active-thumbnail {
+            border: 3px solid #0047AB;
+        }
+    </style>
+</head>
+<body class="font-sans text-gray-900 min-h-screen flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md">
+<main class="w-full max-w-5xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col h-[85vh]" data-purpose="editor-container">
+<header class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-white" data-purpose="top-navigation">
+<div class="flex items-center space-x-3">
+<div class="p-2 rounded-full hover:bg-gray-100 cursor-pointer transition-colors">
+<svg class="h-6 w-6 text-gray-500" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<h1 class="text-lg font-semibold text-gray-800">Edit Assets</h1>
+</div>
+<div class="flex items-center space-x-6 text-gray-500"><button class="p-1 hover:bg-gray-100 rounded-lg transition-colors">
+<img alt="Crop/Rotate Tool" class="h-10 w-auto" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGMAAABNCAYAAACyndrTAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAVdSURBVHhe7drfS1NvHMDx91y1OtpmFxrSjBV6SiyjpGEglFRUf0AWgVDSRUQQsSC6864L6TLoxqgoiqAuJC+koB8X0SILvYqzRRs2EITcGm5tc9nFt4bnydL5g+/z/Z7PC3bh83k8F749m8+ca3p6ehqhhQp1Qfx7JIZGJIZGJIZGJIZGJIZGJIZGJIZGJIZGJIZGJIZGJIZGJIZGJIZGJIZGJIZGJIZGJIZGJIZGJIZGJIZGXPLpELvBwUEeP35MPp8HwOPx4PV68fl8bNy4Eb/fz/bt2/F6veq3LprEUDx79oz79++ryzYrV67k4MGDHDp0iNWrV6vjBZMYsxgcHOTRo0elr1taWlixYgWxWIwvX76U1r1eLydPnqS5ubm0thjunp6eHnXR6RoaGnC5XFiWBUChUODcuXMcPnyYTZs2kc/nGRsbI5fLEQ6HyWQyNDc343K51EuVRWL8gWmaTE1NEY1GyWazVFVV0dDQQG1tLbt376atrY0PHz6QTqf59OkTiUSCnTt3UlGx8L+JJMZfNDU14XK5qKioYP/+/axdu7Y0q6ysJBgMYlkWyWSSsbExxsfH2bVrl+0a5ZDXDKBYLNLX14fL5aK7uxu3261u+aNsNktvby+JRAKAs2fPsmPHDnXbvCz8nvoficViDA0N8fbtW+LxuDr+qzVr1nD+/HmqqqoAuHv3LoVCQd02L46Okc/nsSyLWCxWWpuamgIgk8lgWZbtEYlEyGazM67wD5/Px+nTpwFIpVK8ePFC3TIvjn6aunXrFq9evbKthUIhTNPEsiyuXr1qmwG43W46OzvZt2+fOqK3t5doNIrP5+PKlStlPd3h9DtjIX+KFotF7t27x9evX9VRKVAqlSISiajjOTn6zsjlcsTjcUZHR3nw4AHMuDMymQyfP3+27Z+57+LFizQ2NtrmuVyOCxcuUCwWOXDgAEePHrXN5+LoO8Pj8WCaJvX19eoIwzAwTdP2mLlvtt9hj8dDS0sL/AxXLkfHWA7Hjx+nra2NI0eOqKM5SYwlVl1dzalTp2hqalJHc5IYGnFEjImJCfr6+kin0+qoLH6/n1AoRCgUwu/3q+NFc0SMO3fu8ObNGx4+fKiOyjLzRd0wDHW8aI6IUVtbC8D79+/5/v27OradN0ZHR387ef/tkcvlbNdaDEecM0ZGRrh27Rr84XyQTCa5dOmSbW2+2tvb6erqUpcXxBF3xtatW6msrATg6dOn6pjq6mqOHTtW9tsXS80RdwbAwMAA/f39AFy+fJlAIKBuIZPJkEgkZj3QoZzAOzs7qa+vJxAIsGrVKnXrgjjizgDo6Ogovc19+/btWV87DMOgsbHxt5P3r8fMgIFAANM0lywETophGAbd3d0AJBIJrl+/Xvb/HQKBAK2trbS2ts56Zy2WY56mfunv72dgYAB+/nDPnDnDunXrbHvS6TQ3btxgz549BINB22w5Oe5/4Fu2bCGdThOPx0kmk7x+/Zqamhrq6upKe54/f87Lly8ZHh5m/fr1bNiwwXaN5eK4GADbtm1jcnKSWCxGPp9naGiISCSC2+0ufXowHA5TKBR49+4dNTU1y3LiVjnuaWqmkZERbt68yeTkpG29rq4OwzD4+PFjaa2rq4v29nbbvqXm6BgA3759IxwO8+TJE8bHx9WxzYkTJ9i7d6+6vGQcH+OX6elp4vE4w8PDRKNRJiYmSKVSpQ9Ab968mWAwSEdHh/qtS0ZiaMQx54z/AomhEYmhEYmhEYmhEYmhEYmhEYmhEYmhEYmhEYmhEYmhEYmhEYmhEYmhEYmhEYmhEYmhEYmhEYmhEYmhEYmhEYmhEYmhkR+uTgCXZnaXzQAAAABJRU5ErkJggg=="/>
+</button></div>
+<div class="flex items-center space-x-4">
+<button class="text-gray-500 hover:text-gray-700 font-medium">Reset</button>
+<button class="bg-corporate-blue text-white px-5 py-2 rounded-lg font-semibold hover:bg-corporate-blue-dark transition-colors shadow-lg shadow-blue-100 flex items-center space-x-2">
+<span>Save Changes</span>
+</button>
+</div>
+</header>
+<div class="flex-grow bg-editor-bg flex items-center justify-center p-8 relative overflow-hidden" data-purpose="canvas-preview">
+<div class="relative w-full max-w-2xl bg-white shadow-xl rounded-lg overflow-hidden border border-gray-200" id="main-preview-container">
+<img alt="Main Preview" class="w-full h-auto object-contain block mx-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGby9P1ttu4lRsnsgA8mlNJG_CUoFYcwCpUHJPAS6WgptIOxXTlRLZjOIYpf54LvAWnTYdMsJdGKP1qvCED1mwTGmqiveJxZ-nAHF-pwxkeG7bPCifzuOu7D1avRJKc2t7VfO5jpaqMAnXKe6MS8OjrCQNLACIOyScCcR-AhPYT8gNRYZjdul6vlpQiTHlaKho5cqpPVRWxATUF3qEMtRGb_ZWhzhHSc1akGjKGeUazfcXkbqcjMckZk4rJy5p47jAmxr3Ts1_xElj"/>
+<div class="absolute inset-0 border-2 border-dashed border-corporate-blue opacity-0 pointer-events-none transition-opacity duration-300" id="crop-overlay">
+<div class="absolute top-0 left-0 w-4 h-4 bg-corporate-blue"></div>
+<div class="absolute top-0 right-0 w-4 h-4 bg-corporate-blue"></div>
+<div class="absolute bottom-0 left-0 w-4 h-4 bg-corporate-blue"></div>
+<div class="absolute bottom-0 right-0 w-4 h-4 bg-corporate-blue"></div>
+</div>
+</div>
+<div class="absolute bottom-8 right-8">
+<button class="bg-white p-3 rounded-full shadow-lg border border-gray-100 text-gray-700 hover:text-corporate-blue hover:shadow-xl transition-all">
+<svg class="h-6 w-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+</div>
+<footer class="bg-white border-t border-gray-100 p-6" data-purpose="thumbnail-gallery">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-sm font-bold text-gray-500 uppercase tracking-wider">Project Assets (5)</h3>
+<button class="text-xs font-semibold text-corporate-blue flex items-center space-x-1 hover:underline">
+<svg class="h-4 w-4" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Batch Upload</span>
+</button>
+</div>
+<div class="flex items-center space-x-4 overflow-x-auto pb-2 custom-scrollbar" data-purpose="carousel">
+<div class="flex-shrink-0 w-28 h-20 rounded-lg overflow-hidden active-thumbnail cursor-pointer relative group">
+<img alt="Asset 1" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxTi7sP0DGu3NL7sBlegPQWsrkJYX_LHcYMZkNz_hGvmuYsjrzktDwwHUJQtW9PWxO0QT3ldu7QlNwC9SoYgXgawFuI29UEK1VD1BhVK1bv7tliVO-uosU4xhVKs0tqDE6PSHU4iQZXnIW1tGsac5xMuzXeT_3mAWefYpFKinrAvjclakES-A8ro4F5BteG3Zi_tn5vnB9bswC6qbCQf_c0Ot3-nBrXWkrZNtGI54274m9dcw1HZCtZLUJq8QdnRlwItBVZeE0mOsh"/>
+<div class="absolute inset-0 bg-black/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="text-white text-[10px] font-bold">ACTIVE</span>
+</div>
+</div>
+<div class="flex-shrink-0 w-28 h-20 rounded-lg overflow-hidden border border-gray-200 cursor-pointer hover:border-corporate-blue/50 transition-colors">
+<img alt="Asset 2" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBly2PobDD_hjH8VXl9lxUCDFBhDAQX4K5Sc3tU1EeX-9JaRMotXGP9aGFvl6WrZ-iq-pcq8u7azqyvqX6GDhIkEBnX8WB_5Erxcdi-jRw4gAtPwDC43RcVAdQMmiVwfx3pJtykJwJ6gKPAi8o2uXQGoMqRXt-Nhpzug7yq4WqMlt1x5ycQRxY59MsTsW5s-qnzalBidqUlEJPA_R-uAUSLBMn8aD7yuqCVXKG22OLVVGmokKyPjB8-23MdR343fWuPg1lJO7Bza6W9"/>
+</div>
+<div class="flex-shrink-0 w-28 h-20 rounded-lg overflow-hidden border border-gray-200 cursor-pointer hover:border-corporate-blue/50 transition-colors">
+<img alt="Asset 3" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGexAaMHmY9QZCbtONjqZstOjW89fSLL7nJ44JCgQ5tv2PeY3a3zZ-JupKkwUIo_1goVIE9ws7ZT1dR3uogzMVyT6x2r-Zg07_BO1PrXq7cwHXNwWm6X0kIu85GNK_cbIfCY_fvzX3E3yORe1Y2BS8y2-ASCwCA0XcOrfD2H1-RSsqzsdrQZO3Ilceal5BE_ECBFtDnvAWbi5EC_ZbfUI9H7neeEfyhQX1uvofD2qd4hBNAbeovYjeAKmKm2msD2gUUtO7wzR7SJv-"/>
+</div>
+<div class="flex-shrink-0 w-28 h-20 rounded-lg overflow-hidden border border-gray-200 cursor-pointer hover:border-corporate-blue/50 transition-colors">
+<img alt="Asset 4" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC70l7Lmoyxe8sz1qBaYQh4WYwX2H4mv6tiXkEF6BWtWFKAqlhqlO3eGt3t734esbM6JGY2WXQ-uIEOYEHEa3EeVQs8UfCLj9khm5VwDmQQltwb9mCzdeXksh2fZN3pMdTtBrDQsz19mFkL3Px8FnJOL5LWus6Dx6i5xUhM0phH0n2Py1mNCTy9GS2B-RatWbdZq8a7Y_WNOscz8zAMPxZ-gl41QuJXeRffmwpjbDtBlGMTudRJhNJ6KxZSe5fjeaFW96E--1Tkw1ks"/>
+</div>
+<div class="flex-shrink-0 w-28 h-20 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-corporate-blue hover:bg-accent-blue-light transition-all text-gray-400 hover:text-corporate-blue" data-purpose="add-button">
+<div class="text-center">
+<svg class="h-6 w-6 mx-auto" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="text-[10px] font-bold uppercase mt-1 block">Add New</span>
+</div>
+</div>
+</div>
+</footer>
+</main>
+<script data-purpose="editor-logic">
+    const cropBtn = document.getElementById('crop-tool-btn');
+    const cropOverlay = document.getElementById('crop-overlay');
+    let isCropping = false;
+    cropBtn.addEventListener('click', () => {
+        isCropping = !isCropping;
+        if (isCropping) {
+            cropOverlay.classList.remove('opacity-0');
+            cropOverlay.classList.add('opacity-100');
+            cropBtn.classList.add('bg-corporate-blue', 'text-white');
+            cropBtn.classList.remove('bg-accent-blue-light', 'text-corporate-blue');
+        } else {
+            cropOverlay.classList.remove('opacity-100');
+            cropOverlay.classList.add('opacity-0');
+            cropBtn.classList.remove('bg-corporate-blue', 'text-white');
+            cropBtn.classList.add('bg-accent-blue-light', 'text-corporate-blue');
+        }
+    });
+</script>
+</body></html>

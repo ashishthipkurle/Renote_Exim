@@ -80,7 +80,7 @@ export default async function ProductsPage({
     name: string;
     price: number;
     originCountry: string;
-    category: ProductCategory;
+    category: string;
     images: string[];
     quantity: number;
     exporter: { name: string | null; companyName: string | null; country: string | null };
