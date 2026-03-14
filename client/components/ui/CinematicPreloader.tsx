@@ -27,50 +27,25 @@ export default function CinematicPreloader() {
         const isMarketplace = pathname ? pathname.startsWith("/products") : false;
         const isHome = pathname === "/";
 
-        let currentGroup = "other";
-        if (isHome) currentGroup = "home";
-        else if (isMarketplace) currentGroup = "marketplace";
-        else if (isDashboard) currentGroup = "dashboard";
+        const currentGroup = isHome ? "home" : isMarketplace ? "marketplace" : isDashboard ? "dashboard" : "other";
 
-        const playedAreasRaw = sessionStorage.getItem('preloader_played_areas');
-        const playedAreas = playedAreasRaw ? JSON.parse(playedAreasRaw) : [];
-
-        let isRefresh = false;
-        if (isFirstMount.current) {
-            try {
-                const nav = window.performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
-                isRefresh = nav.length > 0 && nav[0].type === 'reload';
-            } catch (e) {
-                console.warn("[Preloader] Perf check fail", e);
-            }
-            isFirstMount.current = false;
-        }
-
-        const hasPlayedThisArea = playedAreas.includes(currentGroup);
-        const shouldPlay = isHome ? true : isRefresh || (currentGroup !== "other" && !hasPlayedThisArea);
+        // Force shouldPlay for these groups to ensure user sees the animation
+        const shouldPlay = ["home", "marketplace", "dashboard"].includes(currentGroup);
 
         if (shouldPlay) {
-            // Guard: Only set to playing if we are idle
             if (status === "idle") {
-                console.log(`[Preloader] PLAYING for ${currentGroup}`);
+                console.log(`[Preloader] FORCING PLAY for ${currentGroup}`);
                 let texts = ["ENTERING", "RANOTE EXIM", "PORTAL"];
                 if (isHome) texts = ["ENTERING", "RANOTE EXIM", "YOUR TRADING PARTNER"];
                 else if (isMarketplace) texts = ["ENTERING", "RANOTE EXIM", "MARKET PLACER"];
                 else if (pathname?.startsWith("/dashboard/exporter")) texts = ["ENTERING", "RANOTE EXIM", "EXPORTER DASHBOARD"];
                 else if (pathname?.startsWith("/dashboard/importer")) texts = ["ENTERING", "RANOTE EXIM", "IMPORTER DASHBOARD"];
 
-                if (!hasPlayedThisArea && currentGroup !== "other") {
-                    const updatedAreas = [...playedAreas, currentGroup];
-                    sessionStorage.setItem('preloader_played_areas', JSON.stringify(updatedAreas));
-                }
-
                 setActiveTexts(texts);
                 setStatus("playing");
             }
         } else {
-            // Guard: Only set to finished if not already there
             if (status !== "finished") {
-                console.log(`[Preloader] SKIPPING for ${currentGroup}`);
                 setStatus("finished");
             }
         }

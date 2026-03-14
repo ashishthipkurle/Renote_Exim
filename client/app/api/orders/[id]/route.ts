@@ -46,7 +46,7 @@ export async function GET(
         // Authorization check
         const isOwner = auth.role === 'ADMIN' ||
             (auth.role === 'IMPORTER' && order.importerId === auth.userId) ||
-            (auth.role === 'EXPORTER' && order.product.exporterId === auth.userId);
+            (auth.role === 'EXPORTER' && order.products.exporterId === auth.userId);
 
         if (!isOwner) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
@@ -71,14 +71,14 @@ export async function PATCH(
 
         const order = await prisma.order.findUnique({
             where: { id: params.id },
-            include: { product: true }
+            include: { products: true }
         });
 
         if (!order) return NextResponse.json({ error: 'Order not found' }, { status: 404 });
 
         // Authorization check: Only exporter or admin can update status
         const canUpdate = auth.role === 'ADMIN' ||
-            (auth.role === 'EXPORTER' && order.product.exporterId === auth.userId);
+            (auth.role === 'EXPORTER' && order.products.exporterId === auth.userId);
 
         if (!canUpdate) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 

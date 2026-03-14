@@ -1,62 +1,45 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import { prisma } from '@/lib/prisma';
-import { createClient } from '@/utils/supabase/server';
+import { getApiAuthContext } from '@/lib/supabase/auth';
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const supabase = createClient();
-    const { data: { user }, error: authError } = await (await supabase).auth.getUser();
-
-    if (authError || !user) {
+    const auth = await getApiAuthContext(req);
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { items, shippingAddressId }: { items: { productId: string; quantity: number }[], shippingAddressId?: string } = await req.json();
-
+    const body = await req.json();
+    const items = body.items || [];
+    
     if (!items || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json({ error: 'Items are required' }, { status: 400 });
     }
 
-    // Calculate total price server-side
-    let totalPrice = 0;
-    const orderItemsData: { productId: string; quantity: number; unitPrice: number }[] = [];
+    const firstItem = items[0];
 
-    for (const item of items) {
-      const product = await prisma.product.findUnique({
-        where: { id: item.productId },
-      });
+    const product = await prisma.product.findUnique({
+      where: { id: firstItem.productId },
+    });
 
-      if (!product) {
-        return NextResponse.json({ error: `Product not found: ${item.productId}` }, { status: 404 });
-      }
-
-      const itemTotal = product.price * item.quantity;
-      totalPrice += itemTotal;
-
-      orderItemsData.push({
-        productId: product.id,
-        quantity: item.quantity,
-        unitPrice: product.price,
-      });
+    if (!product) {
+      return NextResponse.json({ error: `Product not found: ${firstItem.productId}` }, { status: 404 });
     }
 
+    const totalPrice = product.price * firstItem.quantity;
+
     // 1. Create the Order in PENDING status
-    const order = await prisma.$transaction(async (tx) => {
-      const newOrder = await tx.order.create({
-        data: {
-          orderNumber: `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-          importerId: user.id,
-          totalPrice: totalPrice,
-          status: 'PENDING',
-          paymentStatus: 'PENDING',
-          shippingAddressId: shippingAddressId,
-          items: {
-            create: orderItemsData,
-          },
-        },
-      });
-      return newOrder;
+    const order = await prisma.order.create({
+      data: {
+        orderNumber: `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        importerId: auth.userId,
+        productId: product.id,
+        quantity: firstItem.quantity,
+        totalPrice: totalPrice,
+        status: 'PENDING',
+        paymentStatus: 'PENDING',
+      },
     });
 
     // 2. Create Stripe Payment Intent
@@ -64,18 +47,12 @@ export async function POST(req: Request) {
       amount: Math.round(totalPrice * 100),
       currency: 'usd',
       metadata: {
-        userId: user.id,
+        userId: auth.userId,
         orderId: order.id,
       },
       automatic_payment_methods: {
         enabled: true,
       },
-    });
-
-    // 3. Update Order with Payment Intent ID
-    await prisma.order.update({
-      where: { id: order.id },
-      data: { stripePaymentIntentId: paymentIntent.id },
     });
 
     return NextResponse.json({
@@ -87,5 +64,4 @@ export async function POST(req: Request) {
     console.error('Payment Intent Error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-}
 }

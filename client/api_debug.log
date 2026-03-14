@@ -1,0 +1,28 @@
+[2026-03-14T13:54:48.948Z] [POST /api/products] Body: {
+  "name": "Ranote exim",
+  "category": "ELECTRONICS",
+  "description": "Thia ia soft war produt ",
+  "price": 12,
+  "minOrderQty": 1,
+  "unit": "pcs",
+  "originCountry": "India",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1773496468/renote-exim/products/te4obu5oup7p2jkx0gdb.png"
+  ],
+  "certifications": [],
+  "quantity": 0
+}
+[2026-03-14T14:38:17.683Z] [POST /api/products] Body: {
+  "name": "Samsumg tv ",
+  "category": "MACHINES",
+  "description": "This ia test run inventory",
+  "price": 12,
+  "minOrderQty": 1,
+  "unit": "pc",
+  "originCountry": "India",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1773499059/renote-exim/products/ggjrw8mpvutfror7ds8f.jpg"
+  ],
+  "certifications": [],
+  "quantity": 1
+}

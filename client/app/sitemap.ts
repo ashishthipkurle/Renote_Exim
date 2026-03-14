@@ -40,7 +40,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       take: 1000, 
     });
 
-    const productRoutes: MetadataRoute.Sitemap = products.map((product) => ({
+    const productRoutes: MetadataRoute.Sitemap = products.map((product: any) => ({
       url: `${baseUrl}/marketplace/product/${product.id}`,
       lastModified: product.updatedAt,
       changeFrequency: 'weekly',

@@ -1,4 +1,4 @@
-import { PrismaClient, Role, ProductCategory, OrderStatus, PaymentStatus } from '@prisma/client';
+import { PrismaClient, Role, OrderStatus, PaymentStatus } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -45,7 +45,7 @@ async function main() {
         name: 'Industrial Valve A1',
         description: 'High pressure stainless steel industrial valve.',
         price: 450,
-        category: ProductCategory.MACHINES,
+        category: 'MACHINES',
         minOrderQty: 10,
         unit: 'pcs',
         originCountry: 'India',
@@ -59,7 +59,7 @@ async function main() {
         name: 'Organic Cotton Fabric',
         description: '100% certified organic cotton fabric, 200 GSM.',
         price: 15,
-        category: ProductCategory.TEXTILES,
+        category: 'TEXTILES',
         minOrderQty: 100,
         unit: 'meters',
         originCountry: 'India',
@@ -73,22 +73,15 @@ async function main() {
   console.log('Products created.');
 
   // 3. Create Orders
-  const order = await prisma.order.create({
+  await prisma.order.create({
     data: {
       orderNumber: `ORD-${Date.now()}`,
-      importerId: importers[0].id,
+      importer: { connect: { id: importers[0].id } },
       totalPrice: 4500,
       status: OrderStatus.CONFIRMED,
       paymentStatus: PaymentStatus.PAID,
-      items: {
-        create: [
-          {
-            productId: products[0].id,
-            quantity: 10,
-            unitPrice: 450,
-          },
-        ],
-      },
+      product: { connect: { id: products[0].id } },
+      quantity: 10,
     },
   });
 
