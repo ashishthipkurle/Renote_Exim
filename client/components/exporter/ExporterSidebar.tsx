@@ -2,25 +2,20 @@
 
 import type { ComponentType } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSidebar } from "@/lib/contexts/SidebarContext";
 import {
-  Bell,
   Boxes,
   CreditCard,
   FolderTree,
   Globe,
   LayoutDashboard,
   LineChart,
-  Package,
   Settings,
-  User,
   Users,
   Handshake,
-  ChevronRight,
-  ChevronLeft,
+  FileText,
 } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 
@@ -31,6 +26,7 @@ const nav = [
   { href: `${basePath}/inventory`, label: "Inventory", icon: Boxes },
   { href: `${basePath}/orders`, label: "Orders", icon: FolderTree },
   { href: `${basePath}/shipments`, label: "Shipments", icon: Globe },
+  { href: `${basePath}/rfqs`, label: "RFQs", icon: FileText },
   { href: `${basePath}/directory`, label: "Buyers", icon: Users },
   { href: `${basePath}/suppliers`, label: "Dealers", icon: Handshake },
   { href: `${basePath}/analytics`, label: "Analytics", icon: LineChart },
@@ -93,7 +89,6 @@ function Item({
 }
 
 export default function ExporterSidebar() {
-  const { user } = useAuth();
   const pathname = usePathname();
   const { isExpanded } = useSidebar();
 

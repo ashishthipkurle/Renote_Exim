@@ -30,9 +30,9 @@ yarn-debug.log*
 yarn-error.log*
 
 # Local env files
-# NOTE: .env.local is NOT ignored — it is committed so collaborators
-# get the shared Supabase + DB credentials on pull.
-# Do NOT put personal secrets in .env.local; use .env.development.local instead.
+.env.local
+# NOTE: .env.local should be ignored in production.
+# Use .env.development.local instead for local overrides.
 .env.development.local
 .env.test.local
 .env.production.local

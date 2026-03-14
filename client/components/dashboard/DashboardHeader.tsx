@@ -16,6 +16,7 @@ import Link from "next/link";
 import { useSidebar } from "@/lib/contexts/SidebarContext";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useTheme } from "next-themes";
+import CartSheet from "@/components/cart/CartSheet";
 
 export default function DashboardHeader() {
     const { isExpanded, toggleSidebar } = useSidebar();
@@ -75,6 +76,9 @@ export default function DashboardHeader() {
                         {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                     </button>
                 )}
+
+                {/* Cart */}
+                <CartSheet />
 
                 {/* Notifications */}
                 <Link

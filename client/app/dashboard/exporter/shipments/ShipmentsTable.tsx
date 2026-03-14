@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Truck, MapPin, Search } from "lucide-react";
+import Link from 'next/link';
 
 const SHIPMENT_STATUS: Record<string, { label: string; color: string }> = {
     PREPARING: { label: "Preparing", color: "text-yellow-500 bg-yellow-500/10 border-yellow-500/20" },
@@ -79,16 +80,17 @@ export default function ShipmentsTable({ shipments }: { shipments: any[] }) {
                         {shipments.map((shipment) => {
                             const cfg = SHIPMENT_STATUS[shipment.status] ?? SHIPMENT_STATUS.PREPARING;
                             return (
-                                <div
+                                <Link
                                     key={shipment.id}
-                                    className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 hover:border-primary/40 transition-all duration-500 shadow-2xl rounded-[2rem] p-5 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4 items-center group hover:scale-[1.01]"
+                                    href={`/dashboard/exporter/shipments/${shipment.id}`}
+                                    className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 hover:border-primary/40 transition-all duration-500 shadow-2xl rounded-[2rem] p-5 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4 items-center group hover:scale-[1.01] block"
                                 >
                                     <div className="lg:col-span-3">
                                         <div className="text-sm font-black text-white font-mono truncate group-hover:text-primary transition-colors">
                                             {shipment.trackingNumber}
                                         </div>
                                         <div className="text-[10px] text-slate-500 mt-1 line-clamp-1 font-medium italic group-hover:text-slate-400">
-                                            {shipment.order.product.name}
+                                            {shipment.order.items?.[0]?.product?.name || "Order Item"}
                                         </div>
                                     </div>
 
@@ -126,7 +128,7 @@ export default function ShipmentsTable({ shipments }: { shipments: any[] }) {
                                     <div className="lg:col-span-2 text-right">
                                         <div className="text-[9px] font-black text-slate-500 uppercase tracking-widest italic">{formatDate(shipment.createdAt)}</div>
                                     </div>
-                                </div>
+                                </Link>
                             );
                         })}
                     </>

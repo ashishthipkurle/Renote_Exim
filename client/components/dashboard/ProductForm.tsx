@@ -115,6 +115,28 @@ const defaultProduct: ProductData = {
     quantity: 0,
 };
 
+const VALID_CATEGORIES = new Set([
+    "CHEMICALS", "MACHINES", "TEXTILES", "MEDICAL", "HANDICRAFTS",
+    "FOOD", "ELECTRONICS", "AUTOMOTIVE", "CONSTRUCTION", "AGRICULTURE", "OTHER",
+]);
+
+function normalizeCategory(value: string | null): string {
+    if (!value) return "OTHER";
+    const upper = value.trim().toUpperCase();
+    if (VALID_CATEGORIES.has(upper)) return upper;
+    
+    // Explicit mapping for common mismatches
+    if (upper === "MACHINERY" || upper === "MACHINES & EQUIPMENT" || upper === "MACHINE") {
+        return "MACHINES";
+    }
+    
+    // Check if it's one of the display labels
+    const found = CATEGORIES.find(c => c.label.toUpperCase() === upper || c.value === upper);
+    if (found) return found.value;
+
+    return "OTHER";
+}
+
 export default function ProductForm({
     initialData,
     isEdit = false,
@@ -132,7 +154,7 @@ export default function ProductForm({
         const cat = searchParams.get("category");
         return {
             ...defaultProduct,
-            category: cat || "OTHER",
+            category: normalizeCategory(cat),
         };
     });
 
@@ -205,9 +227,10 @@ export default function ProductForm({
             const apiUrl = isEdit ? `/api/products/${form.id}` : "/api/products";
             const method = isEdit ? "PUT" : "POST";
 
+            const rawCategory = form.category === "OTHER" ? customCategory : form.category;
             const body = {
                 name: form.name,
-                category: form.category === "OTHER" ? customCategory : form.category,
+                category: normalizeCategory(rawCategory),
                 description: form.description,
                 price: form.price,
                 minOrderQty: form.minOrderQty,

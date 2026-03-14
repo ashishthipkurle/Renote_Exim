@@ -9,61 +9,64 @@ datasource db {
 }
 
 model User {
-  id               String         @id @default(uuid())
-  name             String?
-  email            String         @unique
-  password         String?
-  role             Role           @default(IMPORTER)
-  companyName      String?
-  country          String?
-  phone            String?
-  website          String?
-  businessType     String?
-  taxId            String?
-  address          String?
-  verified         Boolean        @default(false)
-  avatar           String?
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
-  businessHours    Json?          @default("{}")
-  description      String?
-  monthlyBudget    Float           @default(0)
-  preferredCategories String[]      @default([])
-  socialLinks      Json?          @default("{}")
-  documents        Document[]
-  receivedMessages Message[]      @relation("Receiver")
-  sentMessages     Message[]      @relation("Sender")
-  notifications    Notification[]
-  orders           Order[]        @relation("ImporterOrders")
-  exportedProducts Product[]      @relation("ExporterProducts")
-  shipments        Shipment[]
-  suppliers        Supplier[]
-  wishlist         Wishlist[]
+  id                  String         @id @default(uuid())
+  name                String?
+  email               String         @unique
+  password            String?
+  role                Role           @default(IMPORTER)
+  companyName         String?
+  country             String?
+  phone               String?
+  website             String?
+  businessType        String?
+  taxId               String?
+  address             String?
+  verified            Boolean        @default(false)
+  avatar              String?
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  businessHours       Json?          @default("{}")
+  description         String?
+  monthlyBudget       Float          @default(0)
+  preferredCategories String[]       @default([])
+  socialLinks         Json?          @default("{}")
+  deletedAt           DateTime?
+  documents           Document[]
+  receivedMessages    Message[]      @relation("Receiver")
+  sentMessages        Message[]      @relation("Sender")
+  notifications       Notification[]
+  orders              Order[]        @relation("ImporterOrders")
+  exportedProducts    Product[]      @relation("ExporterProducts")
+  shipments           Shipment[]
+  suppliers           Supplier[]
+  wishlist            Wishlist[]
 
   @@map("users")
 }
 
 model Product {
-  id             String          @id @default(uuid())
-  exporterId     String
-  name           String
-  category       String
-  description    String
-  price          Float
-  minOrderQty    Int
-  unit           String
-  originCountry  String
-  hsCode         String?
-  images         String[]
-  certifications String[]
-  available      Boolean         @default(true)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  quantity       Int             @default(0)
-  orders         Order[]
-  exporter       User            @relation("ExporterProducts", fields: [exporterId], references: [id], onDelete: Cascade)
-  wishlistedBy   Wishlist[]
-  priceHistory   PriceHistory[]
+  id               String         @id @default(uuid())
+  exporterId       String
+  name             String
+  description      String
+  price            Float
+  minOrderQty      Int
+  unit             String
+  originCountry    String
+  hsCode           String?
+  images           String[]
+  certifications   String[]
+  available        Boolean        @default(true)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  quantity         Int            @default(0)
+  trustDocumentUrl String?
+  category         String
+  deletedAt        DateTime?
+  orders           Order[]        @relation("ProductToOrder")
+  priceHistory     PriceHistory[]
+  exporter         User           @relation("ExporterProducts", fields: [exporterId], references: [id], onDelete: Cascade)
+  wishlistedBy     Wishlist[]
 
   @@map("products")
 }
@@ -71,9 +74,7 @@ model Product {
 model Order {
   id            String        @id @default(uuid())
   orderNumber   String        @unique
-  productId     String
   importerId    String
-  quantity      Int
   totalPrice    Float
   currency      String        @default("USD")
   status        OrderStatus   @default(PENDING)
@@ -81,9 +82,11 @@ model Order {
   notes         String?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
+  productId     String
+  quantity      Int
   messages      Message[]
   importer      User          @relation("ImporterOrders", fields: [importerId], references: [id])
-  product       Product       @relation(fields: [productId], references: [id])
+  product       Product       @relation("ProductToOrder", fields: [productId], references: [id])
   shipment      Shipment?
 
   @@map("orders")
@@ -183,8 +186,8 @@ model Wishlist {
   userId    String
   productId String
   createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, productId])
   @@map("wishlists")

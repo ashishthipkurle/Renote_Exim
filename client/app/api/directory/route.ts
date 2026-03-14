@@ -25,11 +25,11 @@ export async function GET(request: NextRequest) {
                 ],
                 ...(category && category !== 'all' ? {
                     exportedProducts: {
-                        some: { category }
+                        some: { category: category as any }
                     }
                 } : {})
             },
-            select: {
+                select: {
                 id: true,
                 name: true,
                 companyName: true,

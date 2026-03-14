@@ -1,0 +1,35 @@
+{
+  "Common": {
+    "welcome": "Welcome to Renote Exim",
+    "search": "Search products, orders...",
+    "login": "Login",
+    "register": "Register",
+    "dashboard": "Dashboard",
+    "logout": "Logout",
+    "settings": "Settings",
+    "profile": "Profile"
+  },
+  "Marketplace": {
+    "title": "Global Marketplace",
+    "subtitle": "Discover verified products from around the world",
+    "filters": "Filters",
+    "categories": "Categories",
+    "noProducts": "No products found",
+    "viewDetails": "View Details"
+  },
+  "Dashboard": {
+    "overview": "Overview",
+    "inbox": "Inbox",
+    "orders": "Orders",
+    "products": "Products",
+    "shipments": "Shipments",
+    "analytics": "Analytics"
+  },
+  "Auth": {
+    "signIn": "Sign In",
+    "signUp": "Create Account",
+    "forgotPassword": "Forgot Password?",
+    "email": "Email Address",
+    "password": "Password"
+  }
+}

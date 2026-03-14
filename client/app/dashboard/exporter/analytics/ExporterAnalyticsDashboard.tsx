@@ -568,13 +568,15 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
                         <Tooltip content={({ active, payload }) => {
                           if (!active || !payload?.length) return null;
                           const p = payload[0];
-                          return (
-                            <div className="bg-[#0e1420] border border-white/10 rounded-xl px-4 py-3 shadow-2xl">
-                              <p className="text-xs text-slate-400">{CATEGORY_LABELS[p.name] ?? p.name}</p>
-                              <p className="text-sm font-black text-white mt-1">{fCurrency(p.value as number)}</p>
-                              <p className="text-xs text-slate-500">{p.payload.orderCount} orders</p>
-                            </div>
-                          );
+                            return (
+                              <div className="bg-[#0e1420] border border-white/10 rounded-xl px-4 py-3 shadow-2xl">
+                                <p className="text-xs text-slate-400">
+                                  {p.name ? (CATEGORY_LABELS[p.name as string] ?? p.name) : "Unknown"}
+                                </p>
+                                <p className="text-sm font-black text-white mt-1">{fCurrency(p.value as number)}</p>
+                                <p className="text-xs text-slate-500">{p.payload.orderCount} orders</p>
+                              </div>
+                            );
                         }} />
                       </PieChart>
                     </ResponsiveContainer>

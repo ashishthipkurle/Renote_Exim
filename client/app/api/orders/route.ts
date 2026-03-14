@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
         importerId: auth.userId,
         quantity: validatedData.quantity,
         totalPrice,
-        notes: validatedData.notes,
+        notes: validatedData.notes || null,
       },
       include: {
         product: {

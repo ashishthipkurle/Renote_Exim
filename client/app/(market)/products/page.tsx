@@ -2,20 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
-
-type ProductCategory =
-  | "ELECTRONICS"
-  | "TEXTILES"
-  | "FOOD"
-  | "CHEMICALS"
-  | "MACHINES"
-  | "MEDICAL"
-  | "HANDICRAFTS"
-  | "AUTOMOTIVE"
-  | "CONSTRUCTION"
-  | "AGRICULTURE"
-  | "OTHER";
+import { ProductCategory, Prisma } from "@prisma/client";
+import EmptyState from "@/components/ui/EmptyState";
 
 export const dynamic = "force-dynamic";
 
@@ -335,8 +323,14 @@ export default async function ProductsPage({
             </div>
 
             {products.length === 0 ? (
-              <div className="rounded-2xl border border-border bg-card p-10 text-center text-muted-foreground">
-                No products found matching your filters. Try adjusting your criteria.
+              <div className="py-20">
+                <EmptyState 
+                  iconName="searchX"
+                  title="No Listings Found"
+                  description="We couldn't find any products matching your current filters. Try broadening your search or clearing filters."
+                  actionLabel="Clear all filters"
+                  href="/products"
+                />
               </div>
             ) : (
               <div className="columns-1 sm:columns-2 xl:columns-3 2xl:columns-4 gap-6 relative z-10">

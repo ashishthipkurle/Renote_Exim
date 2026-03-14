@@ -81,8 +81,8 @@ export async function PUT(
 
     const product = await prisma.$transaction(async (tx) => {
       const updatedProduct = await tx.product.update({
-        where: { id },
-        data: validatedData,
+        where: { id: params.id },
+        data: validatedData as any,
         include: {
           exporter: {
             select: {

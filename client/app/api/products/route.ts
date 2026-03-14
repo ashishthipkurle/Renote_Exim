@@ -3,8 +3,20 @@ import { prisma } from '@/lib/prisma';
 import { getApiAuthContext } from '@/lib/supabase/auth';
 import { productSchema } from '@/lib/validations';
 import { Prisma } from '@prisma/client';
+import * as fs from 'fs';
 import { z } from 'zod';
 import { createSupabaseRouteClient } from '@/lib/supabase/route';
+
+const LOG_FILE = 'd:\\Job\\Ranote_exim\\Ranote_exim_2\\client\\api_debug.log';
+
+function logToFile(message: string) {
+  const timestamp = new Date().toISOString();
+  try {
+    fs.appendFileSync(LOG_FILE, `[${timestamp}] ${message}\n`);
+  } catch (err) {
+    console.error('Failed to log to file:', err);
+  }
+}
 
 const productCategorySchema = z.enum([
   'CHEMICALS',
@@ -150,11 +162,12 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
+    logToFile(`[POST /api/products] Body: ${JSON.stringify(body, null, 2)}`);
     const validatedData = productSchema.parse(body);
 
     // Try Prisma first
     try {
-      const product = await prisma.$transaction(async (tx) => {
+      const product = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         const newProduct = await tx.product.create({
           data: {
             ...validatedData,
@@ -212,6 +225,7 @@ export async function POST(request: NextRequest) {
     console.error('Create product error:', error);
 
     if (error instanceof z.ZodError) {
+      logToFile(`[POST /api/products] Zod Error: ${JSON.stringify(error.errors, null, 2)}`);
       return NextResponse.json(
         { error: 'Validation failed', details: error.errors },
         { status: 400 }

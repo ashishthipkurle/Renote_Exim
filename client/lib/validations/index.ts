@@ -25,10 +25,43 @@ export const loginSchema = z.object({
 
 export type LoginInput = z.infer<typeof loginSchema>;
 
+// Forgot Password Schema
+export const forgotPasswordSchema = z.object({
+  email: z.string().email('Invalid email address'),
+});
+
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+
+// Reset Password Schema
+export const resetPasswordSchema = z.object({
+  password: z.string().min(8, 'Password must be at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number'),
+  confirmPassword: z.string().min(8, 'Confirm password must be at least 8 characters'),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
+
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+
 // Product Schema
 export const productSchema = z.object({
   name: z.string().min(3, 'Product name must be at least 3 characters'),
-  category: z.string().min(1, 'Category is required'),
+  category: z.enum([
+    'CHEMICALS',
+    'MACHINES',
+    'TEXTILES',
+    'MEDICAL',
+    'HANDICRAFTS',
+    'FOOD',
+    'ELECTRONICS',
+    'AUTOMOTIVE',
+    'CONSTRUCTION',
+    'AGRICULTURE',
+    'OTHER',
+  ]),
   description: z.string().min(20, 'Description must be at least 20 characters'),
   price: z.number().positive('Price must be positive'),
   minOrderQty: z.number().int().positive('Minimum order quantity must be positive'),

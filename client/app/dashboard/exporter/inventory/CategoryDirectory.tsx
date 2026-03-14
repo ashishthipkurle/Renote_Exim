@@ -66,6 +66,20 @@ const ALL_INDUSTRIES = [
     "Workwear", "Woven Fabrics", "X-ray Equipment", "Yarn", "Zinc Products"
 ];
 
+const DISPLAY_TO_ENUM: Record<string, string> = {
+    "AGRICULTURE": "AGRICULTURE",
+    "TEXTILES": "TEXTILES",
+    "CHEMICALS": "CHEMICALS",
+    "MACHINERY": "MACHINES", // Fix: Machinery -> MACHINES
+    "FOOD": "FOOD",
+    "ELECTRONICS": "ELECTRONICS",
+    "AUTOMOTIVE": "AUTOMOTIVE",
+    "CONSTRUCTION": "CONSTRUCTION",
+    "MEDICAL": "MEDICAL",
+    "HANDICRAFTS": "HANDICRAFTS",
+    "OTHER": "OTHER",
+};
+
 export default function CategoryDirectory() {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -79,7 +93,10 @@ export default function CategoryDirectory() {
         , [search]);
 
     const handleSelect = (category: string) => {
-        router.push(`/dashboard/exporter/inventory?action=new&category=${category.toUpperCase()}`, { scroll: false });
+        const upper = category.toUpperCase();
+        // Check if it's already a valid enum or needs mapping
+        const enumValue = DISPLAY_TO_ENUM[upper] || (["MACHINERY", "MACHINES"].includes(upper) ? "MACHINES" : "OTHER");
+        router.push(`/dashboard/exporter/inventory?action=new&category=${enumValue}`, { scroll: false });
     };
 
     const handleBack = () => {

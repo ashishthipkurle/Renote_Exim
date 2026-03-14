@@ -6,11 +6,14 @@ import Image from "next/image";
 import axios from "axios";
 import { toast } from "sonner";
 import { CreditCard, Landmark, Lock, Wallet } from "lucide-react";
+import { Elements } from "@stripe/react-stripe-js";
 
 import { Button } from "@/components/ui/button";
-import { clearCart, getCart, type CartItem } from "@/lib/cart";
+import { getCart, type CartItem } from "@/lib/cart";
 import { getAuthToken } from "@/lib/auth-client";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { getStripe } from "@/lib/stripe-client";
+import CheckoutForm from "@/components/checkout/CheckoutForm";
 
 function getApiErrorMessage(error: unknown): string | null {
   if (!error || typeof error !== "object") return null;
@@ -45,6 +48,8 @@ export default function CheckoutPage() {
   const [productsById, setProductsById] = useState<Record<string, Product>>({});
   const [submitting, setSubmitting] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"card" | "wallet" | "bank">("card");
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [orderId, setOrderId] = useState<string | null>(null);
 
   useEffect(() => {
     setItems(getCart());
@@ -63,7 +68,9 @@ export default function CheckoutPage() {
       }
       setProductsById(next);
     };
-    void load();
+    if (items.length > 0) {
+      void load();
+    }
   }, [items]);
 
   const rows = useMemo(() => {
@@ -74,7 +81,7 @@ export default function CheckoutPage() {
 
   const total = rows.reduce((sum, r) => sum + (r.product?.price ?? 0) * r.item.quantity, 0);
 
-  const placeOrders = async () => {
+  const startPayment = async () => {
     const token = await getAuthToken();
 
     if (!token || !user) {
@@ -89,21 +96,22 @@ export default function CheckoutPage() {
 
     setSubmitting(true);
     try {
-      for (const row of rows) {
-        const product = row.product!;
-        const quantity = Math.max(row.item.quantity, product.minOrderQty);
-        await axios.post(
-          "/api/orders",
-          { productId: product.id, quantity },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-      }
+      const orderItems = rows.map(r => ({
+        productId: r.item.productId,
+        quantity: r.item.quantity
+      }));
 
-      clearCart();
-      setItems([]);
-      toast.success("Order placed successfully");
+      const response = await axios.post(
+        "/api/checkout/create-intent",
+        { items: orderItems },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setClientSecret(response.data.clientSecret);
+      setOrderId(response.data.orderId);
+      toast.success("Payment session initialized");
     } catch (error: unknown) {
-      toast.error(getApiErrorMessage(error) ?? "Failed to place order");
+      toast.error(getApiErrorMessage(error) ?? "Failed to initialize payment");
     } finally {
       setSubmitting(false);
     }
@@ -173,131 +181,90 @@ export default function CheckoutPage() {
 
                 <section className="space-y-6">
                   <div>
-                    <h2 className="text-3xl font-extrabold tracking-tight">Secure Payment</h2>
+                    <h2 className="text-3xl font-extrabold tracking-tight">Payment Detail</h2>
                     <p className="text-muted-foreground">
-                      Select your preferred terminal for encrypted asset transfer.
+                      Confirm order details and proceed to secure checkout.
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <button
-                      type="button"
-                      onClick={() => setPaymentMethod("card")}
-                      className={
-                        "rounded-2xl border p-6 flex flex-col items-start gap-4 transition-all " +
-                        (paymentMethod === "card"
-                          ? "border-primary bg-primary/10 shadow-[0_0_20px_rgba(19,91,236,0.2)]"
-                          : "border-border bg-card/80 hover:border-border/70")
-                      }
-                    >
-                      <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center text-primary">
-                        <CreditCard className="h-5 w-5" />
-                      </div>
-                      <div className="text-left">
-                        <p className="font-extrabold">Credit Card</p>
-                        <p className="text-xs text-muted-foreground mt-1">Stripe Gateway</p>
-                      </div>
-                    </button>
+                  {!clientSecret ? (
+                    <>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <button
+                          type="button"
+                          onClick={() => setPaymentMethod("card")}
+                          className={
+                            "rounded-2xl border p-6 flex flex-col items-start gap-4 transition-all " +
+                            (paymentMethod === "card"
+                              ? "border-primary bg-primary/10 shadow-[0_0_20px_rgba(19,91,236,0.2)]"
+                              : "border-border bg-card/80 hover:border-border/70")
+                          }
+                        >
+                          <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center text-primary">
+                            <CreditCard className="h-5 w-5" />
+                          </div>
+                          <div className="text-left">
+                            <p className="font-extrabold">Credit Card</p>
+                            <p className="text-xs text-muted-foreground mt-1">Stripe Gateway</p>
+                          </div>
+                        </button>
 
-                    <button
-                      type="button"
-                      onClick={() => setPaymentMethod("wallet")}
-                      className="rounded-2xl border border-border bg-card/80 p-6 flex flex-col items-start gap-4 transition-all hover:border-border/70"
-                    >
-                      <div className="w-10 h-10 rounded-xl bg-muted/40 flex items-center justify-center text-muted-foreground">
-                        <Wallet className="h-5 w-5" />
-                      </div>
-                      <div className="text-left">
-                        <p className="font-extrabold">Web3 Wallet</p>
-                        <p className="text-xs text-muted-foreground mt-1">Connect Wallet</p>
-                      </div>
-                    </button>
+                        <button
+                          type="button"
+                          onClick={() => setPaymentMethod("wallet")}
+                          className="rounded-2xl border border-border bg-card/80 p-6 flex flex-col items-start gap-4 transition-all hover:border-border/70"
+                        >
+                          <div className="w-10 h-10 rounded-xl bg-muted/40 flex items-center justify-center text-muted-foreground">
+                            <Wallet className="h-5 w-5" />
+                          </div>
+                          <div className="text-left">
+                            <p className="font-extrabold">Web3 Wallet</p>
+                            <p className="text-xs text-muted-foreground mt-1">Mock Wallet</p>
+                          </div>
+                        </button>
 
-                    <button
-                      type="button"
-                      onClick={() => setPaymentMethod("bank")}
-                      className="rounded-2xl border border-border bg-card/80 p-6 flex flex-col items-start gap-4 transition-all hover:border-border/70"
-                    >
-                      <div className="w-10 h-10 rounded-xl bg-muted/40 flex items-center justify-center text-muted-foreground">
-                        <Landmark className="h-5 w-5" />
-                      </div>
-                      <div className="text-left">
-                        <p className="font-extrabold">Bank Transfer</p>
-                        <p className="text-xs text-muted-foreground mt-1">Direct Wire</p>
-                      </div>
-                    </button>
-                  </div>
-
-                  <div className="rounded-3xl border border-border bg-background/40 backdrop-blur-sm p-8 relative overflow-hidden">
-                    <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/15 rounded-full blur-[100px]" />
-                    <div className="relative z-10 space-y-6">
-                      <div className="flex justify-between items-start">
-                        <div className="w-12 h-10 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-md opacity-80" />
-                        <div className="text-foreground/40 text-4xl">⌁</div>
+                        <button
+                          type="button"
+                          onClick={() => setPaymentMethod("bank")}
+                          className="rounded-2xl border border-border bg-card/80 p-6 flex flex-col items-start gap-4 transition-all hover:border-border/70"
+                        >
+                          <div className="w-10 h-10 rounded-xl bg-muted/40 flex items-center justify-center text-muted-foreground">
+                            <Landmark className="h-5 w-5" />
+                          </div>
+                          <div className="text-left">
+                            <p className="font-extrabold">Bank Transfer</p>
+                            <p className="text-xs text-muted-foreground mt-1">Direct Wire</p>
+                          </div>
+                        </button>
                       </div>
 
-                      <div className="space-y-2">
-                        <label className="block text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-black">
-                          Card Number
-                        </label>
-                        <input
-                          className="w-full bg-transparent border-none p-0 text-xl md:text-2xl text-foreground font-mono tracking-widest focus:ring-0"
-                          defaultValue="4242 4242 4242 4242"
-                        />
-                      </div>
-
-                      <div className="flex gap-12">
-                        <div className="space-y-2">
-                          <label className="block text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-black">
-                            Expires
-                          </label>
-                          <input
-                            className="bg-transparent border-none p-0 text-foreground font-mono tracking-widest focus:ring-0 w-20"
-                            placeholder="MM/YY"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <label className="block text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-black">
-                            CVC
-                          </label>
-                          <input
-                            className="bg-transparent border-none p-0 text-foreground font-mono tracking-widest focus:ring-0 w-12"
-                            defaultValue="***"
-                          />
+                      <div className="rounded-3xl border border-border bg-background/40 backdrop-blur-sm p-8 relative overflow-hidden">
+                        <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/15 rounded-full blur-[100px]" />
+                        <div className="relative z-10 space-y-6 text-center">
+                          <div className="flex justify-center mb-4">
+                            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary">
+                              <Lock className="h-8 w-8" />
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <p className="text-xl font-extrabold">Ready to secure your trade?</p>
+                            <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+                              Click "Initialize Payment" in the summary sidebar to begin your secure transaction.
+                            </p>
+                          </div>
                         </div>
                       </div>
+                    </>
+                  ) : (
+                    <div className="rounded-3xl border border-border bg-card p-8">
+                      <Elements 
+                        stripe={getStripe()} 
+                        options={{ clientSecret, appearance: { theme: 'night' } }}
+                      >
+                        <CheckoutForm amount={total} orderId={orderId!} />
+                      </Elements>
                     </div>
-                  </div>
-
-                  <div className="rounded-2xl border border-border bg-card/80 dark:bg-card/40 backdrop-blur-sm p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="md:col-span-2">
-                      <label className="block text-xs font-black text-muted-foreground uppercase tracking-wider mb-2">
-                        Cardholder Name
-                      </label>
-                      <input
-                        className="w-full bg-background/40 border border-border rounded-xl px-4 py-3 text-foreground"
-                        placeholder="AXEL VANCE"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-black text-muted-foreground uppercase tracking-wider mb-2">
-                        Billing Postal Code
-                      </label>
-                      <input
-                        className="w-full bg-background/40 border border-border rounded-xl px-4 py-3 text-foreground"
-                        placeholder="10001"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-black text-muted-foreground uppercase tracking-wider mb-2">
-                        Region/City
-                      </label>
-                      <input
-                        className="w-full bg-background/40 border border-border rounded-xl px-4 py-3 text-foreground"
-                        placeholder="New York City"
-                      />
-                    </div>
-                  </div>
+                  )}
 
                   <div className="flex flex-wrap gap-6 items-center py-2 px-2">
                     <div className="flex items-center gap-2 text-emerald-500">
@@ -312,10 +279,6 @@ export default function CheckoutPage() {
                       <Lock className="h-4 w-4" />
                       <span className="text-[10px] font-black uppercase tracking-widest">PCI-DSS Compliant</span>
                     </div>
-                  </div>
-
-                  <div className="rounded-xl bg-muted/40 p-4 text-xs text-muted-foreground">
-                    Payment capture is UI-only; submitting will create Orders via `/api/orders` (token required).
                   </div>
                 </section>
               </div>
@@ -373,12 +336,14 @@ export default function CheckoutPage() {
                   </div>
                 </div>
 
-                <Button className="w-full mt-6" size="lg" disabled={submitting} onClick={placeOrders}>
-                  {submitting ? "Submitting..." : "Confirm & Place Order"}
-                </Button>
+                {!clientSecret && (
+                  <Button className="w-full mt-6" size="lg" disabled={submitting} onClick={startPayment}>
+                    {submitting ? "Initializing..." : "Initialize Payment"}
+                  </Button>
+                )}
 
                 <p className="mt-4 text-xs text-muted-foreground">
-                  If you’re not logged in as an IMPORTER, you’ll be prompted to login.
+                  Secure transaction powered by Stripe.
                 </p>
               </div>
             </div>

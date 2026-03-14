@@ -19,6 +19,7 @@ import {
 import { prisma } from "@/lib/prisma";
 import { getServerAuth } from "@/lib/supabase/server";
 import { OrderActions } from "../OrderActions";
+import OrderContact from "@/components/messaging/OrderContact";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof Package }> = {
     PENDING: { label: "Pending", color: "text-yellow-500 bg-yellow-500/10 border-yellow-500/20", icon: Clock },
@@ -237,6 +238,14 @@ export default async function OrderDetailPage({ params }: { params: { id: string
                                         <div className="font-bold text-white">{orderWithRel.importer.name}</div>
                                         <div className="text-[10px] text-slate-500 mt-0.5 font-mono">{orderWithRel.importer.email}</div>
                                     </div>
+                                </div>
+
+                                <div className="mt-6">
+                                    <OrderContact 
+                                        orderId={order.id}
+                                        receiverId={order.importerId}
+                                        receiverName={orderWithRel.importer.name || "Buyer"}
+                                    />
                                 </div>
                             </div>
                         </div>
