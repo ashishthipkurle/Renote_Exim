@@ -35,7 +35,7 @@ export default function AdminTrendsPage() {
 
   const fetchTrends = async () => {
     try {
-      const result = await authFetch("/api/admin/trends");
+      const result = await authFetch<TrendData>("/api/admin/trends");
       setData(result);
     } catch (error) {
       toast.error("Failed to read market signals.");

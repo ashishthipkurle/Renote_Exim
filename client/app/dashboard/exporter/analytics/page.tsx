@@ -25,7 +25,7 @@ export default async function ExporterAnalyticsPage() {
     quantity: number;
     createdAt: Date;
     product: { id: string; name: string; category: string; price: number };
-    importer: { country: string | null; companyName: string | null; name: string };
+    importer: { country: string | null; companyName: string | null; name: string | null };
   }[] = [];
 
   try {

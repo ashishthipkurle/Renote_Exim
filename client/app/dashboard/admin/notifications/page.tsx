@@ -44,7 +44,7 @@ export default function AdminNotificationsPage() {
 
   const fetchNotifications = async () => {
     try {
-      const data = await authFetch("/api/admin/notifications");
+      const data = await authFetch<{ notifications: Notification[] }>("/api/admin/notifications");
       setNotifications(data.notifications || []);
     } catch (error) {
       toast.error("Failed to fetch notification history.");

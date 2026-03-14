@@ -49,7 +49,7 @@ export default function AdminOrdersPage() {
     setLoading(true);
     try {
       const url = `/api/admin/orders?page=${page}&q=${encodeURIComponent(search)}&status=${statusFilter}`;
-      const data = await authFetch(url);
+      const data = await authFetch<{ orders: Order[], total: number, totalPages: number }>(url);
       setOrders(data.orders || []);
       setTotal(data.total || 0);
       setTotalPages(data.totalPages || 1);

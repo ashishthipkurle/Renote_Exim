@@ -13,6 +13,7 @@ import {
   Wallet,
   Settings,
   User,
+  FileText,
 } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 
@@ -47,6 +48,7 @@ export default function ClientSidebar({ basePath }: { basePath: string }) {
   const nav: NavItem[] = [
     { href: basePath, label: "Dashboard", icon: Home },
     { href: `${basePath}/orders`, label: "Orders", icon: Truck },
+    { href: `${basePath}/rfqs`, label: "RFQs", icon: FileText },
     { href: `${basePath}/shipments`, label: "Shipments", icon: Package },
     { href: `${basePath}/inventory`, label: "Inventory", icon: LayoutGrid },
     { href: `${basePath}/analytics`, label: "Analytics", icon: LineChart },

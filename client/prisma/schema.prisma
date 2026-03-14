@@ -23,6 +23,10 @@ model User {
   address          String?
   verified         Boolean        @default(false)
   avatar           String?
+  twoFactorEnabled Boolean        @default(false)
+  twoFactorSecret  String?
+  twoFactorBackupCodes String[]   @default([])
+  stripeCustomerId String?        @unique
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
   businessHours    Json?          @default("{}")
@@ -39,15 +43,114 @@ model User {
   shipments        Shipment[]
   suppliers        Supplier[]
   wishlist         Wishlist[]
+  loginHistory     LoginHistory[]
+  addresses        Address[]
+  rfqs             RFQ[]          @relation("ImporterRFQs")
+  receivedRfqs     RFQ[]          @relation("ExporterRFQs")
+  quotes           Quote[]
+  reviews          Review[]       @relation("UserReviews")
+  givenReviews     Review[]       @relation("GivenReviews")
+  emailPreferences Json?          @default("{\"orders\": true, \"security\": true, \"marketing\": false}")
+  deletedAt        DateTime?
 
+  @@index([email])
+  @@index([role])
   @@map("users")
+}
+
+// ... existing models ...
+
+model RFQ {
+  id              String      @id @default(uuid())
+  title           String
+  importerId      String
+  exporterId      String?
+  category        ProductCategory
+  description     String
+  quantity        Int
+  unit            String
+  budget          Float?
+  deadline        DateTime?
+  status          RFQStatus   @default(OPEN)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  importer        User        @relation("ImporterRFQs", fields: [importerId], references: [id], onDelete: Cascade)
+  exporter        User?       @relation("ExporterRFQs", fields: [exporterId], references: [id], onDelete: SetNull)
+  quotes          Quote[]
+  
+  @@index([importerId])
+  @@index([exporterId])
+  @@index([status])
+  @@map("rfqs")
+}
+
+model Quote {
+  id              String      @id @default(uuid())
+  rfqId           String
+  exporterId      String
+  price           Float
+  validUntil      DateTime
+  notes           String?
+  status          QuoteStatus @default(PENDING)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  rfq             RFQ         @relation(fields: [rfqId], references: [id], onDelete: Cascade)
+  exporter        User        @relation(fields: [exporterId], references: [id], onDelete: Cascade)
+
+  @@index([rfqId])
+  @@index([exporterId])
+  @@map("quotes")
+}
+
+model Review {
+  id              String      @id @default(uuid())
+  userId          String      // The user being reviewed (Exporter or Importer)
+  reviewerId      String      // The user giving the review
+  rating          Int
+  comment         String?
+  orderId         String?     @unique
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  user            User        @relation("UserReviews", fields: [userId], references: [id], onDelete: Cascade)
+  reviewer        User        @relation("GivenReviews", fields: [reviewerId], references: [id], onDelete: Cascade)
+  order           Order?      @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([reviewerId])
+  @@map("reviews")
+}
+
+enum RFQStatus {
+  OPEN
+  IN_PROGRESS
+  CLOSED
+  CANCELLED
+}
+
+enum QuoteStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+model LoginHistory {
+  id        String   @id @default(uuid())
+  userId    String
+  ip        String?
+  userAgent String?
+  success   Boolean
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("login_history")
 }
 
 model Product {
   id             String          @id @default(uuid())
   exporterId     String
   name           String
-  category       String
+  category       ProductCategory
   description    String
   price          Float
   minOrderQty    Int
@@ -60,33 +163,81 @@ model Product {
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   quantity       Int             @default(0)
-  orders         Order[]
+  deletedAt      DateTime?
+  orderItems     OrderItem[]
   exporter       User            @relation("ExporterProducts", fields: [exporterId], references: [id], onDelete: Cascade)
   wishlistedBy   Wishlist[]
   priceHistory   PriceHistory[]
 
+  @@index([name])
+  @@index([category])
+  @@index([exporterId])
   @@map("products")
 }
 
 model Order {
-  id            String        @id @default(uuid())
-  orderNumber   String        @unique
-  productId     String
-  importerId    String
-  quantity      Int
-  totalPrice    Float
-  currency      String        @default("USD")
-  status        OrderStatus   @default(PENDING)
-  paymentStatus PaymentStatus @default(PENDING)
-  notes         String?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  messages      Message[]
-  importer      User          @relation("ImporterOrders", fields: [importerId], references: [id])
-  product       Product       @relation(fields: [productId], references: [id])
-  shipment      Shipment?
+  id                    String        @id @default(uuid())
+  orderNumber           String        @unique
+  importerId            String
+  totalPrice            Float
+  currency              String        @default("USD")
+  status                OrderStatus   @default(PENDING)
+  paymentStatus         PaymentStatus @default(PENDING)
+  notes                 String?
+  stripePaymentIntentId String?       @unique
+  stripeSessionId       String?       @unique
+  shippingAddressId     String?
+  billingAddressId      String?
+  shippingAddress       Address?      @relation("ShippingAddress", fields: [shippingAddressId], references: [id])
+  billingAddress        Address?      @relation("BillingAddress", fields: [billingAddressId], references: [id])
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  messages              Message[]
+  importer              User          @relation("ImporterOrders", fields: [importerId], references: [id], onDelete: Cascade)
+  items                 OrderItem[]
+  shipment              Shipment?
+  documents             Document[]
+  review                Review?
+  deletedAt             DateTime?
 
+  @@index([orderNumber])
+  @@index([importerId])
+  @@index([status])
   @@map("orders")
+}
+
+model OrderItem {
+  id        String   @id @default(uuid())
+  orderId   String
+  productId String
+  quantity  Int
+  unitPrice Float
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+model Address {
+  id             String      @id @default(uuid())
+  userId         String
+  street         String
+  city           String
+  state          String
+  postalCode     String
+  country        String
+  type           AddressType @default(SHIPPING)
+  isDefault      Boolean     @default(false)
+  user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shippingOrders Order[]     @relation("ShippingAddress")
+  billingOrders  Order[]     @relation("BillingAddress")
+
+  @@map("addresses")
+}
+
+enum AddressType {
+  SHIPPING
+  BILLING
 }
 
 model Shipment {
@@ -104,8 +255,8 @@ model Shipment {
   statusHistory     Json[]
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
-  order             Order          @relation(fields: [orderId], references: [id])
-  user              User           @relation(fields: [userId], references: [id])
+  order             Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("shipments")
 }
@@ -119,9 +270,9 @@ model Message {
   content    String
   read       Boolean  @default(false)
   createdAt  DateTime @default(now())
-  order      Order?   @relation(fields: [orderId], references: [id])
-  receiver   User     @relation("Receiver", fields: [receiverId], references: [id])
-  sender     User     @relation("Sender", fields: [senderId], references: [id])
+  order      Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  receiver   User     @relation("Receiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  sender     User     @relation("Sender", fields: [senderId], references: [id], onDelete: Cascade)
 
   @@map("messages")
 }
@@ -137,10 +288,12 @@ model Document {
   verified    Boolean      @default(false)
   verifiedAt  DateTime?
   verifiedBy  String?
+  orderId     String?
   description String?
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
-  owner       User         @relation(fields: [ownerId], references: [id])
+  owner       User         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  order       Order?       @relation(fields: [orderId], references: [id], onDelete: SetNull)
 
   @@map("documents")
 }
@@ -155,7 +308,7 @@ model Notification {
   read      Boolean          @default(false)
   readAt    DateTime?
   createdAt DateTime         @default(now())
-  user      User             @relation(fields: [userId], references: [id])
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("notifications")
 }
@@ -266,6 +419,7 @@ enum NotificationType {
   ORDER_CONFIRMED
   ORDER_SHIPPED
   ORDER_DELIVERED
+  ORDER_UPDATE
   MESSAGE_RECEIVED
   PAYMENT_RECEIVED
   DOCUMENT_VERIFIED

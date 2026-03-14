@@ -1,28 +1,16 @@
-"use client";
-
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import {
-  Users,
   Search,
-  Filter,
-  MoreVertical,
-  ShieldCheck,
-  Ban,
-  Mail,
-  Building2,
-  Globe,
   CheckCircle2,
   XCircle,
-  Menu,
   ChevronLeft,
   ChevronRight,
-  ShieldAlert,
+  ShieldCheck,
   Edit2,
-  Trash2
+  Trash2,
+  Building2,
+  Globe
 } from "lucide-react";
 import { useAuthFetch } from "@/lib/hooks/useAuthFetch";
-import { format } from "date-fns";
 import { toast } from "sonner";
 import clsx from "clsx";
 
@@ -52,7 +40,7 @@ export default function AdminUsersPage() {
     setLoading(true);
     try {
       const url = `/api/admin/users?page=${page}&q=${encodeURIComponent(search)}&role=${roleFilter}&verified=${verifiedFilter}`;
-      const data = await authFetch(url);
+      const data = await authFetch<{ users: User[], total: number, totalPages: number }>(url);
       setUsers(data.users || []);
       setTotal(data.total || 0);
       setTotalPages(data.totalPages || 1);
@@ -197,9 +185,15 @@ export default function AdminUsersPage() {
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-2">
                         {u.verified ? (
-                          <div className="flex items-center gap-1.5 text-emerald-400 text-[10px] font-bold">
-                            <CheckCircle2 className="w-3.5 h-3.5" />
-                            VERIFIED
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-1.5 text-emerald-400 text-[10px] font-black">
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                              VERIFIED
+                            </div>
+                            <div className="flex items-center gap-1 text-[8px] font-black text-primary bg-primary/10 border border-primary/20 px-1.5 py-0.5 rounded shadow-[0_0_10px_rgba(19,91,236,0.2)]">
+                              <ShieldCheck className="w-2.5 h-2.5" />
+                              SEAL OF TRUST
+                            </div>
                           </div>
                         ) : (
                           <div className="flex items-center gap-1.5 text-slate-500 text-[10px] font-bold">

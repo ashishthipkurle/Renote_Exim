@@ -34,7 +34,7 @@ export default function AdminCategoriesPage() {
 
   const fetchCategories = async () => {
     try {
-      const data = await authFetch("/api/admin/categories");
+      const data = await authFetch<{ categories: Category[] }>("/api/admin/categories");
       setCategories(data.categories || []);
     } catch (error) {
       toast.error("Failed to fetch taxonomy data.");

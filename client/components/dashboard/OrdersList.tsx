@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { Package, Truck, Clock, CheckCircle2, XCircle, ShoppingCart, Info, ShieldAlert } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/api-utils";
 import OrderDetailsModal from "./OrderDetailsModal";
 import DisputeModal from "./DisputeModal";
+import EmptyState from "@/components/ui/EmptyState";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
     PENDING: { label: "Pending", color: "text-yellow-500 bg-yellow-500/10 border-yellow-500/20", icon: Clock },
@@ -34,14 +34,13 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
 
     if (initialOrders.length === 0) {
         return (
-            <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-xl rounded-2xl p-12 text-center">
-                <ShoppingCart className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-                <h2 className="text-xl font-bold text-white mb-2">No orders yet</h2>
-                <p className="text-slate-400 text-sm mb-4">Browse the marketplace and place your first order.</p>
-                <Link href="/products" className="inline-flex items-center gap-2 bg-primary hover:bg-[#0f49bd] text-white font-bold py-2 px-4 rounded-xl text-sm">
-                    Browse Products
-                </Link>
-            </div>
+            <EmptyState 
+              icon={ShoppingCart}
+              title="No Orders Yet"
+              description="Your order history is currently empty. Explore the global marketplace to discover premium products."
+              actionLabel="Explore Marketplace"
+              href="/products"
+            />
         );
     }
 

@@ -38,7 +38,7 @@ export default function AdminFeedPage() {
 
   const fetchFeed = async () => {
     try {
-      const data = await authFetch("/api/admin/feed");
+      const data = await authFetch<{ feed: FeedItem[] }>("/api/admin/feed");
       setFeed(data.feed || []);
     } catch (error) {
       toast.error("Failed to pulse system feed.");

@@ -39,7 +39,7 @@ export default function AdminAnalyticsPage() {
 
   const fetchAnalytics = async () => {
     try {
-      const result = await authFetch("/api/admin/analytics");
+      const result = await authFetch<AnalyticsData>("/api/admin/analytics");
       setData(result);
     } catch (error) {
       toast.error("Failed to load platform intelligence.");

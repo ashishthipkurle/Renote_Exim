@@ -41,7 +41,7 @@ export default function AdminDirectoryPage() {
   const fetchDirectory = async () => {
     setLoading(true);
     try {
-      const data = await authFetch(`/api/admin/directory?q=${encodeURIComponent(search)}`);
+      const data = await authFetch<{ users: DirectoryMember[] }>(`/api/admin/directory?q=${encodeURIComponent(search)}`);
       setMembers(data.users || []);
     } catch (error) {
       toast.error("Failed to fetch platform census.");

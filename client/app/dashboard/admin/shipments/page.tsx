@@ -48,7 +48,7 @@ export default function AdminShipmentsPage() {
     setLoading(true);
     try {
       const url = `/api/admin/shipments?page=${page}&q=${encodeURIComponent(search)}&status=${statusFilter}`;
-      const data = await authFetch(url);
+      const data = await authFetch<{ shipments: Shipment[], total: number, totalPages: number }>(url);
       setShipments(data.shipments || []);
       setTotal(data.total || 0);
       setTotalPages(data.totalPages || 1);

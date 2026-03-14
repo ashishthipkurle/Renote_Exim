@@ -126,3 +126,23 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to update profile' }, { status: 500 });
   }
 }
+
+// DELETE /api/user/profile — Delete user account
+export async function DELETE(request: NextRequest) {
+  try {
+    const auth = await getApiAuthContext(request);
+    if (!auth) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Cascade deletion is handled at the DB level via schema.prisma onDelete: Cascade
+    await prisma.user.delete({
+      where: { id: auth.userId },
+    });
+
+    return NextResponse.json({ success: true, message: 'Account deleted successfully' });
+  } catch (error) {
+    console.error('Profile DELETE error:', error);
+    return NextResponse.json({ error: 'Failed to delete account' }, { status: 500 });
+  }
+}

@@ -24,20 +24,20 @@ export async function GET(request: NextRequest) {
                     { companyName: { contains: search, mode: 'insensitive' } },
                 ],
                 ...(category && category !== 'all' ? {
-                    products: {
-                        some: { category }
+                    exportedProducts: {
+                        some: { category: category as any }
                     }
                 } : {})
             },
-            select: {
+                select: {
                 id: true,
                 name: true,
                 companyName: true,
-                image: true,
+                avatar: true,
                 description: true,
                 _count: {
                     select: {
-                        products: true,
+                        exportedProducts: true,
                     }
                 },
             }

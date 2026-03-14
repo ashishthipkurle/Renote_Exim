@@ -52,7 +52,7 @@ export default function AdminProductsPage() {
     setLoading(true);
     try {
       const url = `/api/admin/products?page=${page}&q=${encodeURIComponent(search)}&category=${categoryFilter}`;
-      const data = await authFetch(url);
+      const data = await authFetch<{ products: Product[], total: number, totalPages: number }>(url);
       setProducts(data.products || []);
       setTotal(data.total || 0);
       setTotalPages(data.totalPages || 1);

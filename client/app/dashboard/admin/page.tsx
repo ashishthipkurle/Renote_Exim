@@ -15,7 +15,8 @@ import {
   ArrowUpRight,
   ShieldCheck,
   Activity,
-  History
+  History,
+  LayoutGrid
 } from "lucide-react";
 import { useAuthFetch } from "@/lib/hooks/useAuthFetch";
 import { format } from "date-fns";
@@ -47,8 +48,8 @@ export default function AdminDashboard() {
     async function fetchData() {
       try {
         const [statsData, feedData] = await Promise.all([
-          authFetch("/api/admin/stats"),
-          authFetch("/api/admin/feed")
+          authFetch<Stats>("/api/admin/stats"),
+          authFetch<{ feed: FeedItem[] }>("/api/admin/feed")
         ]);
         setStats(statsData);
         setFeed(feedData.feed || []);

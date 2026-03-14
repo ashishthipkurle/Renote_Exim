@@ -15,10 +15,15 @@ export async function POST(request: NextRequest) {
 
     const { supabase, applyCookies } = createSupabaseRouteClient(request);
 
+    const host = request.headers.get("host");
+    const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`;
+
     const { data, error } = await supabase.auth.signUp({
       email: validatedData.email,
       password: validatedData.password,
       options: {
+        emailRedirectTo: `${appUrl}/api/auth/callback?next=/verify-email`,
         data: {
           name: validatedData.name,
           role: validatedData.role,

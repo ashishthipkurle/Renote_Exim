@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Plus, X } from "lucide-react";
+import { Plus } from "lucide-react";
 
 import { prisma } from "@/lib/prisma";
 import { getServerAuth } from "@/lib/supabase/server";
+import EmptyState from "@/components/ui/EmptyState";
 import { Prisma } from "@prisma/client";
 import InventoryTable from "./InventoryTable";
 import CategoryDirectory from "./CategoryDirectory";
-import ProductForm from "@/components/dashboard/ProductForm";
 
 function formatNumber(n: number) {
   if (n >= 1000000) return (n / 1000000).toFixed(1) + "M";
@@ -154,113 +154,127 @@ export default async function ExporterInventoryPage({
       </header>
 
       <div className="flex-1 overflow-y-auto p-6 lg:p-8 space-y-12 custom-scrollbar">
-        {/* Summary cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-[1600px] mx-auto">
-          {[
-            { k: "Total Listings", v: String(totalListed), color: "text-primary", bar: "bg-primary" },
-            { k: "Available", v: String(totalAvailable), color: "text-emerald-400", bar: "bg-emerald-400" },
-            { k: "Est. Portfolio Value", v: formatMoney(totalValue), color: "text-amber-400", bar: "bg-amber-400" },
-          ].map((s) => (
-            <div key={s.k} className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-2xl rounded-3xl p-8 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 blur-2xl rounded-full -mr-12 -mt-12 group-hover:bg-white/10 transition-colors" />
-              <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">{s.k}</div>
-              <div className={`text-4xl font-black mt-3 ${s.color}`}>{s.v}</div>
-              <div className="mt-6 h-1 w-full bg-slate-800/50 rounded-full overflow-hidden">
-                <div className={`h-full ${s.bar} w-[60%] shadow-[0_0_10px_rgba(0,0,0,0.5)]`} />
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* NEW: Category Selection Directory */}
-        <div className="max-w-[1600px] mx-auto">
-          <CategoryDirectory />
-        </div>
-
-        {/* Category Performance */}
-        <div className="max-w-[1600px] mx-auto">
-          <h2 className="text-sm font-black text-white uppercase tracking-widest mb-6 opacity-80 border-b border-white/10 pb-2 inline-block">
-            Category Performance
-          </h2>
-          {categoriesData.length === 0 ? (
-            <div className="rounded-3xl border border-white/5 bg-[#151c2a]/40 p-12 text-center text-slate-500 italic">
-              Create your first product to see category performance analytics.
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {categoriesData.map((c) => {
-                const styleDef = CATEGORY_COLORS[c.name] || CATEGORY_COLORS.OTHER;
-                const bgClasses = styleDef.split(" ").slice(0, -1).join(" ");
-                const textClass = styleDef.split(" ").pop(); // gets the text color for the title
-
-                return (
-                  <div key={c.name} className={`bg-gradient-to-br ${bgClasses} backdrop-blur-xl border shadow-xl rounded-2xl p-5 hover:-translate-y-1 transition-transform group`}>
-                    <div className={`font-black text-sm uppercase tracking-wider ${textClass} opacity-90`}>{c.name}</div>
-                    <div className="flex items-center justify-between mt-4">
-                      <div>
-                        <div className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Products</div>
-                        <div className="text-white font-black text-xl">{formatNumber(c.productCount)}</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Revenue</div>
-                        <div className="text-emerald-400 font-black text-xl">{formatMoney(c.revenue)}</div>
-                      </div>
-                    </div>
-                    <div className="mt-4 h-1 w-full bg-slate-800/60 rounded-full overflow-hidden">
-                      <div className="h-full bg-white/40 rounded-full group-hover:bg-white/80 transition-all duration-500" style={{ width: `${Math.max((c.revenue / maxCategoryRev) * 100, 5)}%` }} />
-                    </div>
+        {totalListed === 0 ? (
+          <div className="max-w-4xl mx-auto pt-20">
+            <EmptyState 
+              iconName="package"
+              title="No Products Identified"
+              description="Your global inventory is empty. Start by listing your first product to reach international importers."
+              actionLabel="Add First Product"
+              href="/dashboard/exporter/inventory" // Or appropriate link
+            />
+          </div>
+        ) : (
+          <>
+            {/* Summary cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-[1600px] mx-auto">
+              {[
+                { k: "Total Listings", v: String(totalListed), color: "text-primary", bar: "bg-primary" },
+                { k: "Available", v: String(totalAvailable), color: "text-emerald-400", bar: "bg-emerald-400" },
+                { k: "Est. Portfolio Value", v: formatMoney(totalValue), color: "text-amber-400", bar: "bg-amber-400" },
+              ].map((s) => (
+                <div key={s.k} className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-2xl rounded-3xl p-8 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 blur-2xl rounded-full -mr-12 -mt-12 group-hover:bg-white/10 transition-colors" />
+                  <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">{s.k}</div>
+                  <div className={`text-4xl font-black mt-3 ${s.color}`}>{s.v}</div>
+                  <div className="mt-6 h-1 w-full bg-slate-800/50 rounded-full overflow-hidden">
+                    <div className={`h-full ${s.bar} w-[60%] shadow-[0_0_10px_rgba(0,0,0,0.5)]`} />
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
-          )}
-        </div>
 
-        {/* Interactive Products table */}
-        <div className="max-w-[1600px] mx-auto pb-12">
-          <InventoryTable products={products} />
+            {/* NEW: Category Selection Directory */}
+            <div className="max-w-[1600px] mx-auto">
+              <CategoryDirectory />
+            </div>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 mt-12 pb-12">
-              <Link
-                href={`?${new URLSearchParams({ ...searchParams, page: (page - 1).toString() })}`}
-                className={`px-6 py-3 rounded-2xl border border-white/5 text-[10px] uppercase font-black tracking-widest transition-all ${page <= 1 ? "opacity-50 pointer-events-none" : "hover:bg-white/5"
-                  }`}
-              >
-                Prev
-              </Link>
-              <div className="flex items-center gap-2">
-                {Array.from({ length: totalPages }).map((_, i) => {
-                  const p = i + 1;
-                  if (p === 1 || p === totalPages || (p >= page - 1 && p <= page + 1)) {
+            {/* Category Performance */}
+            <div className="max-w-[1600px] mx-auto">
+              <h2 className="text-sm font-black text-white uppercase tracking-widest mb-6 opacity-80 border-b border-white/10 pb-2 inline-block">
+                Category Performance
+              </h2>
+              {categoriesData.length === 0 ? (
+                <div className="rounded-3xl border border-white/5 bg-[#151c2a]/40 p-12 text-center text-slate-500 italic">
+                  Create your first product to see category performance analytics.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {categoriesData.map((c) => {
+                    const styleDef = CATEGORY_COLORS[c.name] || CATEGORY_COLORS.OTHER;
+                    const bgClasses = styleDef.split(" ").slice(0, -1).join(" ");
+                    const textClass = styleDef.split(" ").pop();
+
                     return (
-                      <Link
-                        key={p}
-                        href={`?${new URLSearchParams({ ...searchParams, page: p.toString() })}`}
-                        className={`w-11 h-11 flex items-center justify-center rounded-2xl border text-[10px] font-black transition-all ${page === p ? "bg-primary border-primary text-white shadow-xl shadow-primary/20" : "border-white/5 hover:bg-white/5 text-slate-500"
-                          }`}
-                      >
-                        {p}
-                      </Link>
+                      <div key={c.name} className={`bg-gradient-to-br ${bgClasses} backdrop-blur-xl border shadow-xl rounded-2xl p-5 hover:-translate-y-1 transition-transform group`}>
+                        <div className={`font-black text-sm uppercase tracking-wider ${textClass} opacity-90`}>{c.name}</div>
+                        <div className="flex items-center justify-between mt-4">
+                          <div>
+                            <div className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Products</div>
+                            <div className="text-white font-black text-xl">{formatNumber(c.productCount)}</div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Revenue</div>
+                            <div className="text-emerald-400 font-black text-xl">{formatMoney(c.revenue)}</div>
+                          </div>
+                        </div>
+                        <div className="mt-4 h-1 w-full bg-slate-800/60 rounded-full overflow-hidden">
+                          <div className="h-full bg-white/40 rounded-full group-hover:bg-white/80 transition-all duration-500" style={{ width: `${Math.max((c.revenue / maxCategoryRev) * 100, 5)}%` }} />
+                        </div>
+                      </div>
                     );
-                  }
-                  if (p === page - 2 || p === page + 2) {
-                    return <span key={p} className="text-slate-700 px-1 font-black">...</span>;
-                  }
-                  return null;
-                })}
-              </div>
-              <Link
-                href={`?${new URLSearchParams({ ...searchParams, page: (page + 1).toString() })}`}
-                className={`px-6 py-3 rounded-2xl border border-white/5 text-[10px] uppercase font-black tracking-widest transition-all ${page >= totalPages ? "opacity-50 pointer-events-none" : "hover:bg-white/5"
-                  }`}
-              >
-                Next
-              </Link>
+                  })}
+                </div>
+              )}
             </div>
-          )}
-        </div>
+
+            {/* Interactive Products table */}
+            <div className="max-w-[1600px] mx-auto pb-12">
+              <InventoryTable products={products} />
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-2 mt-12 pb-12">
+                  <Link
+                    href={`?${new URLSearchParams({ ...searchParams, page: (page - 1).toString() })}`}
+                    className={`px-6 py-3 rounded-2xl border border-white/5 text-[10px] uppercase font-black tracking-widest transition-all ${page <= 1 ? "opacity-50 pointer-events-none" : "hover:bg-white/5"
+                      }`}
+                  >
+                    Prev
+                  </Link>
+                  <div className="flex items-center gap-2">
+                    {Array.from({ length: totalPages }).map((_, i) => {
+                      const p = i + 1;
+                      if (p === 1 || p === totalPages || (p >= page - 1 && p <= page + 1)) {
+                        return (
+                          <Link
+                            key={p}
+                            href={`?${new URLSearchParams({ ...searchParams, page: p.toString() })}`}
+                            className={`w-11 h-11 flex items-center justify-center rounded-2xl border text-[10px] font-black transition-all ${page === p ? "bg-primary border-primary text-white shadow-xl shadow-primary/20" : "border-white/5 hover:bg-white/5 text-slate-500"
+                              }`}
+                          >
+                            {p}
+                          </Link>
+                        );
+                      }
+                      if (p === page - 2 || p === page + 2) {
+                        return <span key={p} className="text-slate-700 px-1 font-black">...</span>;
+                      }
+                      return null;
+                    })}
+                  </div>
+                  <Link
+                    href={`?${new URLSearchParams({ ...searchParams, page: (page + 1).toString() })}`}
+                    className={`px-6 py-3 rounded-2xl border border-white/5 text-[10px] uppercase font-black tracking-widest transition-all ${page >= totalPages ? "opacity-50 pointer-events-none" : "hover:bg-white/5"
+                      }`}
+                  >
+                    Next
+                  </Link>
+                </div>
+              )}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

@@ -7,6 +7,7 @@ import {
   Lock,
   Mail,
   ShieldCheck,
+  Smartphone,
   TrendingUp,
   Zap,
 } from "lucide-react";
@@ -31,11 +32,10 @@ function getApiErrorMessage(error: unknown): string | null {
 export default function LoginPage() {
   const router = useRouter();
   const { refreshUser } = useAuth();
+  const [mfaData, setMfaData] = useState<{ factors: any[], user: any } | null>(null);
+  const [mfaCode, setMfaCode] = useState("");
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,6 +43,13 @@ export default function LoginPage() {
 
     try {
       const response = await axios.post("/api/auth/login", formData);
+
+      if (response.data.mfaRequired) {
+        setMfaData(response.data);
+        setIsLoading(false);
+        toast.info("Multi-Factor Authentication required");
+        return;
+      }
 
       // Refresh global auth context
       await refreshUser();
@@ -58,6 +65,33 @@ export default function LoginPage() {
       }
     } catch (error: unknown) {
       toast.error(getApiErrorMessage(error) ?? "Login failed");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleMfaSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      await axios.post("/api/auth/mfa/verify", {
+        factorId: mfaData!.factors[0].id,
+        code: mfaCode,
+      });
+
+      // After MFA verification in Supabase, we are fully signed in with AAL2
+      await refreshUser();
+      toast.success("MFA verified. Login complete.");
+      
+      // Since we don't have the role from the MFA verify response usually, 
+      // fetchUser (via refreshUser) will update the state, and we can just 
+      // check the profile we got earlier or just wait for refresh.
+      // For simplicity, redirect to dashboard root for non-USER roles
+      router.push("/dashboard"); 
+
+    } catch (error: unknown) {
+      toast.error("MFA verification failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -180,86 +214,143 @@ export default function LoginPage() {
               transition={{ duration: 0.35 }}
               className="space-y-6"
             >
-              <div className="space-y-2">
-                <h1 className="text-3xl font-extrabold tracking-tight">Access Terminal</h1>
-                <p className="text-muted-foreground">
-                  Welcome back. Enter your credentials to continue.
-                </p>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-muted-foreground ml-1">
-                    Email
-                  </label>
-                  <div className="relative group">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors w-5 h-5" />
-                    <input
-                      className="w-full pl-12 pr-4 py-4 bg-background border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-ring/20 transition-all placeholder:text-muted-foreground"
-                      placeholder="you@company.com"
-                      type="email"
-                      required
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    />
+              {!mfaData ? (
+                <>
+                  <div className="space-y-2">
+                    <h1 className="text-3xl font-extrabold tracking-tight">Access Terminal</h1>
+                    <p className="text-muted-foreground">
+                      Welcome back. Enter your credentials to continue.
+                    </p>
                   </div>
-                </div>
 
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center px-1">
-                    <label className="text-sm font-semibold text-muted-foreground">
-                      Password
-                    </label>
-                    <Link
-                      href="/forgot-password"
-                      className="text-xs font-bold text-primary hover:underline"
+                  <form onSubmit={handleSubmit} className="space-y-5">
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-muted-foreground ml-1">
+                        Email
+                      </label>
+                      <div className="relative group">
+                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors w-5 h-5" />
+                        <input
+                          className="w-full pl-12 pr-4 py-4 bg-background border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-ring/20 transition-all placeholder:text-muted-foreground"
+                          placeholder="you@company.com"
+                          type="email"
+                          required
+                          value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center px-1">
+                        <label className="text-sm font-semibold text-muted-foreground">
+                          Password
+                        </label>
+                        <Link
+                          href="/forgot-password"
+                          className="text-xs font-bold text-primary hover:underline"
+                        >
+                          Lost key?
+                        </Link>
+                      </div>
+                      <div className="relative group">
+                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors w-5 h-5" />
+                        <input
+                          className="w-full pl-12 pr-4 py-4 bg-background border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-ring/20 transition-all placeholder:text-muted-foreground"
+                          placeholder="••••••••"
+                          type="password"
+                          required
+                          value={formData.password}
+                          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 py-1">
+                      <input
+                        className="w-5 h-5 rounded border-input bg-background text-primary focus:ring-ring/30"
+                        id="remember"
+                        type="checkbox"
+                      />
+                      <label
+                        className="text-sm text-muted-foreground select-none cursor-pointer"
+                        htmlFor="remember"
+                      >
+                        Stay signed in on this device
+                      </label>
+                    </div>
+
+                    <Button
+                      type="submit"
+                      disabled={isLoading}
+                      size="lg"
+                      className="w-full group"
                     >
-                      Lost key?
-                    </Link>
+                      {isLoading ? (
+                        "Signing in..."
+                      ) : (
+                        <>
+                          Join the Network
+                          <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
+                        </>
+                      )}
+                    </Button>
+                  </form>
+                </>
+              ) : (
+                <>
+                  <div className="space-y-2">
+                    <h1 className="text-3xl font-extrabold tracking-tight">Security Check</h1>
+                    <p className="text-muted-foreground">
+                      Two-factor authentication is enabled for this account.
+                    </p>
                   </div>
-                  <div className="relative group">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors w-5 h-5" />
-                    <input
-                      className="w-full pl-12 pr-4 py-4 bg-background border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-ring/20 transition-all placeholder:text-muted-foreground"
-                      placeholder="••••••••"
-                      type="password"
-                      required
-                      value={formData.password}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    />
-                  </div>
-                </div>
 
-                <div className="flex items-center gap-3 py-1">
-                  <input
-                    className="w-5 h-5 rounded border-input bg-background text-primary focus:ring-ring/30"
-                    id="remember"
-                    type="checkbox"
-                  />
-                  <label
-                    className="text-sm text-muted-foreground select-none cursor-pointer"
-                    htmlFor="remember"
-                  >
-                    Stay signed in on this device
-                  </label>
-                </div>
+                  <form onSubmit={handleMfaSubmit} className="space-y-6">
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3 p-4 rounded-xl bg-primary/5 border border-primary/20">
+                        <Smartphone className="w-5 h-5 text-primary" />
+                        <div className="text-sm">
+                          <span className="font-bold">Authenticator App</span>
+                          <p className="text-muted-foreground text-xs">Verified device</p>
+                        </div>
+                      </div>
 
-                <Button
-                  type="submit"
-                  disabled={isLoading}
-                  size="lg"
-                  className="w-full group"
-                >
-                  {isLoading ? (
-                    "Signing in..."
-                  ) : (
-                    <>
-                      Join the Network
-                      <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
-                    </>
-                  )}
-                </Button>
-              </form>
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-muted-foreground ml-1">
+                          Verification Code
+                        </label>
+                        <input
+                          className="w-full px-4 py-4 bg-background border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-ring/20 transition-all text-center text-2xl font-black tracking-[0.5em] placeholder:text-muted-foreground/30"
+                          placeholder="000000"
+                          type="text"
+                          required
+                          maxLength={6}
+                          value={mfaCode}
+                          onChange={(e) => setMfaCode(e.target.value)}
+                        />
+                      </div>
+                    </div>
+
+                    <Button
+                      type="submit"
+                      disabled={isLoading || mfaCode.length !== 6}
+                      size="lg"
+                      className="w-full"
+                    >
+                      {isLoading ? "Verifying..." : "Verify Identity"}
+                    </Button>
+
+                    <button
+                      type="button"
+                      className="w-full text-xs font-bold text-muted-foreground hover:text-primary transition-colors"
+                      onClick={() => setMfaData(null)}
+                    >
+                      Cancel and go back
+                    </button>
+                  </form>
+                </>
+              )}
 
               <p className="text-center text-sm text-muted-foreground">
                 New here?{" "}
