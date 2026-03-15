@@ -3,6 +3,8 @@ import { stripe } from '@/lib/stripe';
 import { prisma } from '@/lib/prisma';
 import { getApiAuthContext } from '@/lib/supabase/auth';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: NextRequest) {
   try {
     const auth = await getApiAuthContext(req);

@@ -162,7 +162,6 @@ export default function ProductForm({
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [newCertification, setNewCertification] = useState("");
     const [customCategory, setCustomCategory] = useState("");
-    const [searchTerm, setSearchTerm] = useState("");
     const [previewImage, setPreviewImage] = useState<string | null>(null);
 
     const handleChange = (
@@ -251,8 +250,9 @@ export default function ProductForm({
             toast.success(isEdit ? "Product updated successfully!" : "Product created successfully!");
             router.push("/dashboard/exporter/inventory");
             router.refresh();
-        } catch (e: any) {
-            toast.error(e.message || "Something went wrong");
+        } catch (e: unknown) {
+            const message = e instanceof Error ? e.message : "Something went wrong";
+            toast.error(message);
         } finally {
             setIsSubmitting(false);
         }

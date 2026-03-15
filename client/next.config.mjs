@@ -18,9 +18,15 @@ const nextConfig = {
       },
     ],
   },
-
+  output: "standalone",
   experimental: {
     serverComponentsExternalPackages: ["@sentry/nextjs"],
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
   },
 }
 

@@ -7,6 +7,8 @@ import { getServerAuth } from "@/lib/supabase/server";
 import { formatCurrency } from "@/lib/api-utils";
 import OrdersList from "@/components/dashboard/OrdersList";
 
+export const dynamic = 'force-dynamic';
+
 export default async function ImporterOrdersPage() {
   const auth = await getServerAuth();
   if (!auth) redirect("/login");

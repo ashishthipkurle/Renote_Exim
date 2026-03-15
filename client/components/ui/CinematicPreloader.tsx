@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import gsap from "gsap";
 
@@ -16,7 +16,6 @@ export default function CinematicPreloader() {
     const [status, setStatus] = useState<"idle" | "playing" | "finished">("idle");
     const [activeTexts, setActiveTexts] = useState<string[]>(["ENTERING", "RANOTE EXIM", "PORTAL"]);
     const pathname = usePathname();
-    const isFirstMount = useRef(true);
 
     // Effect 1: Trigger Logic
     useEffect(() => {

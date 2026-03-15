@@ -52,9 +52,35 @@ export default async function ProductDetailPage({
         },
       },
     });
-  } catch {
-    // Prisma might fail due to DB connection issues — show not found
-    product = null;
+  } catch (error) {
+    console.error("Prisma fallback triggered for product detail:", error);
+    try {
+      const env = require("@/lib/supabase/shared").tryGetSupabaseEnv();
+      if (env) {
+        const { createClient } = require("@supabase/supabase-js");
+        const supabase = createClient(env.url, env.anonKey);
+        const { data: supaProduct, error: supaError } = await supabase
+          .from('products')
+          .select('*, exporter:users!exporterId(id, name, companyName, country, website)')
+          .eq('id', id)
+          .maybeSingle();
+
+        if (!supaError && supaProduct) {
+          product = {
+            ...supaProduct,
+            exporter: Array.isArray(supaProduct.exporter) ? supaProduct.exporter[0] : supaProduct.exporter
+          } as any;
+        } else {
+          console.error("Supabase fallback failed:", supaError);
+          product = null;
+        }
+      } else {
+        product = null;
+      }
+    } catch (fallbackError) {
+      console.error("Supabase fallback setup failed:", fallbackError);
+      product = null;
+    }
   }
 
   if (!product) notFound();
