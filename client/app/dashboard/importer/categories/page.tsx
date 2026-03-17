@@ -9,8 +9,7 @@ import {
   Layers,
   Search,
   Filter,
-  Sparkles,
-  PieChart
+  Sparkles
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -94,15 +93,15 @@ export default function ImporterCategoriesPage() {
   const maxSpent = Math.max(...(data?.categories?.map((c) => c.spent) ?? [1]), 1);
 
   return (
-    <div className="h-dvh overflow-hidden flex flex-col bg-[#0a0c12]">
-      <header className="flex-shrink-0 p-6 lg:p-8 border-b border-white/5 bg-gradient-to-r from-[#0d1017] to-transparent">
+    <div className="h-dvh overflow-hidden flex flex-col bg-slate-50 dark:bg-[#0a0c12] transition-colors duration-300">
+      <header className="flex-shrink-0 p-6 lg:p-8 border-b border-slate-200 dark:border-white/5 bg-white dark:bg-gradient-to-r dark:from-[#0d1017] dark:to-transparent transition-colors duration-300">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-white flex items-center gap-3">
+            <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-3">
               Market Segments
               <Layers className="w-8 h-8 text-primary" />
             </h1>
-            <p className="text-slate-400 mt-1">Configure your procurement focus and category intelligence.</p>
+            <p className="text-slate-500 dark:text-slate-400 mt-1">Configure your procurement focus and category intelligence.</p>
           </div>
 
           <div className="flex items-center gap-4">
@@ -113,10 +112,10 @@ export default function ImporterCategoriesPage() {
                 placeholder="Find category..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="bg-white/5 border border-white/10 rounded-2xl py-3 pl-11 pr-4 text-white font-bold text-sm focus:ring-2 focus:ring-primary/50 outline-none w-64 transition-all"
+                className="bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl py-3 pl-11 pr-4 text-slate-900 dark:text-white font-bold text-sm focus:ring-2 focus:ring-primary/40 outline-none w-64 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 shadow-inner dark:shadow-none"
               />
             </div>
-            <button className="p-3.5 rounded-2xl bg-white/5 border border-white/10 text-slate-400 hover:text-white transition-all">
+            <button className="p-3.5 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all shadow-sm dark:shadow-none">
               <Filter className="w-5 h-5" />
             </button>
           </div>
@@ -151,20 +150,20 @@ export default function ImporterCategoriesPage() {
           {/* All Segments Section */}
           <section className="space-y-6 pb-12">
             <h2 className="text-sm font-black text-slate-500 uppercase tracking-[0.2em] flex items-center gap-2">
-              <div className="size-1.5 rounded-full bg-slate-700" />
+              <div className="size-1.5 rounded-full bg-slate-300 dark:bg-slate-700" />
               Available Global Segments
             </h2>
 
             {loading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {Array.from({ length: 8 }).map((_, i) => (
-                  <div key={i} className="h-48 bg-white/5 rounded-3xl animate-pulse border border-white/5" />
+                  <div key={i} className="h-48 bg-white dark:bg-white/5 rounded-3xl animate-pulse border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-none" />
                 ))}
               </div>
             ) : remaining.length === 0 && preferred.length === 0 ? (
-              <div className="bg-white/5 border border-white/5 border-dashed rounded-[32px] p-20 text-center">
-                <Package className="w-12 h-12 text-slate-700 mx-auto mb-4" />
-                <h3 className="text-white font-bold">No Categories Found</h3>
+              <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/5 border-dashed rounded-[32px] p-20 text-center shadow-sm dark:shadow-none">
+                <Package className="w-12 h-12 text-slate-400 dark:text-slate-700 mx-auto mb-4" />
+                <h3 className="text-slate-900 dark:text-white font-bold">No Categories Found</h3>
                 <p className="text-slate-500 text-sm">No segments match your current search constraints.</p>
               </div>
             ) : (
@@ -198,14 +197,14 @@ function CategoryCard({
   const style = CATEGORY_STYLES[category.name] || CATEGORY_STYLES.OTHER;
 
   return (
-    <div className={`group bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-xl rounded-3xl p-6 transition-all hover:scale-[1.03] hover:border-primary/20`}>
+    <div className={`group bg-white dark:bg-[#151c2a]/60 backdrop-blur-xl border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-xl rounded-3xl p-6 transition-all hover:scale-[1.03] hover:border-primary/30 dark:hover:border-primary/20 hover:shadow-lg dark:hover:shadow-primary/5`}>
       <div className="flex justify-between items-start mb-6">
         <div className="flex items-center gap-3">
-          <div className="size-12 rounded-2xl bg-white/5 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+          <div className="size-12 rounded-2xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
             {style.icon}
           </div>
           <div>
-            <div className="text-white font-black text-lg tracking-tight uppercase leading-none">{category.name}</div>
+            <div className="text-slate-900 dark:text-white font-black text-lg tracking-tight uppercase leading-none">{category.name}</div>
             <div className="text-[10px] text-slate-500 font-bold uppercase mt-1">Market Segment</div>
           </div>
         </div>
@@ -213,7 +212,7 @@ function CategoryCard({
           onClick={onToggle}
           className={`p-2 rounded-xl transition-all ${category.isPreferred
               ? "bg-primary text-white shadow-lg shadow-primary/20"
-              : "bg-white/5 text-slate-500 hover:text-white"
+              : "bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white"
             }`}
         >
           <Star className={`w-4 h-4 ${category.isPreferred ? "fill-current" : ""}`} />
@@ -221,14 +220,14 @@ function CategoryCard({
       </div>
 
       <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="bg-white/5 rounded-2xl p-3 border border-white/5">
+        <div className="bg-slate-50 dark:bg-white/5 rounded-2xl p-3 border border-slate-200 dark:border-white/5">
           <div className="text-[10px] text-slate-500 font-bold uppercase mb-1">Items Ordered</div>
-          <div className="text-white font-black flex items-center gap-2">
+          <div className="text-slate-900 dark:text-white font-black flex items-center gap-2">
             <Package className="w-3 h-3 text-primary" />
             {formatNumber(category.productCount)}
           </div>
         </div>
-        <div className="bg-white/5 rounded-2xl p-3 border border-white/5">
+        <div className="bg-slate-50 dark:bg-white/5 rounded-2xl p-3 border border-slate-200 dark:border-white/5">
           <div className="text-[10px] text-slate-500 font-bold uppercase mb-1">Fiscal Spent</div>
           <div className="text-primary font-black">
             {formatCurrency(category.spent)}
@@ -239,9 +238,9 @@ function CategoryCard({
       <div className="space-y-2">
         <div className="flex justify-between text-[8px] font-black uppercase tracking-widest text-slate-500">
           <span>Market Penetration</span>
-          <span className="text-white">{Math.round((category.spent / maxSpent) * 100)}%</span>
+          <span className="text-slate-900 dark:text-white">{Math.round((category.spent / maxSpent) * 100)}%</span>
         </div>
-        <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden border border-white/5">
+        <div className="h-1.5 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-300 dark:border-white/5">
           <div
             className={`h-full bg-gradient-to-r from-primary to-cyan-400 rounded-full transition-all duration-1000`}
             style={{ width: `${Math.max((category.spent / maxSpent) * 100, 2)}%` }}
@@ -249,10 +248,10 @@ function CategoryCard({
         </div>
       </div>
 
-      <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between">
+      <div className="mt-6 pt-4 border-t border-slate-200 dark:border-white/5 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Sparkles className="w-3 h-3 text-amber-500" />
-          <span className="text-[10px] text-slate-400 font-bold">{category.totalAvailable} Marketplace Items</span>
+          <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold">{category.totalAvailable} Marketplace Items</span>
         </div>
         <button className="text-[10px] font-black text-primary uppercase flex items-center gap-1 group/btn">
           Explore

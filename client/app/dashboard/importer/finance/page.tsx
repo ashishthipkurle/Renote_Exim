@@ -83,20 +83,20 @@ export default function ImporterFinancePage() {
   const isOverBudget = budgetProgress > 100;
 
   return (
-    <div className="h-dvh overflow-hidden flex flex-col bg-gradient-to-br from-[#0a0c12] via-[#0d1017] to-[#0a0c12]">
-      <header className="flex-shrink-0 p-6 lg:p-8 border-b border-white/5">
+    <div className="h-dvh overflow-hidden flex flex-col bg-slate-50 dark:bg-gradient-to-br dark:from-[#0a0c12] dark:via-[#0d1017] dark:to-[#0a0c12] transition-colors duration-300">
+      <header className="flex-shrink-0 p-6 lg:p-8 border-b border-slate-200 dark:border-white/5 bg-white dark:bg-transparent transition-colors duration-300">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-white flex items-center gap-3">
+            <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-3">
               Finance Hub
               <Wallet className="w-8 h-8 text-primary" />
             </h1>
-            <p className="text-slate-400 mt-1">Strategic cash flow and procurement budget management.</p>
+            <p className="text-slate-500 dark:text-slate-400 mt-1">Strategic cash flow and procurement budget management.</p>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={() => toast.success("Generating report...")}
-              className="bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 font-bold py-3 px-6 rounded-2xl transition-all flex items-center gap-2"
+              className="bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 font-bold py-3 px-6 rounded-2xl transition-all flex items-center gap-2"
             >
               <FileText className="w-4 h-4" />
               Tax Statement
@@ -109,28 +109,28 @@ export default function ImporterFinancePage() {
         <div className="max-w-[1600px] mx-auto space-y-8">
           {/* Top Analytics Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-            <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-xl rounded-3xl p-6 relative overflow-hidden group">
+            <div className="bg-white dark:bg-[#151c2a]/60 backdrop-blur-xl border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-xl rounded-3xl p-6 relative overflow-hidden group">
               <div className="absolute -right-4 -top-4 size-24 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-all" />
               <div className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">Total Procurement</div>
-              <div className="text-3xl font-black text-white">{loading ? "..." : formatCurrency(data?.totalBalance ?? 0)}</div>
+              <div className="text-3xl font-black text-slate-900 dark:text-white">{loading ? "..." : formatCurrency(data?.totalBalance ?? 0)}</div>
               <div className="mt-4 flex items-center gap-2 text-emerald-400 text-xs font-bold">
                 <ArrowUpRight className="w-3 h-3" />
                 +12.5% from last month
               </div>
             </div>
 
-            <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-xl rounded-3xl p-6 relative overflow-hidden group">
+            <div className="bg-white dark:bg-[#151c2a]/60 backdrop-blur-xl border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-xl rounded-3xl p-6 relative overflow-hidden group">
               <div className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">Uncleared Payouts</div>
-              <div className="text-3xl font-black text-amber-400">{loading ? "..." : formatCurrency(data?.pendingPayouts ?? 0)}</div>
+              <div className="text-3xl font-black text-amber-500 dark:text-amber-400">{loading ? "..." : formatCurrency(data?.pendingPayouts ?? 0)}</div>
               <div className="mt-4 flex items-center gap-2 text-slate-500 text-xs font-bold">
                 <TrendingUp className="w-3 h-3" />
                 In flight payments
               </div>
             </div>
 
-            <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-xl rounded-3xl p-6 relative overflow-hidden group">
+            <div className="bg-white dark:bg-[#151c2a]/60 backdrop-blur-xl border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-xl rounded-3xl p-6 relative overflow-hidden group">
               <div className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">Tax Provisioning</div>
-              <div className="text-3xl font-black text-rose-400">{loading ? "..." : formatCurrency(data?.estTaxLiability ?? 0)}</div>
+              <div className="text-3xl font-black text-rose-500 dark:text-rose-400">{loading ? "..." : formatCurrency(data?.estTaxLiability ?? 0)}</div>
               <div className="mt-4 flex items-center gap-2 text-slate-500 text-xs font-bold">
                 <AlertCircle className="w-3 h-3" />
                 Based on 10% estimation
@@ -138,25 +138,25 @@ export default function ImporterFinancePage() {
             </div>
 
             {/* Budget Tracker Card */}
-            <div className="bg-primary/10 backdrop-blur-xl border border-primary/20 shadow-xl rounded-3xl p-6 relative overflow-hidden group">
+            <div className="bg-primary/5 dark:bg-primary/10 backdrop-blur-xl border border-primary/20 shadow-sm dark:shadow-xl rounded-3xl p-6 relative overflow-hidden group">
               <div className="flex justify-between items-start mb-1">
                 <div className="text-primary text-[10px] font-black uppercase tracking-widest">Monthly Budget</div>
                 <button
                   onClick={() => setIsBudgetModalOpen(true)}
-                  className="p-1 rounded-lg bg-primary text-white hover:scale-110 transition-transform"
+                  className="p-1 rounded-lg bg-primary text-white hover:scale-110 transition-transform shadow-[0_0_10px_rgba(37,99,235,0.2)] dark:shadow-none"
                 >
                   <Plus className="w-3 h-3" />
                 </button>
               </div>
-              <div className="text-3xl font-black text-white">{loading ? "..." : formatCurrency(data?.monthlyBudget ?? 0)}</div>
+              <div className="text-3xl font-black text-slate-900 dark:text-white">{loading ? "..." : formatCurrency(data?.monthlyBudget ?? 0)}</div>
               <div className="mt-4 space-y-2">
                 <div className="flex justify-between text-[10px] font-bold">
-                  <span className="text-slate-400">Usage Progress</span>
-                  <span className={isOverBudget ? "text-rose-400" : "text-primary"}>
+                  <span className="text-slate-500 dark:text-slate-400">Usage Progress</span>
+                  <span className={isOverBudget ? "text-rose-500 dark:text-rose-400" : "text-primary"}>
                     {budgetProgress.toFixed(1)}%
                   </span>
                 </div>
-                <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden border border-white/5">
+                <div className="h-2 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-300 dark:border-white/5">
                   <div
                     className={`h-full transition-all duration-1000 ${isOverBudget ? "bg-rose-500" : "bg-primary"}`}
                     style={{ width: `${Math.min(budgetProgress, 100)}%` }}
@@ -168,16 +168,16 @@ export default function ImporterFinancePage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* Spending Chart */}
-            <section className="lg:col-span-8 bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-xl rounded-3xl p-8">
+            <section className="lg:col-span-8 bg-white dark:bg-[#151c2a]/60 backdrop-blur-xl border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-xl rounded-3xl p-8">
               <div className="flex items-center justify-between mb-10">
                 <div>
-                  <h3 className="text-xl font-black text-white flex items-center gap-3">
+                  <h3 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-3">
                     Spending Trajectory
                     <BarChart3 className="w-5 h-5 text-primary" />
                   </h3>
                   <p className="text-slate-500 text-sm mt-1">Confirmed payments across the last 6 fiscal months.</p>
                 </div>
-                <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-[10px] font-bold text-slate-400">
+                <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] font-bold text-slate-500 dark:text-slate-400">
                   <Calendar className="w-3.5 h-3.5" />
                   Jan 2026 - Jun 2026
                 </div>
@@ -191,10 +191,10 @@ export default function ImporterFinancePage() {
                     <div key={sh.month} className="flex-1 flex flex-col items-center gap-4 group/bar">
                       <div className="w-full relative">
                         <div
-                          className={`w-full rounded-t-xl transition-all duration-700 bg-gradient-to-t ${i === 5 ? "from-primary/20 to-primary shadow-[0_0_20px_rgba(37,99,235,0.2)]" : "from-slate-800 to-slate-700 hover:to-slate-600"}`}
+                          className={`w-full rounded-t-xl transition-all duration-700 bg-gradient-to-t ${i === 5 ? "from-primary/20 to-primary shadow-[0_0_20px_rgba(37,99,235,0.2)] dark:shadow-[0_0_20px_rgba(37,99,235,0.2)]" : "from-slate-200 to-slate-300 hover:to-slate-400 dark:from-slate-800 dark:to-slate-700 dark:hover:to-slate-600"}`}
                           style={{ height: `${height}%` }}
                         />
-                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-white text-black text-[10px] font-black px-2 py-1 rounded opacity-0 group-hover/bar:opacity-100 transition-opacity whitespace-nowrap">
+                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 dark:bg-white text-white dark:text-black text-[10px] font-black px-2 py-1 rounded opacity-0 group-hover/bar:opacity-100 transition-opacity whitespace-nowrap z-10">
                           {formatCurrency(sh.amount)}
                         </div>
                       </div>
@@ -206,16 +206,16 @@ export default function ImporterFinancePage() {
             </section>
 
             {/* Invoices List */}
-            <section className="lg:col-span-4 bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-xl rounded-3xl p-8 flex flex-col">
+            <section className="lg:col-span-4 bg-white dark:bg-[#151c2a]/60 backdrop-blur-xl border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-xl rounded-3xl p-8 flex flex-col">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-black text-white">Invoices</h3>
+                <h3 className="text-xl font-black text-slate-900 dark:text-white">Invoices</h3>
                 <button className="text-[10px] font-black text-primary uppercase tracking-widest hover:underline">View All</button>
               </div>
 
               <div className="flex-1 space-y-4 overflow-y-auto no-scrollbar">
                 {loading ? (
                   Array.from({ length: 5 }).map((_, i) => (
-                    <div key={i} className="h-16 bg-slate-800/40 rounded-2xl animate-pulse" />
+                    <div key={i} className="h-16 bg-slate-100 dark:bg-slate-800/40 rounded-2xl animate-pulse" />
                   ))
                 ) : !data?.recentInvoices?.length ? (
                   <div className="h-full flex flex-col items-center justify-center p-8 opacity-20">
@@ -224,29 +224,29 @@ export default function ImporterFinancePage() {
                   </div>
                 ) : (
                   data.recentInvoices.map((inv) => (
-                    <div key={inv.id} className="group p-4 bg-white/5 border border-white/5 hover:border-white/10 rounded-2xl transition-all">
+                    <div key={inv.id} className="group p-4 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 hover:border-primary/20 dark:hover:border-white/10 rounded-2xl transition-all">
                       <div className="flex items-center justify-between gap-4 mb-3">
                         <div className="flex items-center gap-3">
-                          <div className="size-8 rounded-lg bg-white/5 flex items-center justify-center text-slate-400 group-hover:text-primary transition-colors">
+                          <div className="size-8 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-transparent flex items-center justify-center text-slate-400 group-hover:text-primary transition-colors shadow-sm dark:shadow-none">
                             <CreditCard className="w-4 h-4" />
                           </div>
                           <div>
-                            <div className="text-[10px] font-black text-white font-mono uppercase truncate max-w-[120px]">{inv.id}</div>
+                            <div className="text-[10px] font-black text-slate-900 dark:text-white font-mono uppercase truncate max-w-[120px]">{inv.id}</div>
                             <div className="text-[10px] text-slate-500 font-bold">{formatDate(inv.date)}</div>
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="text-sm font-black text-white">{formatCurrency(inv.amount)}</div>
-                          <div className={`text-[8px] font-black uppercase tracking-widest ${inv.status === "PAID" ? "text-emerald-400" : "text-amber-400"}`}>
+                          <div className="text-sm font-black text-slate-900 dark:text-white">{formatCurrency(inv.amount)}</div>
+                          <div className={`text-[8px] font-black uppercase tracking-widest ${inv.status === "PAID" ? "text-emerald-500 dark:text-emerald-400" : "text-amber-500 dark:text-amber-400"}`}>
                             {inv.status}
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center justify-between border-t border-white/5 pt-3">
+                      <div className="flex items-center justify-between border-t border-slate-200 dark:border-white/5 pt-3">
                         <div className="text-[10px] text-slate-500 font-bold truncate max-w-[150px]">{inv.seller}</div>
                         <button
                           onClick={() => toast.success("Invoice download started...")}
-                          className="size-6 rounded-lg bg-white/5 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all shadow-sm"
+                          className="size-6 rounded-lg bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-primary hover:text-white transition-all shadow-sm dark:shadow-none"
                         >
                           <Download className="w-3 h-3" />
                         </button>
@@ -267,7 +267,7 @@ export default function ImporterFinancePage() {
         title="Set Procurement Budget"
       >
         <div className="space-y-6">
-          <p className="text-slate-400 text-sm">
+          <p className="text-slate-500 dark:text-slate-400 text-sm">
             Define your monthly expenditure limit. We'll alert you when your confirmed payments approach this threshold.
           </p>
           <div className="space-y-2">
@@ -278,7 +278,7 @@ export default function ImporterFinancePage() {
                 type="number"
                 value={newBudget}
                 onChange={(e) => setNewBudget(e.target.value)}
-                className="w-full bg-slate-900/50 border border-white/10 rounded-2xl py-4 pl-10 pr-4 text-white font-black focus:ring-2 focus:ring-primary/50 outline-none transition-all"
+                className="w-full bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-2xl py-4 pl-10 pr-4 text-slate-900 dark:text-white font-black focus:ring-2 focus:ring-primary/50 outline-none transition-all shadow-inner dark:shadow-none"
                 placeholder="0.00"
               />
             </div>

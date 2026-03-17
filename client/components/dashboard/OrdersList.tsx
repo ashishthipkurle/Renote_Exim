@@ -46,7 +46,7 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
 
     return (
         <>
-            <div className="hidden lg:grid grid-cols-12 gap-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">
+            <div className="hidden lg:grid grid-cols-12 gap-4 px-6 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                 <div className="col-span-4">Product & Seller</div>
                 <div className="col-span-2">Amount</div>
                 <div className="col-span-2">Status</div>
@@ -62,24 +62,24 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
                         <div
                             key={order.id}
                             onClick={() => openDetails(order)}
-                            className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 hover:border-primary/30 transition-all cursor-pointer shadow-xl rounded-2xl p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4 items-center group"
+                            className="bg-white dark:bg-[#151c2a]/60 shadow-sm dark:shadow-xl backdrop-blur-xl border border-slate-200 dark:border-white/5 hover:border-primary/50 dark:hover:border-primary/30 transition-all cursor-pointer rounded-2xl p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4 items-center group"
                         >
                             <div className="lg:col-span-4 flex items-center gap-4">
-                                <div className="size-12 rounded-xl bg-slate-800 border border-white/5 flex-shrink-0 flex items-center justify-center overflow-hidden">
+                                <div className="size-12 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-white/5 flex-shrink-0 flex items-center justify-center overflow-hidden">
                                     {order.product.images?.[0] ? (
                                         <img src={order.product.images[0]} alt="" className="w-full h-full object-cover" />
                                     ) : (
-                                        <Package className="w-5 h-5 text-slate-500" />
+                                        <Package className="w-5 h-5 text-slate-400 dark:text-slate-500" />
                                     )}
                                 </div>
                                 <div>
-                                    <div className="text-sm font-bold text-white group-hover:text-primary transition-colors">{order.product.name}</div>
-                                    <div className="text-xs text-slate-400 mt-0.5">by {order.product.exporter.companyName || order.product.exporter.name}</div>
+                                    <div className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">{order.product.name}</div>
+                                    <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">by {order.product.exporter.companyName || order.product.exporter.name}</div>
                                 </div>
                             </div>
 
                             <div className="lg:col-span-2">
-                                <div className="text-white font-bold">{formatCurrency(order.totalPrice)}</div>
+                                <div className="text-slate-900 dark:text-white font-bold">{formatCurrency(order.totalPrice)}</div>
                                 <div className="text-[10px] text-slate-500 capitalize">{order.paymentStatus.toLowerCase()}</div>
                             </div>
 
@@ -91,13 +91,13 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
                             </div>
 
                             <div className="lg:col-span-2">
-                                <div className="text-sm text-slate-300">{formatDate(order.createdAt)}</div>
+                                <div className="text-sm text-slate-600 dark:text-slate-300">{formatDate(order.createdAt)}</div>
                             </div>
 
                             <div className="lg:col-span-2 flex justify-end gap-2">
                                 <button
                                     onClick={(e) => { e.stopPropagation(); openDetails(order); }}
-                                    className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+                                    className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"
                                     title="Order Details"
                                 >
                                     <Info className="w-4 h-4" />

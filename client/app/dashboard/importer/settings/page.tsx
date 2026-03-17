@@ -13,8 +13,6 @@ import {
   Camera,
   ShieldCheck,
   Lock,
-  BellRing,
-  CreditCard,
   Briefcase,
   FileText,
   Save,
@@ -101,11 +99,11 @@ export default function ImporterSettingsPage() {
   }
 
   return (
-    <div className="h-dvh overflow-hidden flex flex-col bg-[#0a0c12]">
-      <header className="flex-shrink-0 p-6 lg:p-8 border-b border-white/5">
+    <div className="h-dvh overflow-hidden flex flex-col bg-slate-50 dark:bg-[#0a0c12] transition-colors duration-300">
+      <header className="flex-shrink-0 p-6 lg:p-8 border-b border-slate-200 dark:border-white/5 bg-white dark:bg-transparent transition-colors duration-300">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-white italic">OPERATIONAL SETTINGS</h1>
+            <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white italic">OPERATIONAL SETTINGS</h1>
             <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-1">Configure your global procurement identity</p>
           </div>
           <button
@@ -121,7 +119,7 @@ export default function ImporterSettingsPage() {
 
       <div className="flex-1 flex overflow-hidden">
         {/* Nav Sidebar */}
-        <aside className="w-72 border-r border-white/5 p-6 space-y-2 overflow-y-auto hidden lg:block">
+        <aside className="w-72 border-r border-slate-200 dark:border-white/5 bg-white dark:bg-transparent p-6 space-y-2 overflow-y-auto hidden lg:block transition-colors duration-300">
           <TabButton active={activeTab === "profile"} onClick={() => setActiveTab("profile")} icon={User} label="Profile Persona" />
           <TabButton active={activeTab === "business"} onClick={() => setActiveTab("business")} icon={Building2} label="Entity Details" />
           <TabButton active={activeTab === "security"} onClick={() => setActiveTab("security")} icon={Lock} label="Security Core" />
@@ -135,19 +133,19 @@ export default function ImporterSettingsPage() {
                 {/* Header Section */}
                 <div className="flex items-center gap-8">
                   <div className="relative group">
-                    <div className="size-32 rounded-[2.5rem] bg-gradient-to-br from-primary/20 to-indigo-500/10 border-2 border-white/5 flex items-center justify-center text-4xl shadow-2xl relative overflow-hidden">
+                    <div className="size-32 rounded-[2.5rem] bg-gradient-to-br from-primary/20 to-indigo-500/10 border-2 border-slate-200 dark:border-white/5 flex items-center justify-center text-4xl shadow-sm dark:shadow-2xl relative overflow-hidden bg-white dark:bg-transparent">
                       {profile?.avatar ? (
                         <img src={profile.avatar} className="w-full h-full object-cover" />
                       ) : (
-                        <span className="font-black text-white">{form.name?.[0]?.toUpperCase() || "I"}</span>
+                        <span className="font-black text-slate-900 dark:text-white">{form.name?.[0]?.toUpperCase() || "I"}</span>
                       )}
                     </div>
-                    <button className="absolute -bottom-2 -right-2 size-10 rounded-2xl bg-primary text-white flex items-center justify-center shadow-xl border-4 border-[#0a0c12] group-hover:scale-110 transition-transform">
+                    <button className="absolute -bottom-2 -right-2 size-10 rounded-2xl bg-primary text-white flex items-center justify-center shadow-xl border-4 border-slate-50 dark:border-[#0a0c12] group-hover:scale-110 transition-transform">
                       <Camera className="w-4 h-4" />
                     </button>
                   </div>
                   <div>
-                    <h2 className="text-2xl font-black text-white px-1">Institutional Profile</h2>
+                    <h2 className="text-2xl font-black text-slate-900 dark:text-white px-1">Institutional Profile</h2>
                     <p className="text-slate-500 text-sm mt-1 px-1">How your entity appears to global exporters.</p>
                     <div className="flex items-center gap-3 mt-4">
                       <span className="px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest">Importer</span>
@@ -169,9 +167,9 @@ export default function ImporterSettingsPage() {
 
             {activeTab === "business" && (
               <section className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-10">
-                <div className="flex items-center gap-4 border-b border-white/5 pb-6">
+                <div className="flex items-center gap-4 border-b border-slate-200 dark:border-white/5 pb-6">
                   <Building2 className="w-6 h-6 text-primary" />
-                  <h2 className="text-xl font-black text-white uppercase tracking-tighter">Corporate Identity</h2>
+                  <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Corporate Identity</h2>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -190,16 +188,16 @@ export default function ImporterSettingsPage() {
 
             {activeTab === "security" && (
               <section className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-10">
-                <div className="flex items-center gap-4 border-b border-white/5 pb-6">
+                <div className="flex items-center gap-4 border-b border-slate-200 dark:border-white/5 pb-6">
                   <ShieldCheck className="w-6 h-6 text-primary" />
-                  <h2 className="text-xl font-black text-white uppercase tracking-tighter">Security Protocols</h2>
+                  <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Security Protocols</h2>
                 </div>
 
-                <div className="p-8 rounded-[2.5rem] bg-white/5 border border-white/5 border-dashed text-center space-y-4">
-                  <Lock className="w-12 h-12 text-slate-700 mx-auto" />
-                  <h3 className="text-white font-black uppercase tracking-widest text-sm">Access Credential Management</h3>
+                <div className="p-8 rounded-[2.5rem] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/5 border-dashed text-center space-y-4 shadow-sm dark:shadow-none">
+                  <Lock className="w-12 h-12 text-slate-400 dark:text-slate-700 mx-auto" />
+                  <h3 className="text-slate-900 dark:text-white font-black uppercase tracking-widest text-sm">Access Credential Management</h3>
                   <p className="text-slate-500 text-xs max-w-sm mx-auto">Update your security passcodes to maintain integrity within the global marketplace network.</p>
-                  <button className="px-6 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-white font-black text-[10px] uppercase tracking-widest transition-all">
+                  <button className="px-6 py-3 rounded-2xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-white font-black text-[10px] uppercase tracking-widest transition-all">
                     Initialize Password Reset
                   </button>
                 </div>
@@ -219,7 +217,7 @@ function TabButton({ active, onClick, icon: Icon, label }: { active: boolean; on
       onClick={onClick}
       className={`w-full flex items-center gap-4 p-4 rounded-2xl transition-all group ${active
           ? "bg-primary text-white shadow-xl shadow-primary/20"
-          : "text-slate-500 hover:bg-white/5 hover:text-slate-200"
+          : "text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-slate-200"
         }`}
     >
       <Icon className={`w-4 h-4 ${active ? "animate-pulse" : ""}`} />
@@ -233,14 +231,14 @@ function InputGroup({ label, value, onChange, icon: Icon, placeholder, readOnly 
     <div className="space-y-2.5">
       <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">{label}</label>
       <div className="relative group/input">
-        <Icon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600 transition-colors group-focus-within/input:text-primary" />
+        <Icon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-600 transition-colors group-focus-within/input:text-primary" />
         <input
           type="text"
           value={value}
           readOnly={readOnly}
           onChange={(e) => onChange?.(e.target.value)}
           placeholder={placeholder}
-          className={`w-full bg-white/5 border border-white/5 rounded-2xl py-4 pl-12 pr-6 text-white font-bold text-sm focus:ring-2 focus:ring-primary/40 outline-none transition-all placeholder:text-slate-700 ${readOnly ? "opacity-60 cursor-not-allowed" : "hover:border-white/10"}`}
+          className={`w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-2xl py-4 pl-12 pr-6 text-slate-900 dark:text-white shadow-sm dark:shadow-none font-bold text-sm focus:ring-2 focus:ring-primary/40 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-700 ${readOnly ? "opacity-60 cursor-not-allowed bg-slate-50 dark:bg-transparent" : "hover:border-slate-300 dark:hover:border-white/10"}`}
         />
       </div>
     </div>

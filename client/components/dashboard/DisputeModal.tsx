@@ -58,11 +58,11 @@ export default function DisputeModal({
 
                 <form onSubmit={handleSubmit} className="space-y-5">
                     <div>
-                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Dispute Reason</label>
+                        <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Dispute Reason</label>
                         <select
                             value={reason}
                             onChange={(e) => setReason(e.target.value)}
-                            className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors appearance-none"
+                            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 transition-colors appearance-none"
                         >
                             <option value="">Select a reason...</option>
                             {reasons.map(r => <option key={r} value={r}>{r}</option>)}
@@ -70,13 +70,13 @@ export default function DisputeModal({
                     </div>
 
                     <div>
-                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Detailed Comments</label>
+                        <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Detailed Comments</label>
                         <textarea
                             value={comment}
                             onChange={(e) => setComment(e.target.value)}
                             placeholder="Explain the issue in detail..."
                             rows={4}
-                            className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-amber-500 transition-colors"
+                            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:border-amber-500 transition-colors"
                         />
                     </div>
 
@@ -84,7 +84,7 @@ export default function DisputeModal({
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 bg-white/5 hover:bg-white/10 text-slate-300 font-bold py-3 rounded-2xl border border-white/10 transition-all"
+                            className="flex-1 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 font-bold py-3 rounded-2xl border border-slate-200 dark:border-white/10 transition-all"
                         >
                             Cancel
                         </button>

@@ -34,7 +34,7 @@ function Item({ href, label, icon: Icon, basePath }: NavItem & { basePath: strin
         "flex items-center gap-3 px-3 py-3 rounded-xl transition-colors group " +
         (active
           ? "bg-primary/10 text-primary border border-primary/20 shadow-[0_0_15px_rgba(19,91,236,0.15)]"
-          : "text-slate-400 hover:text-white hover:bg-white/5")
+          : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5")
       }
     >
       <Icon className="w-5 h-5 group-hover:text-primary transition-colors" />
@@ -56,24 +56,24 @@ export default function ClientSidebar({ basePath }: { basePath: string }) {
   ];
 
   return (
-    <aside className="w-20 lg:w-64 border-r border-white/5 bg-[#0b1019] flex flex-col items-center lg:items-start py-6 transition-all duration-300 relative z-20">
+    <aside className="w-20 lg:w-64 border-r border-slate-200 dark:border-white/5 bg-white dark:bg-[#0b1019] flex flex-col items-center lg:items-start py-6 transition-all duration-300 relative z-20">
       <nav className="flex-1 w-full px-3 space-y-2">
         {nav.map((n) => (
           <Item key={n.href} href={n.href} label={n.label} icon={n.icon} basePath={basePath} />
         ))}
       </nav>
 
-      <div className="px-3 w-full mt-auto pt-6 border-t border-white/5 space-y-2">
+      <div className="px-3 w-full mt-auto pt-6 border-t border-slate-200 dark:border-white/5 space-y-2">
         <Link
           href={`${basePath}/settings`}
-          className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5 transition-colors group text-slate-400 hover:text-white"
+          className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-colors group text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
         >
           <Settings className="w-5 h-5 group-hover:text-primary transition-colors" />
           <span className="hidden lg:block text-sm font-medium">Settings</span>
         </Link>
 
-        <div className="flex items-center gap-3 px-3 py-3 rounded-xl bg-[#151c2a]/60 border border-white/5 hover:border-white/10 transition-colors cursor-pointer">
-          <div className="size-8 rounded-full bg-slate-700 overflow-hidden ring-2 ring-white/5 flex items-center justify-center text-slate-400">
+        <div className="flex items-center gap-3 px-3 py-3 rounded-xl bg-slate-50 dark:bg-[#151c2a]/60 border border-slate-200 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/10 transition-colors cursor-pointer">
+          <div className="size-8 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden ring-2 ring-slate-100 dark:ring-white/5 flex items-center justify-center text-slate-500 dark:text-slate-400">
             {user?.avatar ? (
               <Image
                 className="w-full h-full object-cover"
@@ -87,8 +87,8 @@ export default function ClientSidebar({ basePath }: { basePath: string }) {
             )}
           </div>
           <div className="hidden lg:block overflow-hidden">
-            <p className="text-xs font-bold truncate text-white">{user?.name ?? "User"}</p>
-            <p className="text-[10px] text-slate-400 truncate capitalize">
+            <p className="text-xs font-bold truncate text-slate-900 dark:text-white">{user?.name ?? "User"}</p>
+            <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate capitalize">
               {user?.role?.toLowerCase() ?? "Account"}
             </p>
           </div>

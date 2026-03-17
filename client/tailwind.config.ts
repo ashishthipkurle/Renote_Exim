@@ -9,15 +9,30 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["var(--font-sora)", "ui-sans-serif", "system-ui", "sans-serif"],
+      },
+      fontSize: {
+        'display-2xl': ['var(--display-2xl-size)', 'var(--display-2xl-line)'],
+        'display-xl': ['var(--display-xl-size)', 'var(--display-xl-line)'],
+        'h1': ['var(--h1-size)', 'var(--h1-line)'],
+        'h2': ['var(--h2-size)', 'var(--h2-line)'],
+        'h3': ['var(--h3-size)', 'var(--h3-line)'],
+        'h4': ['var(--h4-size)', 'var(--h4-line)'],
+      },
       colors: {
-        "background-light": "#f6f6f8",
-        "background-dark": "#0a0f18",
-        "surface-dark": "#101622",
-        "primary-light": "#4f8aff",
-        glass: "rgba(16, 22, 34, 0.6)",
-        "glass-border": "rgba(19, 91, 236, 0.2)",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        brand: {
+          50: "var(--p-brand-50)",
+          100: "var(--p-brand-100)",
+          200: "var(--p-brand-200)",
+          300: "var(--p-brand-300)",
+          400: "var(--p-brand-400)",
+          500: "var(--p-brand-500)",
+          600: "var(--p-brand-600)",
+          700: "var(--p-brand-700)",
+        },
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
