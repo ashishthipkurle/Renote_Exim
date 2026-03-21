@@ -60,26 +60,26 @@ export function CreateShipmentModal({
     };
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-            <div className="bg-[#151c2a] border border-white/10 w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
-                <div className="p-6 border-b border-white/5 flex items-center justify-between bg-gradient-to-r from-primary/10 to-transparent">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+            <div className="bg-card border border-border w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+                <div className="p-6 border-b border-border flex items-center justify-between bg-gradient-to-r from-primary/10 to-transparent">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-primary/20 rounded-xl text-primary">
                             <Truck className="w-5 h-5" />
                         </div>
                         <div>
-                            <h3 className="font-bold text-lg text-white">Create Shipment</h3>
-                            <p className="text-[10px] text-slate-500 font-mono tracking-wider">ORDER: {orderNumber}</p>
+                            <h3 className="font-bold text-lg text-foreground">Create Shipment</h3>
+                            <p className="text-[10px] text-muted-foreground tracking-wider uppercase">ORDER: {orderNumber}</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-full text-slate-400 hover:text-white transition-colors">
+                    <button onClick={onClose} className="p-2 hover:bg-muted rounded-full text-muted-foreground hover:text-foreground transition-colors">
                         <X className="w-5 h-5" />
                     </button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-5">
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-2">
+                        <label className="text-xs font-bold text-muted-foreground uppercase flex items-center gap-2">
                             <Building2 className="w-3.5 h-3.5" />
                             Carrier Name
                         </label>
@@ -87,7 +87,7 @@ export function CreateShipmentModal({
                             required
                             type="text"
                             placeholder="e.g. FedEx, DHL, Maersk"
-                            className="w-full bg-slate-900/50 border border-white/5 rounded-xl px-4 py-3 text-sm focus:border-primary/50 outline-none transition-all text-white placeholder:text-slate-600"
+                            className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-sm focus:border-primary/50 outline-none transition-all text-foreground placeholder:text-muted-foreground/50"
                             value={formData.carrier}
                             onChange={(e) => setFormData({ ...formData, carrier: e.target.value })}
                         />
@@ -95,7 +95,7 @@ export function CreateShipmentModal({
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-2">
+                            <label className="text-xs font-bold text-muted-foreground uppercase flex items-center gap-2">
                                 <MapPin className="w-3.5 h-3.5" />
                                 Origin
                             </label>
@@ -103,13 +103,13 @@ export function CreateShipmentModal({
                                 required
                                 type="text"
                                 placeholder="City, Country"
-                                className="w-full bg-slate-900/50 border border-white/5 rounded-xl px-4 py-3 text-sm focus:border-primary/50 outline-none transition-all text-white placeholder:text-slate-600"
+                                className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-sm focus:border-primary/50 outline-none transition-all text-foreground placeholder:text-muted-foreground/50"
                                 value={formData.origin}
                                 onChange={(e) => setFormData({ ...formData, origin: e.target.value })}
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-2">
+                            <label className="text-xs font-bold text-muted-foreground uppercase flex items-center gap-2">
                                 <MapPin className="w-3.5 h-3.5" />
                                 Destination
                             </label>
@@ -117,7 +117,7 @@ export function CreateShipmentModal({
                                 required
                                 type="text"
                                 placeholder="City, Country"
-                                className="w-full bg-slate-900/50 border border-white/5 rounded-xl px-4 py-3 text-sm focus:border-primary/50 outline-none transition-all text-white placeholder:text-slate-600"
+                                className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-sm focus:border-primary/50 outline-none transition-all text-foreground placeholder:text-muted-foreground/50"
                                 value={formData.destination}
                                 onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
                             />
@@ -125,14 +125,14 @@ export function CreateShipmentModal({
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-2">
+                        <label className="text-xs font-bold text-muted-foreground uppercase flex items-center gap-2">
                             <Calendar className="w-3.5 h-3.5" />
                             Estimated Delivery
                         </label>
                         <input
                             required
                             type="date"
-                            className="w-full bg-slate-900/50 border border-white/5 rounded-xl px-4 py-3 text-sm focus:border-primary/50 outline-none transition-all text-white [color-scheme:dark]"
+                            className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 text-sm focus:border-primary/50 outline-none transition-all text-foreground dark:[color-scheme:dark]"
                             value={formData.estimatedDelivery}
                             onChange={(e) => setFormData({ ...formData, estimatedDelivery: e.target.value })}
                         />
@@ -142,7 +142,7 @@ export function CreateShipmentModal({
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 px-4 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl text-sm font-bold transition-all"
+                            className="flex-1 px-4 py-3 bg-muted hover:bg-muted/80 text-foreground rounded-xl text-sm font-bold transition-all"
                         >
                             Cancel
                         </button>

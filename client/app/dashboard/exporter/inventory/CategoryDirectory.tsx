@@ -1,10 +1,9 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Search, Globe, Plus, ChevronRight, X, Sparkles } from "lucide-react";
+import { Search, Plus, ChevronRight, X, Sparkles } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import ProductForm from "@/components/dashboard/ProductForm";
-import Link from "next/link";
 
 const TOP_SECTORS = [
     { name: "Agriculture", icon: "🌱", color: "text-lime-400" },
@@ -104,7 +103,7 @@ export default function CategoryDirectory() {
     };
 
     return (
-        <div className="bg-[#151c2a]/40 backdrop-blur-xl border border-white/5 rounded-[2.5rem] p-8 lg:p-10 shadow-2xl relative overflow-hidden group min-h-[600px] transition-all duration-700">
+        <div className="bg-card backdrop-blur-xl border border-border rounded-[2.5rem] p-8 lg:p-10 shadow-xl dark:shadow-2xl relative overflow-hidden group min-h-[600px] transition-all duration-700">
             {/* Background Glow */}
             <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/5 via-transparent to-transparent pointer-events-none transition-opacity duration-700 ${isSelected ? 'opacity-30' : 'opacity-100'}`} />
             <div className={`absolute -bottom-24 -right-24 w-96 h-96 bg-primary/10 blur-[120px] rounded-full transition-all duration-1000 ${isSelected ? 'scale-150 -translate-x-1/2 -translate-y-1/2 opacity-40' : 'group-hover:bg-primary/20'}`} />
@@ -112,22 +111,22 @@ export default function CategoryDirectory() {
             <div className="relative z-10 flex flex-col h-full">
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-10">
                     <div className={`transition-all duration-500 ${isSelected ? 'opacity-40 filter grayscale scale-95 origin-left' : 'opacity-100'}`}>
-                        <h2 className="text-2xl font-black text-white uppercase italic tracking-tight flex items-center gap-3">
+                        <h2 className="text-2xl font-black text-foreground uppercase italic tracking-tight flex items-center gap-3">
                             Sector Intelligence
                             {isSelected && <Sparkles className="w-5 h-5 text-primary animate-pulse" />}
                         </h2>
-                        <p className="text-slate-500 text-sm mt-1 font-medium italic">Explore thousands of global trade categories</p>
+                        <p className="text-muted-foreground text-sm mt-1 font-medium">Explore thousands of global trade categories</p>
                     </div>
 
                     {!isSelected && (
                         <div className="relative w-full lg:w-[400px] animate-in fade-in slide-in-from-right-4 duration-500">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                             <input
                                 type="text"
                                 placeholder="Search 1000+ industry sectors..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="w-full pl-12 pr-4 py-4 bg-slate-900/60 border border-white/5 focus:border-primary/50 rounded-2xl text-sm text-white placeholder:text-slate-600 focus:outline-none transition-all shadow-inner"
+                                className="w-full pl-12 pr-4 py-4 bg-muted border border-border focus:border-primary/50 rounded-2xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none transition-all shadow-inner"
                             />
                         </div>
                     )}
@@ -135,7 +134,7 @@ export default function CategoryDirectory() {
                     {isSelected && (
                         <button
                             onClick={handleBack}
-                            className="flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 rounded-2xl text-slate-400 hover:text-white hover:bg-white/10 transition-all font-black text-[10px] uppercase tracking-widest animate-in fade-in slide-in-from-right-4"
+                            className="flex items-center gap-2 px-6 py-3 bg-muted border border-border rounded-2xl text-muted-foreground hover:text-foreground hover:bg-accent transition-all font-black text-[10px] uppercase tracking-widest animate-in fade-in slide-in-from-right-4"
                         >
                             <X className="w-4 h-4" />
                             Back to Index
@@ -155,18 +154,18 @@ export default function CategoryDirectory() {
                                         <button
                                             key={s.name}
                                             onClick={() => handleSelect(s.name)}
-                                            className="flex flex-col items-center justify-center p-5 bg-white/5 border border-white/5 rounded-2xl hover:bg-primary hover:border-primary transition-all group/btn active:scale-95 shadow-xl"
+                                            className="flex flex-col items-center justify-center p-5 bg-muted/50 border border-border rounded-2xl hover:bg-primary hover:border-primary transition-all group/btn active:scale-95 shadow-lg"
                                         >
                                             <span className="text-2xl mb-2 group-hover/btn:scale-125 transition-transform">{s.icon}</span>
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-white">{s.name}</span>
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-foreground group-hover/btn:text-white">{s.name}</span>
                                         </button>
                                     ))}
                                     <button
                                         onClick={() => handleSelect("OTHER")}
-                                        className="flex flex-col items-center justify-center p-5 bg-primary/10 border border-primary/20 rounded-2xl hover:bg-primary transition-all group/btn active:scale-95 shadow-xl"
+                                        className="flex flex-col items-center justify-center p-5 bg-primary/10 border border-primary/20 rounded-2xl hover:bg-primary transition-all group/btn active:scale-95 shadow-lg"
                                     >
                                         <Plus className="w-6 h-6 text-primary group-hover/btn:text-white mb-2" />
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-white">Other</span>
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-foreground group-hover/btn:text-white">Other</span>
                                     </button>
                                 </div>
                             </div>
@@ -174,17 +173,17 @@ export default function CategoryDirectory() {
                             {/* Industry List */}
                             <div>
                                 <div className="flex items-center justify-between mb-4 ml-1">
-                                    <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">{search ? 'Search' : 'Latest'}</div>
+                                    <div className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">{search ? 'Search' : 'Latest'}</div>
                                 </div>
                                 <div className="grid grid-cols-1 gap-2">
                                     {(search ? filtered : ALL_INDUSTRIES.slice(0, 8)).map((item) => (
                                         <button
                                             key={item}
                                             onClick={() => handleSelect(item)}
-                                            className="flex items-center justify-between p-4 bg-white/[0.02] hover:bg-white/[0.05] border border-white/5 rounded-xl transition-all group/item text-left"
+                                            className="flex items-center justify-between p-4 bg-muted/20 hover:bg-accent border border-border rounded-xl transition-all group/item text-left"
                                         >
-                                            <span className="text-xs font-bold text-slate-300 group-hover/item:text-white transition-colors">{item}</span>
-                                            <ChevronRight className="w-3 h-3 text-slate-600 group-hover/item:text-primary transition-all" />
+                                            <span className="text-xs font-bold text-muted-foreground group-hover/item:text-foreground transition-colors">{item}</span>
+                                            <ChevronRight className="w-3 h-3 text-muted-foreground/50 group-hover/item:text-primary transition-all" />
                                         </button>
                                     ))}
                                 </div>
@@ -195,13 +194,13 @@ export default function CategoryDirectory() {
                     {/* RIGHT PANEL: The Form (Visible when selected) */}
                     <div className={`absolute top-0 right-0 w-full lg:w-3/4 h-full transition-all duration-700 ease-in-out ${isSelected ? 'translate-x-0 opacity-100 visible' : 'translate-x-full opacity-0 invisible'}`}>
                         {isSelected && (
-                            <div className="bg-slate-900/40 backdrop-blur-2xl border border-primary/20 rounded-3xl p-8 lg:p-10 shadow-2xl h-full overflow-y-auto custom-scrollbar animate-in slide-in-from-right-12 duration-700">
+                            <div className="bg-card backdrop-blur-2xl border border-primary/20 rounded-3xl p-8 lg:p-10 shadow-2xl h-full overflow-y-auto custom-scrollbar animate-in slide-in-from-right-12 duration-700">
                                 <div className="flex items-center justify-between mb-8">
                                     <div>
-                                        <h3 className="text-xl font-black text-white uppercase italic tracking-tighter">Listing Profile</h3>
+                                        <h3 className="text-xl font-black text-foreground uppercase italic tracking-tighter">Listing Profile</h3>
                                         <div className="flex items-center gap-2 mt-1">
                                             <div className="px-2 py-0.5 bg-primary/20 border border-primary/30 rounded-md text-[9px] font-black text-primary uppercase tracking-widest">{selectedCategory}</div>
-                                            <span className="text-slate-500 font-bold uppercase text-[9px] tracking-widest">Global Protocol</span>
+                                            <span className="text-muted-foreground font-bold uppercase text-[9px] tracking-widest">Global Protocol</span>
                                         </div>
                                     </div>
                                     <Sparkles className="w-6 h-6 text-primary/40" />
@@ -214,12 +213,12 @@ export default function CategoryDirectory() {
 
                     {/* Placeholder for dual pane when not selected (Empty right side or instructions) */}
                     {!isSelected && (
-                        <div className="hidden lg:flex lg:col-span-3 flex-col items-center justify-center text-center p-12 bg-white/[0.02] border border-dashed border-white/5 rounded-3xl animate-in fade-in duration-1000">
+                        <div className="hidden lg:flex lg:col-span-3 flex-col items-center justify-center text-center p-12 bg-muted/10 border border-dashed border-border rounded-3xl animate-in fade-in duration-1000">
                             <div className="w-20 h-20 bg-primary/5 rounded-full flex items-center justify-center mb-6 border border-primary/10">
                                 <Plus className="w-8 h-8 text-primary/40" />
                             </div>
-                            <h3 className="text-sm font-black text-white uppercase tracking-widest mb-3 opacity-60">Ready for Global Trade?</h3>
-                            <p className="max-w-[280px] text-xs text-slate-500 font-medium italic leading-relaxed">
+                            <h3 className="text-sm font-black text-foreground uppercase tracking-widest mb-3 opacity-60">Ready for Global Trade?</h3>
+                            <p className="max-w-[280px] text-xs text-muted-foreground font-medium leading-relaxed">
                                 Select an industry sector from the index on the left to initialize your next market deployment.
                             </p>
                         </div>

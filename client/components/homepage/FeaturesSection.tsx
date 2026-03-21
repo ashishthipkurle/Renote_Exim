@@ -2,16 +2,16 @@ import Image from "next/image";
 
 export default function FeaturesSection() {
   return (
-    <section className="py-24 relative overflow-hidden bg-slate-100 dark:bg-surface-dark">
+    <section className="py-24 relative overflow-hidden bg-muted dark:bg-background">
       <div className="absolute top-0 right-0 w-1/3 h-full bg-primary/5 blur-[100px] pointer-events-none" />
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6 reveal-trigger">
           <div className="max-w-xl">
-            <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">
+            <h2 className="text-4xl font-bold text-foreground mb-4">
               ENGINEERED FOR <br />
               <span className="text-primary">MODERN LOGISTICS</span>
             </h2>
-            <p className="text-slate-600 dark:text-slate-400 text-lg">Our platform combines institutional-grade financial tools with real-time supply chain visibility.</p>
+            <p className="text-muted-foreground text-lg">Our platform combines institutional-grade financial tools with real-time supply chain visibility.</p>
           </div>
           <button className="text-primary hover:text-slate-900 dark:hover:text-white font-semibold flex items-center gap-2 transition-colors group" type="button">
             Explore Capabilities <span className="material-icons group-hover:translate-x-1 transition-transform">arrow_forward</span>

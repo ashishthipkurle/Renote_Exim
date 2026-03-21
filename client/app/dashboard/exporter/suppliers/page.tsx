@@ -105,15 +105,15 @@ export default function ExporterSuppliersPage() {
     );
 
     return (
-        <div className="h-full overflow-hidden flex flex-col bg-gradient-to-br from-[#0a0c12] via-[#0d1017] to-[#0a0c12]">
-            <header className="flex-shrink-0 p-6 lg:p-8 border-b border-white/5">
+        <div className="h-full overflow-hidden flex flex-col bg-background">
+            <header className="flex-shrink-0 p-6 lg:p-8 border-b border-border bg-header/80 backdrop-blur-md">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-3xl font-black tracking-tight text-white flex items-center gap-3">
+                        <h1 className="text-3xl font-black tracking-tight text-foreground flex items-center gap-3">
                             <Handshake className="text-primary w-8 h-8" />
                             Dealer Directory
                         </h1>
-                        <p className="text-slate-400 mt-1">
+                        <p className="text-muted-foreground mt-1">
                             Manage your network of suppliers and product sources.
                         </p>
                     </div>
@@ -127,11 +127,11 @@ export default function ExporterSuppliersPage() {
                 </div>
 
                 <div className="mt-8 relative max-w-xl">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
                     <input
                         type="text"
                         placeholder="Search dealers by name, category, or contact..."
-                        className="w-full bg-[#151c2a]/60 border border-white/10 rounded-2xl pl-12 pr-4 py-3 text-sm text-white focus:border-primary/50 focus:outline-none transition-all"
+                        className="w-full bg-muted/50 border border-border rounded-2xl pl-12 pr-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary/50 focus:outline-none transition-all"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -140,15 +140,15 @@ export default function ExporterSuppliersPage() {
 
             <div className="flex-1 overflow-y-auto p-6 lg:p-8 custom-scrollbar">
                 {loading ? (
-                    <div className="flex flex-col items-center justify-center h-64 text-slate-500">
+                    <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
                         <Loader2 className="w-8 h-8 animate-spin mb-4" />
                         <p>Loading your directory...</p>
                     </div>
                 ) : filteredSuppliers.length === 0 ? (
-                    <div className="bg-[#151c2a]/40 border border-white/5 rounded-3xl p-12 text-center max-w-2xl mx-auto mt-12">
-                        <Handshake className="w-16 h-16 text-slate-700 mx-auto mb-6" />
-                        <h3 className="text-xl font-bold text-white mb-2">No dealers found</h3>
-                        <p className="text-slate-400 mb-8">
+                    <div className="bg-card border border-border rounded-3xl p-12 text-center max-w-2xl mx-auto mt-12">
+                        <Handshake className="w-16 h-16 text-muted-foreground/30 mx-auto mb-6" />
+                        <h3 className="text-xl font-bold text-foreground mb-2">No dealers found</h3>
+                        <p className="text-muted-foreground mb-8">
                             {searchQuery ? "Try adjusting your search terms." : "Start building your supplier network by adding your first dealer."}
                         </p>
                         {!searchQuery && (
@@ -165,65 +165,65 @@ export default function ExporterSuppliersPage() {
                         {filteredSuppliers.map((supplier) => (
                             <div
                                 key={supplier.id}
-                                className="group bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 hover:border-primary/30 transition-all duration-300 rounded-3xl p-6 shadow-xl relative overflow-hidden"
+                                className="group bg-card backdrop-blur-xl border border-border hover:border-primary/50 transition-all duration-300 rounded-3xl p-6 shadow-xl relative overflow-hidden"
                             >
                                 <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button className="text-slate-500 hover:text-white p-1">
+                                    <button className="text-muted-foreground hover:text-foreground p-1">
                                         <MoreVertical className="w-5 h-5" />
                                     </button>
                                 </div>
 
                                 <div className="flex items-start gap-4 mb-6">
-                                    <div className="size-14 rounded-2xl bg-gradient-to-br from-primary/20 to-blue-600/10 border border-primary/20 flex items-center justify-center text-primary font-black text-xl shadow-lg">
+                                    <div className="size-14 rounded-2xl bg-gradient-to-br from-primary/10 to-blue-600/5 border border-primary/20 flex items-center justify-center text-primary font-black text-xl shadow-lg">
                                         {supplier.name.charAt(0).toUpperCase()}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <h3 className="text-lg font-bold text-white truncate">{supplier.name}</h3>
+                                        <h3 className="text-lg font-bold text-foreground truncate">{supplier.name}</h3>
                                         {supplier.category ? (
                                             <span className="inline-flex items-center gap-1 text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded uppercase tracking-wider mt-1">
                                                 <Tag className="w-3 h-3" />
                                                 {supplier.category}
                                             </span>
                                         ) : (
-                                            <span className="text-xs text-slate-500 italic mt-1 block">No category</span>
+                                            <span className="text-xs text-muted-foreground mt-1 block">No category</span>
                                         )}
                                     </div>
                                 </div>
 
                                 <div className="space-y-3 mb-6">
                                     {supplier.contactPerson && (
-                                        <div className="flex items-center gap-3 text-sm text-slate-300">
-                                            <User className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                                        <div className="flex items-center gap-3 text-sm text-foreground/90">
+                                            <User className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                                             <span className="truncate">{supplier.contactPerson}</span>
                                         </div>
                                     )}
                                     {supplier.email && (
-                                        <div className="flex items-center gap-3 text-sm text-slate-300">
-                                            <Mail className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                                        <div className="flex items-center gap-3 text-sm text-foreground/90">
+                                            <Mail className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                                             <span className="truncate">{supplier.email}</span>
                                         </div>
                                     )}
                                     {supplier.phone && (
-                                        <div className="flex items-center gap-3 text-sm text-slate-300">
-                                            <Phone className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                                        <div className="flex items-center gap-3 text-sm text-foreground/90">
+                                            <Phone className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                                             <span>{supplier.phone}</span>
                                         </div>
                                     )}
                                     {supplier.country && (
-                                        <div className="flex items-center gap-3 text-sm text-slate-300">
-                                            <MapPin className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                                        <div className="flex items-center gap-3 text-sm text-foreground/90">
+                                            <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                                             <span className="truncate">{supplier.country}</span>
                                         </div>
                                     )}
                                 </div>
 
                                 {supplier.notes && (
-                                    <div className="pt-4 border-t border-white/5">
-                                        <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                    <div className="pt-4 border-t border-border">
+                                        <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2 flex items-center gap-2">
                                             <FileText className="w-3 h-3" />
                                             Notes
                                         </div>
-                                        <p className="text-xs text-slate-400 line-clamp-2 italic leading-relaxed">
+                                        <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
                                             &quot;{supplier.notes}&quot;
                                         </p>
                                     </div>
@@ -236,14 +236,14 @@ export default function ExporterSuppliersPage() {
 
             {/* Add Dealer Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#05070a]/80 backdrop-blur-md">
-                    <div className="bg-[#151c2a] border border-white/10 w-full max-w-2xl rounded-[2rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
-                        <div className="p-8 border-b border-white/5 flex items-center justify-between">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+                    <div className="bg-background border border-border w-full max-w-2xl rounded-[2rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+                        <div className="p-8 border-b border-border bg-muted/80 backdrop-blur-md flex items-center justify-between">
                             <div>
-                                <h3 className="text-2xl font-black text-white">Add New Dealer</h3>
-                                <p className="text-slate-400 text-sm mt-1">Record the details of your service provider or supplier.</p>
+                                <h3 className="text-2xl font-black text-foreground">Add New Dealer</h3>
+                                <p className="text-muted-foreground text-sm mt-1">Record the details of your service provider or supplier.</p>
                             </div>
-                            <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-white/5 rounded-full text-slate-500 hover:text-white transition-colors">
+                            <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-muted rounded-full text-muted-foreground hover:text-foreground transition-colors">
                                 <X className="w-6 h-6" />
                             </button>
                         </div>
@@ -251,79 +251,79 @@ export default function ExporterSuppliersPage() {
                         <form onSubmit={handleCreateSupplier} className="p-8">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-2">
+                                    <label className="text-xs font-bold text-muted-foreground uppercase flex items-center gap-2">
                                         <Building2 className="w-3.5 h-3.5" />
                                         Company Name*
                                     </label>
                                     <input
                                         required
                                         type="text"
-                                        className="w-full bg-slate-900/50 border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:border-primary outline-none transition-all placeholder:text-slate-700"
+                                        className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:border-primary outline-none transition-all placeholder:text-muted-foreground/50"
                                         placeholder="e.g. Acme Manufacturing"
                                         value={formData.name}
                                         onChange={e => setFormData({ ...formData, name: e.target.value })}
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-2">
+                                    <label className="text-xs font-bold text-muted-foreground uppercase flex items-center gap-2">
                                         <User className="w-3.5 h-3.5" />
                                         Contact Person
                                     </label>
                                     <input
                                         type="text"
-                                        className="w-full bg-slate-900/50 border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:border-primary outline-none transition-all placeholder:text-slate-700"
+                                        className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:border-primary outline-none transition-all placeholder:text-muted-foreground/50"
                                         placeholder="e.g. John Doe"
                                         value={formData.contactPerson}
                                         onChange={e => setFormData({ ...formData, contactPerson: e.target.value })}
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-2">
+                                    <label className="text-xs font-bold text-muted-foreground uppercase flex items-center gap-2">
                                         <Mail className="w-3.5 h-3.5" />
                                         Email Address
                                     </label>
                                     <input
                                         type="email"
-                                        className="w-full bg-slate-900/50 border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:border-primary outline-none transition-all placeholder:text-slate-700"
+                                        className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:border-primary outline-none transition-all placeholder:text-muted-foreground/50"
                                         placeholder="supplier@example.com"
                                         value={formData.email}
                                         onChange={e => setFormData({ ...formData, email: e.target.value })}
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-2">
+                                    <label className="text-xs font-bold text-muted-foreground uppercase flex items-center gap-2">
                                         <Phone className="w-3.5 h-3.5" />
                                         Phone Number
                                     </label>
                                     <input
                                         type="tel"
-                                        className="w-full bg-slate-900/50 border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:border-primary outline-none transition-all placeholder:text-slate-700"
+                                        className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:border-primary outline-none transition-all placeholder:text-muted-foreground/50"
                                         placeholder="+91 00000 00000"
                                         value={formData.phone}
                                         onChange={e => setFormData({ ...formData, phone: e.target.value })}
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-2">
+                                    <label className="text-xs font-bold text-muted-foreground uppercase flex items-center gap-2">
                                         <MapPin className="w-3.5 h-3.5" />
                                         Country
                                     </label>
                                     <input
                                         type="text"
-                                        className="w-full bg-slate-900/50 border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:border-primary outline-none transition-all placeholder:text-slate-700"
+                                        className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:border-primary outline-none transition-all placeholder:text-muted-foreground/50"
                                         placeholder="e.g. India, UAE"
                                         value={formData.country}
                                         onChange={e => setFormData({ ...formData, country: e.target.value })}
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-2">
+                                    <label className="text-xs font-bold text-muted-foreground uppercase flex items-center gap-2">
                                         <Tag className="w-3.5 h-3.5" />
                                         Category
                                     </label>
                                     <input
                                         type="text"
-                                        className="w-full bg-slate-900/50 border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:border-primary outline-none transition-all placeholder:text-slate-700"
+                                        className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:border-primary outline-none transition-all placeholder:text-muted-foreground/50"
                                         placeholder="e.g. Logistics, Packaging"
                                         value={formData.category}
                                         onChange={e => setFormData({ ...formData, category: e.target.value })}
@@ -332,12 +332,12 @@ export default function ExporterSuppliersPage() {
                             </div>
 
                             <div className="mt-6 space-y-2">
-                                <label className="text-xs font-bold text-slate-500 uppercase flex items-center gap-2">
+                                <label className="text-xs font-bold text-muted-foreground uppercase flex items-center gap-2">
                                     <FileText className="w-3.5 h-3.5" />
                                     Notes
                                 </label>
                                 <textarea
-                                    className="w-full bg-slate-900/50 border border-white/5 rounded-xl px-4 py-3 text-sm text-white focus:border-primary outline-none transition-all placeholder:text-slate-700 min-h-[100px]"
+                                    className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:border-primary outline-none transition-all placeholder:text-muted-foreground/50 min-h-[100px]"
                                     placeholder="Payment terms, quality ratings, or other notes..."
                                     value={formData.notes}
                                     onChange={e => setFormData({ ...formData, notes: e.target.value })}
@@ -348,7 +348,7 @@ export default function ExporterSuppliersPage() {
                                 <button
                                     type="button"
                                     onClick={() => setIsModalOpen(false)}
-                                    className="flex-1 py-4 bg-white/5 hover:bg-white/10 text-white rounded-2xl font-bold transition-all"
+                                    className="flex-1 py-4 bg-muted hover:bg-muted/80 text-foreground rounded-2xl font-bold transition-all"
                                 >
                                     Cancel
                                 </button>

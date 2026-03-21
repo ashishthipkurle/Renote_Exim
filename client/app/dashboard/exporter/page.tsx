@@ -149,28 +149,28 @@ export default function ExporterDashboard() {
   ];
 
   return (
-    <main className="flex-1 flex flex-col h-full overflow-hidden bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/20 via-[#0a0c12] to-[#0a0c12] relative">
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: "linear-gradient(to right, #1f2937 1px, transparent 1px), linear-gradient(to bottom, #1f2937 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
+    <main className="flex-1 flex flex-col h-full overflow-hidden bg-background relative transition-colors duration-300">
+      <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none" style={{ backgroundImage: "linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
 
-      <header className="flex-shrink-0 h-20 px-8 flex items-center justify-between border-b border-white/5 bg-[#0a0c12]/30 backdrop-blur-sm z-40">
+      <header className="flex-shrink-0 h-20 px-8 flex items-center justify-between border-b border-border bg-header backdrop-blur-sm z-40 transition-colors duration-300">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-foreground tracking-tight flex items-center gap-2">
             Executive Overview
             <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-primary/20 text-primary border border-primary/30 uppercase tracking-wider">Live</span>
           </h1>
-          <p className="text-slate-400 text-sm">Welcome back, Director</p>
+          <p className="text-muted-foreground text-sm">Welcome back, Director</p>
         </div>
         <div className="flex items-center gap-6">
-          <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full bg-[#151c2a]/50 border border-white/5 text-sm text-slate-400">
+          <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full bg-muted/50 border border-border text-sm text-muted-foreground">
             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
             System Status: Operational
           </div>
           <div className="flex items-center gap-4">
             <div className="relative">
-              <input className="pl-10 pr-4 py-2 bg-[#151c2a]/50 border border-white/10 rounded-lg text-sm text-white placeholder-slate-500 focus:ring-1 focus:ring-primary focus:border-primary w-64 transition-all" placeholder="Search shipments, IDs..." type="text" />
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+              <input className="pl-10 pr-4 py-2 bg-muted/50 border border-border rounded-lg text-sm text-foreground placeholder-muted-foreground focus:ring-1 focus:ring-primary focus:border-primary w-64 transition-all" placeholder="Search shipments, IDs..." type="text" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             </div>
-            <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-[#151c2a]/50 border border-white/10 hover:bg-white/5 text-slate-400 hover:text-white transition-colors">
+            <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-muted/50 border border-border hover:bg-accent text-muted-foreground hover:text-foreground transition-colors">
               <CalendarDays className="w-5 h-5" />
             </button>
             <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-primary hover:bg-[#0f49bd] text-white shadow-lg shadow-primary/20 transition-colors">
@@ -185,7 +185,7 @@ export default function ExporterDashboard() {
           {/* KPI Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
             {stats.map((s) => (
-              <div key={s.label} className={`bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-xl p-6 rounded-2xl relative overflow-hidden group ${s.glowHover} transition-all duration-300`}>
+              <div key={s.label} className={`bg-card backdrop-blur-xl border border-border shadow-xl p-6 rounded-2xl relative overflow-hidden group ${s.glowHover} transition-all duration-300`}>
                 <div className={`absolute -right-6 -top-6 w-24 h-24 ${s.bgTint} rounded-full blur-2xl group-hover:opacity-80 transition-all`} />
                 <div className="flex justify-between items-start mb-4">
                   <div className={`p-3 rounded-xl ${s.bgTint} ${s.textTint} border ${s.borderTint}`}>
@@ -194,17 +194,17 @@ export default function ExporterDashboard() {
                     {s.label === "Active Orders" && <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2" /></svg>}
                     {s.label === "Total Shipments" && <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M13 16V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h1m8-1a1 1 0 0 1-1 1H9m4-1V8a1 1 0 0 1 1-1h2.586a1 1 0 0 1 .707.293l3.414 3.414a1 1 0 0 1 .293.707V16a1 1 0 0 1-1 1h-1m-6-1a1 1 0 0 0 1 1h1M5 17a2 2 0 1 0 4 0m-4 0a2 2 0 1 1 4 0m6 0a2 2 0 1 0 4 0m-4 0a2 2 0 1 1 4 0" /></svg>}
                   </div>
-                  <span className={`flex items-center text-xs font-bold ${s.trendUp === true ? "text-green-400 bg-green-500/10 border-green-500/20" : s.trendUp === false ? "text-red-400 bg-red-500/10 border-red-500/20" : "text-white bg-white/5 border-white/10"} px-2 py-1 rounded border`}>
+                  <span className={`flex items-center text-xs font-bold ${s.trendUp === true ? "text-green-500 bg-green-500/10 border-green-500/20" : s.trendUp === false ? "text-red-500 bg-red-500/10 border-red-500/20" : "text-foreground bg-muted border-border"} px-2 py-1 rounded border transition-colors`}>
                     {s.trendUp === true && <TrendingUp className="w-3 h-3 mr-1" />}
                     {s.trendUp === false && <AlertTriangle className="w-3 h-3 mr-1" />}
                     {s.trend}
                   </span>
                 </div>
                 <div className="space-y-1">
-                  <h3 className="text-slate-400 text-sm font-medium">{s.label}</h3>
-                  <p className={`text-3xl font-bold text-white ${"neon" in s && s.neon ? "drop-shadow-[0_0_10px_rgba(19,91,236,0.5)]" : ""}`}>{s.value}</p>
+                  <h3 className="text-muted-foreground text-sm font-medium">{s.label}</h3>
+                  <p className={`text-3xl font-bold text-foreground ${"neon" in s && s.neon ? "drop-shadow-[0_0_10px_rgba(19,91,236,0.3)] dark:drop-shadow-[0_0_10px_rgba(19,91,236,0.5)]" : ""}`}>{s.value}</p>
                 </div>
-                <div className="mt-4 h-1.5 w-full bg-[#151c2a] rounded-full overflow-hidden">
+                <div className="mt-4 h-1.5 w-full bg-muted rounded-full overflow-hidden">
                   <div className={`h-full bg-gradient-to-r ${s.gradFrom} ${s.gradTo} rounded-full ${s.shadow}`} style={{ width: `${s.bar}%` }} />
                 </div>
               </div>
@@ -213,19 +213,19 @@ export default function ExporterDashboard() {
 
           {/* Map + Transactions */}
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6" style={{ height: "500px" }}>
-            <div className="xl:col-span-2 bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-xl rounded-2xl p-6 flex flex-col h-full relative overflow-hidden">
+            <div className="xl:col-span-2 bg-card backdrop-blur-xl border border-border shadow-xl rounded-2xl p-6 flex flex-col h-full relative overflow-hidden transition-colors duration-300">
               <div className="flex justify-between items-center mb-6 z-10">
                 <div>
-                  <h2 className="text-lg font-bold text-white">Live Logistics Pulse</h2>
-                  <p className="text-slate-400 text-xs">Real-time global trade routes active now</p>
+                  <h2 className="text-lg font-bold text-foreground">Live Logistics Pulse</h2>
+                  <p className="text-muted-foreground text-xs">Real-time global trade routes active now</p>
                 </div>
                 <div className="flex gap-2">
-                  <button className="px-3 py-1.5 bg-[#151c2a] border border-white/10 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:border-primary/50 transition-colors">Air Freight</button>
-                  <button className="px-3 py-1.5 bg-[#151c2a] border border-white/10 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:border-primary/50 transition-colors">Ocean Cargo</button>
+                  <button className="px-3 py-1.5 bg-muted border border-border rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors">Air Freight</button>
+                  <button className="px-3 py-1.5 bg-muted border border-border rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors">Ocean Cargo</button>
                 </div>
               </div>
-              <div className="flex-1 relative rounded-xl bg-[#0f1521] border border-white/5 overflow-hidden group">
-                <div className="absolute inset-0 opacity-30 bg-gradient-to-r from-indigo-900/20 via-blue-900/10 to-emerald-900/20" />
+              <div className="flex-1 relative rounded-xl bg-background border border-border overflow-hidden group">
+                <div className="absolute inset-0 opacity-30 bg-gradient-to-r from-indigo-900/20 via-blue-900/10 to-emerald-900/20 dark:from-indigo-400/10 dark:via-blue-400/5 dark:to-emerald-400/10 transition-colors duration-300" />
                 <div className="absolute top-[35%] left-[24%]">
                   <div className="relative w-3 h-3 bg-primary rounded-full shadow-[0_0_15px_rgba(19,91,236,1)] z-10" />
                   <div className="absolute top-0 left-0 w-3 h-3 bg-primary rounded-full animate-ping z-0" />
@@ -257,42 +257,42 @@ export default function ExporterDashboard() {
             </div>
 
             {/* Recent Transactions — DYNAMIC */}
-            <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-xl rounded-2xl p-6 flex flex-col h-full">
-              <h2 className="text-lg font-bold text-white mb-6">Recent Transactions</h2>
+            <div className="bg-card backdrop-blur-xl border border-border shadow-xl rounded-2xl p-6 flex flex-col h-full transition-colors duration-300">
+              <h2 className="text-lg font-bold text-foreground mb-6">Recent Transactions</h2>
               <div className="flex-1 overflow-y-auto space-y-4 pr-2">
                 {loading ? (
                   Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 animate-pulse">
-                      <div className="flex items-center gap-3"><div className="w-10 h-10 rounded-lg bg-slate-700" /><div><div className="w-32 h-4 bg-slate-700 rounded" /><div className="w-24 h-3 bg-slate-700/50 rounded mt-1" /></div></div>
-                      <div className="w-16 h-4 bg-slate-700 rounded" />
+                    <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-muted/50 border border-border animate-pulse">
+                      <div className="flex items-center gap-3"><div className="w-10 h-10 rounded-lg bg-muted" /><div><div className="w-32 h-4 bg-muted rounded" /><div className="w-24 h-3 bg-muted/50 rounded mt-1" /></div></div>
+                      <div className="w-16 h-4 bg-muted rounded" />
                     </div>
                   ))
                 ) : recentOrders.length === 0 ? (
-                  <div className="flex items-center justify-center h-full text-slate-500 text-sm">No transactions yet</div>
+                  <div className="flex items-center justify-center h-full text-muted-foreground text-sm">No transactions yet</div>
                 ) : (
                   recentOrders.map((order, idx) => {
                     const palette = BG_COLORS[idx % BG_COLORS.length];
                     return (
-                      <div key={order.id} className="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-white/5">
+                      <div key={order.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors border border-border">
                         <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-lg ${palette.bg} ${palette.text} flex items-center justify-center font-bold text-xs border border-white/10`}>
+                          <div className={`w-10 h-10 rounded-lg ${palette.bg} ${palette.text} flex items-center justify-center font-bold text-xs border border-border`}>
                             {getInitials(order.product.name)}
                           </div>
                           <div>
-                            <h4 className="text-sm font-bold text-white">{order.product.name}</h4>
-                            <p className="text-[10px] text-slate-400">{order.importer.companyName || order.importer.name} &bull; {timeAgo(order.createdAt)}</p>
+                            <h4 className="text-sm font-bold text-foreground">{order.product.name}</h4>
+                            <p className="text-[10px] text-muted-foreground">{order.importer.companyName || order.importer.name} &bull; {timeAgo(order.createdAt)}</p>
                           </div>
                         </div>
                         <div className="text-right">
                           <p className="text-sm font-bold text-primary">{formatCurrency(order.totalPrice)}</p>
-                          <p className={`text-[10px] ${STATUS_COLORS[order.status] || "text-slate-400"}`}>{order.status}</p>
+                          <p className={`text-[10px] ${STATUS_COLORS[order.status] || "text-muted-foreground"}`}>{order.status}</p>
                         </div>
                       </div>
                     );
                   })
                 )}
               </div>
-              <Link href="/dashboard/exporter/analytics" className="mt-4 w-full py-2.5 bg-white/5 hover:bg-white/10 text-sm font-medium text-slate-300 rounded-xl transition-colors border border-white/5 text-center block">
+              <Link href="/dashboard/exporter/analytics" className="mt-4 w-full py-2.5 bg-muted/50 hover:bg-accent text-sm font-medium text-muted-foreground rounded-xl transition-colors border border-border text-center block">
                 View All Transactions
               </Link>
             </div>
@@ -300,23 +300,23 @@ export default function ExporterDashboard() {
 
           {/* Revenue by Category + Top Buyers — DYNAMIC */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
-            <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-xl rounded-2xl p-6">
-              <h2 className="text-lg font-bold text-white mb-6">Revenue by Category</h2>
+            <div className="bg-card backdrop-blur-xl border border-border shadow-xl rounded-2xl p-6 transition-colors duration-300">
+              <h2 className="text-lg font-bold text-foreground mb-6">Revenue by Category</h2>
               <div className="space-y-6">
                 {loading ? Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i}><div className="flex justify-between mb-2"><div className="w-24 h-3 bg-slate-700 rounded animate-pulse" /><div className="w-16 h-3 bg-slate-700 rounded animate-pulse" /></div><div className="h-2 w-full bg-[#151c2a] rounded-full" /></div>
+                  <div key={i}><div className="flex justify-between mb-2"><div className="w-24 h-3 bg-muted rounded animate-pulse" /><div className="w-16 h-3 bg-muted rounded animate-pulse" /></div><div className="h-2 w-full bg-muted rounded-full" /></div>
                 )) : categories.length === 0 ? (
-                  <p className="text-sm text-slate-500">No category data yet. Add products to see revenue breakdown.</p>
+                  <p className="text-sm text-muted-foreground">No category data yet. Add products to see revenue breakdown.</p>
                 ) : categories.slice(0, 6).map((c) => {
                   const pct = maxCatRevenue > 0 ? Math.round((c.revenue / maxCatRevenue) * 100) : 0;
                   const colors = CATEGORY_COLORS[c.category] || CATEGORY_COLORS.OTHER;
                   return (
                     <div key={c.category}>
                       <div className="flex justify-between text-xs mb-2">
-                        <span className="text-slate-300 capitalize">{c.category.toLowerCase().replace(/_/g, " ")}</span>
-                        <span className="text-white font-bold">{formatCurrency(c.revenue)}</span>
+                        <span className="text-muted-foreground capitalize">{c.category.toLowerCase().replace(/_/g, " ")}</span>
+                        <span className="text-foreground font-bold">{formatCurrency(c.revenue)}</span>
                       </div>
-                      <div className="h-2 w-full bg-[#151c2a] rounded-full overflow-hidden">
+                      <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
                         <div className={`h-full ${colors.color} rounded-full ${colors.shadow}`} style={{ width: `${Math.max(pct, 5)}%` }} />
                       </div>
                     </div>
@@ -325,29 +325,29 @@ export default function ExporterDashboard() {
               </div>
             </div>
 
-            <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-xl rounded-2xl p-6">
+            <div className="bg-card backdrop-blur-xl border border-border shadow-xl rounded-2xl p-6 transition-colors duration-300">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-lg font-bold text-white">Top Buyers</h2>
+                <h2 className="text-lg font-bold text-foreground">Top Buyers</h2>
                 <Link href="/dashboard/exporter/directory" className="text-primary text-xs font-medium hover:underline">View Directory</Link>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
-                  <thead><tr className="text-xs text-slate-500 border-b border-white/5"><th className="pb-3 font-medium">Buyer</th><th className="pb-3 font-medium">Region</th><th className="pb-3 font-medium">Orders</th><th className="pb-3 font-medium text-right">Value</th></tr></thead>
+                  <thead><tr className="text-xs text-muted-foreground border-b border-border"><th className="pb-3 font-medium">Buyer</th><th className="pb-3 font-medium">Region</th><th className="pb-3 font-medium">Orders</th><th className="pb-3 font-medium text-right">Value</th></tr></thead>
                   <tbody className="text-sm">
                     {loading ? Array.from({ length: 3 }).map((_, i) => (
-                      <tr key={i} className="border-b border-white/5"><td className="py-3"><div className="w-28 h-4 bg-slate-700 rounded animate-pulse" /></td><td className="py-3"><div className="w-20 h-4 bg-slate-700/50 rounded animate-pulse" /></td><td className="py-3"><div className="w-12 h-4 bg-slate-700/50 rounded animate-pulse" /></td><td className="py-3"><div className="w-16 h-4 bg-slate-700 rounded animate-pulse ml-auto" /></td></tr>
+                      <tr key={i} className="border-b border-border"><td className="py-3"><div className="w-28 h-4 bg-muted rounded animate-pulse" /></td><td className="py-3"><div className="w-20 h-4 bg-muted/50 rounded animate-pulse" /></td><td className="py-3"><div className="w-12 h-4 bg-muted/50 rounded animate-pulse" /></td><td className="py-3"><div className="w-16 h-4 bg-muted rounded animate-pulse ml-auto" /></td></tr>
                     )) : partners.length === 0 ? (
-                      <tr><td colSpan={4} className="py-8 text-center text-slate-500 text-sm">No buyers yet</td></tr>
+                      <tr><td colSpan={4} className="py-8 text-center text-muted-foreground text-sm">No buyers yet</td></tr>
                     ) : partners.map((p, idx) => {
                       const palette = BG_COLORS[idx % BG_COLORS.length];
                       return (
-                        <tr key={p.id} className="border-b border-white/5 last:border-0 group hover:bg-white/5 transition-colors">
+                        <tr key={p.id} className="border-b border-border last:border-0 group hover:bg-accent/30 transition-colors">
                           <td className="py-3 flex items-center gap-3">
                             <div className={`w-8 h-8 rounded-full ${palette.bg} ${palette.text} flex items-center justify-center font-bold text-xs`}>{getInitials(p.companyName || p.name)}</div>
-                            <span className="text-slate-200 font-medium">{p.companyName || p.name}</span>
+                            <span className="text-foreground font-medium">{p.companyName || p.name}</span>
                           </td>
-                          <td className="py-3 text-slate-400">{p.country || "—"}</td>
-                          <td className="py-3 text-white">{formatNumber(p.orderCount)}</td>
+                          <td className="py-3 text-muted-foreground">{p.country || "—"}</td>
+                          <td className="py-3 text-foreground">{formatNumber(p.orderCount)}</td>
                           <td className="py-3 text-right text-primary font-bold">{formatCurrency(p.totalValue)}</td>
                         </tr>
                       );

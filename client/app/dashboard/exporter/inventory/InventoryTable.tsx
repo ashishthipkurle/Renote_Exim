@@ -115,13 +115,13 @@ export default function InventoryTable({ products }: { products: Product[] }) {
             <div className="flex flex-col md:flex-row gap-4">
                 {/* Search */}
                 <form onSubmit={handleSearch} className="flex-1 relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <input
                         type="text"
                         placeholder="Search products by name or description..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 bg-[#151c2a]/60 border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
+                        className="w-full pl-10 pr-4 py-2.5 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
                     />
                     <button type="submit" className="hidden" />
                 </form>
@@ -129,7 +129,7 @@ export default function InventoryTable({ products }: { products: Product[] }) {
                 {/* Filters */}
                 <div className="flex flex-col sm:flex-row gap-3">
                     <div className="relative">
-                        <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+                        <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                         <select
                             value={categoryFilter}
                             onChange={(e) => {
@@ -137,7 +137,7 @@ export default function InventoryTable({ products }: { products: Product[] }) {
                                 // Trigger right away for select
                                 setTimeout(updateFilters, 0);
                             }}
-                            className="w-full sm:w-40 appearance-none pl-10 pr-8 py-2.5 bg-[#151c2a]/60 border border-white/10 rounded-xl text-white focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all text-sm"
+                            className="w-full sm:w-40 appearance-none pl-10 pr-8 py-2.5 bg-card border border-border rounded-xl text-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all text-sm"
                         >
                             <option value="">All Categories</option>
                             {categories.map((c) => (
@@ -155,7 +155,7 @@ export default function InventoryTable({ products }: { products: Product[] }) {
                                 setStatusFilter(e.target.value);
                                 setTimeout(updateFilters, 0);
                             }}
-                            className="w-full sm:w-36 appearance-none px-4 py-2.5 bg-[#151c2a]/60 border border-white/10 rounded-xl text-white focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all text-sm"
+                            className="w-full sm:w-36 appearance-none px-4 py-2.5 bg-card border border-border rounded-xl text-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all text-sm"
                         >
                             <option value="ALL">All Status</option>
                             <option value="ACTIVE">Active</option>
@@ -173,7 +173,7 @@ export default function InventoryTable({ products }: { products: Product[] }) {
                                     router.push("?");
                                 });
                             }}
-                            className="px-4 py-2.5 text-sm text-slate-400 hover:text-white transition-colors"
+                            className="px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
                         >
                             Clear
                         </button>
@@ -188,7 +188,7 @@ export default function InventoryTable({ products }: { products: Product[] }) {
                     </div>
                 )}
 
-                <div className="hidden lg:grid grid-cols-12 gap-4 px-8 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] italic">
+                <div className="hidden lg:grid grid-cols-12 gap-4 px-8 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
                     <div className="col-span-4 text-primary opacity-50">Global Market Identity</div>
                     <div className="col-span-2">Sector</div>
                     <div className="col-span-2">Economics</div>
@@ -198,10 +198,10 @@ export default function InventoryTable({ products }: { products: Product[] }) {
                 </div>
 
                 {products.length === 0 ? (
-                    <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-2xl rounded-[2rem] p-16 text-center">
-                        <Package className="w-16 h-16 text-slate-700 mx-auto mb-6" />
-                        <h2 className="text-2xl font-black text-white mb-3 uppercase italic">No Assets Identified</h2>
-                        <p className="text-slate-400 text-sm mb-8 max-w-md mx-auto leading-relaxed">
+                    <div className="bg-card backdrop-blur-xl border border-border shadow-2xl rounded-[2rem] p-16 text-center">
+                        <Package className="w-16 h-16 text-muted-foreground/30 mx-auto mb-6" />
+                        <h2 className="text-2xl font-black text-foreground mb-3 uppercase italic">No Assets Identified</h2>
+                        <p className="text-muted-foreground text-sm mb-8 max-w-md mx-auto leading-relaxed">
                             Your global inventory is currently empty. Initialize your trade presence by deploying your first product listing.
                         </p>
                         <Link
@@ -215,55 +215,55 @@ export default function InventoryTable({ products }: { products: Product[] }) {
                     products.map((product) => (
                         <div
                             key={product.id}
-                            className={`bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 hover:border-primary/40 transition-all duration-500 shadow-2xl rounded-[2rem] p-5 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4 items-center group ${isDeletingId === product.id ? "opacity-30 pointer-events-none scale-95" : "hover:scale-[1.01]"
+                            className={`bg-card backdrop-blur-xl border border-border hover:border-primary/40 transition-all duration-500 shadow-xl dark:shadow-2xl rounded-[2rem] p-5 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4 items-center group ${isDeletingId === product.id ? "opacity-30 pointer-events-none scale-95" : "hover:scale-[1.01]"
                                 }`}
                         >
                             <div className="lg:col-span-4 flex items-center gap-5">
-                                <div className="size-16 rounded-2xl bg-slate-900 border border-white/5 flex-shrink-0 overflow-hidden flex items-center justify-center shadow-lg group-hover:border-primary/20 transition-colors">
+                                <div className="size-16 rounded-2xl bg-muted border border-border flex-shrink-0 overflow-hidden flex items-center justify-center shadow-lg group-hover:border-primary/20 transition-colors">
                                     {product.images?.[0] ? (
                                         <img src={product.images[0]} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                     ) : (
-                                        <Package className="w-6 h-6 text-slate-700" />
+                                        <Package className="w-6 h-6 text-muted-foreground" />
                                     )}
                                 </div>
                                 <div className="min-w-0">
-                                    <div className="text-base font-black text-white truncate group-hover:text-primary transition-colors">{product.name}</div>
-                                    <div className="text-[10px] text-slate-500 mt-1 line-clamp-1 font-medium italic group-hover:text-slate-400">
+                                    <div className="text-base font-black text-foreground truncate group-hover:text-primary transition-colors">{product.name}</div>
+                                    <div className="text-[10px] text-muted-foreground mt-1 line-clamp-1 font-medium italic group-hover:text-foreground">
                                         {product.description || "NO MARKET DESCRIPTION PROVIDED"}
                                     </div>
                                 </div>
                             </div>
 
                             <div className="lg:col-span-2">
-                                <span className="inline-flex items-center px-3 py-1 rounded-xl bg-slate-900/50 border border-white/5 text-[9px] text-slate-400 font-black uppercase tracking-[0.15em]">
+                                <span className="inline-flex items-center px-3 py-1 rounded-xl bg-muted/50 border border-border text-[9px] text-muted-foreground font-black uppercase tracking-[0.15em]">
                                     {product.category}
                                 </span>
                             </div>
 
                             <div className="lg:col-span-2">
-                                <div className="text-white font-black text-lg tracking-tight">{formatCurrency(product.price)}</div>
-                                <div className="text-[9px] text-slate-600 font-bold uppercase tracking-wider mt-0.5">per {product.unit}</div>
+                                <div className="text-foreground font-black text-lg tracking-tight">{formatCurrency(product.price)}</div>
+                                <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider mt-0.5">per {product.unit}</div>
                             </div>
 
                             <div className="lg:col-span-2 flex flex-col items-center">
-                                <div className="flex items-center gap-2 bg-slate-900/80 border border-white/5 rounded-xl p-1 shadow-inner">
+                                <div className="flex items-center gap-2 bg-muted border border-border rounded-xl p-1 shadow-inner">
                                     <button
                                         onClick={() => updateQuantity(product.id, product.quantity - 1)}
-                                        className="size-7 flex items-center justify-center rounded-lg hover:bg-white/5 text-slate-500 hover:text-white transition-colors text-lg font-bold"
+                                        className="size-7 flex items-center justify-center rounded-lg hover:bg-background/50 text-muted-foreground hover:text-foreground transition-colors text-lg font-bold"
                                     >
                                         -
                                     </button>
-                                    <div className="min-w-[40px] text-center text-sm font-black text-white">
+                                    <div className="min-w-[40px] text-center text-sm font-black text-foreground">
                                         {product.quantity}
                                     </div>
                                     <button
                                         onClick={() => updateQuantity(product.id, product.quantity + 1)}
-                                        className="size-7 flex items-center justify-center rounded-lg hover:bg-white/5 text-slate-500 hover:text-white transition-colors text-lg font-bold"
+                                        className="size-7 flex items-center justify-center rounded-lg hover:bg-background/50 text-muted-foreground hover:text-foreground transition-colors text-lg font-bold"
                                     >
                                         +
                                     </button>
                                 </div>
-                                <div className="text-[9px] text-slate-600 font-bold uppercase tracking-widest mt-2 italic">Unit: {product.unit}</div>
+                                <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest mt-2 italic">Unit: {product.unit}</div>
                             </div>
 
                             <div className="lg:col-span-1 flex justify-start lg:justify-center">
@@ -284,7 +284,7 @@ export default function InventoryTable({ products }: { products: Product[] }) {
                             <div className="lg:col-span-1 flex justify-end gap-3 mt-4 lg:mt-0">
                                 <Link
                                     href={`/dashboard/exporter/inventory/${product.id}/edit`}
-                                    className="p-3 bg-white/5 text-slate-500 hover:text-white hover:bg-white/10 border border-white/5 rounded-2xl transition-all active:scale-90"
+                                    className="p-3 bg-muted border border-border text-muted-foreground hover:text-foreground hover:bg-accent rounded-2xl transition-all active:scale-90"
                                     title="Edit Protocol"
                                 >
                                     <Edit2 className="w-4 h-4" />
@@ -292,11 +292,11 @@ export default function InventoryTable({ products }: { products: Product[] }) {
                                 <button
                                     onClick={() => deleteProduct(product.id, product.name)}
                                     disabled={isDeletingId === product.id}
-                                    className="p-3 bg-white/5 text-slate-500 hover:text-red-400 hover:bg-red-400/10 border border-white/5 rounded-2xl transition-all active:scale-90"
+                                    className="p-3 bg-muted border border-border text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-2xl transition-all active:scale-90"
                                     title="Purge Asset"
                                 >
                                     {isDeletingId === product.id ? (
-                                        <div className="w-4 h-4 border-2 border-red-400 border-t-transparent rounded-full animate-spin" />
+                                        <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
                                     ) : (
                                         <Trash2 className="w-4 h-4" />
                                     )}

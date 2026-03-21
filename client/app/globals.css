@@ -62,7 +62,7 @@
     --p-error-700: #8f2a16;
 
     /* --- 2. SEMANTIC TOKENS (LIGHT MODE) --- */
-    --background: 210 20% 98%; /* hsl version of #f3f4f6 approx */
+    --background: 210 40% 98%;
     --foreground: 222 47% 11%;
     
     --card: 0 0% 100%;
@@ -86,16 +86,18 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
+    --border: 214.3 32% 91%;
+    --input: 214.3 32% 91%;
     --ring: 221 83% 53%;
     --radius: 0.75rem;
 
-    /* Dashboard Specific */
-    --sidebar: var(--p-neutral-50);
-    --sidebar-foreground: var(--p-blue-gray-800);
-    --sidebar-primary: var(--brand-primary);
-    --sidebar-border: var(--p-neutral-100);
+    /* Dashboard Specific (Light) */
+    --sidebar: 210 40% 99%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 221 83% 53%;
+    --sidebar-border: 214.3 32% 91%;
+    --header-bg: 0 0% 100% / 0.8;
+    --header-border: 214.3 32% 91%;
 
     /* --- 3. TYPOGRAPHY TOKENS (REM) --- */
     --display-2xl-size: 3.25rem;
@@ -122,10 +124,10 @@
 
   .dark {
     /* --- SEMANTIC TOKENS (DARK MODE) --- */
-    --background: 223 45% 7%;
+    --background: 223 45% 7%; /* Equivalent to #0a0c12 approx */
     --foreground: 210 40% 98%;
     
-    --card: 224 39% 10%;
+    --card: 224 39% 10%; /* Equivalent to #151c2a approx */
     --card-foreground: 210 40% 98%;
     
     --popover: 224 39% 10%;
@@ -146,13 +148,17 @@
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
     
-    --border: 220 25% 18%;
+    --border: 220 25% 18%; /* Equivalent to #1e1e22 approx */
     --input: 220 25% 18%;
     --ring: 221 83% 53%;
 
-    /* Dashboard Specific */
-    --sidebar: #050507;
-    --sidebar-border: #1e1e22;
+    /* Dashboard Specific (Dark) */
+    --sidebar: 225 27% 6%; /* #0a0c12 */
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 221 83% 53%;
+    --sidebar-border: 220 25% 18%;
+    --header-bg: 223 45% 7% / 0.8;
+    --header-border: 220 25% 18%;
 
     /* Chart Colors */
     --chart-1: 220 70% 50%;

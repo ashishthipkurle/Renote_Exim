@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function HomeHero() {
   return (
-    <header className="relative min-h-[95vh] flex items-center justify-center overflow-hidden pt-20 pb-12 bg-slate-50 dark:bg-background-dark transition-colors duration-500">
+    <header className="relative min-h-[95vh] flex items-center justify-center overflow-hidden pt-20 pb-12 bg-background transition-colors duration-500">
       <div className="absolute inset-0 z-0">
         {/* Light Theme Globe */}
         <div
@@ -18,14 +18,14 @@ export default function HomeHero() {
           style={{ backgroundPosition: "center 30%", transform: "scale(1.1)" }}
           aria-hidden="true"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-slate-50 dark:from-background-dark/90 dark:via-transparent dark:to-background-dark transition-colors duration-500 pointer-events-none" aria-hidden="true" />
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-transparent dark:from-background-dark/80 dark:via-transparent dark:to-background-dark/80 transition-colors duration-500 pointer-events-none" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background dark:from-background/90 dark:via-transparent dark:to-background transition-colors duration-500 pointer-events-none" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-transparent dark:from-background/80 dark:via-transparent dark:to-background/80 transition-colors duration-500 pointer-events-none" aria-hidden="true" />
         <div className="absolute top-1/4 left-1/4 w-[40rem] h-[40rem] bg-primary/20 dark:bg-primary/10 rounded-full blur-[120px] animate-pulse transition-opacity duration-500 opacity-20 dark:opacity-100 pointer-events-none" aria-hidden="true" />
         <div className="absolute bottom-1/3 right-1/4 w-[35rem] h-[35rem] bg-indigo-500/20 dark:bg-indigo-600/10 rounded-full blur-[140px] transition-opacity duration-500 opacity-20 dark:opacity-100 pointer-events-none" aria-hidden="true" />
       </div>
 
       <div className="relative z-10 container mx-auto px-6 text-center flex flex-col items-center justify-center h-full mt-10">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-slate-200 dark:border-primary/30 mb-10 animate-[float_4s_ease-in-out_infinite] bg-white/60 dark:bg-[#101622]/80 backdrop-blur-md transition-colors duration-500 shadow-sm dark:shadow-lg">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border mb-10 animate-[float_4s_ease-in-out_infinite] bg-background/60 backdrop-blur-md transition-colors duration-500 shadow-sm dark:shadow-lg">
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 dark:bg-green-400 opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-green-600 dark:bg-green-500" />
@@ -33,7 +33,7 @@ export default function HomeHero() {
           <span className="text-xs font-semibold text-primary uppercase tracking-widest">Global Network Active</span>
         </div>
 
-        <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold text-slate-900 dark:text-white mb-8 tracking-tight leading-none drop-shadow-2xl transition-colors duration-500">
+        <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold text-foreground mb-8 tracking-tight leading-none drop-shadow-2xl transition-colors duration-500">
           TRADE WITHOUT <br />
           <span className="gradient-text text-glow relative inline-block">
             BORDERS
@@ -52,7 +52,7 @@ export default function HomeHero() {
           </span>
         </h1>
 
-        <p className="text-xl md:text-2xl text-slate-700 dark:text-slate-300 max-w-3xl mx-auto mb-12 leading-relaxed font-light drop-shadow-lg transition-colors duration-500">
+        <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-12 leading-relaxed font-light drop-shadow-lg transition-colors duration-500">
           The next-generation B2B marketplace. Connect with verified suppliers, automate logistics, and track shipments in real-time across our immersive global network.
         </p>
 
@@ -65,7 +65,7 @@ export default function HomeHero() {
             <span className="material-icons group-hover:translate-x-1 transition-transform text-sm">arrow_forward</span>
           </Link>
           <button
-            className="w-full sm:w-1/2 hover:bg-white/80 dark:hover:bg-white/10 text-slate-900 dark:text-white font-semibold py-5 px-8 rounded-xl transition-all duration-300 text-lg flex items-center justify-center gap-2 border border-slate-300 dark:border-white/20 hover:border-slate-400 dark:hover:border-white/40 hover:-translate-y-1 bg-white/40 dark:bg-[#101622]/60 backdrop-blur-xl shadow-lg"
+            className="w-full sm:w-1/2 hover:bg-background/80 dark:hover:bg-white/10 text-foreground font-semibold py-5 px-8 rounded-xl transition-all duration-300 text-lg flex items-center justify-center gap-2 border border-border hover:border-border/80 hover:-translate-y-1 bg-background/40 backdrop-blur-xl shadow-lg"
             type="button"
           >
             <span className="material-icons text-primary text-xl">play_circle</span>

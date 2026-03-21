@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -94,7 +94,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-display selection:bg-primary selection:text-white">
+    <div className="bg-background text-foreground font-display selection:bg-primary selection:text-white">
       <HomeNavbar />
       <HomeHero />
       <ForwardMarquee />

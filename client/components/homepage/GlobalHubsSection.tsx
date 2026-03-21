@@ -45,11 +45,11 @@ export default function GlobalHubsSection() {
   };
 
   return (
-    <section ref={sectionRef} className="py-24 relative bg-slate-50 dark:bg-[#0A0E17] overflow-hidden flex items-center min-h-[90vh]">
+    <section ref={sectionRef} className="py-24 relative bg-background overflow-hidden flex items-center min-h-[90vh]">
       {/* Port Background */}
       <div className="absolute top-0 right-0 w-full md:w-[60%] h-full z-0">
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-50 dark:from-[#0A0E17] via-slate-50/80 dark:via-[#0A0E17]/80 to-transparent z-10" />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-50 dark:from-[#0A0E17] via-transparent to-slate-50 dark:to-[#0A0E17] z-10 opacity-60" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent z-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background z-10 opacity-60" />
         <Image
           src="https://images.unsplash.com/photo-1586528116311-ad8ed7c80a30?q=80&w=2070"
           alt="Container Port"
@@ -72,17 +72,17 @@ export default function GlobalHubsSection() {
 
       <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center gap-16 relative z-10 w-full">
         <div className="w-full md:w-[45%] reveal-trigger">
-          <div className="relative rounded-2xl overflow-hidden glass-card p-8 border border-white/60 dark:border-white/10 shadow-2xl bg-white/60 dark:bg-[#0A0E17]/60 backdrop-blur-xl">
-            <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">Strategic Global Hubs</h3>
-            <p className="text-slate-600 dark:text-slate-300 mb-8 leading-relaxed text-sm">
+          <div className="relative rounded-2xl overflow-hidden glass-card p-8 border border-border shadow-2xl bg-background/60 backdrop-blur-xl">
+            <h3 className="text-3xl font-bold text-foreground mb-4">Strategic Global Hubs</h3>
+            <p className="text-muted-foreground mb-8 leading-relaxed text-sm">
               Our network of strategically located port facilities ensures your cargo never stops moving. From Shanghai to Rotterdam, we maintain priority access and dedicated customs channels.
             </p>
 
             <div className="space-y-6">
               <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-4">
                 <div>
-                  <h4 className="text-slate-900 dark:text-white font-bold">Singapore Port</h4>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Asia Pacific Hub</p>
+                  <h4 className="text-foreground font-bold">Singapore Port</h4>
+                  <p className="text-sm text-muted-foreground">Asia Pacific Hub</p>
                 </div>
                 <span className="px-3 py-1 bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-500/30 rounded-full text-[10px] uppercase font-bold tracking-widest">ACTIVE</span>
               </div>
@@ -105,8 +105,8 @@ export default function GlobalHubsSection() {
         </div>
 
         <div className="w-full md:w-[55%] space-y-8 reveal-trigger pl-0 md:pl-10" style={{ transitionDelay: "200ms" }}>
-          <h2 className="text-5xl md:text-6xl font-bold text-slate-900 dark:text-white leading-tight">STRATEGIC <br /><span className="text-primary">GLOBAL HUBS</span></h2>
-          <p className="text-slate-300 dark:text-slate-300 text-lg leading-relaxed max-w-xl">Our physical presence in 40+ major logistical hubs ensures your goods are handled with priority. From Singapore to Rotterdam, we provide on-ground support.</p>
+          <h2 className="text-5xl md:text-6xl font-bold text-foreground leading-tight">STRATEGIC <br /><span className="text-primary">GLOBAL HUBS</span></h2>
+          <p className="text-muted-foreground text-lg leading-relaxed max-w-xl">Our physical presence in 40+ major logistical hubs ensures your goods are handled with priority. From Singapore to Rotterdam, we provide on-ground support.</p>
           <div className="space-y-4 pt-4 max-w-xl">
             <div
               onClick={() => handleItemClick("expedited")}
