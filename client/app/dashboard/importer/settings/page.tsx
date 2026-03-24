@@ -216,8 +216,8 @@ function TabButton({ active, onClick, icon: Icon, label }: { active: boolean; on
     <button
       onClick={onClick}
       className={`w-full flex items-center gap-4 p-4 rounded-2xl transition-all group ${active
-          ? "bg-primary text-white shadow-xl shadow-primary/20"
-          : "text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-slate-200"
+        ? "bg-primary text-white shadow-xl shadow-primary/20"
+        : "text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-slate-200"
         }`}
     >
       <Icon className={`w-4 h-4 ${active ? "animate-pulse" : ""}`} />

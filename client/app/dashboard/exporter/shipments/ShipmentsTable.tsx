@@ -61,7 +61,7 @@ export default function ShipmentsTable({ shipments }: { shipments: any[] }) {
                 {shipments.length === 0 ? (
                     <div className="bg-card border border-border shadow-2xl rounded-[2rem] p-16 text-center">
                         <Truck className="w-16 h-16 text-muted-foreground/30 mx-auto mb-6" />
-                        <h2 className="text-2xl font-black text-foreground mb-3 uppercase italic">No Global Logistics ID&apos;d</h2>
+                        <h2 className="text-2xl font-black text-foreground mb-3 uppercase ">No Global Logistics ID&apos;d</h2>
                         <p className="text-muted-foreground text-sm mb-8 max-w-md mx-auto leading-relaxed">
                             There are currently no active shipments in transit. Your logistics chain will appear here once orders are dispatched.
                         </p>

@@ -30,6 +30,7 @@ export async function GET() {
                     }),
                 ]);
 
+
                 return {
                     month: m.name,
                     users,
@@ -45,7 +46,7 @@ export async function GET() {
             _count: { id: true },
         });
 
-        const categoryDistribution = categoriesRaw.map(c => ({
+        const categoryDistribution = categoriesRaw.map((c: any) => ({
             name: c.category,
             value: c._count.id,
         }));
