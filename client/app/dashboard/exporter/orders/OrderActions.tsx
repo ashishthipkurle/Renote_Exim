@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CheckCircle2, XCircle, Package, Truck, Loader2, Plus } from 'lucide-react';
+import { CheckCircle2, XCircle, Package, Truck, Loader2 } from 'lucide-react';
 import { authFetch } from '@/lib/api-utils';
 import { toast } from 'sonner';
 import { CreateShipmentModal } from './CreateShipmentModal';
@@ -94,7 +94,7 @@ export function OrderActions({ orderId, orderNumber, currentStatus, importerCoun
             )}
 
             {['SHIPPED', 'DELIVERED', 'CANCELLED', 'DISPUTED'].includes(currentStatus) && (
-                <p className="text-slate-500 text-sm italic py-2">No further actions available for this status.</p>
+                <p className="text-muted-foreground text-sm italic py-2">No further actions available for this status.</p>
             )}
         </div>
     );

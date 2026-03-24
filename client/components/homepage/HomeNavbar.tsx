@@ -22,18 +22,18 @@ export default function HomeNavbar() {
   }, []);
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-white/90 dark:bg-[#101622]/90 backdrop-blur-xl border-b border-slate-200 dark:border-white/10 transition-colors duration-300">
+    <nav className="fixed top-0 w-full z-50 bg-background/90 backdrop-blur-xl border-b border-border transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-white font-bold primary-glow-hover">
             <span className="material-icons text-sm">public</span>
           </div>
-          <span className="text-xl font-bold tracking-wide text-slate-900 dark:text-white">
+          <span className="text-xl font-bold tracking-wide text-foreground">
             RANOTE<span className="text-primary">EXIM</span>
           </span>
         </div>
 
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600 dark:text-slate-400">
+        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
           <Link className="hover:text-primary dark:hover:text-white transition-colors" href="/products">
             Marketplace
           </Link>
@@ -59,8 +59,8 @@ export default function HomeNavbar() {
               {isProfileMenuOpen && (
                 <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-[#101622]/95 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl py-2 z-50">
                   <div className="px-4 py-3 border-b border-slate-100 dark:border-white/10 mb-2">
-                    <p className="text-sm text-slate-900 dark:text-white font-bold truncate tracking-wide">{user.name || "User"}</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{user.email}</p>
+                    <p className="text-sm text-foreground font-bold truncate tracking-wide">{user.name || "User"}</p>
+                    <p className="text-xs text-muted-foreground truncate">{user.email}</p>
                   </div>
                   <Link
                     href={user.role === "USER" ? "/products" : `/dashboard/${user.role.toLowerCase()}`}

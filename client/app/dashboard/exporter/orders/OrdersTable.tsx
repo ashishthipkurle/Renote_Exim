@@ -85,7 +85,7 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
                             onClick={() => updateFilters(pill.id)}
                             className={`px-4 py-2 rounded-xl border text-xs font-bold transition-all ${currentStatus === pill.id
                                     ? pill.color.replace("/10", "/20").replace("border-", "border-opacity-100 ") + " border-primary ring-1 ring-primary/30"
-                                    : "text-slate-500 bg-white/5 border-white/5 hover:bg-white/10"
+                                    : "text-muted-foreground bg-muted/50 border-border hover:bg-muted"
                                 }`}
                         >
                             {pill.label} <span className="opacity-50 ml-1">{pill.count}</span>
@@ -94,13 +94,13 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
                 </div>
 
                 <form onSubmit={handleSearch} className="relative w-full lg:w-96">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <input
                         type="text"
                         placeholder="Search by product, buyer, or ID..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 bg-[#151c2a]/60 border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all text-sm"
+                        className="w-full pl-10 pr-4 py-2.5 bg-muted/50 border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all text-sm"
                     />
                 </form>
             </div>
@@ -108,23 +108,23 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
             {/* Orders List */}
             <div className="space-y-4 relative">
                 {isPending && (
-                    <div className="absolute inset-0 bg-[#0a0c12]/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl">
+                    <div className="absolute inset-0 bg-background/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-2xl">
                         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
                     </div>
                 )}
 
                 {orders.length === 0 ? (
-                    <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-xl rounded-2xl p-12 text-center">
-                        <Package className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-                        <h2 className="text-xl font-bold text-white mb-2">No orders found</h2>
-                        <p className="text-slate-400 text-sm">
+                    <div className="bg-card backdrop-blur-xl border border-border shadow-md dark:shadow-xl rounded-2xl p-12 text-center">
+                        <Package className="w-12 h-12 text-muted-foreground/40 mx-auto mb-4" />
+                        <h2 className="text-xl font-bold text-foreground mb-2">No orders found</h2>
+                        <p className="text-muted-foreground text-sm">
                             Try adjusting your filters or search query.
                         </p>
                     </div>
                 ) : (
                     <>
                         {/* Desktop Header */}
-                        <div className="hidden lg:grid grid-cols-12 gap-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                        <div className="hidden lg:grid grid-cols-12 gap-4 px-6 text-xs font-bold text-muted-foreground uppercase tracking-wider">
                             <div className="col-span-4">Product & Buyer</div>
                             <div className="col-span-2">Amount</div>
                             <div className="col-span-2">Status</div>
@@ -138,30 +138,30 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
                             return (
                                 <div
                                     key={order.id}
-                                    className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 hover:border-primary/30 transition-colors shadow-xl rounded-2xl p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4 items-center"
+                                    className="bg-card backdrop-blur-xl border border-border hover:border-primary/30 transition-colors shadow-sm dark:shadow-xl rounded-2xl p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4 items-center"
                                 >
                                     <div className="lg:col-span-4 flex items-center gap-4">
-                                        <div className="size-12 rounded-xl bg-slate-800 border border-white/5 flex-shrink-0 flex items-center justify-center overflow-hidden">
+                                        <div className="size-12 rounded-xl bg-muted border border-border flex-shrink-0 flex items-center justify-center overflow-hidden">
                                             {order.product.images?.[0] ? (
                                                 <img src={order.product.images[0]} alt="" className="w-full h-full object-cover" />
                                             ) : (
-                                                <Package className="w-5 h-5 text-slate-500" />
+                                                <Package className="w-5 h-5 text-muted-foreground" />
                                             )}
                                         </div>
                                         <div>
-                                            <div className="text-sm font-bold text-white line-clamp-1">{order.product.name}</div>
-                                            <div className="text-xs text-slate-400 mt-0.5 truncate">
+                                            <div className="text-sm font-bold text-foreground line-clamp-1">{order.product.name}</div>
+                                            <div className="text-xs text-muted-foreground mt-0.5 truncate">
                                                 {order.importer.companyName || order.importer.name} ({order.importer.country ?? "N/A"})
                                             </div>
-                                            <div className="text-[10px] text-slate-500 mt-0.5">
+                                            <div className="text-[10px] text-muted-foreground/60 mt-0.5">
                                                 Qty: {order.quantity} · {order.product.category}
                                             </div>
                                         </div>
                                     </div>
 
                                     <div className="lg:col-span-2">
-                                        <div className="text-white font-bold">{formatCurrency(order.totalPrice)}</div>
-                                        <div className="text-[10px] text-slate-500 capitalize">{order.paymentStatus.toLowerCase()}</div>
+                                        <div className="text-foreground font-bold">{formatCurrency(order.totalPrice)}</div>
+                                        <div className="text-[10px] text-muted-foreground capitalize">{order.paymentStatus.toLowerCase()}</div>
                                     </div>
 
                                     <div className="lg:col-span-2">
@@ -172,7 +172,7 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
                                     </div>
 
                                     <div className="lg:col-span-2">
-                                        <div className="text-sm text-slate-300">{formatDate(order.createdAt)}</div>
+                                        <div className="text-sm text-muted-foreground">{formatDate(order.createdAt)}</div>
                                     </div>
 
                                     <div className="lg:col-span-2 flex justify-end">

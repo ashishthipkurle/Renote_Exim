@@ -48,12 +48,12 @@ export default function RFQForm({ onSubmitSuccess }: { onSubmitSuccess?: () => v
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-4">
         <div className="space-y-2">
-          <label className="text-sm font-bold text-slate-300 uppercase tracking-wider">Requirement Title</label>
+          <label className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Requirement Title</label>
           <div className="relative">
-            <FileText className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+            <FileText className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
             <input
               required
-              className="w-full bg-slate-900 border-slate-800 rounded-xl h-12 pl-11 pr-4 text-white focus:border-blue-500/50 transition-all outline-none"
+              className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl h-12 pl-11 pr-4 text-slate-900 dark:text-white focus:border-blue-500/50 transition-all outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
               placeholder="e.g. 5000 units of organic cotton yarn"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
@@ -63,9 +63,9 @@ export default function RFQForm({ onSubmitSuccess }: { onSubmitSuccess?: () => v
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <label className="text-sm font-bold text-slate-300 uppercase tracking-wider">Category</label>
+            <label className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Category</label>
             <select
-              className="w-full bg-slate-900 border-slate-800 rounded-xl h-12 px-4 text-white outline-none"
+              className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl h-12 px-4 text-slate-900 dark:text-white outline-none"
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
             >
@@ -73,12 +73,12 @@ export default function RFQForm({ onSubmitSuccess }: { onSubmitSuccess?: () => v
             </select>
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-bold text-slate-300 uppercase tracking-wider">Deadline</label>
+            <label className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Deadline</label>
             <div className="relative">
-              <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+              <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
               <input
                 type="date"
-                className="w-full bg-slate-900 border-slate-800 rounded-xl h-12 pl-11 pr-4 text-white outline-none"
+                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl h-12 pl-11 pr-4 text-slate-900 dark:text-white outline-none"
                 value={formData.deadline}
                 onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
               />
@@ -88,25 +88,25 @@ export default function RFQForm({ onSubmitSuccess }: { onSubmitSuccess?: () => v
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <label className="text-sm font-bold text-slate-300 uppercase tracking-wider">Quantity</label>
+            <label className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Quantity</label>
             <div className="relative">
-              <Package className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+              <Package className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
               <input
                 type="number"
                 required
-                className="w-full bg-slate-900 border-slate-800 rounded-xl h-12 pl-11 pr-4 text-white outline-none"
+                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl h-12 pl-11 pr-4 text-slate-900 dark:text-white outline-none"
                 value={formData.quantity}
                 onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) })}
               />
             </div>
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-bold text-slate-300 uppercase tracking-wider">Target Budget ($)</label>
+            <label className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Target Budget ($)</label>
             <div className="relative">
-              <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+              <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
               <input
                 type="number"
-                className="w-full bg-slate-900 border-slate-800 rounded-xl h-12 pl-11 pr-4 text-white outline-none"
+                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl h-12 pl-11 pr-4 text-slate-900 dark:text-white outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 placeholder="Optional"
                 value={formData.budget}
                 onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
@@ -116,20 +116,20 @@ export default function RFQForm({ onSubmitSuccess }: { onSubmitSuccess?: () => v
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-bold text-slate-300 uppercase tracking-wider">Detailed Specifications</label>
+          <label className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Detailed Specifications</label>
           <textarea
             required
             rows={4}
-            className="w-full bg-slate-900 border-slate-800 rounded-xl p-4 text-white outline-none focus:border-blue-500/50 transition-all resize-none"
+            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 text-slate-900 dark:text-white outline-none focus:border-blue-500/50 transition-all resize-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
             placeholder="Describe your requirements in detail (materials, packing, shipping terms)..."
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           />
         </div>
 
-        <div className="p-4 bg-blue-500/5 border border-blue-500/10 rounded-xl flex items-start gap-3">
-          <Info className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
-          <p className="text-xs text-blue-300 leading-relaxed italic">
+        <div className="p-4 bg-blue-50 dark:bg-blue-500/5 border border-blue-200 dark:border-blue-500/10 rounded-xl flex items-start gap-3">
+          <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+          <p className="text-xs text-blue-800 dark:text-blue-300 leading-relaxed italic">
             This RFQ will be sent to verified exporters in the {formData.category.toLowerCase()} category. 
             They will submit quotes directly to your dashboard.
           </p>

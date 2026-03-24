@@ -1,28 +1,11 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Package, ArrowRight, Clock, CheckCircle2, XCircle, Truck } from "lucide-react";
+import { Package, Clock, CheckCircle2, XCircle, Truck } from "lucide-react";
 
 import { prisma } from "@/lib/prisma";
 import { getServerAuth } from "@/lib/supabase/server";
 import { Prisma } from "@prisma/client";
 import OrdersTable from "./OrdersTable";
-
-const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof Package }> = {
-  PENDING: { label: "Pending", color: "text-yellow-500 bg-yellow-500/10 border-yellow-500/20", icon: Clock },
-  CONFIRMED: { label: "Confirmed", color: "text-blue-400 bg-blue-400/10 border-blue-400/20", icon: CheckCircle2 },
-  PROCESSING: { label: "Processing", color: "text-purple-400 bg-purple-400/10 border-purple-400/20", icon: Package },
-  SHIPPED: { label: "Shipped", color: "text-cyan-400 bg-cyan-400/10 border-cyan-400/20", icon: Truck },
-  DELIVERED: { label: "Delivered", color: "text-emerald-400 bg-emerald-400/10 border-emerald-400/20", icon: CheckCircle2 },
-  CANCELLED: { label: "Cancelled", color: "text-red-400 bg-red-400/10 border-red-400/20", icon: XCircle },
-};
-
-function formatMoney(n: number) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
-}
-
-function formatDate(d: Date) {
-  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(d);
-}
 
 export default async function ExporterOrdersPage({
   searchParams,
@@ -107,12 +90,12 @@ export default async function ExporterOrdersPage({
   const totalPages = Math.ceil(total / limit);
 
   return (
-    <div className="h-full overflow-hidden flex flex-col bg-gradient-to-br from-[#0a0c12] via-[#0d1017] to-[#0a0c12]">
-      <header className="flex-shrink-0 p-6 lg:p-8 border-b border-white/5">
+    <div className="h-full overflow-hidden flex flex-col bg-background">
+      <header className="flex-shrink-0 p-6 lg:p-8 border-b border-border">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-white uppercase italic">Orders</h1>
-            <p className="text-slate-400 mt-1">
+            <h1 className="text-3xl font-black tracking-tight text-foreground uppercase">Orders</h1>
+            <p className="text-muted-foreground mt-1">
               Manage incoming orders from importers — {statusCounts.all} total
             </p>
           </div>
@@ -128,7 +111,7 @@ export default async function ExporterOrdersPage({
             <div className="flex items-center justify-center gap-2 pb-12">
               <Link
                 href={`?${new URLSearchParams({ ...searchParams, page: (page - 1).toString() })}`}
-                className={`px-4 py-2 rounded-xl border border-white/5 text-xs font-bold transition-all ${page <= 1 ? "opacity-50 pointer-events-none" : "hover:bg-white/5"
+                className={`px-4 py-2 rounded-xl border border-border text-xs font-bold transition-all ${page <= 1 ? "opacity-50 pointer-events-none" : "hover:bg-muted"
                   }`}
               >
                 Previous
@@ -142,7 +125,7 @@ export default async function ExporterOrdersPage({
                       <Link
                         key={p}
                         href={`?${new URLSearchParams({ ...searchParams, page: p.toString() })}`}
-                        className={`w-10 h-10 flex items-center justify-center rounded-xl border text-xs font-bold transition-all ${page === p ? "bg-primary border-primary text-white" : "border-white/5 hover:bg-white/5 text-slate-400"
+                        className={`w-10 h-10 flex items-center justify-center rounded-xl border text-xs font-bold transition-all ${page === p ? "bg-primary border-primary text-white" : "border-border hover:bg-muted text-muted-foreground"
                           }`}
                       >
                         {p}
@@ -150,14 +133,14 @@ export default async function ExporterOrdersPage({
                     );
                   }
                   if (p === page - 2 || p === page + 2) {
-                    return <span key={p} className="text-slate-600 px-1">...</span>;
+                    return <span key={p} className="text-muted-foreground/60 px-1">...</span>;
                   }
                   return null;
                 })}
               </div>
               <Link
                 href={`?${new URLSearchParams({ ...searchParams, page: (page + 1).toString() })}`}
-                className={`px-4 py-2 rounded-xl border border-white/5 text-xs font-bold transition-all ${page >= totalPages ? "opacity-50 pointer-events-none" : "hover:bg-white/5"
+                className={`px-4 py-2 rounded-xl border border-border text-xs font-bold transition-all ${page >= totalPages ? "opacity-50 pointer-events-none" : "hover:bg-muted"
                   }`}
               >
                 Next

@@ -10,9 +10,6 @@ import {
     User,
     Building2,
     Globe,
-    Calendar,
-    CreditCard,
-    Hash,
     ShoppingBag
 } from "lucide-react";
 
@@ -77,13 +74,13 @@ export default async function OrderDetailPage({ params }: { params: { id: string
     const StatusIcon = cfg.icon;
 
     return (
-        <div className="h-full overflow-hidden flex flex-col bg-slate-950 text-white">
+        <div className="h-full overflow-hidden flex flex-col bg-background text-foreground">
             {/* Header & Back Action */}
-            <div className="flex-shrink-0 p-6 lg:p-8 border-b border-white/5 bg-[#0d1017]/80 backdrop-blur-md">
+            <div className="flex-shrink-0 p-6 lg:p-8 border-b border-border bg-header/80 backdrop-blur-md">
                 <div className="max-w-6xl mx-auto w-full">
                     <Link
                         href="/dashboard/exporter/orders"
-                        className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-4 text-xs font-bold uppercase tracking-widest"
+                        className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-4 text-xs font-bold uppercase tracking-widest"
                     >
                         <ChevronLeft className="w-4 h-4" />
                         Back to Orders
@@ -104,14 +101,14 @@ export default async function OrderDetailPage({ params }: { params: { id: string
                             </p>
                         </div>
 
-                        <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 p-4 rounded-2xl flex items-center gap-6">
+                        <div className="bg-card border border-border p-4 rounded-2xl flex items-center gap-6">
                             <div className="text-right">
-                                <div className="text-[9px] text-slate-500 uppercase font-black tracking-widest px-1">Total Amount</div>
+                                <div className="text-[9px] text-muted-foreground uppercase font-black tracking-widest px-1">Total Amount</div>
                                 <div className="text-xl font-black text-primary">{formatMoney(order.totalPrice)}</div>
                             </div>
-                            <div className="w-px h-10 bg-white/10" />
+                            <div className="w-px h-10 bg-border" />
                             <div>
-                                <div className="text-[9px] text-slate-500 uppercase font-black tracking-widest px-1">Payment Status</div>
+                                <div className="text-[9px] text-muted-foreground uppercase font-black tracking-widest px-1">Payment Status</div>
                                 <div className="font-black text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded border border-primary/20 mt-1 uppercase tracking-widest text-center">
                                     {order.paymentStatus}
                                 </div>
@@ -140,29 +137,29 @@ export default async function OrderDetailPage({ params }: { params: { id: string
                         </section>
 
                         {/* Product Info */}
-                        <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 rounded-3xl overflow-hidden">
-                            <div className="p-6 border-b border-white/5 flex items-center gap-2">
-                                <ShoppingBag className="w-5 h-5 text-slate-400" />
+                        <div className="bg-card border border-border rounded-3xl overflow-hidden">
+                            <div className="p-6 border-b border-border flex items-center gap-2">
+                                <ShoppingBag className="w-5 h-5 text-muted-foreground" />
                                 <h3 className="font-bold text-lg">Product Details</h3>
                             </div>
                             <div className="p-6">
                                 <div className="flex flex-col md:flex-row gap-6">
-                                    <div className="w-full md:w-48 h-48 rounded-2xl bg-slate-800 border border-white/5 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-inner">
+                                    <div className="w-full md:w-48 h-48 rounded-2xl bg-muted border border-border flex items-center justify-center overflow-hidden flex-shrink-0 shadow-inner">
                                         {orderWithRel.product.images?.[0] ? (
                                             <img src={orderWithRel.product.images[0]} alt={orderWithRel.product.name} className="w-full h-full object-cover" />
                                         ) : (
-                                            <Package className="w-12 h-12 text-slate-700" />
+                                            <Package className="w-12 h-12 text-muted-foreground/40" />
                                         )}
                                     </div>
                                     <div className="flex-1 space-y-4">
                                         <div>
-                                            <h2 className="text-2xl font-bold text-white mb-1">{orderWithRel.product.name}</h2>
+                                            <h2 className="text-2xl font-bold text-foreground mb-1">{orderWithRel.product.name}</h2>
                                             <div className="flex gap-2">
-                                                <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded border border-white/5">
+                                                <span className="text-[10px] bg-muted text-muted-foreground px-2 py-0.5 rounded border border-border">
                                                     {orderWithRel.product.category}
                                                 </span>
                                                 {orderWithRel.product.hsCode && (
-                                                    <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded border border-white/5 font-mono">
+                                                    <span className="text-[10px] bg-muted text-muted-foreground px-2 py-0.5 rounded border border-border font-mono">
                                                         HS Code: {orderWithRel.product.hsCode}
                                                     </span>
                                                 )}
@@ -170,12 +167,12 @@ export default async function OrderDetailPage({ params }: { params: { id: string
                                         </div>
 
                                         <div className="grid grid-cols-2 gap-4 pt-2">
-                                            <div className="bg-white/5 p-3 rounded-xl border border-white/5">
-                                                <div className="text-[10px] text-slate-500 uppercase font-bold mb-1">Quantity</div>
+                                            <div className="bg-muted/30 p-3 rounded-xl border border-border">
+                                                <div className="text-[10px] text-muted-foreground uppercase font-bold mb-1">Quantity</div>
                                                 <div className="text-lg font-bold">{order.quantity} units</div>
                                             </div>
-                                            <div className="bg-white/5 p-3 rounded-xl border border-white/5">
-                                                <div className="text-[10px] text-slate-500 uppercase font-bold mb-1">Unit Price</div>
+                                            <div className="bg-muted/30 p-3 rounded-xl border border-border">
+                                                <div className="text-[10px] text-muted-foreground uppercase font-bold mb-1">Unit Price</div>
                                                 <div className="text-lg font-bold">{formatMoney(orderWithRel.product.price)}</div>
                                             </div>
                                         </div>
@@ -186,9 +183,9 @@ export default async function OrderDetailPage({ params }: { params: { id: string
 
                         {/* Order Notes */}
                         {order.notes && (
-                            <div className="bg-[#151c2a]/60 border border-white/5 p-6 rounded-3xl">
-                                <h3 className="font-bold mb-3 text-slate-300">Importer Notes</h3>
-                                <p className="text-slate-400 text-sm leading-relaxed p-4 bg-slate-900/50 rounded-2xl italic border border-white/5">
+                            <div className="bg-card border border-border p-6 rounded-3xl">
+                                <h3 className="font-bold mb-3 text-foreground">Importer Notes</h3>
+                                <p className="text-muted-foreground text-sm leading-relaxed p-4 bg-muted/50 rounded-2xl italic border border-border">
                                     &quot;{order.notes}&quot;
                                 </p>
                             </div>
@@ -198,7 +195,7 @@ export default async function OrderDetailPage({ params }: { params: { id: string
                     {/* Right Col: Buyer & Meta */}
                     <div className="space-y-8">
                         {/* Buyer Info */}
-                        <div className="bg-[#151c2a]/80 backdrop-blur-xl border border-white/5 rounded-3xl p-6 shadow-xl">
+                        <div className="bg-card border border-border rounded-3xl p-6 shadow-xl">
                             <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
                                 <User className="w-5 h-5 text-primary" />
                                 Importer Information
@@ -210,8 +207,8 @@ export default async function OrderDetailPage({ params }: { params: { id: string
                                         <Building2 className="w-5 h-5" />
                                     </div>
                                     <div>
-                                        <div className="text-[10px] text-slate-500 uppercase font-bold tracking-tight mb-0.5">Company</div>
-                                        <div className="font-bold text-white leading-tight">
+                                        <div className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight mb-0.5">Company</div>
+                                        <div className="font-bold text-foreground leading-tight">
                                             {orderWithRel.importer.companyName || orderWithRel.importer.name}
                                         </div>
                                     </div>
@@ -222,8 +219,8 @@ export default async function OrderDetailPage({ params }: { params: { id: string
                                         <Globe className="w-5 h-5" />
                                     </div>
                                     <div>
-                                        <div className="text-[10px] text-slate-500 uppercase font-bold tracking-tight mb-0.5">Region</div>
-                                        <div className="font-bold text-white capitalize">
+                                        <div className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight mb-0.5">Region</div>
+                                        <div className="font-bold text-foreground capitalize">
                                             {orderWithRel.importer.country || "International Merchant"}
                                         </div>
                                     </div>
@@ -234,9 +231,9 @@ export default async function OrderDetailPage({ params }: { params: { id: string
                                         <User className="w-5 h-5" />
                                     </div>
                                     <div>
-                                        <div className="text-[10px] text-slate-500 uppercase font-bold tracking-tight mb-0.5">Contact</div>
-                                        <div className="font-bold text-white">{orderWithRel.importer.name}</div>
-                                        <div className="text-[10px] text-slate-500 mt-0.5 font-mono">{orderWithRel.importer.email}</div>
+                                        <div className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight mb-0.5">Contact</div>
+                                        <div className="font-bold text-foreground">{orderWithRel.importer.name}</div>
+                                        <div className="text-[10px] text-muted-foreground mt-0.5 font-mono">{orderWithRel.importer.email}</div>
                                     </div>
                                 </div>
 
@@ -251,26 +248,26 @@ export default async function OrderDetailPage({ params }: { params: { id: string
                         </div>
 
                         {/* Timeline / Meta */}
-                        <div className="bg-[#151c2a]/40 border border-white/5 rounded-3xl p-6">
-                            <h3 className="text-sm font-bold text-slate-400 mb-4 uppercase tracking-[0.2em]">Activity Log</h3>
+                        <div className="bg-muted/20 border border-border rounded-3xl p-6">
+                            <h3 className="text-sm font-bold text-muted-foreground mb-4 uppercase tracking-[0.2em]">Activity Log</h3>
                             <div className="space-y-4">
                                 <div className="flex gap-4">
                                     <div className="relative">
                                         <div className="w-3 h-3 rounded-full bg-primary shadow-[0_0_8px_rgba(19,91,236,0.6)]" />
-                                        <div className="absolute top-3 left-1.5 w-[2px] h-8 bg-white/5" />
+                                        <div className="absolute top-3 left-1.5 w-[2px] h-8 bg-border" />
                                     </div>
                                     <div>
-                                        <div className="text-xs font-bold text-white">Order Placed</div>
-                                        <div className="text-[10px] text-slate-500 mt-0.5 underline underline-offset-2">
+                                        <div className="text-xs font-bold text-foreground">Order Placed</div>
+                                        <div className="text-[10px] text-muted-foreground mt-0.5 underline underline-offset-2">
                                             {formatDate(order.createdAt)}
                                         </div>
                                     </div>
                                 </div>
                                 <div className="flex gap-4 opacity-50">
-                                    <div className="w-3 h-3 rounded-full border-2 border-slate-700" />
+                                    <div className="w-3 h-3 rounded-full border-2 border-border" />
                                     <div>
-                                        <div className="text-xs font-bold text-slate-400">Processing Started</div>
-                                        <div className="text-[10px] text-slate-600 mt-0.5 italic">Awaiting action...</div>
+                                        <div className="text-xs font-bold text-muted-foreground/60">Processing Started</div>
+                                        <div className="text-[10px] text-muted-foreground/40 mt-0.5 italic">Awaiting action...</div>
                                     </div>
                                 </div>
                             </div>

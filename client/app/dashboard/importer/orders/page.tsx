@@ -39,12 +39,12 @@ export default async function ImporterOrdersPage() {
     .reduce((acc, o) => acc + o.totalPrice, 0);
 
   return (
-    <div className="h-dvh overflow-hidden flex flex-col bg-gradient-to-br from-[#0a0c12] via-[#0d1017] to-[#0a0c12]">
-      <header className="flex-shrink-0 p-6 lg:p-8 border-b border-white/5">
+    <div className="h-dvh overflow-hidden flex flex-col bg-slate-50 dark:bg-gradient-to-br dark:from-[#0a0c12] dark:via-[#0d1017] dark:to-[#0a0c12] transition-colors duration-300">
+      <header className="flex-shrink-0 p-6 lg:p-8 border-b border-slate-200 dark:border-white/5 bg-white dark:bg-transparent transition-colors duration-300">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-white">My Orders</h1>
-            <p className="text-slate-400 mt-1">
+            <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">My Orders</h1>
+            <p className="text-slate-500 dark:text-slate-400 mt-1">
               {orders.length} orders · {formatCurrency(totalSpent)} total spent
             </p>
           </div>

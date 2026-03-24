@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function HomeFooter() {
   return (
-    <footer className="bg-slate-50 dark:bg-background-dark border-t border-slate-200 dark:border-white/5 pt-20 pb-10">
+    <footer className="bg-background border-t border-border pt-20 pb-10">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
           <div className="col-span-1 md:col-span-1">
@@ -12,11 +12,11 @@ export default function HomeFooter() {
               <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-white font-bold">
                 <span className="material-icons text-sm">public</span>
               </div>
-              <span className="text-xl font-bold tracking-wide text-slate-900 dark:text-white">
+              <span className="text-xl font-bold tracking-wide text-foreground">
                 RANOTE<span className="text-primary">EXIM</span>
               </span>
             </div>
-            <p className="text-slate-600 dark:text-slate-500 text-sm leading-relaxed mb-6">
+            <p className="text-muted-foreground text-sm leading-relaxed mb-6">
               Reimagining global trade infrastructure for the digital age. Secure, fast, and transparent.
             </p>
             <div className="flex gap-4">
@@ -45,8 +45,8 @@ export default function HomeFooter() {
           </div>
 
           <div>
-            <h4 className="text-slate-900 dark:text-white font-bold mb-6">Platform</h4>
-            <ul className="space-y-3 text-sm text-slate-600 dark:text-slate-500">
+            <h4 className="text-foreground font-bold mb-6">Platform</h4>
+            <ul className="space-y-3 text-sm text-muted-foreground">
               <li>
                 <Link className="hover:text-primary transition-colors" href="/products">
                   Marketplace
@@ -112,7 +112,7 @@ export default function HomeFooter() {
           </div>
         </div>
 
-        <div className="border-t border-slate-200 dark:border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-slate-500 dark:text-slate-600">
+        <div className="border-t border-border pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-muted-foreground">
           <p>&copy; 2026 Ranote Exim. All rights reserved.</p>
           <div className="flex gap-8 mt-4 md:mt-0">
             <Link className="hover:text-slate-800 dark:hover:text-slate-400 transition-colors" href="/privacy">

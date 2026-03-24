@@ -104,11 +104,11 @@ export default function ExporterNotificationsPage() {
   });
 
   return (
-    <div className="h-full overflow-hidden flex flex-col bg-gradient-to-br from-[#0a0c12] via-[#0d1017] to-[#0a0c12]">
-      <header className="flex-shrink-0 p-6 lg:p-8 border-b border-white/5">
+    <div className="h-full overflow-hidden flex flex-col bg-background">
+      <header className="flex-shrink-0 p-6 lg:p-8 border-b border-border bg-header/80 backdrop-blur-md">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-white flex items-center gap-3">
+            <h1 className="text-3xl font-black tracking-tight text-foreground flex items-center gap-3">
               Notifications
               {data && data.unreadCount > 0 && (
                 <span className="bg-primary/20 text-primary border border-primary/20 text-sm px-2.5 py-0.5 rounded-full font-bold">
@@ -116,7 +116,7 @@ export default function ExporterNotificationsPage() {
                 </span>
               )}
             </h1>
-            <p className="text-slate-400 mt-2 text-sm">
+            <p className="text-muted-foreground mt-2 text-sm">
               Stay updated on your orders, messages, and account alerts.
             </p>
           </div>
@@ -124,7 +124,7 @@ export default function ExporterNotificationsPage() {
             <button
               onClick={markAllRead}
               disabled={!data || data.unreadCount === 0}
-              className="flex items-center gap-2 bg-slate-800/50 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-2 px-5 rounded-xl text-sm border border-white/5 transition-colors"
+              className="flex items-center gap-2 bg-muted hover:bg-muted/80 disabled:opacity-50 disabled:cursor-not-allowed text-foreground font-semibold py-2 px-5 rounded-xl text-sm border border-border transition-colors"
             >
               <CheckCheck className="w-4 h-4 text-emerald-400" />
               Mark All Read
@@ -134,16 +134,16 @@ export default function ExporterNotificationsPage() {
 
         {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-4 mt-6">
-          <div className="flex bg-slate-800/60 rounded-xl overflow-hidden border border-white/5 p-1">
+          <div className="flex bg-muted/50 rounded-xl overflow-hidden border border-border p-1">
             <button
               onClick={() => setStatusFilter("all")}
-              className={`px-5 py-2 text-sm font-bold rounded-lg transition-colors ${statusFilter === "all" ? "bg-[#1a2236] text-white shadow-sm" : "text-slate-400 hover:text-white"}`}
+              className={`px-5 py-2 text-sm font-bold rounded-lg transition-colors ${statusFilter === "all" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
             >
               All
             </button>
             <button
               onClick={() => setStatusFilter("unread")}
-              className={`px-5 py-2 text-sm font-bold rounded-lg transition-colors ${statusFilter === "unread" ? "bg-[#1a2236] text-white shadow-sm" : "text-slate-400 hover:text-white"}`}
+              className={`px-5 py-2 text-sm font-bold rounded-lg transition-colors ${statusFilter === "unread" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
             >
               Unread Only
             </button>
@@ -154,7 +154,7 @@ export default function ExporterNotificationsPage() {
               <button
                 key={f}
                 onClick={() => setGroupFilter(f)}
-                className={`flex-shrink-0 px-4 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition-all border ${groupFilter === f ? "bg-primary/10 text-primary border-primary/20" : "bg-transparent text-slate-500 border-white/5 hover:border-white/10 hover:text-slate-300"}`}
+                className={`flex-shrink-0 px-4 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition-all border ${groupFilter === f ? "bg-primary/10 text-primary border-primary/20" : "bg-transparent text-muted-foreground border-border hover:bg-accent/50 hover:text-foreground"}`}
               >
                 {f}
               </button>
@@ -167,12 +167,12 @@ export default function ExporterNotificationsPage() {
         <div className="max-w-[900px] mx-auto space-y-3 pb-10">
           {loading ? (
             Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="h-24 bg-[#151c2a]/60 rounded-2xl animate-pulse border border-white/5" />
+              <div key={i} className="h-24 bg-card rounded-2xl animate-pulse border border-border" />
             ))
           ) : !filteredNotifications?.length ? (
-            <div className="text-center py-20 text-slate-500 bg-[#151c2a]/40 border border-white/5 rounded-3xl mt-10">
+            <div className="text-center py-20 text-muted-foreground bg-muted/20 border border-border rounded-3xl mt-10">
               <div className="text-5xl mb-4 opacity-50">📭</div>
-              <p className="text-base font-medium text-slate-300">Your inbox is clear</p>
+              <p className="text-base font-medium text-foreground">Your inbox is clear</p>
               <p className="text-sm mt-1">No notifications match your current filters.</p>
             </div>
           ) : (
@@ -180,16 +180,16 @@ export default function ExporterNotificationsPage() {
               <div
                 key={n.id}
                 onClick={() => markOneRead(n.id, n.read)}
-                className={`group relative bg-[#151c2a]/60 backdrop-blur-xl border rounded-2xl p-5 flex gap-5 transition-all cursor-pointer overflow-hidden ${n.read
-                  ? "border-white/5 hover:bg-[#1a2236]/80 text-slate-400"
-                  : "border-primary/30 shadow-lg shadow-primary/5 hover:border-primary/50 text-white"
+                className={`group relative bg-card backdrop-blur-xl border rounded-2xl p-5 flex gap-5 transition-all cursor-pointer overflow-hidden ${n.read
+                  ? "border-border hover:bg-muted/50 text-muted-foreground"
+                  : "border-primary/30 shadow-lg shadow-primary/5 hover:border-primary/50 text-foreground"
                   }`}
               >
                 {!n.read && (
                   <div className="absolute top-0 left-0 w-1 h-full bg-primary rounded-l-2xl" />
                 )}
 
-                <div className={`w-12 h-12 flex-shrink-0 rounded-xl flex items-center justify-center text-2xl bg-slate-800/80 border border-white/5 ${!n.read ? "shadow-[0_0_15px_rgba(25,97,227,0.15)]" : "opacity-60"}`}>
+                <div className={`w-12 h-12 flex-shrink-0 rounded-xl flex items-center justify-center text-2xl bg-muted border border-border ${!n.read ? "shadow-[0_0_15px_rgba(25,97,227,0.15)]" : "opacity-60"}`}>
                   {typeIcon(n.type)}
                 </div>
 
@@ -198,11 +198,11 @@ export default function ExporterNotificationsPage() {
                     <div className="font-bold text-base truncate">
                       {n.title}
                     </div>
-                    <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap pt-1">
+                    <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap pt-1">
                       {timeAgo(n.createdAt)}
                     </div>
                   </div>
-                  <p className={`text-sm mt-1.5 leading-relaxed line-clamp-2 ${n.read ? "text-slate-500" : "text-slate-300"}`}>
+                  <p className={`text-sm mt-1.5 leading-relaxed line-clamp-2 ${n.read ? "text-muted-foreground" : "text-muted-foreground"}`}>
                     {n.message}
                   </p>
                 </div>

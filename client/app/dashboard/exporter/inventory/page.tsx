@@ -1,13 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Plus, X } from "lucide-react";
+import { Plus } from "lucide-react";
 
 import { prisma } from "@/lib/prisma";
 import { getServerAuth } from "@/lib/supabase/server";
 import { Prisma } from "@prisma/client";
 import InventoryTable from "./InventoryTable";
 import CategoryDirectory from "./CategoryDirectory";
-import ProductForm from "@/components/dashboard/ProductForm";
 
 function formatNumber(n: number) {
   if (n >= 1000000) return (n / 1000000).toFixed(1) + "M";
@@ -101,11 +100,11 @@ export default async function ExporterInventoryPage({
 
     const revenueMap = new Map(revenueData.map((r) => [r.category, Number(r.revenue)]));
 
-    categoriesData = rawCategories.map((c) => ({
+    categoriesData = rawCategories.map((c: any) => ({
       name: c.category,
       productCount: c._count.id,
       revenue: revenueMap.get(c.category) ?? 0,
-    })).sort((a, b) => b.revenue - a.revenue);
+    })).sort((a: any, b: any) => b.revenue - a.revenue);
 
   } catch (e) {
     console.warn("Failed to fetch inventory data:", e);
@@ -122,8 +121,8 @@ export default async function ExporterInventoryPage({
       select: { available: true, price: true, minOrderQty: true },
     });
     totalListed = allProducts.length;
-    totalAvailable = allProducts.filter((p) => p.available).length;
-    totalValue = allProducts.reduce((acc, p) => acc + p.price * (p.minOrderQty ?? 1), 0);
+    totalAvailable = allProducts.filter((p: any) => p.available).length;
+    totalValue = allProducts.reduce((acc: number, p: any) => acc + p.price * (p.minOrderQty ?? 1), 0);
   } catch (e) {
     console.warn("Failed to fetch summary stats:", e);
   }
@@ -132,12 +131,12 @@ export default async function ExporterInventoryPage({
   const maxCategoryRev = Math.max(...(categoriesData.map((c) => c.revenue) ?? [1]), 1);
 
   return (
-    <div className="h-full overflow-hidden flex flex-col bg-gradient-to-br from-[#0a0c12] via-[#0d1017] to-[#0a0c12]">
-      <header className="flex-shrink-0 p-6 lg:p-8 border-b border-white/5">
+    <div className="h-full overflow-hidden flex flex-col bg-background transition-colors duration-300">
+      <header className="flex-shrink-0 p-6 lg:p-8 border-b border-border bg-header backdrop-blur-sm z-10">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-white uppercase italic">Inventory Hub</h1>
-            <p className="text-slate-400 mt-1">
+            <h1 className="text-3xl font-black tracking-tight text-foreground uppercase">Inventory Hub</h1>
+            <p className="text-muted-foreground mt-1">
               Manage product listings and category performance
             </p>
           </div>
@@ -158,15 +157,15 @@ export default async function ExporterInventoryPage({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-[1600px] mx-auto">
           {[
             { k: "Total Listings", v: String(totalListed), color: "text-primary", bar: "bg-primary" },
-            { k: "Available", v: String(totalAvailable), color: "text-emerald-400", bar: "bg-emerald-400" },
-            { k: "Est. Portfolio Value", v: formatMoney(totalValue), color: "text-amber-400", bar: "bg-amber-400" },
+            { k: "Available", v: String(totalAvailable), color: "text-emerald-500", bar: "bg-emerald-500" },
+            { k: "Est. Portfolio Value", v: formatMoney(totalValue), color: "text-amber-500", bar: "bg-amber-500" },
           ].map((s) => (
-            <div key={s.k} className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-2xl rounded-3xl p-8 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 blur-2xl rounded-full -mr-12 -mt-12 group-hover:bg-white/10 transition-colors" />
-              <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">{s.k}</div>
+            <div key={s.k} className="bg-card backdrop-blur-xl border border-border shadow-xl p-8 relative overflow-hidden group rounded-3xl transition-all hover:shadow-2xl">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-muted/50 blur-2xl rounded-full -mr-12 -mt-12 group-hover:bg-muted transition-colors" />
+              <div className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">{s.k}</div>
               <div className={`text-4xl font-black mt-3 ${s.color}`}>{s.v}</div>
-              <div className="mt-6 h-1 w-full bg-slate-800/50 rounded-full overflow-hidden">
-                <div className={`h-full ${s.bar} w-[60%] shadow-[0_0_10px_rgba(0,0,0,0.5)]`} />
+              <div className="mt-6 h-1 w-full bg-muted rounded-full overflow-hidden">
+                <div className={`h-full ${s.bar} w-[60%] shadow-[0_0_10px_rgba(0,0,0,0.1)]`} />
               </div>
             </div>
           ))}
@@ -179,11 +178,11 @@ export default async function ExporterInventoryPage({
 
         {/* Category Performance */}
         <div className="max-w-[1600px] mx-auto">
-          <h2 className="text-sm font-black text-white uppercase tracking-widest mb-6 opacity-80 border-b border-white/10 pb-2 inline-block">
+          <h2 className="text-sm font-black text-foreground uppercase tracking-widest mb-6 opacity-80 border-b border-border pb-2 inline-block">
             Category Performance
           </h2>
           {categoriesData.length === 0 ? (
-            <div className="rounded-3xl border border-white/5 bg-[#151c2a]/40 p-12 text-center text-slate-500 italic">
+            <div className="rounded-3xl border border-border bg-card p-12 text-center text-muted-foreground italic shadow-sm dark:shadow-none">
               Create your first product to see category performance analytics.
             </div>
           ) : (
@@ -194,20 +193,20 @@ export default async function ExporterInventoryPage({
                 const textClass = styleDef.split(" ").pop(); // gets the text color for the title
 
                 return (
-                  <div key={c.name} className={`bg-gradient-to-br ${bgClasses} backdrop-blur-xl border shadow-xl rounded-2xl p-5 hover:-translate-y-1 transition-transform group`}>
+                  <div key={c.name} className={`bg-gradient-to-br ${bgClasses} backdrop-blur-xl border border-border shadow-sm dark:shadow-xl rounded-2xl p-5 hover:-translate-y-1 transition-transform group text-foreground`}>
                     <div className={`font-black text-sm uppercase tracking-wider ${textClass} opacity-90`}>{c.name}</div>
                     <div className="flex items-center justify-between mt-4">
                       <div>
-                        <div className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Products</div>
-                        <div className="text-white font-black text-xl">{formatNumber(c.productCount)}</div>
+                        <div className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Products</div>
+                        <div className="text-foreground font-black text-xl">{formatNumber(c.productCount)}</div>
                       </div>
                       <div className="text-right">
-                        <div className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Revenue</div>
-                        <div className="text-emerald-400 font-black text-xl">{formatMoney(c.revenue)}</div>
+                        <div className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Revenue</div>
+                        <div className="text-emerald-500 font-black text-xl">{formatMoney(c.revenue)}</div>
                       </div>
                     </div>
-                    <div className="mt-4 h-1 w-full bg-slate-800/60 rounded-full overflow-hidden">
-                      <div className="h-full bg-white/40 rounded-full group-hover:bg-white/80 transition-all duration-500" style={{ width: `${Math.max((c.revenue / maxCategoryRev) * 100, 5)}%` }} />
+                    <div className="mt-4 h-1 w-full bg-muted rounded-full overflow-hidden">
+                      <div className="h-full bg-primary/40 dark:bg-white/40 rounded-full group-hover:bg-primary/80 dark:group-hover:bg-white/80 transition-all duration-500" style={{ width: `${Math.max((c.revenue / maxCategoryRev) * 100, 5)}%` }} />
                     </div>
                   </div>
                 );
@@ -228,7 +227,7 @@ export default async function ExporterInventoryPage({
             <div className="flex items-center justify-center gap-2 mt-12 pb-12">
               <Link
                 href={`?${new URLSearchParams({ ...searchParams, page: (page - 1).toString() })}`}
-                className={`px-6 py-3 rounded-2xl border border-white/5 text-[10px] uppercase font-black tracking-widest transition-all ${page <= 1 ? "opacity-50 pointer-events-none" : "hover:bg-white/5"
+                className={`px-6 py-3 rounded-2xl border border-border text-[10px] uppercase font-black tracking-widest transition-all ${page <= 1 ? "opacity-50 pointer-events-none" : "hover:bg-accent text-foreground"
                   }`}
               >
                 Prev
@@ -241,7 +240,7 @@ export default async function ExporterInventoryPage({
                       <Link
                         key={p}
                         href={`?${new URLSearchParams({ ...searchParams, page: p.toString() })}`}
-                        className={`w-11 h-11 flex items-center justify-center rounded-2xl border text-[10px] font-black transition-all ${page === p ? "bg-primary border-primary text-white shadow-xl shadow-primary/20" : "border-white/5 hover:bg-white/5 text-slate-500"
+                        className={`w-11 h-11 flex items-center justify-center rounded-2xl border text-[10px] font-black transition-all ${page === p ? "bg-primary border-primary text-white shadow-xl shadow-primary/20" : "border-border hover:bg-accent text-muted-foreground"
                           }`}
                       >
                         {p}
@@ -256,7 +255,7 @@ export default async function ExporterInventoryPage({
               </div>
               <Link
                 href={`?${new URLSearchParams({ ...searchParams, page: (page + 1).toString() })}`}
-                className={`px-6 py-3 rounded-2xl border border-white/5 text-[10px] uppercase font-black tracking-widest transition-all ${page >= totalPages ? "opacity-50 pointer-events-none" : "hover:bg-white/5"
+                className={`px-6 py-3 rounded-2xl border border-border text-[10px] uppercase font-black tracking-widest transition-all ${page >= totalPages ? "opacity-50 pointer-events-none" : "hover:bg-accent text-foreground"
                   }`}
               >
                 Next

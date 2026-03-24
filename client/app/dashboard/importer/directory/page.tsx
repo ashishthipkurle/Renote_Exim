@@ -58,15 +58,15 @@ export default function ImporterDirectoryPage() {
     }, [search, category]);
 
     return (
-        <div className="h-dvh overflow-hidden flex flex-col bg-[#0a0c12]">
-            <header className="flex-shrink-0 p-6 lg:p-8 border-b border-white/5 bg-gradient-to-b from-[#0d1017] to-transparent">
+        <div className="h-dvh overflow-hidden flex flex-col bg-slate-50 dark:bg-[#0a0c12] transition-colors duration-300">
+            <header className="flex-shrink-0 p-6 lg:p-8 border-b border-slate-200 dark:border-white/5 bg-white dark:bg-gradient-to-b dark:from-[#0d1017] dark:to-transparent transition-colors duration-300">
                 <div className="max-w-[1600px] mx-auto flex flex-col xl:flex-row xl:items-center justify-between gap-8">
                     <div>
-                        <h1 className="text-4xl font-black tracking-tighter text-white flex items-center gap-4">
+                        <h1 className="text-4xl font-black tracking-tighter text-slate-900 dark:text-white flex items-center gap-4">
                             Supply Chain Directory
                             <ShieldCheck className="w-10 h-10 text-primary" />
                         </h1>
-                        <p className="text-slate-500 mt-2 font-medium max-w-lg">
+                        <p className="text-slate-500 dark:text-slate-400 mt-2 font-medium max-w-lg">
                             Verified global exporters and manufacturing partners curated for your procurement needs.
                         </p>
                     </div>
@@ -79,13 +79,13 @@ export default function ImporterDirectoryPage() {
                                 placeholder="Search by company or name..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-6 text-white font-bold text-sm focus:ring-2 focus:ring-primary/50 outline-none w-full sm:w-80 transition-all placeholder:text-slate-600"
+                                className="bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl py-4 pl-12 pr-6 text-slate-900 dark:text-white font-bold text-sm focus:ring-2 focus:ring-primary/40 outline-none w-full sm:w-80 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 shadow-inner dark:shadow-none"
                             />
                         </div>
                         <select
                             value={category}
                             onChange={(e) => setCategory(e.target.value)}
-                            className="bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white font-black text-xs focus:ring-2 focus:ring-primary/50 outline-none transition-all cursor-pointer uppercase tracking-widest"
+                            className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl py-4 px-6 text-slate-900 dark:text-white font-black text-xs focus:ring-2 focus:ring-primary/40 outline-none transition-all cursor-pointer uppercase tracking-widest shadow-sm dark:shadow-none"
                         >
                             <option value="all">All Specialties</option>
                             <option value="CHEMICALS">Chemicals</option>
@@ -102,13 +102,13 @@ export default function ImporterDirectoryPage() {
                     {loading && exporters.length === 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8">
                             {Array.from({ length: 8 }).map((_, i) => (
-                                <div key={i} className="h-96 bg-[#151c2a]/40 rounded-[2.5rem] animate-pulse border border-white/5" />
+                                <div key={i} className="h-96 bg-white dark:bg-[#151c2a]/40 rounded-[2.5rem] animate-pulse border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-none" />
                             ))}
                         </div>
                     ) : exporters.length === 0 ? (
                         <div className="py-40 text-center opacity-40">
-                            <Globe className="w-16 h-16 mx-auto mb-6 text-slate-700" />
-                            <h2 className="text-xl font-black text-white uppercase tracking-widest italic">No Partners Found</h2>
+                            <Globe className="w-16 h-16 mx-auto mb-6 text-slate-400 dark:text-slate-700" />
+                            <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-widest italic">No Partners Found</h2>
                             <p className="text-slate-500 mt-2">Adjust your search parameters to discover other global suppliers.</p>
                         </div>
                     ) : (
@@ -126,11 +126,11 @@ export default function ImporterDirectoryPage() {
 
 function ExporterCard({ exporter }: { exporter: Exporter }) {
     return (
-        <div className="group relative bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-2xl rounded-[2.5rem] overflow-hidden transition-all hover:scale-[1.02] hover:border-primary/20 hover:shadow-primary/5">
+        <div className="group relative bg-white dark:bg-[#151c2a]/60 backdrop-blur-xl border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-2xl rounded-[2.5rem] overflow-hidden transition-all hover:scale-[1.02] hover:border-primary/30 dark:hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5">
             {/* Visual Header */}
             <div className="h-24 bg-gradient-to-r from-primary/10 to-indigo-500/10 relative">
                 <div className="absolute -bottom-10 left-8">
-                    <div className="size-20 rounded-3xl bg-slate-900 border-4 border-[#0a0c12] flex items-center justify-center text-3xl overflow-hidden shadow-xl">
+                    <div className="size-20 rounded-3xl bg-slate-100 dark:bg-slate-900 border-4 border-white dark:border-[#0a0c12] flex items-center justify-center text-3xl overflow-hidden shadow-xl">
                         {exporter.image ? (
                             <img src={exporter.image} alt={exporter.name} className="w-full h-full object-cover" />
                         ) : (
@@ -143,7 +143,7 @@ function ExporterCard({ exporter }: { exporter: Exporter }) {
             <div className="pt-14 p-8 px-10 space-y-6">
                 <div>
                     <div className="flex items-center justify-between mb-1">
-                        <h3 className="text-xl font-black text-white tracking-tight truncate group-hover:text-primary transition-colors">
+                        <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight truncate group-hover:text-primary transition-colors">
                             {exporter.companyName || exporter.name}
                         </h3>
                         <Verified className="w-5 h-5 text-primary" />
@@ -172,25 +172,25 @@ function ExporterCard({ exporter }: { exporter: Exporter }) {
                     <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Core Verticals</span>
                     <div className="flex flex-wrap gap-2">
                         {exporter.categories.slice(0, 3).map((cat) => (
-                            <span key={cat} className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/5 text-[10px] font-bold text-slate-400 capitalize">
+                            <span key={cat} className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 text-[10px] font-bold text-slate-600 dark:text-slate-400 capitalize">
                                 {cat.toLowerCase()}
                             </span>
                         ))}
                         {exporter.categories.length > 3 && (
-                            <span className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/5 text-[10px] font-bold text-slate-500">
+                            <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 text-[10px] font-bold text-slate-500">
                                 +{exporter.categories.length - 3}
                             </span>
                         )}
                     </div>
                 </div>
 
-                <div className="pt-4 border-t border-white/5 flex items-center justify-between">
+                <div className="pt-4 border-t border-slate-200 dark:border-white/5 flex items-center justify-between">
                     <div className="flex flex-col">
                         <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest leading-none mb-1">Products</span>
-                        <span className="text-sm font-black text-white">{exporter._count.products} Fixed</span>
+                        <span className="text-sm font-black text-slate-900 dark:text-white">{exporter._count.products} Fixed</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <button className="p-3 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-400 transition-all">
+                        <button className="p-3 rounded-2xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all shadow-sm dark:shadow-none">
                             <MessageSquare className="w-5 h-5" />
                         </button>
                         <button className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-primary hover:bg-[#0f49bd] text-white font-black text-xs shadow-xl shadow-primary/20 transition-all active:scale-95">

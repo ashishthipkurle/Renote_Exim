@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Manrope } from "next/font/google";
+import { Sora } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
@@ -11,9 +11,10 @@ import Footer from "@/components/layout/Footer";
 import CommandMenu from "@/components/ui/CommandMenu";
 import CookieConsent from "@/components/ui/CookieConsent";
 
-const manrope = Manrope({
+const sora = Sora({
   subsets: ["latin"],
-  variable: "--font-manrope",
+  variable: "--font-sora",
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -78,7 +79,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className={`${manrope.variable} font-sans antialiased`}>
+      <body className={`${sora.variable} font-sans antialiased`}>
         <ThemeProvider>
           <AuthProvider>
             <SkipToContent />

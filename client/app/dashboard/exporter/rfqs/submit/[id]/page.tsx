@@ -73,27 +73,27 @@ export default function NewQuotePage({ params }: { params: Promise<{ id: string 
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-20">
       <div className="flex items-center gap-4">
-        <Link href="/dashboard/exporter/rfqs" className="size-10 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white transition-colors">
+        <Link href="/dashboard/exporter/rfqs" className="size-10 rounded-xl bg-muted border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">Submit Trade Quote</h1>
-          <p className="text-slate-400 mt-1">Responding to: <span className="text-blue-400 font-medium">{rfq.title}</span></p>
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">Submit Trade Quote</h1>
+          <p className="text-muted-foreground mt-1">Responding to: <span className="text-primary font-medium">{rfq.title}</span></p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
-          <form onSubmit={handleSubmit} className="bg-slate-900/50 border border-slate-800 rounded-3xl p-8 space-y-6">
+          <form onSubmit={handleSubmit} className="bg-card border border-border rounded-3xl p-8 space-y-6">
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Total Price ($)</label>
+                <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">Total Price ($)</label>
                 <div className="relative">
-                  <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                  <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <input
                     required
                     type="number"
-                    className="w-full bg-slate-950 border-slate-800 rounded-2xl h-14 pl-12 pr-4 text-white focus:border-blue-500/50 outline-none transition-all"
+                    className="w-full bg-muted border border-border rounded-2xl h-14 pl-12 pr-4 text-foreground focus:border-primary/50 outline-none transition-all"
                     placeholder="e.g. 15000"
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
@@ -101,13 +101,13 @@ export default function NewQuotePage({ params }: { params: Promise<{ id: string 
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Lead Time (Days)</label>
+                <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">Lead Time (Days)</label>
                 <div className="relative">
-                  <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                  <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <input
                     required
                     type="number"
-                    className="w-full bg-slate-950 border-slate-800 rounded-2xl h-14 pl-12 pr-4 text-white focus:border-blue-500/50 outline-none transition-all"
+                    className="w-full bg-muted border border-border rounded-2xl h-14 pl-12 pr-4 text-foreground focus:border-primary/50 outline-none transition-all"
                     placeholder="e.g. 15"
                     value={formData.leadTime}
                     onChange={(e) => setFormData({ ...formData, leadTime: e.target.value })}
@@ -118,22 +118,22 @@ export default function NewQuotePage({ params }: { params: Promise<{ id: string 
 
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Valid Until</label>
+                <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">Valid Until</label>
                 <div className="relative">
-                  <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                  <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <input
                     required
                     type="date"
-                    className="w-full bg-slate-950 border-slate-800 rounded-2xl h-14 pl-12 pr-4 text-white focus:border-blue-500/50 outline-none transition-all"
+                    className="w-full bg-muted border border-border rounded-2xl h-14 pl-12 pr-4 text-foreground focus:border-primary/50 outline-none transition-all"
                     value={formData.validUntil}
                     onChange={(e) => setFormData({ ...formData, validUntil: e.target.value })}
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Shipping Terms</label>
+                <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">Shipping Terms</label>
                 <select
-                  className="w-full bg-slate-950 border-slate-800 rounded-2xl h-14 px-4 text-white focus:border-blue-500/50 outline-none transition-all"
+                  className="w-full bg-muted border border-border rounded-2xl h-14 px-4 text-foreground focus:border-primary/50 outline-none transition-all"
                   value={formData.terms}
                   onChange={(e) => setFormData({ ...formData, terms: e.target.value })}
                 >
@@ -146,10 +146,10 @@ export default function NewQuotePage({ params }: { params: Promise<{ id: string 
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Additional Notes</label>
+              <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">Additional Notes</label>
               <textarea
                 rows={4}
-                className="w-full bg-slate-950 border-slate-800 rounded-2xl p-4 text-white focus:border-blue-500/50 outline-none transition-all resize-none"
+                className="w-full bg-muted border border-border rounded-2xl p-4 text-foreground focus:border-primary/50 outline-none transition-all resize-none"
                 placeholder="Include details about packing, quality assurance, or logistics..."
                 value={formData.note}
                 onChange={(e) => setFormData({ ...formData, note: e.target.value })}
@@ -168,20 +168,20 @@ export default function NewQuotePage({ params }: { params: Promise<{ id: string 
         </div>
 
         <div className="space-y-6">
-          <div className="p-6 bg-slate-900/50 border border-slate-800 rounded-3xl space-y-4">
-            <h3 className="text-sm font-black text-white uppercase tracking-widest">Requirement Summary</h3>
+          <div className="p-6 bg-card border border-border rounded-3xl space-y-4">
+            <h3 className="text-sm font-black text-foreground uppercase tracking-widest">Requirement Summary</h3>
             <div className="space-y-4">
               <div className="flex items-start gap-3">
                 <Package className="w-4 h-4 text-blue-500 mt-1" />
                 <div>
-                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Wanted Quantity</p>
-                  <p className="text-white font-bold">{rfq.quantity} {rfq.unit}</p>
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Wanted Quantity</p>
+                  <p className="text-foreground font-bold">{rfq.quantity} {rfq.unit}</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <FileText className="w-4 h-4 text-blue-500 mt-1" />
+                <FileText className="w-4 h-4 text-primary mt-1" />
                 <div>
-                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Target Budget</p>
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Target Budget</p>
                   <p className="text-green-500 font-bold">{rfq.budget ? `$${rfq.budget.toLocaleString()}` : 'Not Specified'}</p>
                 </div>
               </div>
@@ -189,8 +189,8 @@ export default function NewQuotePage({ params }: { params: Promise<{ id: string 
           </div>
 
           <div className="p-6 bg-blue-600/5 border border-blue-500/10 rounded-3xl flex items-start gap-3">
-            <Info className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
-            <p className="text-xs text-blue-300 leading-relaxed italic">
+            <Info className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+            <p className="text-xs text-muted-foreground leading-relaxed">
               Once submitted, your quote will be visible to the importer and cannot be edited. Ensure all terms are final.
             </p>
           </div>

@@ -2,12 +2,12 @@
 
 import { useState, useMemo, useRef, useCallback } from "react";
 import {
-  AreaChart, Area, BarChart, Bar, LineChart, Line,
+  AreaChart, Area, BarChart, Bar,
   PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, RadialBarChart, RadialBar, Legend,
+  Tooltip, ResponsiveContainer,
 } from "recharts";
 import {
-  TrendingUp, TrendingDown, Package, ShoppingCart, Globe,
+  TrendingUp, Package, ShoppingCart, Globe,
   DollarSign, Download, RefreshCw, Filter, ChevronDown,
   ArrowUpRight, ArrowDownRight, BarChart2, Activity,
   CreditCard, Truck, CheckCircle2, Clock, XCircle, AlertCircle,
@@ -78,12 +78,12 @@ function fMonth(iso: string) {
 function ChartTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-[#0e1420] border border-white/10 rounded-xl px-4 py-3 shadow-2xl shadow-black/60 backdrop-blur-xl">
-      <p className="text-[11px] text-slate-500 mb-2 font-medium">{label}</p>
+    <div className="bg-card border border-border rounded-xl px-4 py-3 shadow-2xl dark:shadow-black/60 backdrop-blur-xl">
+      <p className="text-[11px] text-muted-foreground mb-2 font-medium">{label}</p>
       {payload.map((p: any, i: number) => (
         <div key={i} className="flex items-center gap-2 text-xs font-bold">
           <span className="size-2 rounded-full" style={{ background: p.color }} />
-          <span className="text-slate-400 capitalize">{p.name}:</span>
+          <span className="text-muted-foreground capitalize">{p.name}:</span>
           <span style={{ color: p.color }}>
             {p.name === "revenue" || p.name === "Revenue" || p.name === "paidRevenue"
               ? fCurrency(p.value)
@@ -100,10 +100,10 @@ function ChartTooltip({ active, payload, label }: any) {
 function EmptyChart({ icon: Icon, message }: { icon: React.ElementType; message: string }) {
   return (
     <div className="flex flex-col items-center justify-center h-full gap-3 py-8">
-      <div className="p-4 rounded-2xl bg-slate-800/50 border border-white/5">
-        <Icon className="w-8 h-8 text-slate-600" />
+      <div className="p-4 rounded-2xl bg-muted border border-border">
+        <Icon className="w-8 h-8 text-muted-foreground" />
       </div>
-      <p className="text-slate-500 text-sm text-center max-w-[200px]">{message}</p>
+      <p className="text-muted-foreground text-sm text-center max-w-[200px]">{message}</p>
     </div>
   );
 }
@@ -119,9 +119,9 @@ function KpiCard({
   const isPositive = (trend ?? 0) >= 0;
   return (
     <div
-      className="relative overflow-hidden rounded-2xl border border-white/5 bg-[#0e1420] p-6 transition-all duration-300 hover:scale-[1.02] hover:border-white/10 group cursor-default"
+      className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:scale-[1.02] hover:border-primary/20 group cursor-default shadow-sm dark:shadow-none"
       style={{ boxShadow: `0 0 0 0 ${glowColor}`, transition: "box-shadow 0.3s" }}
-      onMouseEnter={e => (e.currentTarget.style.boxShadow = `0 8px 40px -8px ${glowColor}40`)}
+      onMouseEnter={e => (e.currentTarget.style.boxShadow = `0 8px 40px -8px ${glowColor}25`)}
       onMouseLeave={e => (e.currentTarget.style.boxShadow = "none")}
     >
       {/* Background glow blob */}
@@ -131,10 +131,10 @@ function KpiCard({
       />
       {/* Top row */}
       <div className="flex items-start justify-between relative">
-        <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">{label}</p>
+        <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">{label}</p>
         <div
           className="p-2.5 rounded-xl border transition-colors"
-          style={{ background: `${glowColor}15`, borderColor: `${glowColor}30` }}
+          style={{ background: `${glowColor}10`, borderColor: `${glowColor}20` }}
         >
           <Icon className="w-4 h-4" style={{ color: glowColor }} />
         </div>
@@ -143,7 +143,7 @@ function KpiCard({
       <p className="text-3xl font-black mt-3 tracking-tight" style={{ color: accentColor }}>
         {value}
       </p>
-      <p className="text-xs text-slate-500 mt-1">{sub}</p>
+      <p className="text-xs text-muted-foreground mt-1">{sub}</p>
       {/* Trend badge */}
       {trend !== undefined && (
         <div
@@ -158,10 +158,10 @@ function KpiCard({
         </div>
       )}
       {/* Bottom bar */}
-      <div className="mt-4 h-[2px] w-full bg-slate-800 rounded-full overflow-hidden">
+      <div className="mt-4 h-[2px] w-full bg-muted rounded-full overflow-hidden">
         <div
           className="h-full rounded-full w-3/4"
-          style={{ background: `linear-gradient(90deg, ${glowColor}, ${glowColor}40)` }}
+          style={{ background: `linear-gradient(90deg, ${glowColor}, ${glowColor}60)` }}
         />
       </div>
     </div>
@@ -173,7 +173,7 @@ function KpiCard({
 function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
     <div
-      className={`rounded-2xl border border-white/5 bg-[#0e1420] p-6 transition-all duration-200 hover:border-white/10 ${className}`}
+      className={`rounded-2xl border border-border bg-card p-6 transition-all duration-200 hover:border-primary/10 shadow-sm dark:shadow-none ${className}`}
     >
       {children}
     </div>
@@ -183,8 +183,8 @@ function Card({ children, className = "" }: { children: React.ReactNode; classNa
 function CardHeader({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
     <div className="mb-5">
-      <p className="text-white font-bold tracking-tight">{title}</p>
-      {subtitle && <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>}
+      <p className="text-foreground font-bold tracking-tight">{title}</p>
+      {subtitle && <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>}
     </div>
   );
 }
@@ -350,14 +350,14 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
   return (
     <div
       ref={dashboardRef}
-      className="h-dvh overflow-hidden flex flex-col bg-gradient-to-br from-[#0a0c12] via-[#0d1017] to-[#0a0c12]"
+      className="h-dvh overflow-hidden flex flex-col bg-background"
     >
       {/* ── Header ── */}
-      <header className="flex-shrink-0 px-6 py-5 lg:px-8 border-b border-white/5 bg-[#0a0c12]/80 backdrop-blur-xl">
+      <header className="flex-shrink-0 px-6 py-5 lg:px-8 border-b border-border bg-header backdrop-blur-xl">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-white">Performance Analytics</h1>
-            <p className="text-slate-400 mt-1 text-sm">
+            <h1 className="text-3xl font-black tracking-tight text-foreground">Performance Analytics</h1>
+            <p className="text-muted-foreground mt-1 text-sm">
               {hasOrders
                 ? `Real-time insights across ${fNum(data.totalOrders)} orders & ${fNum(data.totalProducts)} products`
                 : "No orders yet — analytics will appear as orders come in"}
@@ -366,7 +366,7 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
 
           <div className="flex items-center gap-2 flex-wrap">
             {/* Timeframe */}
-            <div className="flex items-center bg-[#151c2a] border border-white/8 rounded-xl p-1 gap-0.5">
+            <div className="flex items-center bg-muted border border-border rounded-xl p-1 gap-0.5">
               {TIMEFRAMES.map((tf) => (
                 <button
                   key={tf}
@@ -374,7 +374,7 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 ${
                     timeframe === tf
                       ? "bg-primary text-white shadow-lg shadow-primary/30"
-                      : "text-slate-400 hover:text-white hover:bg-white/5"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
                   }`}
                 >
                   {tf}
@@ -384,11 +384,11 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
 
             {/* Category */}
             <div className="relative">
-              <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500 pointer-events-none" />
+              <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="pl-9 pr-8 py-2.5 bg-[#151c2a] border border-white/8 rounded-xl text-xs text-white font-bold focus:outline-none focus:border-primary/40 appearance-none cursor-pointer"
+                className="pl-9 pr-8 py-2.5 bg-muted border border-border rounded-xl text-xs text-foreground font-bold focus:outline-none focus:border-primary/40 appearance-none cursor-pointer"
               >
                 {availableCategories.map((c) => (
                   <option key={c} value={c}>
@@ -396,7 +396,7 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
                   </option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-500 pointer-events-none" />
+              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground pointer-events-none" />
             </div>
 
             {/* Export PDF */}
@@ -439,39 +439,39 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
           <Card>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
               <div>
-                <p className="text-white font-bold tracking-tight">
+                <p className="text-foreground font-bold tracking-tight">
                   {activeMetric === "revenue" ? "Revenue Trend" : "Order Volume Trend"}
                 </p>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-muted-foreground mt-0.5">
                   {filteredMonthly.length > 0
                     ? `${filteredMonthly[0].label} → ${filteredMonthly[filteredMonthly.length - 1].label}`
                     : "No data for selected period"}
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <div className="flex bg-[#151c2a] border border-white/8 rounded-xl p-1 gap-0.5">
+                <div className="flex bg-muted border border-border rounded-xl p-1 gap-0.5">
                   {(["revenue", "orderCount"] as const).map((m) => (
                     <button
                       key={m}
                       onClick={() => setActiveMetric(m)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-all ${
-                        activeMetric === m ? "bg-primary text-white" : "text-slate-400 hover:text-white"
+                        activeMetric === m ? "bg-primary text-white" : "text-muted-foreground hover:text-foreground hover:bg-accent"
                       }`}
                     >
                       {m === "revenue" ? "Revenue" : "Orders"}
                     </button>
                   ))}
                 </div>
-                <div className="flex bg-[#151c2a] border border-white/8 rounded-xl p-1 gap-0.5">
+                <div className="flex bg-muted border border-border rounded-xl p-1 gap-0.5">
                   <button
                     onClick={() => setChartMode("area")}
-                    className={`p-2 rounded-lg transition-all ${chartMode === "area" ? "bg-primary text-white" : "text-slate-400 hover:text-white"}`}
+                    className={`p-2 rounded-lg transition-all ${chartMode === "area" ? "bg-primary text-white" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}
                   >
                     <Activity className="w-3.5 h-3.5" />
                   </button>
                   <button
                     onClick={() => setChartMode("bar")}
-                    className={`p-2 rounded-lg transition-all ${chartMode === "bar" ? "bg-primary text-white" : "text-slate-400 hover:text-white"}`}
+                    className={`p-2 rounded-lg transition-all ${chartMode === "bar" ? "bg-primary text-white" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}
                   >
                     <BarChart2 className="w-3.5 h-3.5" />
                   </button>
@@ -488,16 +488,16 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
                     <AreaChart data={filteredMonthly} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                       <defs>
                         <linearGradient id="grad1" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor={activeMetric === "revenue" ? "#135bec" : "#34d399"} stopOpacity={0.35} />
+                          <stop offset="0%" stopColor={activeMetric === "revenue" ? "#135bec" : "#34d399"} stopOpacity={0.25} />
                           <stop offset="100%" stopColor={activeMetric === "revenue" ? "#135bec" : "#34d399"} stopOpacity={0} />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
-                      <XAxis dataKey="label" tick={{ fill: "#475569", fontSize: 11 }} axisLine={false} tickLine={false} />
-                      <YAxis
-                        tick={{ fill: "#475569", fontSize: 11 }} axisLine={false} tickLine={false} width={70}
-                        tickFormatter={(v) => activeMetric === "revenue" ? fCurrency(v) : fNum(v)}
-                      />
+                      <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-border" opacity={0.4} vertical={false} />
+                       <XAxis dataKey="label" tick={{ fill: "currentColor", fontSize: 11 }} className="text-muted-foreground" axisLine={false} tickLine={false} />
+                       <YAxis
+                         tick={{ fill: "currentColor", fontSize: 11 }} className="text-muted-foreground" axisLine={false} tickLine={false} width={70}
+                         tickFormatter={(v) => activeMetric === "revenue" ? fCurrency(v) : fNum(v)}
+                       />
                       <Tooltip content={<ChartTooltip />} />
                       <Area
                         type="monotone" dataKey={activeMetric}
@@ -513,16 +513,16 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
                       <defs>
                         <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="0%" stopColor={activeMetric === "revenue" ? "#135bec" : "#34d399"} stopOpacity={1} />
-                          <stop offset="100%" stopColor={activeMetric === "revenue" ? "#135bec" : "#34d399"} stopOpacity={0.4} />
+                          <stop offset="100%" stopColor={activeMetric === "revenue" ? "#135bec" : "#34d399"} stopOpacity={0.6} />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                      <XAxis dataKey="label" tick={{ fill: "#475569", fontSize: 11 }} axisLine={false} tickLine={false} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-border" opacity={0.4} vertical={false} />
+                      <XAxis dataKey="label" tick={{ fill: "currentColor", fontSize: 11 }} className="text-muted-foreground" axisLine={false} tickLine={false} />
                       <YAxis
-                        tick={{ fill: "#475569", fontSize: 11 }} axisLine={false} tickLine={false} width={70}
+                        tick={{ fill: "currentColor", fontSize: 11 }} className="text-muted-foreground" axisLine={false} tickLine={false} width={70}
                         tickFormatter={(v) => activeMetric === "revenue" ? fCurrency(v) : fNum(v)}
                       />
-                      <Tooltip content={<ChartTooltip />} cursor={{ fill: "rgba(255,255,255,0.03)", radius: 8 } as any} />
+                      <Tooltip content={<ChartTooltip />} cursor={{ fill: "currentColor", opacity: 0.05, radius: 8 } as any} />
                       <Bar
                         dataKey={activeMetric} name={activeMetric === "revenue" ? "Revenue" : "Orders"}
                         fill="url(#barGrad)" radius={[8, 8, 0, 0]}
@@ -569,12 +569,12 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
                           if (!active || !payload?.length) return null;
                           const p = payload[0];
                             return (
-                              <div className="bg-[#0e1420] border border-white/10 rounded-xl px-4 py-3 shadow-2xl">
-                                <p className="text-xs text-slate-400">
+                              <div className="bg-card border border-border rounded-xl px-4 py-3 shadow-2xl">
+                                <p className="text-xs text-muted-foreground">
                                   {p.name ? (CATEGORY_LABELS[p.name as string] ?? p.name) : "Unknown"}
                                 </p>
-                                <p className="text-sm font-black text-white mt-1">{fCurrency(p.value as number)}</p>
-                                <p className="text-xs text-slate-500">{p.payload.orderCount} orders</p>
+                                <p className="text-sm font-black text-foreground mt-1">{fCurrency(p.value as number)}</p>
+                                <p className="text-xs text-muted-foreground/60">{p.payload.orderCount} orders</p>
                               </div>
                             );
                         }} />
@@ -589,9 +589,9 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
                       return (
                         <div key={c.category} className="flex items-center gap-3 group">
                           <span className="size-2 rounded-full flex-shrink-0 shadow-lg" style={{ background: PALETTE[i % PALETTE.length], boxShadow: `0 0 8px ${PALETTE[i % PALETTE.length]}80` }} />
-                          <span className="text-xs text-slate-400 flex-1">{CATEGORY_LABELS[c.category] ?? c.category}</span>
-                          <span className="text-[10px] text-slate-600">{c.orderCount} orders</span>
-                          <span className="text-xs font-bold text-white w-10 text-right">{pct}%</span>
+                          <span className="text-xs text-muted-foreground flex-1">{CATEGORY_LABELS[c.category] ?? c.category}</span>
+                          <span className="text-[10px] text-muted-foreground/60">{c.orderCount} orders</span>
+                          <span className="text-xs font-bold text-foreground w-10 text-right">{pct}%</span>
                         </div>
                       );
                     })}
@@ -622,15 +622,15 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
                               {i + 1}
                             </div>
                             <div>
-                              <p className="text-sm text-white font-semibold leading-tight">{p.name}</p>
-                              <p className="text-[10px] text-slate-500">
+                              <p className="text-sm text-foreground font-semibold leading-tight">{p.name}</p>
+                              <p className="text-[10px] text-muted-foreground">
                                 {CATEGORY_LABELS[p.category] ?? p.category} · {p.orderCount} orders
                               </p>
                             </div>
                           </div>
                           <p className="text-sm font-black" style={{ color }}>{fCurrency(p.revenue)}</p>
                         </div>
-                        <div className="h-2 w-full bg-slate-800/60 rounded-full overflow-hidden">
+                        <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
                           <div
                             className="h-full rounded-full transition-all duration-700"
                             style={{
@@ -652,8 +652,8 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
           <Card>
             <div className="flex items-center gap-2 mb-5">
               <Globe className="w-4 h-4 text-primary" />
-              <p className="text-white font-bold tracking-tight">Geographic Breakdown</p>
-              <span className="ml-auto text-xs text-slate-500">{data.geographicData.length} countries</span>
+              <p className="text-foreground font-bold tracking-tight">Geographic Breakdown</p>
+              <span className="ml-auto text-xs text-muted-foreground">{data.geographicData.length} countries</span>
             </div>
 
             {data.geographicData.length === 0 ? (
@@ -675,10 +675,10 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
                           </linearGradient>
                         ))}
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" horizontal={false} />
-                      <XAxis type="number" tick={{ fill: "#475569", fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={fCurrency} />
-                      <YAxis type="category" dataKey="country" tick={{ fill: "#94a3b8", fontSize: 12 }} axisLine={false} tickLine={false} width={110} />
-                      <Tooltip content={<ChartTooltip />} cursor={{ fill: "rgba(255,255,255,0.03)" }} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-border" opacity={0.4} horizontal={false} />
+                      <XAxis type="number" tick={{ fill: "currentColor", fontSize: 10 }} className="text-muted-foreground" axisLine={false} tickLine={false} tickFormatter={fCurrency} />
+                      <YAxis type="category" dataKey="country" tick={{ fill: "currentColor", fontSize: 12 }} className="text-foreground" axisLine={false} tickLine={false} width={110} />
+                      <Tooltip content={<ChartTooltip />} cursor={{ fill: "currentColor", opacity: 0.05 }} />
                       <Bar dataKey="revenue" name="Revenue" radius={[0, 8, 8, 0]}>
                         {data.geographicData.map((_, i) => (
                           <Cell
@@ -696,7 +696,7 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
                   {data.geographicData.map((g, i) => (
                     <div
                       key={g.country}
-                      className="flex items-center gap-3 p-3 rounded-xl bg-slate-800/30 border border-white/5 hover:border-white/10 hover:bg-slate-800/50 transition-all group"
+                      className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border hover:border-primary/20 hover:bg-muted/50 transition-all group"
                     >
                       <div
                         className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black flex-shrink-0"
@@ -705,12 +705,12 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
                         #{i + 1}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-white truncate">{g.country}</p>
-                        <p className="text-[10px] text-slate-500">{g.orderCount} orders</p>
+                        <p className="text-sm font-semibold text-foreground truncate">{g.country}</p>
+                        <p className="text-[10px] text-muted-foreground">{g.orderCount} orders</p>
                       </div>
                       <div className="text-right flex-shrink-0">
                         <p className="text-sm font-black" style={{ color: PALETTE[i % PALETTE.length] }}>{fCurrency(g.revenue)}</p>
-                        <p className="text-[10px] text-slate-600">{((g.revenue / maxGeo) * 100).toFixed(1)}% share</p>
+                        <p className="text-[10px] text-muted-foreground/60">{((g.revenue / maxGeo) * 100).toFixed(1)}% share</p>
                       </div>
                     </div>
                   ))}
@@ -726,7 +726,7 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
             <Card className="lg:col-span-7">
               <div className="flex items-center gap-2 mb-5">
                 <CreditCard className="w-4 h-4 text-emerald-400" />
-                <p className="text-white font-bold tracking-tight">Payment Status</p>
+                <p className="text-foreground font-bold tracking-tight">Payment Status</p>
               </div>
 
               {data.totalOrders === 0 ? (
@@ -761,9 +761,9 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
                           if (!active || !payload?.length) return null;
                           const p = payload[0];
                           return (
-                            <div className="bg-[#0e1420] border border-white/10 rounded-xl px-4 py-3 shadow-2xl">
+                            <div className="bg-card border border-border rounded-xl px-4 py-3 shadow-2xl">
                               <p className="text-xs font-bold" style={{ color: p.payload.color }}>{p.name}</p>
-                              <p className="text-sm font-black text-white">{fNum(p.value as number)} orders</p>
+                              <p className="text-sm font-black text-foreground">{fNum(p.value as number)} orders</p>
                             </div>
                           );
                         }} />
@@ -772,7 +772,7 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
                     {/* Centre label */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                       <p className="text-2xl font-black text-emerald-400">{data.paymentBreakdown.PAID}</p>
-                      <p className="text-[10px] text-slate-500 font-medium">Paid</p>
+                      <p className="text-[10px] text-muted-foreground font-medium">Paid</p>
                     </div>
                   </div>
 
@@ -792,11 +792,11 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
                         <s.icon className="w-4 h-4 flex-shrink-0" style={{ color: s.color }} />
                         <div className="flex-1 min-w-0">
                           <p className="text-xs font-bold" style={{ color: s.color }}>{s.label}</p>
-                          {s.rev > 0 && <p className="text-[10px] text-slate-500">{fCurrency(s.rev)}</p>}
+                          {s.rev > 0 && <p className="text-[10px] text-muted-foreground">{fCurrency(s.rev)}</p>}
                         </div>
                         <div className="text-right">
-                          <p className="text-sm font-black text-white">{fNum(s.count)}</p>
-                          <p className="text-[10px] text-slate-500">
+                          <p className="text-sm font-black text-foreground">{fNum(s.count)}</p>
+                          <p className="text-[10px] text-muted-foreground">
                             {data.totalOrders > 0 ? ((s.count / data.totalOrders) * 100).toFixed(1) : 0}%
                           </p>
                         </div>
@@ -811,7 +811,7 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
             <Card className="lg:col-span-5">
               <div className="flex items-center gap-2 mb-5">
                 <Truck className="w-4 h-4 text-cyan-400" />
-                <p className="text-white font-bold tracking-tight">Order Pipeline</p>
+                <p className="text-foreground font-bold tracking-tight">Order Pipeline</p>
               </div>
 
               {orderStatusData.length === 0 ? (
@@ -828,8 +828,8 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
                   ].map((s) => (
                     <div key={s.label} className="flex items-center gap-3">
                       <s.icon className="w-3.5 h-3.5 flex-shrink-0" style={{ color: s.color }} />
-                      <span className="text-xs text-slate-400 w-20 flex-shrink-0">{s.label}</span>
-                      <div className="flex-1 h-2 bg-slate-800/60 rounded-full overflow-hidden">
+                      <span className="text-xs text-muted-foreground w-20 flex-shrink-0">{s.label}</span>
+                      <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                         <div
                           className="h-full rounded-full transition-all duration-700"
                           style={{
@@ -839,7 +839,7 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
                           }}
                         />
                       </div>
-                      <span className="text-xs font-bold text-white w-6 text-right flex-shrink-0">{s.count}</span>
+                      <span className="text-xs font-bold text-foreground w-6 text-right flex-shrink-0">{s.count}</span>
                     </div>
                   ))}
 
@@ -854,10 +854,10 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
                           { label: "Customs", count: data.shipmentBreakdown.CUSTOMS, color: "#a78bfa" },
                           { label: "Returned", count: data.shipmentBreakdown.RETURNED, color: "#fb7185" },
                         ].filter((s) => s.count > 0).map((s) => (
-                          <div key={s.label} className="flex items-center gap-2 p-2 rounded-lg bg-slate-800/30 border border-white/5">
+                          <div key={s.label} className="flex items-center gap-2 p-2 rounded-lg bg-muted/30 border border-border">
                             <span className="size-1.5 rounded-full" style={{ background: s.color }} />
-                            <span className="text-[10px] text-slate-400">{s.label}</span>
-                            <span className="ml-auto text-[10px] font-bold text-white">{s.count}</span>
+                            <span className="text-[10px] text-muted-foreground">{s.label}</span>
+                            <span className="ml-auto text-[10px] font-bold text-foreground">{s.count}</span>
                           </div>
                         ))}
                       </div>

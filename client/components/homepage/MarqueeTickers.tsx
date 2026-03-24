@@ -1,7 +1,7 @@
 export function ForwardMarquee() {
   return (
-    <div className="w-full bg-slate-50/80 dark:bg-background-dark/80 backdrop-blur-md border-y border-slate-200 dark:border-white/10 py-4 overflow-hidden relative z-20 shadow-2xl">
-      <div className="flex gap-16 animate-marquee whitespace-nowrap text-sm font-mono text-slate-400">
+    <div className="w-full bg-background/80 backdrop-blur-md border-y border-border py-4 overflow-hidden relative z-20 shadow-2xl">
+      <div className="flex gap-16 animate-marquee whitespace-nowrap text-sm font-mono text-muted-foreground">
         <span className="flex items-center gap-2 hover:text-white transition-colors cursor-default">
           <span className="text-primary animate-pulse">●</span> SHP-8922: CN &gt; US <span className="text-white font-bold">$1.2M</span>{" "}
           <span className="text-green-400 flex items-center gap-1 text-xs bg-green-400/10 px-1 rounded">▲ 2.4%</span>
@@ -27,9 +27,9 @@ export function ForwardMarquee() {
           <span className="text-primary animate-pulse">●</span> SHP-8922: CN &gt; US <span className="text-white font-bold">$1.2M</span>{" "}
           <span className="text-green-400 flex items-center gap-1 text-xs bg-green-400/10 px-1 rounded">▲ 2.4%</span>
         </span>
-        <span className="flex items-center gap-2 hover:text-slate-900 dark:hover:text-white transition-colors cursor-default">
-          <span className="text-primary animate-pulse">●</span> LOG-4412: DE &gt; FR <span className="text-slate-900 dark:text-white font-bold">$540K</span>{" "}
-          <span className="text-blue-600 dark:text-blue-400 flex items-center gap-1 text-xs bg-blue-100 dark:bg-blue-400/10 px-1 rounded">Processing</span>
+        <span className="flex items-center gap-2 hover:text-foreground transition-colors cursor-default">
+          <span className="text-primary animate-pulse">●</span> LOG-4412: DE &gt; FR <span className="text-foreground font-bold">$540K</span>{" "}
+          <span className="text-blue-500 flex items-center gap-1 text-xs bg-blue-500/10 px-1 rounded">Processing</span>
         </span>
       </div>
     </div>
@@ -38,9 +38,9 @@ export function ForwardMarquee() {
 
 export function ReverseMarquee() {
   return (
-    <div className="w-full bg-white dark:bg-[#0B0E14] border-y border-slate-200 dark:border-white/10 py-6 overflow-hidden relative z-20">
+    <div className="w-full bg-background border-y border-border py-6 overflow-hidden relative z-20">
       <div className="absolute inset-0 bg-primary/5 pointer-events-none" />
-      <div className="flex gap-20 animate-marquee-reverse whitespace-nowrap text-sm font-mono text-slate-600 dark:text-slate-300">
+      <div className="flex gap-20 animate-marquee-reverse whitespace-nowrap text-sm font-mono text-muted-foreground">
         <span className="flex items-center gap-3">
           <span className="material-symbols-outlined text-primary text-sm animate-pulse">public</span>
           850 tonnes of Textiles: Vietnam &gt; USA

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback, useLayoutEffect } from "react";
+import { useTheme } from "next-themes";
 import { authFetch, formatCurrency } from "@/lib/api-utils";
 
 // Safe useLayoutEffect that falls back to useEffect on the server
@@ -458,7 +459,13 @@ function DownloadBtn({ inv, dark }: { inv: Invoice; dark: boolean }) {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function ExporterFinancePage() {
+  const { theme, resolvedTheme } = useTheme();
   const [dark, setDark] = useState(true);
+
+  useEffect(() => {
+    setDark(resolvedTheme === "dark");
+  }, [resolvedTheme]);
+
   const [data, setData] = useState<FinanceData | null>(null);
   const [chartData, setChartData] = useState<MonthlyPoint[]>([]);
   const [loading, setLoading] = useState(true);
@@ -520,14 +527,14 @@ export default function ExporterFinancePage() {
   }, [dark]);
 
   return (
-    <div className="h-dvh overflow-hidden flex flex-col bg-gradient-to-br from-[#0a0c12] via-[#0d1017] to-[#0a0c12]" style={{ fontFamily: "var(--font-manrope), sans-serif" }}>
+    <div className="h-dvh overflow-hidden flex flex-col bg-background" style={{ fontFamily: "var(--font-manrope), sans-serif" }}>
 
       {/* ── Header ── */}
-      <header className="flex-shrink-0 p-6 lg:p-8 border-b border-white/5">
+      <header className="flex-shrink-0 p-6 lg:p-8 border-b border-border bg-header/80 backdrop-blur-md">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-white">Finance Overview</h1>
-            <p className="text-slate-400 mt-1">Revenue breakdown, payout status, and invoices.</p>
+            <h1 className="text-3xl font-black tracking-tight text-foreground">Finance Overview</h1>
+            <p className="text-muted-foreground mt-1">Revenue breakdown, payout status, and invoices.</p>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
 
