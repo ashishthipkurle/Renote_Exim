@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -62,34 +62,9 @@ export default function HomePage() {
       scrollObserver.observe(el);
     });
 
-    // Parallax globe backgrounds
-    const heroGlobes = document.querySelectorAll<HTMLElement>(".parallax-globe");
-    const onScroll = () => {
-      if (heroGlobes.length === 0) return;
-      const scrolled = window.scrollY;
-      const viewportHeight = window.innerHeight;
-      const newY = 20 + scrolled * 0.04;
-      const rotation = scrolled * 0.02;
-      const scale = 1.05 + scrolled * 0.0003;
-
-      heroGlobes.forEach((globe) => {
-        globe.style.backgroundPosition = `center ${newY}%`;
-        globe.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
-
-        if (globe.id === "hero-globe-dark") {
-          globe.style.opacity = scrolled > viewportHeight
-            ? "0.4"
-            : String(Math.min(1, Math.max(0.4, 0.4 + scrolled * 0.0001)));
-        }
-      });
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-
     return () => {
       triggerObserver.disconnect();
       scrollObserver.disconnect();
-      window.removeEventListener("scroll", onScroll);
     };
   }, []);
 

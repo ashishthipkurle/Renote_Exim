@@ -9,6 +9,11 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        headline: ["Manrope", "sans-serif"],
+        body: ["Inter", "sans-serif"],
+        label: ["Inter", "sans-serif"],
+      },
       colors: {
         "background-light": "#f6f6f8",
         "background-dark": "#0a0f18",
@@ -16,6 +21,23 @@ export default {
         "primary-light": "#4f8aff",
         glass: "rgba(16, 22, 34, 0.6)",
         "glass-border": "rgba(19, 91, 236, 0.2)",
+        /* The Curator marketplace tokens */
+        "surface": "#f7f9fb",
+        "surface-container": "#eceef0",
+        "surface-container-low": "#f2f4f6",
+        "surface-container-high": "#e6e8ea",
+        "surface-container-highest": "#e0e3e5",
+        "surface-container-lowest": "#ffffff",
+        "on-surface": "#191c1e",
+        "on-surface-variant": "#45464d",
+        "on-primary-container": "#2480ff",
+        "on-secondary-container": "#54647a",
+        "secondary-container": "#d0e1fb",
+        "on-tertiary-container": "#0c9488",
+        "tertiary-fixed": "#89f5e7",
+        "primary-fixed": "#d8e2ff",
+        "on-primary-fixed": "#001a41",
+        "outline-variant": "#c6c6cd",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {

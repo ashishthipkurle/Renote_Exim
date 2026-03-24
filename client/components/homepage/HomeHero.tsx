@@ -1,23 +1,78 @@
 import Link from "next/link";
+import dynamic from "next/dynamic";
+import { useState, useEffect } from "react";
+import WebGLBoundary from "@/components/webgl/WebGLBoundary";
+
+// Dynamic import for WebGL component to avoid SSR issues
+const GlobeScene = dynamic(() => import("@/components/webgl/GlobeScene"), {
+  ssr: false,
+  loading: () => <div className="absolute inset-0 bg-slate-50 dark:bg-background-dark" />,
+});
 
 export default function HomeHero() {
+  const [webglError, setWebglError] = useState(false);
+
+  // Parallax Scroll Effect for Fallback Globe
+  useEffect(() => {
+    if (!webglError) return;
+
+    const onScroll = () => {
+      const globes = document.querySelectorAll<HTMLElement>(".parallax-globe");
+      if (globes.length === 0) return;
+      
+      const scrolled = window.scrollY;
+      const viewportHeight = window.innerHeight;
+      
+      const newY = 20 + scrolled * 0.04;
+      const rotation = scrolled * 0.02;
+      const scale = 1.05 + scrolled * 0.0003;
+
+      globes.forEach((globe) => {
+        globe.style.backgroundPosition = `center ${newY}%`;
+        globe.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
+
+        if (globe.id === "hero-globe-dark") {
+          globe.style.opacity = scrolled > viewportHeight
+            ? "0.4"
+            : String(Math.min(1, Math.max(0.4, 0.4 + scrolled * 0.0001)));
+        }
+      });
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll(); // Initial call
+    
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [webglError]);
+
+  // Fallback Globe UI (Original Image Based)
+  const FallbackGlobe = () => (
+    <>
+      <div
+        className="parallax-globe absolute inset-0 bg-[url('/assets/globe_light_theme.png')] bg-cover bg-center dark:hidden opacity-100"
+        id="hero-globe-light"
+        aria-hidden="true"
+      />
+      <div
+        className="parallax-globe absolute inset-0 hidden dark:block bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop')] bg-cover bg-center opacity-40 mix-blend-screen transition-transform duration-100 ease-linear"
+        id="hero-globe-dark"
+        aria-hidden="true"
+      />
+    </>
+  );
+
   return (
     <header className="relative min-h-[95vh] flex items-center justify-center overflow-hidden pt-20 pb-12 bg-slate-50 dark:bg-background-dark transition-colors duration-500">
       <div className="absolute inset-0 z-0">
-        {/* Light Theme Globe */}
-        <div
-          className="parallax-globe absolute inset-0 bg-[url('/assets/globe_light_theme.png')] bg-cover bg-center dark:hidden opacity-100"
-          id="hero-globe-light"
-          style={{ backgroundPosition: "center 20%", transform: "scale(1.05)" }}
-          aria-hidden="true"
-        />
-        {/* Dark Theme Globe */}
-        <div
-          className="parallax-globe absolute inset-0 hidden dark:block bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop')] bg-cover bg-center opacity-40 mix-blend-screen transition-transform duration-100 ease-linear"
-          id="hero-globe-dark"
-          style={{ backgroundPosition: "center 30%", transform: "scale(1.1)" }}
-          aria-hidden="true"
-        />
+        {/* Cinematic WebGL Engine (3D Globe) with Error Boundary & Fallback */}
+        {!webglError ? (
+          <WebGLBoundary fallback={<FallbackGlobe />} onError={() => setWebglError(true)}>
+            <GlobeScene />
+          </WebGLBoundary>
+        ) : (
+          <FallbackGlobe />
+        )}
+        
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-slate-50 dark:from-background-dark/90 dark:via-transparent dark:to-background-dark transition-colors duration-500 pointer-events-none" aria-hidden="true" />
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-transparent dark:from-background-dark/80 dark:via-transparent dark:to-background-dark/80 transition-colors duration-500 pointer-events-none" aria-hidden="true" />
         <div className="absolute top-1/4 left-1/4 w-[40rem] h-[40rem] bg-primary/20 dark:bg-primary/10 rounded-full blur-[120px] animate-pulse transition-opacity duration-500 opacity-20 dark:opacity-100 pointer-events-none" aria-hidden="true" />
