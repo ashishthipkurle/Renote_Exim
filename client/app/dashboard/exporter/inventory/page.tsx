@@ -6,7 +6,6 @@ import { prisma } from "@/lib/prisma";
 import { getServerAuth } from "@/lib/supabase/server";
 import { Prisma } from "@prisma/client";
 import InventoryTable from "./InventoryTable";
-import CategoryDirectory from "./CategoryDirectory";
 
 function formatNumber(n: number) {
   if (n >= 1000000) return (n / 1000000).toFixed(1) + "M";
@@ -142,7 +141,7 @@ export default async function ExporterInventoryPage({
           </div>
           <div className="flex items-center gap-3">
             <Link
-              href="/dashboard/exporter/inventory?action=new"
+              href="/dashboard/exporter/inventory/add"
               className="inline-flex items-center gap-2 bg-primary hover:bg-[#0f49bd] text-white font-black text-xs uppercase tracking-widest py-3 px-6 rounded-2xl shadow-2xl shadow-primary/20 transition-all active:scale-95"
             >
               <Plus className="w-4 h-4" />

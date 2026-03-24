@@ -104,12 +104,18 @@ export default function CategoryDirectory({ usedCategories = [] }: { usedCategor
     const handleSelect = (category: string) => {
         const upper = category.toUpperCase();
         // Check if it's already a valid enum or needs mapping
-        const enumValue = DISPLAY_TO_ENUM[upper] || (["MACHINERY", "MACHINES"].includes(upper) ? "MACHINES" : upper);
-        router.push(`/dashboard/exporter/inventory?action=new&category=${enumValue}`, { scroll: false });
+        const enumValue = DISPLAY_TO_ENUM[upper] || (["MACHINERY", "MACHINES"].includes(upper) ? "MACHINES" : "OTHER");
+        router.push(`/dashboard/exporter/inventory/add?action=new&category=${enumValue}`, { scroll: false });
     };
 
     const handleBack = () => {
-        router.push(`/dashboard/exporter/inventory`, { scroll: false });
+        // If we are in the "form" view (isSelected), go back to the "directory" view on the same page
+        if (isSelected) {
+            router.push(`/dashboard/exporter/inventory/add`, { scroll: false });
+        } else {
+            // Otherwise go back to the inventory index
+            router.push(`/dashboard/exporter/inventory`, { scroll: false });
+        }
     };
 
     return (
@@ -121,8 +127,8 @@ export default function CategoryDirectory({ usedCategories = [] }: { usedCategor
             <div className="relative z-10 flex flex-col h-full">
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-10">
                     <div className={`transition-all duration-500 ${isSelected ? 'opacity-40 filter grayscale scale-95 origin-left' : 'opacity-100'}`}>
-                        <h2 className="text-2xl font-black text-foreground uppercase italic tracking-tight flex items-center gap-3">
-                            Sector Intelligence
+                        <h2 className="text-2xl font-black text-foreground uppercase  tracking-tight flex items-center gap-3">
+                            Products
                             {isSelected && <Sparkles className="w-5 h-5 text-primary animate-pulse" />}
                         </h2>
                         <p className="text-muted-foreground text-sm mt-1 font-medium">Explore thousands of global trade categories</p>
