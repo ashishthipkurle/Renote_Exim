@@ -171,15 +171,6 @@ export default function CategoryDirectory({ usedCategories = [] }: { usedCategor
                                                 <span className="text-[10px] font-black uppercase tracking-widest text-white">{s.name}</span>
                                             </button>
                                         ))}
-                                        <button
-                                            key={s.name}
-                                            onClick={() => handleSelect(s.name)}
-                                            className="flex flex-col items-center justify-center p-5 bg-muted/50 border border-border rounded-2xl hover:bg-primary hover:border-primary transition-all group/btn active:scale-95 shadow-lg"
-                                        >
-                                            <span className="text-2xl mb-2 group-hover/btn:scale-125 transition-transform">{s.icon}</span>
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-foreground group-hover/btn:text-white">{s.name}</span>
-                                        </button>
-                                    ))}
                                     <button
                                         onClick={() => handleSelect("OTHER")}
                                         className="flex flex-col items-center justify-center p-5 bg-primary/10 border border-primary/20 rounded-2xl hover:bg-primary transition-all group/btn active:scale-95 shadow-lg"
@@ -188,7 +179,8 @@ export default function CategoryDirectory({ usedCategories = [] }: { usedCategor
                                         <span className="text-[10px] font-black uppercase tracking-widest text-foreground group-hover/btn:text-white">Other</span>
                                     </button>
                                 </div>
-                            )}
+                            </div>
+                        )}
 
                             {/* Industry List - Shows Used Categories by default, or all when searching */}
                             <div>
