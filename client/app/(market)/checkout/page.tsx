@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import axios from "axios";
 import { toast } from "sonner";
 import { CreditCard, Landmark, Lock, Wallet } from "lucide-react";
@@ -31,7 +32,14 @@ type Product = {
   price: number;
   minOrderQty: number;
   unit: string;
+  category?: string;
+  originCountry?: string;
   images?: string[];
+  exporter?: {
+    name?: string | null;
+    companyName?: string | null;
+    country?: string | null;
+  };
 };
 
 function formatMoney(amount: number) {
@@ -43,6 +51,7 @@ function formatMoney(amount: number) {
 }
 
 export default function CheckoutPage() {
+  const router = useRouter();
   const { user } = useAuth();
   const [items, setItems] = useState<CartItem[]>([]);
   const [productsById, setProductsById] = useState<Record<string, Product>>({});
@@ -81,7 +90,74 @@ export default function CheckoutPage() {
 
   const total = rows.reduce((sum, r) => sum + (r.product?.price ?? 0) * r.item.quantity, 0);
 
+  const saveLocalOrders = () => {
+    if (typeof window === "undefined") return [] as string[];
+
+    const storageKey = "renote_local_orders";
+    const now = Date.now();
+    const createdOrderIds: string[] = [];
+
+    const existingRaw = localStorage.getItem(storageKey);
+    const existing = existingRaw ? (JSON.parse(existingRaw) as any[]) : [];
+
+    const sourceRows = items.map((item) => ({ item, product: productsById[item.productId] ?? null }));
+
+    const newOrders = sourceRows.map((row, index) => {
+      const orderId = `local-${now}-${index + 1}`;
+      createdOrderIds.push(orderId);
+
+      return {
+        id: orderId,
+        orderNumber: `ORD-${new Date().getFullYear()}-${String(now + index).slice(-6)}`,
+        importerId: (user as any)?.id ?? (user as any)?.userId ?? "local-importer",
+        totalPrice: (row.product?.price ?? 0) * row.item.quantity,
+        currency: "USD",
+        status: "PENDING",
+        paymentStatus: "PENDING",
+        quantity: row.item.quantity,
+        productId: row.item.productId,
+        createdAt: new Date(now + index).toISOString(),
+        updatedAt: new Date(now + index).toISOString(),
+        product: {
+          id: row.item.productId,
+          name: row.product?.name ?? `Product ${row.item.productId.slice(0, 6)}`,
+          category: row.product?.category ?? "General",
+          images: row.product?.images ?? [],
+          exporter: {
+            name: row.product?.exporter?.name ?? "Exporter",
+            companyName: row.product?.exporter?.companyName ?? "Global Supplier",
+            country: row.product?.exporter?.country ?? row.product?.originCountry ?? "N/A",
+          },
+        },
+        importer: {
+          name: (user as any)?.name ?? "Importer",
+          companyName: (user as any)?.companyName ?? "Trading Co.",
+          country: (user as any)?.country ?? "N/A",
+        },
+        _local: true,
+      };
+    });
+
+    if (newOrders.length === 0) {
+      return createdOrderIds;
+    }
+
+    localStorage.setItem(storageKey, JSON.stringify([...newOrders, ...existing].slice(0, 200)));
+    window.dispatchEvent(new Event("renote-orders-updated"));
+    return createdOrderIds;
+  };
+
   const startPayment = async () => {
+    const BYPASS_PAYMENT_INIT = true;
+
+    if (BYPASS_PAYMENT_INIT) {
+      const createdIds = saveLocalOrders();
+      toast.success("Order initialized successfully");
+      const orderIdForNext = createdIds[0] ?? `BYPASS-${Date.now()}`;
+      router.push(`/dashboard/importer/orders?orderId=${orderIdForNext}`);
+      return;
+    }
+
     const token = await getAuthToken();
 
     if (!token || !user) {
