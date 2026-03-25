@@ -14,6 +14,9 @@ import {
 import {
   authFetch, formatCurrency, formatNumber, timeAgo, getInitials,
 } from "@/lib/api-utils";
+import dynamic from "next/dynamic";
+
+const ShipTrackingMap = dynamic(() => import("@/components/dashboard/ShipTrackingMap"), { ssr: false });
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -38,6 +41,7 @@ interface ShipmentRoute {
   id: string; fromPort: string; toPort: string;
   type: "air" | "ocean" | "land"; status: string;
   vessel?: string; cargo?: string; progress?: number; color?: string;
+  lat?: number; lng?: number; lastLocation?: string;
 }
 
 // Dashboard filter periods
@@ -253,9 +257,9 @@ const EmbeddedMap = memo(function EmbeddedMap({ filter, apiRoutes, isDemo }: Map
   const IC="#fbbf24";
   return(
     <div className="absolute inset-0">
-      <img src="/world-map-flat.png" alt="" className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none"
-        style={{opacity:0.20,mixBlendMode:"luminosity",filter:"hue-rotate(200deg) brightness(0.55) saturate(0.35)"}}/>
-      <div className="absolute inset-0 pointer-events-none" style={{background:"radial-gradient(ellipse 130% 80% at 50% 55%,rgba(3,12,30,0.2) 0%,rgba(2,6,14,0.65) 100%)"}}/>
+      <img src="/world-map-real.png" alt="World Map" className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none"
+        style={{opacity:0.55,filter:"brightness(0.7) saturate(1.2)"}}/>
+      <div className="absolute inset-0 pointer-events-none" style={{background:"radial-gradient(ellipse 130% 80% at 50% 55%,rgba(3,12,30,0.1) 0%,rgba(2,6,14,0.45) 100%)"}}/>
       {/* India ambient glow — adjusted x position */}
       <div className="absolute pointer-events-none" style={{left:"68%",top:"60%",width:260,height:190,transform:"translate(-50%,-50%)",background:"radial-gradient(ellipse,rgba(251,191,36,0.09) 0%,transparent 70%)"}}/>
       <div className="absolute inset-0 pointer-events-none opacity-[0.012]" style={{backgroundImage:"repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,200,255,0.5) 2px,rgba(0,200,255,0.5) 3px)"}}/>
@@ -316,13 +320,39 @@ const EmbeddedMap = memo(function EmbeddedMap({ filter, apiRoutes, isDemo }: Map
           const lift=route.type==="ocean"?-0.10:-0.28; const[cx,cy]=arcCtrl(p1[0],p1[1],p2[0],p2[1],lift);
           const pt=bezPt(p1[0],p1[1],cx,cy,p2[0],p2[1],pkt.t);
           const clr=routeColor(route);
+          
+          // Use real lat/lng if available, otherwise fallback to bezier path
+          let pos = pt;
+          if (route.lat !== undefined && route.lng !== undefined) {
+            const [rx, ry] = project(route.lng, route.lat);
+            pos = { x: rx, y: ry };
+          }
+
           let rgId="indigo";
           if(clr==="#fbbf24")rgId="gold"; else if(clr==="#e879f9")rgId="fuchsia"; else if(clr==="#38bdf8")rgId="sky"; else if(clr==="#fb923c")rgId="orange"; else if(clr==="#34d399")rgId="emerald"; else if(clr==="#a78bfa")rgId="violet"; else if(clr==="#67e8f9")rgId="cyan";
+          
           const trail=[0.03,0.07,0.12].map(off=>bezPt(p1[0],p1[1],cx,cy,p2[0],p2[1],Math.max(0,pkt.t-off)));
           return(
             <g key={pkt.id} filter="url(#em-pkt)">
-              {trail.map((tp,ti)=><circle key={ti} cx={tp.x} cy={tp.y} r={2.4-ti*0.65} fill={clr} opacity={0.38-ti*0.1}/>)}
-              <circle cx={pt.x} cy={pt.y} r={4.2} fill={`url(#em-rg-${rgId})`} opacity={0.97}/>
+              {/* Only show trail for calculated paths, not real GPS fixed points for now to avoid jumpiness */}
+              {route.lat === undefined && trail.map((tp,ti)=><circle key={ti} cx={tp.x} cy={tp.y} r={2.4-ti*0.65} fill={clr} opacity={0.38-ti*0.1}/>)}
+              
+              {/* Vessel Icon or Marker */}
+              <g transform={`translate(${pos.x},${pos.y})`}>
+                <circle r={4.6} fill={`url(#em-rg-${rgId})`} opacity={0.97}/>
+                {route.type === "ocean" ? (
+                  <path d="M-3,-2 L3,-2 L4,1 L0,3 L-4,1 Z" fill="white" opacity="0.8" transform="scale(0.8)"/>
+                ) : (
+                  <path d="M-4,0 L4,0 M0,-4 L0,4" stroke="white" strokeWidth="1" opacity="0.8" transform="rotate(45) scale(0.8)"/>
+                )}
+              </g>
+
+              {route.lat !== undefined && (
+                 <circle cx={pos.x} cy={pos.y} r={10} fill="none" stroke={clr} strokeWidth="1.5" opacity="0.5">
+                   <animate attributeName="r" values="4;15;4" dur="3s" repeatCount="indefinite" />
+                   <animate attributeName="stroke-opacity" values="0.6;0;0.6" dur="3s" repeatCount="indefinite" />
+                 </circle>
+              )}
             </g>
           );
         })}
@@ -373,10 +403,11 @@ const EmbeddedMap = memo(function EmbeddedMap({ filter, apiRoutes, isDemo }: Map
           const lift=r.type==="ocean"?-0.10:-0.28; const[,cy]=arcCtrl(x1,y1,x2,y2,lift);
           const by=Math.min(Math.max(cy-40,4),VH-80); const clr=routeColor(r);
           return(<g style={{pointerEvents:"none"}}>
-            <rect x={bx-90} y={by} width={180} height={62} rx={6} fill="#04080f" stroke={clr} strokeWidth="0.9" strokeOpacity="0.8" style={{filter:`drop-shadow(0 0 12px ${clr}55)`}}/>
-            <text x={bx} y={by+16} textAnchor="middle" fontSize="8.5" fill={clr} fontFamily="monospace" fontWeight="bold">{fp.name.toUpperCase()} → {tp.name.toUpperCase()}</text>
-            <text x={bx} y={by+30} textAnchor="middle" fontSize="7.5" fill="#64748b" fontFamily="monospace">{r.type==="air"?"✈ Air":r.type==="ocean"?"⚓ Ocean":"🚛 Land"}{r.vessel?` · ${r.vessel}`:""}</text>
+            <rect x={bx-90} y={by} width={180} height={75} rx={8} fill="#04080f" stroke={clr} strokeWidth="1" strokeOpacity="1" style={{filter:`drop-shadow(0 0 15px ${clr}55)`}}/>
+            <text x={bx} y={by+16} textAnchor="middle" fontSize="9" fill={clr} fontFamily="monospace" fontWeight="bold">{fp.name.toUpperCase()} → {tp.name.toUpperCase()}</text>
+            <text x={bx} y={by+30} textAnchor="middle" fontSize="7.5" fill="#64748b" fontFamily="monospace">{r.type==="air"?"✈ AIR":r.type==="ocean"?"⚓ OCEAN":"🚛 LAND"}{r.vessel?` · ${r.vessel}`:""}</text>
             <text x={bx} y={by+44} textAnchor="middle" fontSize="7.5" fill="#94a3b8" fontFamily="monospace">{r.cargo?`${r.cargo}`:`Status: ${r.status}`}</text>
+            <text x={bx} y={by+58} textAnchor="middle" fontSize="8" fill="#fff" fontFamily="monospace" fontWeight="bold">{r.lastLocation ? `📍 ${r.lastLocation}` : r.importer ? `💼 ${r.importer}` : ""}</text>
           </g>);
         })()}
       </svg>
@@ -472,10 +503,17 @@ export default function ExporterDashboard() {
   // Load live routes
   useEffect(()=>{
     setMapLoading(true);
-    fetch("/api/shipments/active",{credentials:"include"})
-      .then(r=>r.ok?r.json():Promise.reject(r.status))
-      .then((d:{routes:ShipmentRoute[];total:number})=>{ setApiRoutes(d.routes); setMapIsDemo(false); setActiveCount(d.total); setLastUpdate(new Date()); })
-      .catch(()=>{ setMapIsDemo(true); setActiveCount(DEMO_ROUTES.length); })
+    authFetch<{routes:ShipmentRoute[];total:number}>("/api/shipments/active")
+      .then((d)=>{
+        if(d && d.routes && d.routes.length > 0){
+          console.log('[MAP] Live routes loaded:', d.routes.length);
+          setApiRoutes(d.routes); setMapIsDemo(false); setActiveCount(d.total); setLastUpdate(new Date());
+        } else {
+          console.log('[MAP] No live routes, using demo');
+          setMapIsDemo(true); setActiveCount(DEMO_ROUTES.length);
+        }
+      })
+      .catch((err)=>{ console.error('[MAP] API error, falling back to demo:', err); setMapIsDemo(true); setActiveCount(DEMO_ROUTES.length); })
       .finally(()=>setMapLoading(false));
   },[mapRefresh]);
 
@@ -778,87 +816,9 @@ export default function ExporterDashboard() {
           {/* ── Map + Transactions ── */}
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-5" style={{height:"520px"}}>
 
-            {/* Map */}
-            <div className="xl:col-span-2 bg-[#0d1117]/80 backdrop-blur-xl border border-white/5 shadow-xl rounded-2xl flex flex-col h-full overflow-hidden">
-              {/* Map header */}
-              <div className="flex-shrink-0 flex items-center justify-between px-5 py-3 z-20 relative" style={{borderBottom:"1px solid rgba(255,255,255,0.05)"}}>
-                <div className="min-w-0 flex items-center gap-3">
-                  <Globe className="w-4 h-4 text-primary flex-shrink-0"/>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h2 className="text-[14px] font-bold text-white tracking-tight">India Global Trade Network</h2>
-                      <span className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase border ${mapIsDemo?"bg-amber-500/12 border-amber-500/30 text-amber-400":"bg-green-500/12 border-green-500/30 text-green-400"}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full inline-block animate-pulse ${mapIsDemo?"bg-amber-400":"bg-green-400"}`}/>
-                        {mapIsDemo?"Demo":"Live"}
-                      </span>
-                    </div>
-                    <p className="text-[10px] text-slate-500 mt-0.5">{activeCount} active routes{lastUpdate&&<span> · {lastUpdate.toLocaleTimeString()}</span>}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1.5 flex-wrap justify-end">
-                  {(Object.entries(FILTER_CFG) as [FilterMode,typeof FILTER_CFG[FilterMode]][]).map(([mode,cfg])=>{
-                    const count=mode==="all"?activeCount:(regionCounts[mode]??0);
-                    const isActive=mapFilter===mode;
-                    return(
-                      <button key={mode} onClick={()=>setMapFilter(mode)}
-                        className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-semibold border transition-all duration-200"
-                        style={{background:isActive?`${cfg.color}15`:"transparent",borderColor:isActive?`${cfg.color}45`:"rgba(255,255,255,0.07)",color:isActive?cfg.color:"#475569",boxShadow:isActive?`0 0 12px ${cfg.color}22`:"none"}}>
-                        <span>{cfg.icon}</span>
-                        <span className="hidden lg:inline">{mode==="all"?"All":cfg.label}</span>
-                        {count>0&&<span className="opacity-60 text-[9px]">{count}</span>}
-                      </button>
-                    );
-                  })}
-                  <button onClick={()=>setMapRefresh(n=>n+1)}
-                    className="w-7 h-7 flex items-center justify-center rounded-lg border border-white/8 text-slate-500 hover:text-white hover:border-white/20 transition-all duration-200">
-                    <RefreshCw className={`w-3.5 h-3.5 ${mapLoading?"animate-spin":""}`}/>
-                  </button>
-                </div>
-              </div>
-
-              {/* Map area */}
-              <div className="flex-1 relative overflow-hidden">
-                <EmbeddedMap filter={mapFilter} apiRoutes={apiRoutes} isDemo={mapIsDemo}/>
-                {mapLoading&&(
-                  <div className="absolute inset-0 flex items-center justify-center z-30" style={{background:"rgba(3,8,16,0.55)",backdropFilter:"blur(4px)"}}>
-                    <div className="flex flex-col items-center gap-2">
-                      <div className="w-7 h-7 rounded-full border-2 border-yellow-400/30 border-t-yellow-400 animate-spin"/>
-                      <p className="text-[10px] text-slate-400 font-mono">Loading trade routes…</p>
-                    </div>
-                  </div>
-                )}
-                {/* Legend */}
-                <div className="absolute bottom-3 left-3 flex flex-col gap-1.5 z-20">
-                  {[{clr:"#fbbf24",label:"India Hubs",dot:false},{clr:"#818cf8",label:"Air Freight",dot:true,dashed:false},{clr:"#67e8f9",label:"Ocean Cargo",dot:true,dashed:true}].map(({clr,label,dot,dashed})=>(
-                    <div key={label} className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg backdrop-blur-md" style={{background:"rgba(3,8,15,0.85)",border:`1px solid ${clr}22`}}>
-                      {dot?(<svg width="18" height="6"><line x1="0" y1="3" x2="18" y2="3" stroke={clr} strokeWidth="1.5" strokeDasharray={dashed?"5,3":"none"}/><circle cx="13" cy="3" r="1.8" fill={clr}/></svg>):(<span className="w-2 h-2 rounded-full flex-shrink-0" style={{background:clr,boxShadow:`0 0 8px ${clr}`}}/>)}
-                      <span className="text-[9px] font-mono" style={{color:clr}}>{label}</span>
-                    </div>
-                  ))}
-                </div>
-                {/* Region pills */}
-                <div className="absolute bottom-3 right-3 flex flex-col gap-1 z-20">
-                  {(["russia","europe","usa","africa","asia"] as FilterMode[]).map(m=>{
-                    const cfg=FILTER_CFG[m]; const count=regionCounts[m]??0; if(count===0) return null;
-                    const active=mapFilter===m||mapFilter==="all";
-                    return(
-                      <button key={m} className="flex items-center gap-2 px-2 py-1 rounded-lg backdrop-blur-md transition-all" style={{background:active?`${cfg.color}12`:"rgba(3,8,15,0.7)",border:`1px solid ${active?cfg.color+"28":"rgba(255,255,255,0.04)"}`,opacity:active?1:0.4}} onClick={()=>setMapFilter(mapFilter===m?"all":m)}>
-                        <span className="text-[9px]">{cfg.icon}</span>
-                        <span className="text-[9px] font-mono" style={{color:active?cfg.color:"#374151"}}>{cfg.label}</span>
-                        <span className="text-[10px] font-bold font-mono" style={{color:active?cfg.color:"#1f2937"}}>{count}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Map footer */}
-              <div className="flex-shrink-0 flex items-center gap-5 px-5 py-2.5 z-20" style={{borderTop:"1px solid rgba(255,255,255,0.04)"}}>
-                <div className="flex items-center gap-1.5"><Wind className="w-3 h-3 text-indigo-400"/><span className="text-[10px] text-slate-500">Air</span><span className="text-[10px] font-bold text-indigo-400">{(mapIsDemo?DEMO_ROUTES:apiRoutes).filter(r=>r.type==="air").length}</span></div>
-                <div className="flex items-center gap-1.5"><Anchor className="w-3 h-3 text-cyan-400"/><span className="text-[10px] text-slate-500">Ocean</span><span className="text-[10px] font-bold text-cyan-400">{(mapIsDemo?DEMO_ROUTES:apiRoutes).filter(r=>r.type==="ocean").length}</span></div>
-                <div className="flex items-center gap-1.5"><Layers className="w-3 h-3 text-slate-400"/><span className="text-[10px] text-slate-500">Ports</span><span className="text-[10px] font-bold text-slate-300">{new Set((mapIsDemo?DEMO_ROUTES:apiRoutes).flatMap(r=>[r.fromPort,r.toPort])).size}</span></div>
-                <div className="ml-auto"><Link href="/dashboard/exporter/shipments" className="flex items-center gap-1 text-[10px] text-primary hover:text-blue-300 font-medium transition-colors">All shipments<ChevronRight className="w-3 h-3"/></Link></div>
-              </div>
+            {/* Map — Leaflet-based real world interactive map */}
+            <div className="xl:col-span-2 h-full">
+              <ShipTrackingMap />
             </div>
 
             {/* Recent Transactions */}

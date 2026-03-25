@@ -79,11 +79,10 @@ export async function getApiAuthContext(request: NextRequest): Promise<ApiAuthCo
           email: user.email ?? "",
           name: typeof meta.name === "string" ? meta.name : null,
           role,
-          companyName: typeof meta.companyName === "string" ? meta.companyName : null,
+          businessName: typeof meta.companyName === "string" ? meta.companyName : null,
           country: typeof meta.country === "string" ? meta.country : null,
           phone: typeof meta.phone === "string" ? meta.phone : null,
-          website: typeof meta.website === "string" ? meta.website : null,
-          verified: false,
+          verificationStatus: 'PENDING',
         },
         select: { id: true, role: true },
       });

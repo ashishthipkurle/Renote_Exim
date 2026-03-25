@@ -19,10 +19,10 @@ export default function HomeHero() {
     const onScroll = () => {
       const globes = document.querySelectorAll<HTMLElement>(".parallax-globe");
       if (globes.length === 0) return;
-      
+
       const scrolled = window.scrollY;
       const viewportHeight = window.innerHeight;
-      
+
       const newY = 20 + scrolled * 0.04;
       const rotation = scrolled * 0.02;
       const scale = 1.05 + scrolled * 0.0003;
@@ -41,7 +41,7 @@ export default function HomeHero() {
 
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll(); // Initial call
-    
+
     return () => window.removeEventListener("scroll", onScroll);
   }, [webglError]);
 
@@ -72,7 +72,7 @@ export default function HomeHero() {
         ) : (
           <FallbackGlobe />
         )}
-        
+
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-slate-50 dark:from-background-dark/90 dark:via-transparent dark:to-background-dark transition-colors duration-500 pointer-events-none" aria-hidden="true" />
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-transparent dark:from-background-dark/80 dark:via-transparent dark:to-background-dark/80 transition-colors duration-500 pointer-events-none" aria-hidden="true" />
         <div className="absolute top-1/4 left-1/4 w-[40rem] h-[40rem] bg-primary/20 dark:bg-primary/10 rounded-full blur-[120px] animate-pulse transition-opacity duration-500 opacity-20 dark:opacity-100 pointer-events-none" aria-hidden="true" />

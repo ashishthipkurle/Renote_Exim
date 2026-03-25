@@ -7,6 +7,12 @@ const globalForPrisma = globalThis as unknown as {
 const createPrismaClient = () => {
   const baseClient = new PrismaClient({
     log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
+    datasourceUrl: process.env.DATABASE_URL,
+  });
+
+  // Handle potential connection issues gracefully
+  baseClient.$on('error' as any, (e: any) => {
+    console.error('[PRISMA_CLIENT_ERROR]', e.message);
   });
 
   return baseClient.$extends({

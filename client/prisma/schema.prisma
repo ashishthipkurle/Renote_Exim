@@ -9,6 +9,279 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+model User {
+  id                  String             @id @default(uuid())
+  email               String             @unique
+  role                Role               @default(USER)
+  verificationStatus  VerificationStatus @default(PENDING)
+  businessName        String?
+  b2bActive           Boolean            @default(false)
+  b2cActive           Boolean            @default(false)
+  preferredCurrency   String             @default("USD")
+  budgetLimit         Float?
+  contactInfo         Json?
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  name                String?
+  password            String?
+  avatar              String?
+  country             String?
+  phone               String?
+  deletedAt           DateTime?
+  address             String?
+  cart                Cart?
+  documents           Document[]
+  messagesReceived    Message[]          @relation("MessagesReceived")
+  messagesSent        Message[]          @relation("MessagesSent")
+  notifications       Notification[]
+  ordersAsBuyer       Order[]            @relation("BuyerOrders")
+  ordersAsSeller      Order[]            @relation("SellerOrders")
+  products            Product[]          @relation("ExporterProducts")
+  suppliersAsExporter Supplier[]         @relation("ExporterSuppliers")
+  suppliersAsImporter Supplier[]         @relation("ImporterSuppliers")
+
+  @@map("users")
+}
+
+model Product {
+  id               String                   @id @default(uuid())
+  exporterId       String
+  name             String
+  description      String
+  category         ProductCategory
+  moq              Int                      @default(1)
+  b2bPrice         Float
+  b2cPrice         Float?
+  currency         String                   @default("USD")
+  isDualListed     Boolean                  @default(false)
+  stockQty         Int                      @default(0)
+  hsCode           String?
+  originCountry    String
+  searchVector     Unsupported("tsvector")?
+  certifications   String[]                 @default([])
+  images           String[]                 @default([])
+  available        Boolean                  @default(true)
+  trustDocumentUrl String?
+  unit             String?                  @default("")
+  createdAt        DateTime                 @default(now())
+  updatedAt        DateTime                 @updatedAt
+  deletedAt        DateTime?
+  cartItems        CartItem[]
+  orders           Order[]                  @relation("ProductOrders")
+  priceHistory     PriceHistory[]
+  exporter         User                     @relation("ExporterProducts", fields: [exporterId], references: [id])
+
+  @@index([searchVector], type: Gin)
+  @@map("products")
+}
+
+model PriceHistory {
+  id         String   @id @default(uuid())
+  productId  String
+  price      Float
+  currency   String
+  recordedAt DateTime @default(now())
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("price_history")
+}
+
+model Cart {
+  id         String     @id @default(uuid())
+  consumerId String     @unique
+  createdAt  DateTime   @default(now())
+  cartItems  CartItem[]
+  consumer   User       @relation(fields: [consumerId], references: [id], onDelete: Cascade)
+
+  @@map("carts")
+}
+
+model CartItem {
+  id            String  @id @default(uuid())
+  cartId        String
+  productId     String
+  quantity      Int
+  priceSnapshot Float
+  currency      String
+  cart          Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product       Product @relation(fields: [productId], references: [id])
+
+  @@map("cart_items")
+}
+
+model Order {
+  id                     String        @id @default(uuid())
+  orderType              OrderType
+  orderNumber            String        @unique
+  buyerId                String
+  sellerId               String
+  productId              String
+  quantity               Int
+  unitPrice              Float
+  totalPrice             Float
+  currency               String
+  exchangeRateAtPurchase Float?
+  totalPriceUSD          Float?
+  orderStatus            OrderStatus   @default(QUOTE_REQUESTED)
+  paymentStatus          PaymentStatus @default(PENDING)
+  stripePaymentIntentId  String?
+  stripeInvoiceId        String?
+  notes                  String?
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @updatedAt
+  documents              Document[]
+  messages               Message[]     @relation("OrderMessages")
+  buyer                  User          @relation("BuyerOrders", fields: [buyerId], references: [id])
+  product                Product       @relation("ProductOrders", fields: [productId], references: [id])
+  seller                 User          @relation("SellerOrders", fields: [sellerId], references: [id])
+  shipment               Shipment?
+
+  @@map("orders")
+}
+
+model Shipment {
+  id                    String          @id @default(uuid())
+  orderId               String          @unique
+  courierId             String?
+  trackingNumber        String?         @unique
+  estimatedDelivery     DateTime?
+  currentStatus         ShipmentStatus  @default(PREPARING)
+  declaredValue         Float?
+  declaredValueCurrency String?
+  origin                String?
+  destination           String?
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+  statusHistory         ShipmentEvent[]
+  order                 Order           @relation(fields: [orderId], references: [id])
+
+  @@map("shipments")
+}
+
+model ShipmentEvent {
+  id         String         @id @default(uuid())
+  shipmentId String
+  status     ShipmentStatus
+  location   String?
+  note       String?
+  createdAt  DateTime       @default(now())
+  latitude   Float?
+  longitude  Float?
+  shipment   Shipment       @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  @@map("shipment_events")
+}
+
+model Document {
+  id                 String                @id @default(uuid())
+  userId             String
+  orderId            String?
+  docType            DocumentType
+  fileUrl            String
+  mimeType           String
+  fileSizeBytes      Int
+  verificationStatus DocVerificationStatus @default(PENDING)
+  reviewedBy         String?
+  reviewedAt         DateTime?
+  virusScanStatus    ScanStatus            @default(PENDING)
+  description        String?
+  fileName           String?
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+  order              Order?                @relation(fields: [orderId], references: [id])
+  user               User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("documents")
+}
+
+model Message {
+  id          String              @id @default(uuid())
+  senderId    String
+  receiverId  String
+  orderId     String?
+  productId   String?
+  subject     String?
+  body        String
+  isRead      Boolean             @default(false)
+  createdAt   DateTime            @default(now())
+  attachments MessageAttachment[]
+  order       Order?              @relation("OrderMessages", fields: [orderId], references: [id])
+  receiver    User                @relation("MessagesReceived", fields: [receiverId], references: [id], onDelete: Cascade)
+  sender      User                @relation("MessagesSent", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+model MessageAttachment {
+  id            String  @id @default(uuid())
+  messageId     String
+  fileUrl       String
+  fileName      String
+  mimeType      String
+  fileSizeBytes Int
+  message       Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@map("message_attachments")
+}
+
+model Notification {
+  id             String           @id @default(uuid())
+  userId         String
+  type           NotificationType
+  message        String
+  isRead         Boolean          @default(false)
+  linkedEntityId String?
+  title          String?
+  link           String?
+  createdAt      DateTime         @default(now())
+  readAt         DateTime?
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model Supplier {
+  id                String   @id @default(uuid())
+  importerId        String
+  exporterId        String
+  tags              String[] @default([])
+  rating            Int?
+  contractNotes     String?
+  preferredCurrency String?
+  name              String?
+  email             String?
+  address           String?
+  country           String?
+  notes             String?
+  category          String?
+  contactPerson     String?
+  phone             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  exporter          User     @relation("ExporterSuppliers", fields: [exporterId], references: [id], onDelete: Cascade)
+  importer          User     @relation("ImporterSuppliers", fields: [importerId], references: [id], onDelete: Cascade)
+
+  @@map("suppliers")
+}
+
+model Wishlist {
+  id        String   @id @default(uuid())
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+
+  @@map("wishlists")
+}
+
+model StripeEvent {
+  id            String   @id @default(uuid())
+  stripeEventId String   @unique
+  eventType     String
+  processedAt   DateTime @default(now())
+
+  @@map("stripe_events")
+}
+
 enum Role {
   USER
   CONSUMER
@@ -105,300 +378,4 @@ enum NotificationType {
   PAYMENT_RECEIVED
   PAYMENT_FAILED
   ADMIN_BROADCAST
-}
-
-model User {
-  id                 String             @id @default(uuid())
-  email              String             @unique
-  role               Role               @default(USER)
-  verificationStatus VerificationStatus @default(PENDING)
-  businessName       String?
-  b2bActive          Boolean            @default(false)
-  b2cActive          Boolean            @default(false)
-  preferredCurrency  String             @default("USD")
-  budgetLimit        Float?
-  contactInfo        Json?
-  createdAt          DateTime           @default(now())
-  updatedAt          DateTime           @updatedAt
-
-  name               String?
-  password           String?
-  avatar             String?
-  country            String?
-  phone              String?
-  deletedAt          DateTime?
-  address            String?
-
-  products           Product[]          @relation("ExporterProducts")
-  cart               Cart?
-  ordersAsBuyer      Order[]            @relation("BuyerOrders")
-  ordersAsSeller     Order[]            @relation("SellerOrders")
-  documents          Document[]
-  messagesSent       Message[]          @relation("MessagesSent")
-  messagesReceived   Message[]          @relation("MessagesReceived")
-  notifications      Notification[]
-  suppliersAsImporter Supplier[]        @relation("ImporterSuppliers")
-  suppliersAsExporter Supplier[]        @relation("ExporterSuppliers")
-
-  @@map("users")
-}
-
-model Product {
-  id               String          @id @default(uuid())
-  exporterId       String
-  name             String
-  description      String
-  category         ProductCategory
-  moq              Int             @default(1)
-  b2bPrice         Float
-  b2cPrice         Float?
-  currency         String          @default("USD")
-  isDualListed     Boolean         @default(false)
-  stockQty         Int             @default(0)
-  hsCode           String?
-  originCountry    String
-  searchVector     Unsupported("tsvector")?
-  certifications   String[]        @default([])
-  images           String[]        @default([])
-  
-  available        Boolean         @default(true) 
-  trustDocumentUrl String? 
-  unit             String?         @default("")
-
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
-  deletedAt        DateTime?
-
-  exporter         User            @relation("ExporterProducts", fields: [exporterId], references: [id], onDelete: Restrict)
-  priceHistory     PriceHistory[]
-  cartItems        CartItem[]
-  orders           Order[]         @relation("ProductOrders")
-
-  @@index([searchVector], type: Gin)
-  @@map("products")
-}
-
-model PriceHistory {
-  id          String   @id @default(uuid())
-  productId   String
-  price       Float
-  currency    String
-  recordedAt  DateTime @default(now())
-
-  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  @@map("price_history")
-}
-
-model Cart {
-  id          String   @id @default(uuid())
-  consumerId  String   @unique
-  createdAt   DateTime @default(now())
-
-  consumer    User     @relation(fields: [consumerId], references: [id], onDelete: Cascade)
-  cartItems   CartItem[]
-
-  @@map("carts")
-}
-
-model CartItem {
-  id            String   @id @default(uuid())
-  cartId        String
-  productId     String
-  quantity      Int
-  priceSnapshot Float
-  currency      String
-
-  cart          Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  product       Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
-
-  @@map("cart_items")
-}
-
-model Order {
-  id                     String        @id @default(uuid())
-  orderType              OrderType
-  orderNumber            String        @unique
-  buyerId                String
-  sellerId               String
-  productId              String
-  quantity               Int
-  unitPrice              Float
-  totalPrice             Float
-  currency               String
-  exchangeRateAtPurchase Float?
-  totalPriceUSD          Float?
-  orderStatus            OrderStatus   @default(QUOTE_REQUESTED)
-  paymentStatus          PaymentStatus @default(PENDING)
-  stripePaymentIntentId  String?
-  stripeInvoiceId        String?
-  notes                  String? 
-  
-  createdAt              DateTime      @default(now())
-  updatedAt              DateTime      @updatedAt
-
-  buyer                  User          @relation("BuyerOrders", fields: [buyerId], references: [id], onDelete: Restrict)
-  seller                 User          @relation("SellerOrders", fields: [sellerId], references: [id], onDelete: Restrict)
-  product                Product       @relation("ProductOrders", fields: [productId], references: [id], onDelete: Restrict)
-  shipment               Shipment?
-  documents              Document[]
-  messages               Message[]     @relation("OrderMessages")
-
-  @@map("orders")
-}
-
-model Shipment {
-  id                    String         @id @default(uuid())
-  orderId               String         @unique
-  courierId             String?
-  trackingNumber        String?        @unique 
-  estimatedDelivery     DateTime?
-  currentStatus         ShipmentStatus @default(PREPARING)
-  declaredValue         Float?
-  declaredValueCurrency String?
-  
-  origin                String?        
-  destination           String?        
-  
-  createdAt             DateTime       @default(now())
-  updatedAt             DateTime       @updatedAt
-
-  order                 Order          @relation(fields: [orderId], references: [id], onDelete: Restrict)
-  statusHistory         ShipmentEvent[]
-
-  @@map("shipments")
-}
-
-model ShipmentEvent {
-  id          String         @id @default(uuid())
-  shipmentId  String
-  status      ShipmentStatus
-  location    String?
-  note        String?
-  createdAt   DateTime       @default(now())
-
-  shipment    Shipment       @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
-
-  @@map("shipment_events")
-}
-
-model Document {
-  id                 String               @id @default(uuid())
-  userId             String
-  orderId            String?
-  docType            DocumentType
-  fileUrl            String
-  mimeType           String
-  fileSizeBytes      Int
-  verificationStatus DocVerificationStatus @default(PENDING)
-  reviewedBy         String?
-  reviewedAt         DateTime?
-  virusScanStatus    ScanStatus          @default(PENDING)
-  
-  description        String?             
-  fileName           String?             
-  
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime             @updatedAt
-
-  user               User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
-  order              Order?               @relation(fields: [orderId], references: [id], onDelete: SetNull)
-
-  @@map("documents")
-}
-
-model Message {
-  id          String   @id @default(uuid())
-  senderId    String
-  receiverId  String
-  orderId     String?
-  productId   String?
-  subject     String?
-  body        String   
-  isRead      Boolean  @default(false)
-  createdAt   DateTime @default(now())
-
-  sender      User     @relation("MessagesSent", fields: [senderId], references: [id], onDelete: Cascade)
-  receiver    User     @relation("MessagesReceived", fields: [receiverId], references: [id], onDelete: Cascade)
-  order       Order?   @relation("OrderMessages", fields: [orderId], references: [id], onDelete: SetNull)
-  
-  attachments MessageAttachment[]
-
-  @@map("messages")
-}
-
-model MessageAttachment {
-  id            String   @id @default(uuid())
-  messageId     String
-  fileUrl       String
-  fileName      String
-  mimeType      String
-  fileSizeBytes Int
-
-  message       Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
-
-  @@map("message_attachments")
-}
-
-model Notification {
-  id             String           @id @default(uuid())
-  userId         String
-  type           NotificationType
-  message        String
-  isRead         Boolean          @default(false)
-  linkedEntityId String?
-  title          String?          
-  link           String?
-  
-  createdAt      DateTime         @default(now())
-  readAt         DateTime?
-
-  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("notifications")
-}
-
-model Supplier {
-  id                String   @id @default(uuid())
-  importerId        String
-  exporterId        String
-  tags              String[] @default([])
-  rating            Int?     
-  contractNotes     String?
-  preferredCurrency String?
-
-  name              String?  
-  email             String?  
-  address           String?
-  country           String?
-  notes             String?
-  category          String?
-  contactPerson     String?
-  phone             String?
-
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-
-  importer          User     @relation("ImporterSuppliers", fields: [importerId], references: [id], onDelete: Cascade)
-  exporter          User     @relation("ExporterSuppliers", fields: [exporterId], references: [id], onDelete: Cascade)
-
-  @@map("suppliers")
-}
-
-model Wishlist {
-  id        String   @id @default(uuid())
-  userId    String
-  productId String
-  createdAt DateTime @default(now())
-
-  // Note: the original schema had user and product without named relations to these specific ones, let's omit unless strictly specified. We can use default relations.
-  @@map("wishlists")
-}
-
-model StripeEvent {
-  id            String   @id @default(uuid())
-  stripeEventId String   @unique
-  eventType     String
-  processedAt   DateTime @default(now())
-
-  @@map("stripe_events")
 }
