@@ -22,7 +22,7 @@ export default function HomeNavbar() {
   }, []);
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-background/90 backdrop-blur-xl border-b border-border transition-colors duration-300">
+    <nav className="sticky top-0 w-full z-50 bg-background/90 backdrop-blur-xl border-b border-border transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-white font-bold primary-glow-hover">

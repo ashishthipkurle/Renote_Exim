@@ -15,6 +15,7 @@ import ConnectivitySection from "@/components/homepage/ConnectivitySection";
 import ComplianceSection from "@/components/homepage/ComplianceSection";
 import CTASection from "@/components/homepage/CTASection";
 import HomeFooter from "@/components/homepage/HomeFooter";
+import ScrollVideoSection from "@/components/homepage/ScrollVideoSection";
 
 export default function HomePage() {
   const { user, loading } = useAuth();
@@ -70,6 +71,7 @@ export default function HomePage() {
 
   return (
     <div className="bg-background text-foreground font-display selection:bg-primary selection:text-white">
+      <ScrollVideoSection />
       <HomeNavbar />
       <HomeHero />
       <ForwardMarquee />

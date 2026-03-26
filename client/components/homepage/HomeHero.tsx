@@ -1,40 +1,36 @@
 import Link from "next/link";
-import dynamic from "next/dynamic";
-import { useState, useEffect } from "react";
-import WebGLBoundary from "@/components/webgl/WebGLBoundary";
-
-// Dynamic import for WebGL component to avoid SSR issues
-const GlobeScene = dynamic(() => import("@/components/webgl/GlobeScene"), {
-  ssr: false,
-  loading: () => <div className="absolute inset-0 bg-slate-50 dark:bg-background-dark" />,
-});
+import { useEffect, useRef } from "react";
 
 export default function HomeHero() {
-  const [webglError, setWebglError] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
 
-  // Parallax Scroll Effect for Fallback Globe
+  // Parallax Scroll Effect for the realistic globe images
   useEffect(() => {
-    if (!webglError) return;
-
     const onScroll = () => {
       const globes = document.querySelectorAll<HTMLElement>(".parallax-globe");
-      if (globes.length === 0) return;
+      const section = sectionRef.current;
+      if (globes.length === 0 || !section) return;
 
-      const scrolled = window.scrollY;
+      const rect = section.getBoundingClientRect();
       const viewportHeight = window.innerHeight;
 
+      // Calculate how far the section has scrolled *past* the top of the viewport.
+      // 0 when exactly at the top border (straight in section). Increases as it scrolls past.
+      const scrolled = Math.max(0, -rect.top);
+
       const newY = 20 + scrolled * 0.04;
-      const rotation = scrolled * 0.02;
+      const rotation = scrolled * -0.02; // Negative value rotates it left-to-right
       const scale = 1.05 + scrolled * 0.0003;
 
       globes.forEach((globe) => {
-        globe.style.backgroundPosition = `center ${newY}%`;
+        globe.style.backgroundPosition = `center ${Math.min(newY, 100)}%`;
         globe.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
 
+        // Fade out dark theme specifically slightly if needed, or just let it be
         if (globe.id === "hero-globe-dark") {
           globe.style.opacity = scrolled > viewportHeight
-            ? "0.4"
-            : String(Math.min(1, Math.max(0.4, 0.4 + scrolled * 0.0001)));
+            ? "0.6"
+            : String(Math.min(1, Math.max(0.6, 0.9 - scrolled * 0.0003)));
         }
       });
     };
@@ -43,35 +39,28 @@ export default function HomeHero() {
     onScroll(); // Initial call
 
     return () => window.removeEventListener("scroll", onScroll);
-  }, [webglError]);
-
-  // Fallback Globe UI (Original Image Based)
-  const FallbackGlobe = () => (
-    <>
-      <div
-        className="parallax-globe absolute inset-0 bg-[url('/assets/globe_light_theme.png')] bg-cover bg-center dark:hidden opacity-100"
-        id="hero-globe-light"
-        aria-hidden="true"
-      />
-      <div
-        className="parallax-globe absolute inset-0 hidden dark:block bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop')] bg-cover bg-center opacity-40 mix-blend-screen transition-transform duration-100 ease-linear"
-        id="hero-globe-dark"
-        aria-hidden="true"
-      />
-    </>
-  );
+  }, []);
 
   return (
-    <header className="relative min-h-[95vh] flex items-center justify-center overflow-hidden pt-20 pb-12 bg-background transition-colors duration-500">
+    <header 
+      ref={sectionRef} 
+      className="relative min-h-[95vh] flex items-center justify-center overflow-hidden pt-20 pb-12 bg-background transition-colors duration-500"
+    >
       <div className="absolute inset-0 z-0">
-        {/* Cinematic WebGL Engine (3D Globe) with Error Boundary & Fallback */}
-        {!webglError ? (
-          <WebGLBoundary fallback={<FallbackGlobe />} onError={() => setWebglError(true)}>
-            <GlobeScene />
-          </WebGLBoundary>
-        ) : (
-          <FallbackGlobe />
-        )}
+        
+        {/* Light Mode Realistic Globe */}
+        <div
+          className="parallax-globe absolute inset-0 bg-[url('/assets/globe_light_theme.png')] bg-cover bg-center dark:hidden opacity-100 transition-transform duration-100 ease-linear"
+          id="hero-globe-light"
+          aria-hidden="true"
+        />
+        
+        {/* Dark Mode Realistic Globe */}
+        <div
+          className="parallax-globe absolute inset-0 hidden dark:block bg-[url('/assets/globe_dark_theme.avif')] bg-cover bg-center opacity-90 transition-transform duration-100 ease-linear"
+          id="hero-globe-dark"
+          aria-hidden="true"
+        />
 
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-slate-50 dark:from-background-dark/90 dark:via-transparent dark:to-background-dark transition-colors duration-500 pointer-events-none" aria-hidden="true" />
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-transparent dark:from-background-dark/80 dark:via-transparent dark:to-background-dark/80 transition-colors duration-500 pointer-events-none" aria-hidden="true" />
