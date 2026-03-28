@@ -250,8 +250,9 @@ export default function ProductForm({
             toast.success(isEdit ? "Product updated successfully!" : "Product created successfully!");
             router.push("/dashboard/exporter/inventory");
             router.refresh();
-        } catch (e: any) {
-            toast.error(e.message || "Something went wrong");
+        } catch (e: unknown) {
+            const message = e instanceof Error ? e.message : "Something went wrong";
+            toast.error(message);
         } finally {
             setIsSubmitting(false);
         }

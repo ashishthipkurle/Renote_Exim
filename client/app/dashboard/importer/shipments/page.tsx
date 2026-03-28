@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { getServerAuth } from "@/lib/supabase/server";
 import ShipmentCard from "@/components/dashboard/ShipmentCard";
 
+export const dynamic = 'force-dynamic';
+
 export default async function ImporterShipmentsPage() {
   const auth = await getServerAuth();
   if (!auth) redirect("/login");

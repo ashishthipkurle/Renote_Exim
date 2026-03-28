@@ -22,7 +22,13 @@ type Product = {
     images: string[];
 };
 
-export default function InventoryTable({ products }: { products: Product[] }) {
+export default function InventoryTable({ 
+    products, 
+    availableCategories = [] 
+}: { 
+    products: Product[],
+    availableCategories?: string[]
+}) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [isPending, startTransition] = useTransition();
@@ -96,20 +102,6 @@ export default function InventoryTable({ products }: { products: Product[] }) {
         }
     };
 
-    const categories = [
-        "CHEMICALS",
-        "MACHINES",
-        "TEXTILES",
-        "MEDICAL",
-        "HANDICRAFTS",
-        "FOOD",
-        "ELECTRONICS",
-        "AUTOMOTIVE",
-        "CONSTRUCTION",
-        "AGRICULTURE",
-        "OTHER",
-    ];
-
     return (
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row gap-4">
@@ -140,7 +132,10 @@ export default function InventoryTable({ products }: { products: Product[] }) {
                             className="w-full sm:w-40 appearance-none pl-10 pr-8 py-2.5 bg-card border border-border rounded-xl text-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all text-sm"
                         >
                             <option value="">All Categories</option>
-                            {categories.map((c) => (
+                            {(availableCategories.length > 0 ? availableCategories : [
+                                "CHEMICALS", "MACHINES", "TEXTILES", "MEDICAL", "HANDICRAFTS",
+                                "FOOD", "ELECTRONICS", "AUTOMOTIVE", "CONSTRUCTION", "AGRICULTURE", "OTHER"
+                            ]).map((c) => (
                                 <option key={c} value={c}>
                                     {c.charAt(0) + c.slice(1).toLowerCase()}
                                 </option>

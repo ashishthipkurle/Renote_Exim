@@ -9,6 +9,8 @@ interface ImporterStats {
   pendingOrders: number;
   activeShipments: number;
   totalSpent: number;
+  monthlySpending?: { month: string; spent: number; year: number; monthNum: number }[];
+  categories?: { name: string; spent: number }[];
 }
 
 interface Order {
@@ -42,14 +44,7 @@ const insightStyle: Record<string, { color: string; bg: string; border: string }
   SYSTEM: { color: "text-primary", bg: "bg-primary/10", border: "hover:border-primary/30" },
 };
 
-const bubbles = [
-  { label: "Asia\nPac", size: 100, top: "20%", left: "55%", color: "bg-[#00f0ff]/20", border: "border-[#00f0ff]/40", text: "text-[#00f0ff]" },
-  { label: "North\nAm", size: 120, top: "15%", left: "25%", color: "bg-[#d4af37]/20", border: "border-[#d4af37]/40", text: "text-[#d4af37]" },
-  { label: "Europe", size: 90, top: "55%", left: "42%", color: "bg-purple-500/20", border: "border-purple-500/40", text: "text-purple-300" },
-  { label: "MENA", size: 70, top: "60%", left: "72%", color: "bg-[#00f0ff]/20", border: "border-[#00f0ff]/40", text: "text-[#00f0ff]" },
-  { label: "LATAM", size: 60, top: "75%", left: "12%", color: "bg-emerald-500/20", border: "border-emerald-500/40", text: "text-emerald-300" },
-  { label: "Africa", size: 50, top: "40%", left: "8%", color: "bg-primary/20", border: "border-primary/40", text: "text-primary" },
-];
+// Removed static bubbles array, using dynamic category data instead
 
 function feedColor(status: string) {
   switch (status.toUpperCase()) {
@@ -177,33 +172,41 @@ export default function ImporterDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left column */}
           <div className="lg:col-span-8 flex flex-col gap-6">
-            {/* Market Intelligence + Insights */}
-            <div className="bg-white dark:bg-[#161b26]/70 shadow-sm dark:shadow-none backdrop-blur-xl rounded-xl p-6 border border-slate-200 dark:border-white/5 relative overflow-hidden flex flex-col lg:flex-row gap-6">
+            {/* Spending by Category + Insights */}
+            <div className="bg-[#161b26]/70 backdrop-blur-xl rounded-xl p-6 border border-white/5 relative overflow-hidden flex flex-col lg:flex-row gap-6">
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="text-xl font-extrabold text-slate-900 dark:text-white">Global Market Intelligence</h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">Regional Performance &amp; Growth Analysis</p>
+                    <h3 className="text-xl font-extrabold text-white">Spending by Category</h3>
+                    <p className="text-xs text-slate-400">Your top purchased product categories</p>
                   </div>
                 </div>
-                {/* Bubble chart */}
-                <div className="relative w-full h-[380px] bg-slate-50 dark:bg-[radial-gradient(circle_at_bottom_left,_#1a2333_0%,_#0d1017_100%)] rounded-xl overflow-hidden border border-slate-200 dark:border-transparent">
-                  <div className="absolute w-full h-px top-[25%] left-0 bg-slate-200 dark:bg-white/5" />
-                  <div className="absolute w-full h-px top-[50%] left-0 bg-slate-200 dark:bg-white/5" />
-                  <div className="absolute w-full h-px top-[75%] left-0 bg-slate-200 dark:bg-white/5" />
-                  <div className="absolute h-full w-px top-0 left-[25%] bg-slate-200 dark:bg-white/5" />
-                  <div className="absolute h-full w-px top-0 left-[50%] bg-slate-200 dark:bg-white/5" />
-                  <div className="absolute h-full w-px top-0 left-[75%] bg-slate-200 dark:bg-white/5" />
-                  <div className="absolute bottom-2 right-4 text-slate-400 dark:text-white/30 text-[0.7rem] font-semibold uppercase">Market Size →</div>
-                  {bubbles.map((b) => (
-                    <div
-                      key={b.label}
-                      className={`absolute rounded-full ${b.color} backdrop-blur-sm border ${b.border} flex flex-col items-center justify-center cursor-pointer hover:scale-110 hover:z-20 hover:border-slate-300 dark:hover:border-white/40 hover:shadow-lg transition-all duration-300`}
-                      style={{ width: b.size, height: b.size, top: b.top, left: b.left }}
-                    >
-                      <span className={`text-xs font-bold text-center leading-tight ${b.text} whitespace-pre-line`}>{b.label}</span>
-                    </div>
-                  ))}
+                {/* Category bars */}
+                <div className="w-full h-[380px] bg-[#1a2333]/30 rounded-xl overflow-hidden p-6 flex flex-col justify-center gap-6">
+                  {loading ? (
+                    Array.from({ length: 5 }).map((_, i) => (
+                      <div key={i} className="h-10 bg-white/5 rounded-lg animate-pulse" />
+                    ))
+                  ) : (!data?.categories || data.categories.length === 0) ? (
+                    <div className="flex items-center justify-center h-full text-slate-500 text-sm">No category data available</div>
+                  ) : (
+                    data.categories.sort((a,b) => b.spent - a.spent).slice(0, 5).map((cat, i) => {
+                      const maxSpent = Math.max(...data.categories!.map(c => c.spent));
+                      const percent = maxSpent > 0 ? (cat.spent / maxSpent) * 100 : 0;
+                      const colors = ["bg-[#00f0ff]", "bg-[#d4af37]", "bg-purple-500", "bg-emerald-500", "bg-rose-500"];
+                      return (
+                        <div key={cat.name} className="flex flex-col gap-2">
+                          <div className="flex justify-between items-end">
+                            <span className="text-sm font-bold text-white uppercase tracking-wider">{cat.name}</span>
+                            <span className="text-xs text-slate-400 font-medium">{formatCurrency(cat.spent)}</span>
+                          </div>
+                          <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+                            <div className={`h-full ${colors[i % colors.length]} rounded-full transition-all duration-1000`} style={{ width: `${percent}%` }} />
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
                 </div>
               </div>
               {/* Strategic Insights from notifications */}
@@ -240,31 +243,64 @@ export default function ImporterDashboard() {
               </div>
             </div>
 
-            {/* Revenue chart placeholder */}
-            <div className="bg-white dark:bg-[#161b26]/70 shadow-sm dark:shadow-none backdrop-blur-xl rounded-xl p-6 border border-slate-200 dark:border-white/5">
+            {/* Revenue chart -> monthly spending */}
+            <div className="bg-[#161b26]/70 backdrop-blur-xl rounded-xl p-6 border border-white/5">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">Spending Trend</h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Order spending over time</p>
+                  <h3 className="text-lg font-bold text-white">Spending Trend</h3>
+                  <p className="text-xs text-slate-400">Order spending over the last 6 months</p>
                 </div>
               </div>
-              <div className="relative w-full h-48 flex items-end px-2">
-                <div className="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-10 z-0 pb-6">
+              <div className="relative w-full h-48 flex flex-col justify-end px-2">
+                <div className="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-10 z-0 pb-8">
                   <div className="w-full h-px bg-slate-400" />
                   <div className="w-full h-px bg-slate-400" />
                   <div className="w-full h-px bg-slate-400" />
                   <div className="w-full h-px bg-slate-400" />
                 </div>
-                <svg className="absolute inset-0 w-full h-full z-10 pb-6 drop-shadow-[0_0_8px_rgba(0,240,255,0.3)]" preserveAspectRatio="none" viewBox="0 0 800 200">
-                  <defs>
-                    <linearGradient id="areaGrad" x1="0%" x2="0%" y1="0%" y2="100%">
-                      <stop offset="0%" style={{ stopColor: "#00f0ff", stopOpacity: 0.2 }} />
-                      <stop offset="100%" style={{ stopColor: "#00f0ff", stopOpacity: 0 }} />
-                    </linearGradient>
-                  </defs>
-                  <path d="M0,160 C100,150 200,110 300,120 C400,60 500,90 600,40 C700,30 750,15 800,20 L800,200 L0,200 Z" fill="url(#areaGrad)" />
-                  <path d="M0,160 C100,150 200,110 300,120 C400,60 500,90 600,40 C700,30 750,15 800,20" fill="none" stroke="#00f0ff" strokeWidth="3" />
-                </svg>
+                {loading || !data?.monthlySpending ? (
+                  <div className="absolute inset-0 flex items-center justify-center text-slate-500 z-20 pb-8 text-sm">Loading chart...</div>
+                ) : (
+                  <>
+                    <div className="absolute inset-0 z-10 pb-8">
+                      <svg className="w-full h-full overflow-visible drop-shadow-[0_0_8px_rgba(0,240,255,0.3)]" preserveAspectRatio="none" viewBox="0 0 800 200">
+                        <defs>
+                          <linearGradient id="areaGrad" x1="0%" x2="0%" y1="0%" y2="100%">
+                            <stop offset="0%" style={{ stopColor: "#00f0ff", stopOpacity: 0.2 }} />
+                            <stop offset="100%" style={{ stopColor: "#00f0ff", stopOpacity: 0 }} />
+                          </linearGradient>
+                        </defs>
+                        {(() => {
+                          const ms = data.monthlySpending!;
+                          const maxVal = Math.max(...ms.map(m => m.spent), 1);
+                          const points = ms.map((m, i) => {
+                            const x = ms.length > 1 ? (i / (ms.length - 1)) * 800 : 400;
+                            const y = 180 - (m.spent / maxVal) * 160;
+                            return `${x},${y}`;
+                          });
+                          const areaPath = `M0,200 L${points.join(" L")} L800,200 Z`;
+                          const linePath = `M${points.join(" L")}`;
+                          return (
+                            <>
+                              <path d={areaPath} fill="url(#areaGrad)" className="transition-all duration-1000" />
+                              <path d={linePath} fill="none" stroke="#00f0ff" strokeWidth="3" className="transition-all duration-1000" />
+                              {points.map((p, i) => {
+                                const [cx, cy] = p.split(",");
+                                return <circle key={i} cx={cx} cy={cy} r="5" fill="#0d1017" stroke="#00f0ff" strokeWidth="2" className="transition-all duration-1000 hover:r-[7px] hover:fill-[#00f0ff] cursor-pointer" />;
+                              })}
+                            </>
+                          );
+                        })()}
+                      </svg>
+                    </div>
+                    {/* X-axis labels */}
+                    <div className="relative z-20 w-full flex justify-between text-[10px] font-medium text-slate-500 mt-auto pt-2">
+                      {data.monthlySpending.map((m, i) => (
+                        <span key={i} className="text-center w-8 -ml-4 first:ml-0 last:-mr-4">{m.month}</span>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>

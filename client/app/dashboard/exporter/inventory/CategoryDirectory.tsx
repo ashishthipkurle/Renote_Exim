@@ -79,7 +79,7 @@ const DISPLAY_TO_ENUM: Record<string, string> = {
     "OTHER": "OTHER",
 };
 
-export default function CategoryDirectory() {
+export default function CategoryDirectory({ usedCategories = [] }: { usedCategories?: string[] }) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [search, setSearch] = useState("");
@@ -87,15 +87,30 @@ export default function CategoryDirectory() {
     const isSelected = searchParams.get("action") === "new";
     const selectedCategory = searchParams.get("category");
 
-    const filtered = useMemo(() =>
-        ALL_INDUSTRIES.filter(i => i.toLowerCase().includes(search.toLowerCase())).slice(0, 15)
-        , [search]);
+    // Map usedCategories (ENUMS) back to display names if possible
+    const usedDisplayNames = useMemo(() => {
+        return usedCategories.map(cat => {
+            const entry = Object.entries(DISPLAY_TO_ENUM).find(([_, val]) => val === cat);
+            if (entry) return entry[0].charAt(0) + entry[0].slice(1).toLowerCase();
+            return cat.charAt(0) + cat.slice(1).toLowerCase();
+        });
+    }, [usedCategories]);
+
+    const filtered = useMemo(() => {
+        const listToFilter = search ? ALL_INDUSTRIES : usedDisplayNames;
+        return listToFilter.filter(i => i.toLowerCase().includes(search.toLowerCase())).slice(0, 15);
+    }, [search, usedDisplayNames]);
 
     const handleSelect = (category: string) => {
         const upper = category.toUpperCase();
         // Check if it's already a valid enum or needs mapping
+<<<<<<< HEAD
         const enumValue = DISPLAY_TO_ENUM[upper] || (["MACHINERY", "MACHINES"].includes(upper) ? "MACHINES" : "OTHER");
         router.push(`/dashboard/exporter/inventory/add?action=new&category=${enumValue}`, { scroll: false });
+=======
+        const enumValue = DISPLAY_TO_ENUM[upper] || (["MACHINERY", "MACHINES"].includes(upper) ? "MACHINES" : upper);
+        router.push(`/dashboard/exporter/inventory?action=new&category=${enumValue}`, { scroll: false });
+>>>>>>> ee21e5783a35760961c31c0688004a735e9abf72
     };
 
     const handleBack = () => {
@@ -152,11 +167,21 @@ export default function CategoryDirectory() {
                     {/* LEFT PANEL: Directory (Blurred when selected) */}
                     <div className={`lg:col-span-1 transition-all duration-700 ease-in-out ${isSelected ? 'blur-md opacity-30 pointer-events-none scale-[0.98]' : 'blur-none opacity-100'}`}>
                         <div className="grid grid-cols-1 gap-10">
-                            {/* Featured Grid */}
-                            <div>
-                                <div className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-4 ml-1">Featured Global Sectors</div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                    {TOP_SECTORS.map((s) => (
+                            {/* Featured Grid - Only show if no used categories or searching */}
+                            {(usedDisplayNames.length === 0 || search) && (
+                                <div>
+                                    <div className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-4 ml-1">Featured Global Sectors</div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        {TOP_SECTORS.map((s) => (
+                                            <button
+                                                key={s.name}
+                                                onClick={() => handleSelect(s.name)}
+                                                className="flex flex-col items-center justify-center p-5 bg-white/5 border border-white/5 rounded-2xl hover:bg-primary hover:border-primary transition-all group/btn active:scale-95 shadow-xl"
+                                            >
+                                                <span className="text-2xl mb-2 group-hover/btn:scale-125 transition-transform">{s.icon}</span>
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-white">{s.name}</span>
+                                            </button>
+                                        ))}
                                         <button
                                             key={s.name}
                                             onClick={() => handleSelect(s.name)}
@@ -174,9 +199,9 @@ export default function CategoryDirectory() {
                                         <span className="text-[10px] font-black uppercase tracking-widest text-foreground group-hover/btn:text-white">Other</span>
                                     </button>
                                 </div>
-                            </div>
+                            )}
 
-                            {/* Industry List */}
+                            {/* Industry List - Shows Used Categories by default, or all when searching */}
                             <div>
                                 <div className="flex items-center justify-between mb-4 ml-1">
                                     <div className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">{search ? 'Search' : 'Latest'}</div>

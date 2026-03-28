@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     const scope = searchParams.get('scope') || auth.role.toLowerCase();
 
     if (scope === 'importer' || auth.role === 'IMPORTER') {
-      const [totalOrders, activeShipments, totalSpentResult, pendingDeliveries] = await Promise.all([
+      const [totalOrders, activeShipments, totalSpentResult, pendingOrders, paidOrders] = await Promise.all([
         prisma.order.count({ where: { importerId: auth.userId } }),
         prisma.shipment.count({
           where: {
@@ -28,19 +28,51 @@ export async function GET(request: NextRequest) {
           where: { importerId: auth.userId, paymentStatus: { in: ['PAID', 'PARTIAL'] } },
           _sum: { totalPrice: true },
         }),
-        prisma.shipment.count({
+        prisma.order.count({
           where: {
-            order: { importerId: auth.userId },
-            status: { in: ['IN_TRANSIT', 'CUSTOMS', 'OUT_FOR_DELIVERY'] },
+            importerId: auth.userId,
+            status: { in: ['PENDING', 'CONFIRMED', 'PROCESSING'] },
           },
         }),
+        prisma.order.findMany({
+          where: { importerId: auth.userId, paymentStatus: { in: ['PAID', 'PARTIAL'] } },
+          include: { product: true },
+        }),
       ]);
+
+      const monthlySpending = Array.from({ length: 6 }).map((_, i) => {
+        const d = new Date();
+        d.setMonth(d.getMonth() - i);
+        return {
+          month: d.toLocaleString('default', { month: 'short' }),
+          spent: 0,
+          year: d.getFullYear(),
+          monthNum: d.getMonth()
+        };
+      }).reverse();
+
+      const categoryMap = new Map<string, number>();
+
+      paidOrders.forEach((order: any) => {
+        const cat = order.product?.category || 'OTHER';
+        categoryMap.set(cat, (categoryMap.get(cat) || 0) + order.totalPrice);
+        
+        const orderDate = new Date(order.createdAt);
+        const m = monthlySpending.find((m: any) => m.monthNum === orderDate.getMonth() && m.year === orderDate.getFullYear());
+        if (m) {
+          m.spent += order.totalPrice;
+        }
+      });
+
+      const categories = Array.from(categoryMap.entries()).map(([name, spent]) => ({ name, spent }));
 
       return NextResponse.json({
         totalOrders,
         activeShipments,
         totalSpent: totalSpentResult._sum.totalPrice ?? 0,
-        pendingDeliveries,
+        pendingOrders,
+        monthlySpending,
+        categories
       });
     }
 

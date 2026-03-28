@@ -170,6 +170,13 @@ export default async function ExporterInventoryPage({
           ))}
         </div>
 
+<<<<<<< HEAD
+=======
+        {/* NEW: Category Selection Directory */}
+        <div className="max-w-[1600px] mx-auto">
+          <CategoryDirectory usedCategories={categoriesData.map(c => c.name)} />
+        </div>
+>>>>>>> ee21e5783a35760961c31c0688004a735e9abf72
 
         {/* Category Performance */}
         <div className="max-w-[1600px] mx-auto">
@@ -212,7 +219,10 @@ export default async function ExporterInventoryPage({
 
         {/* Interactive Products table */}
         <div className="max-w-[1600px] mx-auto pb-12">
-          <InventoryTable products={products} />
+          <InventoryTable 
+            products={products} 
+            availableCategories={categoriesData.map(c => c.name)} 
+          />
 
           {/* Pagination */}
           {totalPages > 1 && (

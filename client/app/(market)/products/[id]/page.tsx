@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
 import {
   Star,
   StarHalf,
@@ -20,6 +21,15 @@ import {
 
 import { prisma } from "@/lib/prisma";
 import AddToCartButton from "@/components/marketplace/AddToCartButton";
+
+type ProductReview = {
+  orderId: string;
+  productId: string;
+  productName: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+};
 
 function formatMoney(amount: number) {
   return new Intl.NumberFormat(undefined, {
@@ -52,9 +62,35 @@ export default async function ProductDetailPage({
         },
       },
     });
-  } catch {
-    // Prisma might fail due to DB connection issues — show not found
-    product = null;
+  } catch (error) {
+    console.error("Prisma fallback triggered for product detail:", error);
+    try {
+      const env = require("@/lib/supabase/shared").tryGetSupabaseEnv();
+      if (env) {
+        const { createClient } = require("@supabase/supabase-js");
+        const supabase = createClient(env.url, env.anonKey);
+        const { data: supaProduct, error: supaError } = await supabase
+          .from('products')
+          .select('*, exporter:users!exporterId(id, name, companyName, country, website)')
+          .eq('id', id)
+          .maybeSingle();
+
+        if (!supaError && supaProduct) {
+          product = {
+            ...supaProduct,
+            exporter: Array.isArray(supaProduct.exporter) ? supaProduct.exporter[0] : supaProduct.exporter
+          } as any;
+        } else {
+          console.error("Supabase fallback failed:", supaError);
+          product = null;
+        }
+      } else {
+        product = null;
+      }
+    } catch (fallbackError) {
+      console.error("Supabase fallback setup failed:", fallbackError);
+      product = null;
+    }
   }
 
   if (!product) notFound();
@@ -65,6 +101,25 @@ export default async function ProductDetailPage({
   const titlePrimary = nameParts.slice(0, splitIndex).join(" ");
   const titleAccent = nameParts.slice(splitIndex).join(" ");
   const oldPrice = product.price * 1.15;
+
+  let productReviews: ProductReview[] = [];
+  try {
+    const cookieStore = await cookies();
+    const raw = cookieStore.get("renote_product_reviews")?.value;
+    const parsed = raw ? (JSON.parse(decodeURIComponent(raw)) as ProductReview[]) : [];
+    productReviews = parsed
+      .filter((review) => review.productId === product.id)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  } catch {
+    productReviews = [];
+  }
+
+  const avgRating =
+    productReviews.length > 0
+      ? productReviews.reduce((sum, review) => sum + review.rating, 0) / productReviews.length
+      : 4.5;
+  const fullStars = Math.floor(avgRating);
+  const hasHalf = avgRating - fullStars >= 0.5;
 
   return (
     <div className="bg-background min-h-screen">
@@ -152,14 +207,14 @@ export default async function ProductDetailPage({
             {/* Rating */}
             <div className="flex items-center gap-2">
               <div className="flex text-amber-400">
-                <Star className="h-4 w-4 fill-current" />
-                <Star className="h-4 w-4 fill-current" />
-                <Star className="h-4 w-4 fill-current" />
-                <Star className="h-4 w-4 fill-current" />
-                <StarHalf className="h-4 w-4 fill-current" />
+                {[1, 2, 3, 4, 5].map((star) => {
+                  if (star <= fullStars) return <Star key={star} className="h-4 w-4 fill-current" />;
+                  if (star === fullStars + 1 && hasHalf) return <StarHalf key={star} className="h-4 w-4 fill-current" />;
+                  return <Star key={star} className="h-4 w-4" />;
+                })}
               </div>
               <span className="text-sm text-muted-foreground font-medium">
-                (128 Verified Reviews)
+                ({productReviews.length > 0 ? productReviews.length : 128} Verified Reviews)
               </span>
             </div>
 
@@ -321,6 +376,36 @@ export default async function ProductDetailPage({
                 </div>
               </div>
             )}
+
+            <div className="rounded-xl border border-border bg-card/60 p-4 space-y-3">
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                Recent Buyer Reviews
+              </p>
+
+              {productReviews.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  No buyer review yet for this product. Order and share your experience.
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {productReviews.slice(0, 3).map((review) => (
+                    <div key={review.orderId} className="rounded-lg border border-border bg-background/50 p-3">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-1 text-amber-400">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star key={star} className={`h-3.5 w-3.5 ${star <= review.rating ? "fill-current" : ""}`} />
+                          ))}
+                        </div>
+                        <span className="text-[10px] text-muted-foreground uppercase tracking-widest">
+                          {new Date(review.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <p className="text-sm text-foreground mt-2">{review.comment || "No written feedback."}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </section>
