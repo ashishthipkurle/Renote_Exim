@@ -271,7 +271,7 @@ export default function ImageUploader({ images, onChange, maxFiles = 8 }: ImageU
         <div className="space-y-4">
             <div
                 className={`relative border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center transition-colors
-                    ${isDragging ? "border-primary bg-primary/10" : "border-white/10 hover:border-white/20 hover:bg-white/[0.02]"}`}
+                    ${isDragging ? "border-primary bg-primary/10" : "border-border hover:border-primary/50 hover:bg-muted/50"}`}
                 onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
                 onDragLeave={(e) => { e.preventDefault(); setIsDragging(false); }}
                 onDrop={(e) => {
@@ -288,11 +288,11 @@ export default function ImageUploader({ images, onChange, maxFiles = 8 }: ImageU
                     title=" "
                 />
 
-                <UploadCloud className="w-8 h-8 text-slate-400 mb-3" />
-                <p className="text-white text-sm font-bold">Drag & Drop visual assets here</p>
-                <p className="text-slate-500 text-xs mt-1">or click to browse your files</p>
-                <div className="mt-4 px-3 py-1 bg-slate-800 rounded-lg border border-white/5">
-                    <p className="text-[10px] text-slate-400 uppercase tracking-wider">
+                <UploadCloud className="w-8 h-8 text-muted-foreground mb-3" />
+                <p className="text-foreground text-sm font-bold">Drag & Drop visual assets here</p>
+                <p className="text-muted-foreground text-xs mt-1">or click to browse your files</p>
+                <div className="mt-4 px-3 py-1 bg-muted rounded-lg border border-border">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
                         Supported: JPG, PNG, WEBP • Max Size: 5MB
                     </p>
                 </div>
@@ -302,7 +302,7 @@ export default function ImageUploader({ images, onChange, maxFiles = 8 }: ImageU
             {uploadQueue.length > 0 && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
                     {uploadQueue.map(item => (
-                        <div key={item.id} className="relative group rounded-xl overflow-hidden border border-white/10 aspect-square bg-slate-900 shadow-xl">
+                        <div key={item.id} className="relative group rounded-xl overflow-hidden border border-border aspect-square bg-muted shadow-xl">
                             <img src={item.previewUrl} alt="preview" className={`w-full h-full object-cover transition-transform duration-700 ${item.status === 'uploading' ? 'opacity-40 brightness-50' : ''}`} />
 
                             {item.status === "uploading" && (

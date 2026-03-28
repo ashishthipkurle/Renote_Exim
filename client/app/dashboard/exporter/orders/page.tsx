@@ -4,13 +4,13 @@ import { Package, Clock, CheckCircle2, XCircle, Truck } from "lucide-react";
 
 import { prisma } from "@/lib/prisma";
 import { getServerAuth } from "@/lib/supabase/server";
-import { Prisma } from "@prisma/client";
+import { OrderStatus } from "@prisma/client";
 import OrdersTable from "./OrdersTable";
 
 export default async function ExporterOrdersPage({
   searchParams,
 }: {
-  searchParams: { status?: string; search?: string; page?: string };
+  searchParams: { [key: string]: string | string[] | undefined };
 }) {
   const auth = await getServerAuth();
   if (!auth) redirect("/login");
@@ -18,25 +18,30 @@ export default async function ExporterOrdersPage({
     redirect(`/dashboard/${auth.role.toLowerCase()}`);
   }
 
-  const page = parseInt(searchParams.page || "1");
+  const page = parseInt(typeof searchParams.page === 'string' ? searchParams.page : "1");
   const limit = 10;
   const skip = (page - 1) * limit;
 
   // Build where clause
-  const where: Prisma.OrderWhereInput = {
-    product: { exporterId: auth.userId },
+  const where: any = {
+    product: { is: { exporterId: auth.userId } },
   };
 
   if (searchParams.status && searchParams.status !== "ALL") {
-    where.status = searchParams.status as any;
+    const s = Array.isArray(searchParams.status) ? searchParams.status[0] : searchParams.status;
+    const status = (s || "").toUpperCase();
+    if (Object.values(OrderStatus).includes(status as any)) {
+      where.status = status as OrderStatus;
+    }
   }
 
-  if (searchParams.search) {
+  if (typeof searchParams.search === 'string' && searchParams.search) {
+    const search = searchParams.search;
     where.OR = [
-      { id: { contains: searchParams.search, mode: "insensitive" } },
-      { product: { name: { contains: searchParams.search, mode: "insensitive" } } },
-      { importer: { name: { contains: searchParams.search, mode: "insensitive" } } },
-      { importer: { companyName: { contains: searchParams.search, mode: "insensitive" } } },
+      { id: { contains: search, mode: "insensitive" } },
+      { product: { is: { name: { contains: search, mode: "insensitive" } } } },
+      { importer: { is: { name: { contains: search, mode: "insensitive" } } } },
+      { importer: { is: { companyName: { contains: search, mode: "insensitive" } } } },
     ];
   }
 

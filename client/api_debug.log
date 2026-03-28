@@ -26,3 +26,57 @@
   "certifications": [],
   "quantity": 1
 }
+[2026-03-25T15:34:06.940Z] [POST /api/products] Body: {
+  "name": "rice",
+  "category": "MACHINES",
+  "description": "qwertyuiolkjhgfdsazxcvbnmjhgfdsaqwertyui",
+  "price": 45,
+  "basePrice": 45,
+  "bulkPrice": 35,
+  "minBulkQty": 14,
+  "minOrderQty": 1,
+  "unit": "kg",
+  "originCountry": "india",
+  "hsCode": "4589",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1774451658/renote-exim/products/ddtukilfdl2nylyry10k.jpg"
+  ],
+  "certifications": [],
+  "quantity": 14
+}
+[2026-03-25T15:34:08.243Z] [POST /api/products] Body: {
+  "name": "rice",
+  "category": "MACHINES",
+  "description": "qwertyuiolkjhgfdsazxcvbnmjhgfdsaqwertyui",
+  "price": 45,
+  "basePrice": 45,
+  "bulkPrice": 35,
+  "minBulkQty": 14,
+  "minOrderQty": 1,
+  "unit": "kg",
+  "originCountry": "india",
+  "hsCode": "4589",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1774451658/renote-exim/products/ddtukilfdl2nylyry10k.jpg"
+  ],
+  "certifications": [],
+  "quantity": 14
+}
+[2026-03-25T15:34:10.274Z] [POST /api/products] Body: {
+  "name": "rice",
+  "category": "MACHINES",
+  "description": "qwertyuiolkjhgfdsazxcvbnmjhgfdsaqwertyui",
+  "price": 45,
+  "basePrice": 45,
+  "bulkPrice": 35,
+  "minBulkQty": 14,
+  "minOrderQty": 1,
+  "unit": "kg",
+  "originCountry": "india",
+  "hsCode": "4589",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1774451658/renote-exim/products/ddtukilfdl2nylyry10k.jpg"
+  ],
+  "certifications": [],
+  "quantity": 14
+}

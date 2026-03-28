@@ -7,7 +7,7 @@ import * as fs from 'fs';
 import { z } from 'zod';
 import { createSupabaseRouteClient } from '@/lib/supabase/route';
 
-const LOG_FILE = 'd:\\Job\\Ranote_exim\\Ranote_exim_2\\client\\api_debug.log';
+const LOG_FILE = 'api_debug.log';
 
 function logToFile(message: string) {
   const timestamp = new Date().toISOString();
@@ -172,7 +172,8 @@ export async function POST(request: NextRequest) {
           data: {
             ...validatedData,
             exporterId: auth.userId,
-          },
+            b2bPrice: validatedData.price, // Fallback if required by client
+          } as any,
           include: {
             exporter: {
               select: {
@@ -190,7 +191,8 @@ export async function POST(request: NextRequest) {
           data: {
             productId: newProduct.id,
             price: newProduct.price,
-          },
+            currency: "USD", // Fallback if required by client
+          } as any,
         });
 
         return newProduct;

@@ -162,7 +162,6 @@ export default function ProductForm({
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [newCertification, setNewCertification] = useState("");
     const [customCategory, setCustomCategory] = useState("");
-    const [searchTerm, setSearchTerm] = useState("");
     const [previewImage, setPreviewImage] = useState<string | null>(null);
 
     const handleChange = (
@@ -259,9 +258,9 @@ export default function ProductForm({
     };
 
     const inputClass =
-        "w-full px-5 py-4 bg-slate-900/60 border border-white/5 focus:border-primary/50 rounded-2xl text-sm text-white placeholder:text-slate-600 focus:outline-none transition-all shadow-inner";
-    const labelClass = "block text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-2.5 ml-1";
-    const errorClass = "text-[10px] font-bold text-red-400 mt-1.5 ml-1 uppercase tracking-wider";
+        "w-full px-5 py-4 bg-muted border border-border focus:border-primary/50 rounded-2xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none transition-all shadow-inner";
+    const labelClass = "block text-[10px] font-black text-muted-foreground uppercase tracking-[0.15em] mb-2.5 ml-1";
+    const errorClass = "text-[10px] font-bold text-destructive mt-1.5 ml-1 uppercase tracking-wider";
 
     return (
         <form onSubmit={handleSubmit} className="w-full">
@@ -270,15 +269,15 @@ export default function ProductForm({
                     <div className="flex items-center gap-6">
                         <Link
                             href="/dashboard/exporter/inventory"
-                            className="p-3 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all text-slate-400 hover:text-white group"
+                            className="p-3 bg-card border border-border rounded-2xl hover:bg-accent transition-all text-muted-foreground hover:text-foreground group"
                         >
                             <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                         </Link>
                         <div>
-                            <h1 className="text-3xl font-black text-white uppercase italic tracking-tighter">
+                            <h1 className="text-3xl font-black text-foreground uppercase italic tracking-tighter">
                                 {isEdit ? "Edit Listing" : "New Listing"}
                             </h1>
-                            <p className="text-slate-500 text-xs font-bold mt-1 uppercase tracking-widest leading-relaxed">
+                            <p className="text-muted-foreground text-xs font-bold mt-1 uppercase tracking-widest leading-relaxed">
                                 {isEdit
                                     ? "Modify your asset parameters for global trade"
                                     : "Feature your products to buyers worldwide"}
@@ -301,10 +300,10 @@ export default function ProductForm({
                 {/* Left Column: Main Specs */}
                 <div className="lg:col-span-12 xl:col-span-8 space-y-8">
                     {/* Basic Info */}
-                    <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-2xl rounded-[2.5rem] p-10 space-y-8 relative overflow-hidden group">
+                    <div className="bg-card backdrop-blur-xl border border-border shadow-2xl rounded-[2.5rem] p-10 space-y-8 relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[80px] rounded-full -mr-32 -mt-32 group-hover:bg-primary/10 transition-colors pointer-events-none" />
 
-                        <h2 className="text-sm font-black text-white tracking-[0.25em] uppercase opacity-50 mb-4 italic">Core Specifications</h2>
+                        <h2 className="text-sm font-black text-foreground tracking-[0.25em] uppercase opacity-50 mb-4 italic">Core Specifications</h2>
 
                         <div className="space-y-6">
                             <div>
@@ -342,7 +341,7 @@ export default function ProductForm({
                                                     <option key={c} value={c.toUpperCase()}>{c}</option>
                                                 ))}
                                             </datalist>
-                                            <Plus className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none rotate-45" />
+                                            <Plus className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none rotate-45" />
                                         </div>
                                     </div>
 
@@ -391,14 +390,14 @@ export default function ProductForm({
                     </div>
 
                     {/* Pricing */}
-                    <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-2xl rounded-[2.5rem] p-10 space-y-8 relative overflow-hidden group">
-                        <h2 className="text-sm font-black text-white tracking-[0.25em] uppercase opacity-50 mb-4 italic">Trade Economics</h2>
+                    <div className="bg-card backdrop-blur-xl border border-border shadow-2xl rounded-[2.5rem] p-10 space-y-8 relative overflow-hidden group">
+                        <h2 className="text-sm font-black text-foreground tracking-[0.25em] uppercase opacity-50 mb-4 italic">Trade Economics</h2>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             <div>
                                 <label htmlFor="price" className={labelClass}>FOB Price (USD) *</label>
                                 <div className="relative">
-                                    <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 font-bold">$</span>
+                                    <span className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">$</span>
                                     <input
                                         id="price"
                                         name="price"
@@ -464,7 +463,7 @@ export default function ProductForm({
                                 placeholder="e.g. 0910.20.00"
                                 className={inputClass}
                             />
-                            <p className="text-[9px] text-slate-500 mt-2 ml-1 italic font-medium uppercase tracking-wider">Crucial for international customs processing</p>
+                            <p className="text-[9px] text-muted-foreground mt-2 ml-1 italic font-medium uppercase tracking-wider">Crucial for international customs processing</p>
                         </div>
                     </div>
                 </div>
@@ -472,8 +471,8 @@ export default function ProductForm({
                 {/* Right Column: Visuals & Certs */}
                 <div className="lg:col-span-12 xl:col-span-4 space-y-8">
                     {/* Visual Assets */}
-                    <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-2xl rounded-[2.5rem] p-8 space-y-6">
-                        <h2 className="text-[11px] font-black text-white tracking-[0.25em] uppercase opacity-50 italic">Asset Gallery</h2>
+                    <div className="bg-card backdrop-blur-xl border border-border shadow-2xl rounded-[2.5rem] p-8 space-y-6">
+                        <h2 className="text-[11px] font-black text-foreground tracking-[0.25em] uppercase opacity-50 italic">Asset Gallery</h2>
 
                         {/* Previews */}
                         <ImageUploader 
@@ -490,7 +489,7 @@ export default function ProductForm({
                                 {form.images.map((url, i) => (
                                     <div 
                                         key={i} 
-                                        className="relative group rounded-xl overflow-hidden border border-white/10 aspect-square bg-slate-900 shadow-xl cursor-zoom-in"
+                                        className="relative group rounded-xl overflow-hidden border border-border aspect-square bg-muted shadow-xl cursor-zoom-in"
                                         onClick={() => setPreviewImage(url)}
                                     >
                                         <img src={url} alt="asset" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
@@ -510,8 +509,8 @@ export default function ProductForm({
                     </div>
 
                     {/* Professional Certs */}
-                    <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-2xl rounded-[2.5rem] p-8 space-y-6">
-                        <h2 className="text-[11px] font-black text-white tracking-[0.25em] uppercase opacity-50 italic">Trust Markers</h2>
+                    <div className="bg-card backdrop-blur-xl border border-border shadow-2xl rounded-[2.5rem] p-8 space-y-6">
+                        <h2 className="text-[11px] font-black text-foreground tracking-[0.25em] uppercase opacity-50 italic">Trust Markers</h2>
 
                         <div className="flex flex-wrap gap-2">
                             {form.certifications.map((cert, i) => (
@@ -547,7 +546,7 @@ export default function ProductForm({
                     <div className="bg-primary/5 border border-primary/20 rounded-[2.5rem] p-8 relative overflow-hidden group">
                         <Save className="w-10 h-10 text-primary mb-4 opacity-30" />
                         <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Listing Protocols</p>
-                        <ul className="text-[10px] text-slate-500 mt-4 space-y-2 italic font-medium leading-relaxed">
+                        <ul className="text-[10px] text-muted-foreground mt-4 space-y-2 italic font-medium leading-relaxed">
                             <li>• Prices should be in USD.</li>
                             <li>• Weights must use metric units.</li>
                             <li>• Quality images increase buyer trust.</li>
@@ -556,15 +555,15 @@ export default function ProductForm({
                 </div>
 
                 {/* Final Action */}
-                <div className="lg:col-span-12 flex items-center justify-between bg-[#151c2a]/80 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-8 mt-4 shadow-2xl">
+                <div className="lg:col-span-12 flex items-center justify-between bg-card/80 backdrop-blur-2xl border border-border rounded-[2rem] p-8 mt-4 shadow-2xl">
                     <div className="hidden sm:block">
-                        <p className="text-white font-black text-xs uppercase tracking-widest">{isEdit ? "Update Existing Asset" : "Deploy New Asset"}</p>
-                        <p className="text-slate-500 text-[10px] uppercase font-bold tracking-wider mt-1 italic">Authorized Listing Procedure (ALP-1)</p>
+                        <p className="text-foreground font-black text-xs uppercase tracking-widest">{isEdit ? "Update Existing Asset" : "Deploy New Asset"}</p>
+                        <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider mt-1 italic">Authorized Listing Procedure (ALP-1)</p>
                     </div>
                     <div className="flex items-center gap-4 w-full sm:w-auto">
                         <Link
                             href="/dashboard/exporter/inventory"
-                            className="flex-1 sm:flex-none px-10 py-4 text-slate-500 border border-white/5 hover:text-white hover:bg-white/5 font-black text-[10px] uppercase tracking-widest rounded-2xl transition-all"
+                            className="flex-1 sm:flex-none px-10 py-4 text-muted-foreground border border-border hover:text-foreground hover:bg-muted font-black text-[10px] uppercase tracking-widest rounded-2xl transition-all"
                         >
                             Abort
                         </Link>
