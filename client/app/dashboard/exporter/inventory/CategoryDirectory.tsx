@@ -104,13 +104,8 @@ export default function CategoryDirectory({ usedCategories = [] }: { usedCategor
     const handleSelect = (category: string) => {
         const upper = category.toUpperCase();
         // Check if it's already a valid enum or needs mapping
-<<<<<<< HEAD
         const enumValue = DISPLAY_TO_ENUM[upper] || (["MACHINERY", "MACHINES"].includes(upper) ? "MACHINES" : "OTHER");
         router.push(`/dashboard/exporter/inventory/add?action=new&category=${enumValue}`, { scroll: false });
-=======
-        const enumValue = DISPLAY_TO_ENUM[upper] || (["MACHINERY", "MACHINES"].includes(upper) ? "MACHINES" : upper);
-        router.push(`/dashboard/exporter/inventory?action=new&category=${enumValue}`, { scroll: false });
->>>>>>> ee21e5783a35760961c31c0688004a735e9abf72
     };
 
     const handleBack = () => {
@@ -126,13 +121,13 @@ export default function CategoryDirectory({ usedCategories = [] }: { usedCategor
     return (
         <div className="bg-card backdrop-blur-xl border border-border rounded-[2.5rem] p-8 lg:p-10 shadow-xl dark:shadow-2xl relative overflow-hidden group min-h-[600px] transition-all duration-700">
             {/* Background Glow */}
-            <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/5 via-transparent to-transparent pointer-events-none transition-opacity duration-700 ${isSelected ? 'opacity-30' : 'opacity-100'}`} />
-            <div className={`absolute -bottom-24 -right-24 w-96 h-96 bg-primary/10 blur-[120px] rounded-full transition-all duration-1000 ${isSelected ? 'scale-150 -translate-x-1/2 -translate-y-1/2 opacity-40' : 'group-hover:bg-primary/20'}`} />
+            <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/5 via-transparent to-transparent pointer-events-none transition-opacity duration-700 ${isSelected ? "opacity-30" : "opacity-100"}`} />
+            <div className={`absolute -bottom-24 -right-24 w-96 h-96 bg-primary/10 blur-[120px] rounded-full transition-all duration-1000 ${isSelected ? "scale-150 -translate-x-1/2 -translate-y-1/2 opacity-40" : "group-hover:bg-primary/20"}`} />
 
             <div className="relative z-10 flex flex-col h-full">
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-10">
-                    <div className={`transition-all duration-500 ${isSelected ? 'opacity-40 filter grayscale scale-95 origin-left' : 'opacity-100'}`}>
-                        <h2 className="text-2xl font-black text-foreground uppercase  tracking-tight flex items-center gap-3">
+                    <div className={`transition-all duration-500 ${isSelected ? "opacity-40 filter grayscale scale-95 origin-left" : "opacity-100"}`}>
+                        <h2 className="text-2xl font-black text-foreground uppercase tracking-tight flex items-center gap-3">
                             Products
                             {isSelected && <Sparkles className="w-5 h-5 text-primary animate-pulse" />}
                         </h2>
@@ -165,46 +160,38 @@ export default function CategoryDirectory({ usedCategories = [] }: { usedCategor
 
                 <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-12 relative overflow-hidden">
                     {/* LEFT PANEL: Directory (Blurred when selected) */}
-                    <div className={`lg:col-span-1 transition-all duration-700 ease-in-out ${isSelected ? 'blur-md opacity-30 pointer-events-none scale-[0.98]' : 'blur-none opacity-100'}`}>
+                    <div className={`lg:col-span-1 transition-all duration-700 ease-in-out ${isSelected ? "blur-md opacity-30 pointer-events-none scale-[0.98]" : "blur-none opacity-100"}`}>
                         <div className="grid grid-cols-1 gap-10">
                             {/* Featured Grid - Only show if no used categories or searching */}
                             {(usedDisplayNames.length === 0 || search) && (
-                                <div>
+                                <div className="space-y-4">
                                     <div className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-4 ml-1">Featured Global Sectors</div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                         {TOP_SECTORS.map((s) => (
                                             <button
                                                 key={s.name}
                                                 onClick={() => handleSelect(s.name)}
-                                                className="flex flex-col items-center justify-center p-5 bg-white/5 border border-white/5 rounded-2xl hover:bg-primary hover:border-primary transition-all group/btn active:scale-95 shadow-xl"
+                                                className="flex flex-col items-center justify-center p-5 bg-muted/50 border border-border rounded-2xl hover:bg-primary hover:border-primary transition-all group/btn active:scale-95 shadow-lg"
                                             >
                                                 <span className="text-2xl mb-2 group-hover/btn:scale-125 transition-transform">{s.icon}</span>
-                                                <span className="text-[10px] font-black uppercase tracking-widest text-white">{s.name}</span>
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-foreground group-hover/btn:text-white">{s.name}</span>
                                             </button>
                                         ))}
                                         <button
-                                            key={s.name}
-                                            onClick={() => handleSelect(s.name)}
-                                            className="flex flex-col items-center justify-center p-5 bg-muted/50 border border-border rounded-2xl hover:bg-primary hover:border-primary transition-all group/btn active:scale-95 shadow-lg"
+                                            onClick={() => handleSelect("OTHER")}
+                                            className="flex flex-col items-center justify-center p-5 bg-primary/10 border border-primary/20 rounded-2xl hover:bg-primary transition-all group/btn active:scale-95 shadow-lg"
                                         >
-                                            <span className="text-2xl mb-2 group-hover/btn:scale-125 transition-transform">{s.icon}</span>
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-foreground group-hover/btn:text-white">{s.name}</span>
+                                            <Plus className="w-6 h-6 text-primary group-hover/btn:text-white mb-2" />
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-foreground group-hover/btn:text-white">Other</span>
                                         </button>
-                                    ))}
-                                    <button
-                                        onClick={() => handleSelect("OTHER")}
-                                        className="flex flex-col items-center justify-center p-5 bg-primary/10 border border-primary/20 rounded-2xl hover:bg-primary transition-all group/btn active:scale-95 shadow-lg"
-                                    >
-                                        <Plus className="w-6 h-6 text-primary group-hover/btn:text-white mb-2" />
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-foreground group-hover/btn:text-white">Other</span>
-                                    </button>
+                                    </div>
                                 </div>
                             )}
 
                             {/* Industry List - Shows Used Categories by default, or all when searching */}
-                            <div>
+                            <div className="space-y-4">
                                 <div className="flex items-center justify-between mb-4 ml-1">
-                                    <div className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">{search ? 'Search' : 'Latest'}</div>
+                                    <div className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">{search ? "Search" : "Latest"}</div>
                                 </div>
                                 <div className="grid grid-cols-1 gap-2">
                                     {(search ? filtered : ALL_INDUSTRIES.slice(0, 8)).map((item) => (
@@ -223,7 +210,7 @@ export default function CategoryDirectory({ usedCategories = [] }: { usedCategor
                     </div>
 
                     {/* RIGHT PANEL: The Form (Visible when selected) */}
-                    <div className={`absolute top-0 right-0 w-full lg:w-3/4 h-full transition-all duration-700 ease-in-out ${isSelected ? 'translate-x-0 opacity-100 visible' : 'translate-x-full opacity-0 invisible'}`}>
+                    <div className={`absolute top-0 right-0 w-full lg:w-3/4 h-full transition-all duration-700 ease-in-out ${isSelected ? "translate-x-0 opacity-100 visible" : "translate-x-full opacity-0 invisible"}`}>
                         {isSelected && (
                             <div className="bg-card backdrop-blur-2xl border border-primary/20 rounded-3xl p-8 lg:p-10 shadow-2xl h-full overflow-y-auto custom-scrollbar animate-in slide-in-from-right-12 duration-700">
                                 <div className="flex items-center justify-between mb-8">
