@@ -24,6 +24,13 @@ export default function DashboardHeader() {
     const { theme, setTheme } = useTheme();
     const [mounted, setMounted] = React.useState(false);
 
+    const notificationsHref =
+        user?.role === "IMPORTER"
+            ? "/dashboard/importer/notifications"
+            : user?.role === "ADMIN"
+                ? "/dashboard/admin/notifications"
+                : "/dashboard/exporter/notifications";
+
     React.useEffect(() => {
         setMounted(true);
     }, []);
@@ -82,7 +89,7 @@ export default function DashboardHeader() {
 
                 {/* Notifications */}
                 <Link
-                    href="/dashboard/exporter/notifications"
+                    href={notificationsHref}
                     className="relative size-9 lg:size-10 bg-accent/50 hover:bg-accent border border-border rounded-xl flex items-center justify-center text-muted-foreground hover:text-foreground transition-all active:scale-95 group"
                 >
                     <Bell className="w-5 h-5 group-hover:animate-bounce" />

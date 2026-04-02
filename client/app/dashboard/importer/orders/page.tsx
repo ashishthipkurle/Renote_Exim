@@ -9,7 +9,12 @@ import OrdersList from "@/components/dashboard/OrdersList";
 
 export const dynamic = 'force-dynamic';
 
-export default async function ImporterOrdersPage() {
+export default async function ImporterOrdersPage({
+  searchParams,
+}: {
+  searchParams?: { view?: string } | Promise<{ view?: string }>;
+}) {
+  await searchParams;
   const auth = await getServerAuth();
   if (!auth) redirect("/login");
   if (auth.role !== "IMPORTER" && auth.role !== "ADMIN") {
@@ -26,6 +31,7 @@ export default async function ImporterOrdersPage() {
           select: { name: true, category: true, images: true },
           include: { exporter: { select: { name: true, companyName: true, country: true } } },
         },
+        shipment: true,
       },
       orderBy: { createdAt: "desc" },
       take: 50,
@@ -48,13 +54,15 @@ export default async function ImporterOrdersPage() {
               {orders.length} orders · {formatCurrency(totalSpent)} total spent
             </p>
           </div>
-          <Link
-            href="/products"
-            className="inline-flex items-center gap-2 bg-primary hover:bg-[#0f49bd] text-white font-bold py-2.5 px-6 rounded-xl shadow-lg shadow-primary/20 transition-colors"
-          >
-            <ShoppingCart className="w-4 h-4" />
-            Browse Products
-          </Link>
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              href="/products"
+              className="inline-flex items-center gap-2 bg-primary hover:bg-[#0f49bd] text-white font-bold py-2.5 px-6 rounded-xl shadow-lg shadow-primary/20 transition-colors"
+            >
+              <ShoppingCart className="w-4 h-4" />
+              Browse Products
+            </Link>
+          </div>
         </div>
       </header>
 

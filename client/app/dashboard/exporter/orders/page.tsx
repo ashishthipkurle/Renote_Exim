@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Package, Clock, CheckCircle2, XCircle, Truck } from "lucide-react";
 
 import { prisma } from "@/lib/prisma";
 import { getServerAuth } from "@/lib/supabase/server";
@@ -10,15 +9,16 @@ import OrdersTable from "./OrdersTable";
 export default async function ExporterOrdersPage({
   searchParams,
 }: {
-  searchParams: { status?: string; search?: string; page?: string };
+  searchParams?: { status?: string; search?: string; page?: string } | Promise<{ status?: string; search?: string; page?: string }>;
 }) {
+  const resolvedSearchParams = (await searchParams) ?? {};
   const auth = await getServerAuth();
   if (!auth) redirect("/login");
   if (auth.role !== "EXPORTER" && auth.role !== "ADMIN") {
     redirect(`/dashboard/${auth.role.toLowerCase()}`);
   }
 
-  const page = parseInt(searchParams.page || "1");
+  const page = parseInt(resolvedSearchParams.page || "1");
   const limit = 10;
   const skip = (page - 1) * limit;
 
@@ -27,16 +27,16 @@ export default async function ExporterOrdersPage({
     product: { exporterId: auth.userId },
   };
 
-  if (searchParams.status && searchParams.status !== "ALL") {
-    where.status = searchParams.status as any;
+  if (resolvedSearchParams.status && resolvedSearchParams.status !== "ALL") {
+    where.status = resolvedSearchParams.status as any;
   }
 
-  if (searchParams.search) {
+  if (resolvedSearchParams.search) {
     where.OR = [
-      { id: { contains: searchParams.search, mode: "insensitive" } },
-      { product: { name: { contains: searchParams.search, mode: "insensitive" } } },
-      { importer: { name: { contains: searchParams.search, mode: "insensitive" } } },
-      { importer: { companyName: { contains: searchParams.search, mode: "insensitive" } } },
+      { id: { contains: resolvedSearchParams.search, mode: "insensitive" } },
+      { product: { name: { contains: resolvedSearchParams.search, mode: "insensitive" } } },
+      { importer: { name: { contains: resolvedSearchParams.search, mode: "insensitive" } } },
+      { importer: { companyName: { contains: resolvedSearchParams.search, mode: "insensitive" } } },
     ];
   }
 
@@ -58,6 +58,7 @@ export default async function ExporterOrdersPage({
         include: {
           product: { select: { name: true, category: true, images: true } },
           importer: { select: { name: true, companyName: true, country: true } },
+          shipment: true,
         },
         orderBy: { createdAt: "desc" },
         skip,
@@ -110,7 +111,7 @@ export default async function ExporterOrdersPage({
           {totalPages > 1 && (
             <div className="flex items-center justify-center gap-2 pb-12">
               <Link
-                href={`?${new URLSearchParams({ ...searchParams, page: (page - 1).toString() })}`}
+                href={`?${new URLSearchParams({ ...resolvedSearchParams, page: (page - 1).toString() })}`}
                 className={`px-4 py-2 rounded-xl border border-border text-xs font-bold transition-all ${page <= 1 ? "opacity-50 pointer-events-none" : "hover:bg-muted"
                   }`}
               >
@@ -119,12 +120,11 @@ export default async function ExporterOrdersPage({
               <div className="flex items-center gap-1">
                 {Array.from({ length: totalPages }).map((_, i) => {
                   const p = i + 1;
-                  // Show only first, last, and pages around current
                   if (p === 1 || p === totalPages || (p >= page - 1 && p <= page + 1)) {
                     return (
                       <Link
                         key={p}
-                        href={`?${new URLSearchParams({ ...searchParams, page: p.toString() })}`}
+                        href={`?${new URLSearchParams({ ...resolvedSearchParams, page: p.toString() })}`}
                         className={`w-10 h-10 flex items-center justify-center rounded-xl border text-xs font-bold transition-all ${page === p ? "bg-primary border-primary text-white" : "border-border hover:bg-muted text-muted-foreground"
                           }`}
                       >
@@ -139,7 +139,7 @@ export default async function ExporterOrdersPage({
                 })}
               </div>
               <Link
-                href={`?${new URLSearchParams({ ...searchParams, page: (page + 1).toString() })}`}
+                href={`?${new URLSearchParams({ ...resolvedSearchParams, page: (page + 1).toString() })}`}
                 className={`px-4 py-2 rounded-xl border border-border text-xs font-bold transition-all ${page >= totalPages ? "opacity-50 pointer-events-none" : "hover:bg-muted"
                   }`}
               >

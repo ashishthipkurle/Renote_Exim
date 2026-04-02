@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Package, ArrowRight, Clock, CheckCircle2, XCircle, Truck, Search, ChevronDown, Star } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import ShipmentTrackingPanel from "@/components/dashboard/ShipmentTrackingPanel";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
     PENDING: { label: "Pending", color: "text-yellow-500 bg-yellow-500/10 border-yellow-500/20", icon: Clock },
@@ -47,6 +48,7 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
     const searchParams = useSearchParams();
     const [isPending, startTransition] = useTransition();
     const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
+    const [shipmentExpandedOrderId, setShipmentExpandedOrderId] = useState<string | null>(null);
     const [localOrders, setLocalOrders] = useState<any[]>([]);
     const [reviewsByOrder, setReviewsByOrder] = useState<Record<string, ProductReview>>({});
 
@@ -187,9 +189,9 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
                 )}
 
                 {displayOrders.length === 0 ? (
-                    <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-xl rounded-2xl p-12 text-center">
+                    <div className="bg-white/90 dark:bg-[#151c2a]/70 backdrop-blur-xl border border-slate-200 dark:border-white/10 shadow-xl rounded-2xl p-12 text-center">
                         <Package className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-                        <h2 className="text-xl font-bold text-white mb-2">No orders found</h2>
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No orders found</h2>
                         <p className="text-slate-400 text-sm">
                             Try adjusting your filters or search query.
                         </p>
@@ -213,13 +215,13 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
                             return (
                                 <div
                                     key={order.id}
-                                    className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 hover:border-primary/30 hover:bg-[#172033]/70 transition-all duration-300 shadow-xl rounded-2xl p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4 items-center"
+                                    className="bg-white/90 dark:bg-[#151c2a]/70 backdrop-blur-xl border border-slate-200 dark:border-white/10 hover:border-primary/30 hover:shadow-[0_10px_38px_rgba(37,99,235,0.12)] dark:hover:bg-[#172033]/75 transition-all duration-300 rounded-2xl p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4 items-center"
                                 >
                                     <div
                                         className="lg:col-span-4 flex items-center gap-4 cursor-pointer"
                                         onClick={() => setExpandedOrderId(isExpanded ? null : order.id)}
                                     >
-                                        <div className="size-12 rounded-xl bg-slate-800 border border-white/5 flex-shrink-0 flex items-center justify-center overflow-hidden">
+                                        <div className="size-12 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-white/10 flex-shrink-0 flex items-center justify-center overflow-hidden">
                                             {order.product?.images?.[0] ? (
                                                 <img src={order.product.images[0]} alt="" className="w-full h-full object-cover" />
                                             ) : (
@@ -227,7 +229,7 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
                                             )}
                                         </div>
                                         <div>
-                                            <div className="text-sm font-bold text-white line-clamp-1">{order.product?.name ?? "Unknown Product"}</div>
+                                            <div className="text-sm font-bold text-slate-900 dark:text-white line-clamp-1">{order.product?.name ?? "Unknown Product"}</div>
                                             <div className="text-xs text-slate-400 mt-0.5 truncate">
                                                 {order.importer?.companyName || order.importer?.name || "Importer"} ({order.importer?.country ?? "N/A"})
                                             </div>
@@ -239,7 +241,7 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
                                     </div>
 
                                     <div className="lg:col-span-2">
-                                        <div className="text-white font-bold">{formatCurrency(order.totalPrice)}</div>
+                                        <div className="text-slate-900 dark:text-white font-bold">{formatCurrency(order.totalPrice)}</div>
                                         <div className="text-[10px] text-slate-500 capitalize">{(order.paymentStatus ?? "pending").toLowerCase()}</div>
                                     </div>
 
@@ -258,11 +260,22 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
                                         {order.product?.id ? (
                                             <Link
                                                 href={`/products/${order.product.id}`}
-                                                className="inline-flex items-center gap-1 bg-primary/15 hover:bg-primary/25 text-primary text-xs font-bold px-3 py-2 rounded-lg transition-colors"
+                                                className="inline-flex items-center gap-1 bg-primary text-white text-xs font-bold px-3 py-2 rounded-lg transition-all hover:brightness-110 hover:-translate-y-0.5"
                                             >
-                                                Vire Product <ArrowRight className="w-3 h-3" />
+                                                View Product <ArrowRight className="w-3 h-3" />
                                             </Link>
                                         ) : null}
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setExpandedOrderId(order.id);
+                                                setShipmentExpandedOrderId((prev) => (prev === order.id ? null : order.id));
+                                            }}
+                                            className="inline-flex items-center gap-1 bg-primary text-white text-xs font-bold px-3 py-2 rounded-lg transition-all hover:brightness-110 hover:-translate-y-0.5"
+                                            title="Shipment Details"
+                                        >
+                                            Shipment Details
+                                        </button>
                                         <button
                                             type="button"
                                             onClick={() => setExpandedOrderId(isExpanded ? null : order.id)}
@@ -274,10 +287,10 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
                                     </div>
 
                                     <div className={`lg:col-span-12 overflow-hidden transition-all duration-300 ease-out ${isExpanded ? "max-h-[1000px] opacity-100 mt-2" : "max-h-0 opacity-0"}`}>
-                                        <div className="rounded-xl border border-white/10 bg-[#0f1522]/70 p-4 lg:p-5">
+                                        <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/80 dark:bg-[#0f1522]/70 p-4 lg:p-5 space-y-4">
                                             <div className="flex flex-col lg:flex-row gap-4 mb-4">
                                                 <div className="lg:w-48 w-full">
-                                                    <div className="aspect-[4/3] rounded-xl border border-white/10 bg-slate-900/70 overflow-hidden">
+                                                    <div className="aspect-[4/3] rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-slate-900/70 overflow-hidden">
                                                         {order.product?.images?.[0] ? (
                                                             <img src={order.product.images[0]} alt={order.product?.name ?? "Product"} className="w-full h-full object-cover" />
                                                         ) : (
@@ -289,39 +302,43 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
                                                 </div>
 
                                                 <div className="flex-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 text-sm">
-                                                    <div className="rounded-lg bg-white/5 border border-white/10 p-3">
+                                                    <div className="rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-3">
                                                         <div className="text-slate-400 text-xs uppercase tracking-widest">Order Number</div>
-                                                        <div className="text-white font-semibold mt-1 break-all">{order.orderNumber ?? order.id}</div>
+                                                        <div className="text-slate-900 dark:text-white font-semibold mt-1 break-all">{order.orderNumber ?? order.id}</div>
                                                     </div>
-                                                    <div className="rounded-lg bg-white/5 border border-white/10 p-3">
+                                                    <div className="rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-3">
                                                         <div className="text-slate-400 text-xs uppercase tracking-widest">Created</div>
-                                                        <div className="text-white font-semibold mt-1">{formatDate(order.createdAt)}</div>
+                                                        <div className="text-slate-900 dark:text-white font-semibold mt-1">{formatDate(order.createdAt)}</div>
                                                     </div>
-                                                    <div className="rounded-lg bg-white/5 border border-white/10 p-3">
+                                                    <div className="rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-3">
                                                         <div className="text-slate-400 text-xs uppercase tracking-widest">Buyer</div>
-                                                        <div className="text-white font-semibold mt-1">{order.importer?.companyName || order.importer?.name || "Importer"}</div>
+                                                        <div className="text-slate-900 dark:text-white font-semibold mt-1">{order.importer?.companyName || order.importer?.name || "Importer"}</div>
                                                     </div>
-                                                    <div className="rounded-lg bg-white/5 border border-white/10 p-3">
+                                                    <div className="rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-3">
                                                         <div className="text-slate-400 text-xs uppercase tracking-widest">Country</div>
-                                                        <div className="text-white font-semibold mt-1">{order.importer?.country ?? "N/A"}</div>
+                                                        <div className="text-slate-900 dark:text-white font-semibold mt-1">{order.importer?.country ?? "N/A"}</div>
                                                     </div>
-                                                    <div className="rounded-lg bg-white/5 border border-white/10 p-3 md:col-span-2">
+                                                    <div className="rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-3 md:col-span-2">
                                                         <div className="text-slate-400 text-xs uppercase tracking-widest">Product</div>
-                                                        <div className="text-white font-semibold mt-1">{order.product?.name ?? "Unknown Product"}</div>
+                                                        <div className="text-slate-900 dark:text-white font-semibold mt-1">{order.product?.name ?? "Unknown Product"}</div>
                                                     </div>
-                                                    <div className="rounded-lg bg-white/5 border border-white/10 p-3">
+                                                    <div className="rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-3">
                                                         <div className="text-slate-400 text-xs uppercase tracking-widest">Price</div>
-                                                        <div className="text-white font-semibold mt-1">{formatCurrency(order.totalPrice)}</div>
+                                                        <div className="text-slate-900 dark:text-white font-semibold mt-1">{formatCurrency(order.totalPrice)}</div>
                                                     </div>
-                                                    <div className="rounded-lg bg-white/5 border border-white/10 p-3">
+                                                    <div className="rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-3">
                                                         <div className="text-slate-400 text-xs uppercase tracking-widest">Quantity</div>
-                                                        <div className="text-white font-semibold mt-1">{order.quantity ?? 0}</div>
+                                                        <div className="text-slate-900 dark:text-white font-semibold mt-1">{order.quantity ?? 0}</div>
                                                     </div>
                                                 </div>
                                             </div>
 
+                                            {shipmentExpandedOrderId === order.id && (
+                                                <ShipmentTrackingPanel shipment={order.shipment} />
+                                            )}
+
                                             <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
-                                                <h4 className="text-sm font-bold text-white mb-2">Buyer Review & Rating</h4>
+                                                <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-2">Buyer Review & Rating</h4>
                                                 {review ? (
                                                     <>
                                                         <div className="flex items-center gap-2 text-amber-400 mb-2">

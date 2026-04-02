@@ -559,7 +559,7 @@ export default function ExporterDashboard() {
     {
       label:"Total Shipments", value:loading?"—":String(data?.totalShipments??0),
       sub:PERIOD_LABELS[period],
-      icon:<Truck className="w-5 h-5"/>, href:"/dashboard/exporter/shipments",
+      icon:<Truck className="w-5 h-5"/>, href:"/dashboard/exporter/orders",
       gradFrom:"from-orange-600", gradTo:"to-orange-400",
       bgTint:"bg-orange-500/10", textTint:"text-orange-500",
       borderTint:"border-orange-500/20", glowColor:"rgba(249,115,22,0.4)",
@@ -857,7 +857,7 @@ export default function ExporterDashboard() {
                 <div className="flex items-center gap-1.5"><Wind className="w-3 h-3 text-indigo-400"/><span className="text-[10px] text-slate-500">Air</span><span className="text-[10px] font-bold text-indigo-400">{(mapIsDemo?DEMO_ROUTES:apiRoutes).filter(r=>r.type==="air").length}</span></div>
                 <div className="flex items-center gap-1.5"><Anchor className="w-3 h-3 text-cyan-400"/><span className="text-[10px] text-slate-500">Ocean</span><span className="text-[10px] font-bold text-cyan-400">{(mapIsDemo?DEMO_ROUTES:apiRoutes).filter(r=>r.type==="ocean").length}</span></div>
                 <div className="flex items-center gap-1.5"><Layers className="w-3 h-3 text-slate-400"/><span className="text-[10px] text-slate-500">Ports</span><span className="text-[10px] font-bold text-slate-300">{new Set((mapIsDemo?DEMO_ROUTES:apiRoutes).flatMap(r=>[r.fromPort,r.toPort])).size}</span></div>
-                <div className="ml-auto"><Link href="/dashboard/exporter/shipments" className="flex items-center gap-1 text-[10px] text-primary hover:text-blue-300 font-medium transition-colors">All shipments<ChevronRight className="w-3 h-3"/></Link></div>
+                <div className="ml-auto"><Link href="/dashboard/exporter/orders" className="flex items-center gap-1 text-[10px] text-primary hover:text-blue-300 font-medium transition-colors">All shipments<ChevronRight className="w-3 h-3"/></Link></div>
               </div>
             </div>
 

@@ -32,6 +32,10 @@ model User {
   socialLinks         Json?          @default("{}")
   deletedAt           DateTime?
   documents           Document[]
+  requestedCalls      CallSchedule[] @relation("CallRequester")
+  receivedCalls       CallSchedule[] @relation("CallReceiver")
+  outgoingSessions    CallSession[]  @relation("CallCaller")
+  incomingSessions    CallSession[]  @relation("CallCallee")
   receivedMessages    Message[]      @relation("Receiver")
   sentMessages        Message[]      @relation("Sender")
   notifications       Notification[]
@@ -127,6 +131,52 @@ model Message {
   sender     User     @relation("Sender", fields: [senderId], references: [id])
 
   @@map("messages")
+}
+
+model CallSchedule {
+  id              String           @id @default(uuid())
+  requesterId     String
+  receiverId      String
+  title           String?
+  agenda          String?
+  callType        CallType         @default(VIDEO)
+  scheduledFor    DateTime
+  durationMinutes Int              @default(30)
+  timezone        String           @default("UTC")
+  status          CallScheduleStatus @default(PENDING)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  requester       User             @relation("CallRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  receiver        User             @relation("CallReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  sessions        CallSession[]
+
+  @@index([requesterId, status, scheduledFor])
+  @@index([receiverId, status, scheduledFor])
+  @@map("call_schedules")
+}
+
+model CallSession {
+  id            String            @id @default(uuid())
+  scheduleId    String?
+  callerId      String
+  calleeId      String
+  callType      CallType          @default(VIDEO)
+  status        CallSessionStatus @default(RINGING)
+  startedAt     DateTime          @default(now())
+  connectedAt   DateTime?
+  endedAt       DateTime?
+  durationSec   Int?
+  endedReason   String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  schedule      CallSchedule?     @relation(fields: [scheduleId], references: [id], onDelete: SetNull)
+  caller        User              @relation("CallCaller", fields: [callerId], references: [id], onDelete: Cascade)
+  callee        User              @relation("CallCallee", fields: [calleeId], references: [id], onDelete: Cascade)
+
+  @@index([callerId, createdAt])
+  @@index([calleeId, createdAt])
+  @@index([status, createdAt])
+  @@map("call_sessions")
 }
 
 model Document {
@@ -270,8 +320,36 @@ enum NotificationType {
   ORDER_SHIPPED
   ORDER_DELIVERED
   MESSAGE_RECEIVED
+  CALL_SCHEDULED
+  CALL_ACCEPTED
+  CALL_REJECTED
+  CALL_REMINDER
+  MISSED_CALL
   PAYMENT_RECEIVED
   DOCUMENT_VERIFIED
   ACCOUNT_VERIFIED
   GENERAL
+}
+
+enum CallType {
+  AUDIO
+  VIDEO
+}
+
+enum CallScheduleStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+  COMPLETED
+  EXPIRED
+}
+
+enum CallSessionStatus {
+  RINGING
+  ACTIVE
+  ENDED
+  MISSED
+  DECLINED
+  FAILED
 }

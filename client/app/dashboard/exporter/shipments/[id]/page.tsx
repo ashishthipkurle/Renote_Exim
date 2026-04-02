@@ -55,7 +55,7 @@ export default function ShipmentDetailPage({ params }: { params: Promise<{ id: s
     <div className="max-w-6xl mx-auto space-y-8 pb-20 animate-in fade-in duration-700">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
-          <Link href="/dashboard/exporter/shipments" className="size-12 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white transition-all hover:scale-105">
+               <Link href="/dashboard/exporter/orders" className="size-12 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white transition-all hover:scale-105">
             <ArrowLeft className="w-6 h-6" />
           </Link>
           <div>

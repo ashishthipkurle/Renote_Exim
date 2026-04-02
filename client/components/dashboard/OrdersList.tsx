@@ -7,6 +7,7 @@ import { formatCurrency, formatDate } from "@/lib/api-utils";
 import OrderDetailsModal from "./OrderDetailsModal";
 import DisputeModal from "./DisputeModal";
 import EmptyState from "@/components/ui/EmptyState";
+import ShipmentTrackingPanel from "@/components/dashboard/ShipmentTrackingPanel";
 import { toast } from "sonner";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
@@ -36,6 +37,7 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
     const [detailsOpen, setDetailsOpen] = useState(false);
     const [disputeOpen, setDisputeOpen] = useState(false);
     const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
+    const [shipmentExpandedOrderId, setShipmentExpandedOrderId] = useState<string | null>(null);
     const [reviewsByOrder, setReviewsByOrder] = useState<Record<string, ProductReview>>({});
     const [ratingDraftByOrder, setRatingDraftByOrder] = useState<Record<string, number>>({});
     const [commentDraftByOrder, setCommentDraftByOrder] = useState<Record<string, string>>({});
@@ -172,13 +174,13 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
                     return (
                         <div
                             key={order.id}
-                            className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 hover:border-primary/30 hover:bg-[#172033]/70 transition-all duration-300 shadow-xl rounded-2xl p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4 items-center group"
+                            className="bg-white/90 dark:bg-[#151c2a]/70 backdrop-blur-xl border border-slate-200 dark:border-white/10 hover:border-primary/30 hover:shadow-[0_10px_38px_rgba(37,99,235,0.12)] dark:hover:bg-[#172033]/75 transition-all duration-300 rounded-2xl p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4 items-center group"
                         >
                             <div
                                 className="lg:col-span-4 flex items-center gap-4 cursor-pointer"
                                 onClick={() => setExpandedOrderId(isExpanded ? null : order.id)}
                             >
-                                <div className="size-12 rounded-xl bg-slate-800 border border-white/5 flex-shrink-0 flex items-center justify-center overflow-hidden">
+                                <div className="size-12 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-white/10 flex-shrink-0 flex items-center justify-center overflow-hidden">
                                     {order.product?.images?.[0] ? (
                                         <img src={order.product.images[0]} alt="" className="w-full h-full object-cover" />
                                     ) : (
@@ -186,14 +188,14 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
                                     )}
                                 </div>
                                 <div>
-                                    <div className="text-sm font-bold text-white group-hover:text-primary transition-colors">{order.product?.name ?? "Unknown Product"}</div>
-                                    <div className="text-xs text-slate-400 mt-0.5">by {order.product?.exporter?.companyName || order.product?.exporter?.name || "Exporter"}</div>
+                                    <div className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">{order.product?.name ?? "Unknown Product"}</div>
+                                    <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">by {order.product?.exporter?.companyName || order.product?.exporter?.name || "Exporter"}</div>
                                     <div className="text-[11px] text-primary/90 mt-1 font-semibold">{formatCurrency(order.totalPrice)}</div>
                                 </div>
                             </div>
 
                             <div className="lg:col-span-2">
-                                <div className="text-white font-bold">{formatCurrency(order.totalPrice)}</div>
+                                <div className="text-slate-900 dark:text-white font-bold">{formatCurrency(order.totalPrice)}</div>
                                 <div className="text-[10px] text-slate-500 capitalize">{(order.paymentStatus ?? "pending").toLowerCase()}</div>
                             </div>
 
@@ -213,12 +215,23 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
                                     <Link
                                         href={`/products/${order.product.id}`}
                                         onClick={(e) => e.stopPropagation()}
-                                        className="px-3 py-2 rounded-lg bg-primary/15 hover:bg-primary/25 text-primary text-xs font-bold transition-colors"
-                                        title="Vire Product"
+                                        className="px-3 py-2 rounded-lg bg-primary text-white text-xs font-bold transition-all hover:brightness-110 hover:-translate-y-0.5"
+                                        title="View Product"
                                     >
-                                        Vire Product
+                                        View Product
                                     </Link>
                                 ) : null}
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setExpandedOrderId(order.id);
+                                        setShipmentExpandedOrderId((prev) => (prev === order.id ? null : order.id));
+                                    }}
+                                    className="px-3 py-2 rounded-lg bg-primary text-white text-xs font-bold transition-all hover:brightness-110 hover:-translate-y-0.5"
+                                    title="Shipment Details"
+                                >
+                                    Shipment Details
+                                </button>
                                 <button
                                     onClick={(e) => { e.stopPropagation(); openDetails(order); }}
                                     className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"
@@ -248,10 +261,10 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
                             </div>
 
                             <div className={`lg:col-span-12 overflow-hidden transition-all duration-300 ease-out ${isExpanded ? "max-h-[1200px] opacity-100 mt-2" : "max-h-0 opacity-0"}`}>
-                                <div className="rounded-xl border border-white/10 bg-[#0f1522]/70 p-4 lg:p-5 space-y-4">
+                                <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/80 dark:bg-[#0f1522]/70 p-4 lg:p-5 space-y-4">
                                     <div className="flex flex-col lg:flex-row gap-4">
                                         <div className="lg:w-48 w-full">
-                                            <div className="aspect-[4/3] rounded-xl border border-white/10 bg-slate-900/70 overflow-hidden">
+                                            <div className="aspect-[4/3] rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-slate-900/70 overflow-hidden">
                                                 {order.product?.images?.[0] ? (
                                                     <img src={order.product.images[0]} alt={order.product?.name ?? "Product"} className="w-full h-full object-cover" />
                                                 ) : (
@@ -263,40 +276,44 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
                                         </div>
 
                                         <div className="flex-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 text-sm">
-                                            <div className="rounded-lg bg-white/5 border border-white/10 p-3">
+                                            <div className="rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-3">
                                                 <div className="text-slate-400 text-xs uppercase tracking-widest">Order ID</div>
-                                                <div className="text-white font-semibold mt-1 break-all">{order.orderNumber ?? order.id}</div>
+                                                <div className="text-slate-900 dark:text-white font-semibold mt-1 break-all">{order.orderNumber ?? order.id}</div>
                                             </div>
-                                            <div className="rounded-lg bg-white/5 border border-white/10 p-3">
+                                            <div className="rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-3">
                                                 <div className="text-slate-400 text-xs uppercase tracking-widest">Product Price</div>
-                                                <div className="text-white font-semibold mt-1">{formatCurrency(order.totalPrice)}</div>
+                                                <div className="text-slate-900 dark:text-white font-semibold mt-1">{formatCurrency(order.totalPrice)}</div>
                                             </div>
-                                            <div className="rounded-lg bg-white/5 border border-white/10 p-3">
+                                            <div className="rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-3">
                                                 <div className="text-slate-400 text-xs uppercase tracking-widest">Quantity</div>
-                                                <div className="text-white font-semibold mt-1">{order.quantity ?? 0}</div>
+                                                <div className="text-slate-900 dark:text-white font-semibold mt-1">{order.quantity ?? 0}</div>
                                             </div>
-                                            <div className="rounded-lg bg-white/5 border border-white/10 p-3">
+                                            <div className="rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-3">
                                                 <div className="text-slate-400 text-xs uppercase tracking-widest">Category</div>
-                                                <div className="text-white font-semibold mt-1">{order.product?.category ?? "N/A"}</div>
+                                                <div className="text-slate-900 dark:text-white font-semibold mt-1">{order.product?.category ?? "N/A"}</div>
                                             </div>
-                                            <div className="rounded-lg bg-white/5 border border-white/10 p-3 md:col-span-2 xl:col-span-2">
+                                            <div className="rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-3 md:col-span-2 xl:col-span-2">
                                                 <div className="text-slate-400 text-xs uppercase tracking-widest">Product Name</div>
-                                                <div className="text-white font-semibold mt-1">{order.product?.name ?? "Unknown Product"}</div>
+                                                <div className="text-slate-900 dark:text-white font-semibold mt-1">{order.product?.name ?? "Unknown Product"}</div>
                                             </div>
-                                            <div className="rounded-lg bg-white/5 border border-white/10 p-3">
+                                            <div className="rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-3">
                                                 <div className="text-slate-400 text-xs uppercase tracking-widest">Seller</div>
-                                                <div className="text-white font-semibold mt-1">{order.product?.exporter?.companyName || order.product?.exporter?.name || "Exporter"}</div>
+                                                <div className="text-slate-900 dark:text-white font-semibold mt-1">{order.product?.exporter?.companyName || order.product?.exporter?.name || "Exporter"}</div>
                                             </div>
-                                            <div className="rounded-lg bg-white/5 border border-white/10 p-3">
+                                            <div className="rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-3">
                                                 <div className="text-slate-400 text-xs uppercase tracking-widest">Seller Country</div>
-                                                <div className="text-white font-semibold mt-1">{order.product?.exporter?.country ?? "N/A"}</div>
+                                                <div className="text-slate-900 dark:text-white font-semibold mt-1">{order.product?.exporter?.country ?? "N/A"}</div>
                                             </div>
                                         </div>
                                     </div>
 
+                                    {shipmentExpandedOrderId === order.id && (
+                                        <ShipmentTrackingPanel shipment={order.shipment} />
+                                    )}
+
                                     <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-3">
                                         <div className="flex items-center justify-between gap-3">
-                                            <h4 className="text-sm font-bold text-white">Give a Review</h4>
+                                            <h4 className="text-sm font-bold text-slate-900 dark:text-white">Give a Review</h4>
                                             {review && <span className="text-xs text-emerald-400 font-semibold">Submitted</span>}
                                         </div>
 
@@ -322,7 +339,7 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
                                                 <textarea
                                                     value={currentComment}
                                                     onChange={(e) => setCommentDraftByOrder((prev) => ({ ...prev, [order.id]: e.target.value }))}
-                                                    className="w-full min-h-24 rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/40"
+                                                    className="w-full min-h-24 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 px-3 py-2 text-sm text-slate-900 dark:text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/40"
                                                     placeholder="Share product quality, packaging, and delivery experience..."
                                                 />
 
