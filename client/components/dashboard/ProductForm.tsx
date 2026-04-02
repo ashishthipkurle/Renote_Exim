@@ -91,6 +91,7 @@ type ProductData = {
     category: string;
     description: string;
     price: number;
+    regularPrice: number;
     minOrderQty: number;
     unit: string;
     originCountry: string;
@@ -106,6 +107,7 @@ const defaultProduct: ProductData = {
     category: "OTHER",
     description: "",
     price: 0,
+    regularPrice: 0,
     minOrderQty: 1,
     unit: "kg",
     originCountry: "",
@@ -203,7 +205,8 @@ export default function ProductForm({
         if (!form.name || form.name.length < 3) newErrors.name = "Name must be at least 3 characters";
         if (!form.description || form.description.length < 20)
             newErrors.description = "Description must be at least 20 characters";
-        if (!form.price || form.price <= 0) newErrors.price = "Price must be positive";
+        if (!form.price || form.price <= 0) newErrors.price = "FOB Price must be positive";
+        if (!form.regularPrice || form.regularPrice <= 0) newErrors.regularPrice = "Regular Price must be positive";
         if (!form.minOrderQty || form.minOrderQty <= 0) newErrors.minOrderQty = "MOQ must be positive";
         if (!form.unit) newErrors.unit = "Unit is required";
         if (!form.originCountry || form.originCountry.length < 2)
@@ -232,6 +235,7 @@ export default function ProductForm({
                 category: normalizeCategory(rawCategory),
                 description: form.description,
                 price: form.price,
+                regularPrice: form.regularPrice,
                 minOrderQty: form.minOrderQty,
                 unit: form.unit,
                 originCountry: form.originCountry,
@@ -394,9 +398,27 @@ export default function ProductForm({
                     <div className="bg-card backdrop-blur-xl border border-border shadow-2xl rounded-[2.5rem] p-10 space-y-8 relative overflow-hidden group">
                         <h2 className="text-sm font-black text-foreground tracking-[0.25em] uppercase opacity-50 mb-4 italic">Trade Economics</h2>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                             <div>
-                                <label htmlFor="price" className={labelClass}>FOB Price (USD) *</label>
+                                <label htmlFor="regularPrice" className={labelClass}>Regular Price (USD) *</label>
+                                <div className="relative">
+                                    <span className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">$</span>
+                                    <input
+                                        id="regularPrice"
+                                        name="regularPrice"
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        value={form.regularPrice || ""}
+                                        onChange={handleChange}
+                                        placeholder="0.00"
+                                        className={inputClass + " pl-10"}
+                                    />
+                                </div>
+                                {errors.regularPrice && <p className={errorClass}>{errors.regularPrice}</p>}
+                            </div>
+                            <div>
+                                <label htmlFor="price" className={labelClass}>FOB Price (Bulk Purchase) *</label>
                                 <div className="relative">
                                     <span className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">$</span>
                                     <input

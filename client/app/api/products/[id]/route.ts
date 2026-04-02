@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { getApiAuthContext } from '@/lib/supabase/auth';
 import { productSchema } from '@/lib/validations';
 import { z } from 'zod';
+import { Prisma } from '@prisma/client';
 
 export async function GET(
   request: NextRequest,
@@ -10,6 +11,9 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+    const auth = await getApiAuthContext(request);
+    const role = auth?.role || 'USER';
+
     const product = await prisma.product.findUnique({
       where: { id },
       include: {
@@ -35,7 +39,12 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({ product });
+    const displayProduct = {
+      ...product,
+      price: role === 'IMPORTER' ? product.price : (product.regularPrice || product.price)
+    };
+
+    return NextResponse.json({ product: displayProduct });
   } catch (error) {
     console.error('Get product error:', error);
     return NextResponse.json(
@@ -79,9 +88,9 @@ export async function PUT(
     const body = await request.json();
     const validatedData = productSchema.partial().parse(body);
 
-    const product = await prisma.$transaction(async (tx) => {
+    const product = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const updatedProduct = await tx.product.update({
-        where: { id: params.id },
+        where: { id },
         data: validatedData as any,
         include: {
           exporter: {
@@ -104,6 +113,9 @@ export async function PUT(
           },
         });
       }
+
+      // If regularPrice was updated, we could also record history if needed, 
+      // but the user only mentioned 'price' (FOB) for existing history.
 
       return updatedProduct;
     });

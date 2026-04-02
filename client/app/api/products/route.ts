@@ -44,6 +44,9 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '12');
 
+    const auth = await getApiAuthContext(request);
+    const role = auth?.role || 'USER';
+
     // Try Prisma first
     try {
       const where: Prisma.ProductWhereInput = { available: true };
@@ -89,8 +92,13 @@ export async function GET(request: NextRequest) {
         prisma.product.count({ where }),
       ]);
 
+      const displayProducts = products.map((p: any) => ({
+        ...p,
+        price: role === 'IMPORTER' ? p.price : (p.regularPrice || p.price)
+      }));
+
       return NextResponse.json({
-        products,
+        products: displayProducts,
         pagination: {
           page,
           limit,
@@ -124,8 +132,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });
     }
 
+    const displayProducts = (products || []).map((p: any) => ({
+      ...p,
+      price: role === 'IMPORTER' ? p.price : (p.regularPrice || p.price)
+    }));
+
     return NextResponse.json({
-      products: products || [],
+      products: displayProducts,
       pagination: {
         page,
         limit,
@@ -172,7 +185,6 @@ export async function POST(request: NextRequest) {
           data: {
             ...validatedData,
             exporterId: auth.userId,
-            b2bPrice: validatedData.price, // Fallback if required by client
           } as any,
           include: {
             exporter: {
@@ -209,12 +221,15 @@ export async function POST(request: NextRequest) {
       .from('products')
       .insert({
         ...validatedData,
+        id: crypto.randomUUID(),
+        updatedAt: new Date().toISOString(),
         exporterId: auth.userId,
       })
       .select('*, exporter:users!exporterId(id, name, companyName, country)')
       .single();
 
     if (insertError) {
+      logToFile(`[POST /api/products] Supabase REST insert failed: ${JSON.stringify(insertError, null, 2)}`);
       console.error('[POST /api/products] Supabase REST insert failed:', insertError);
       return NextResponse.json(
         { error: 'Failed to create product' },

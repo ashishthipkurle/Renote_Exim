@@ -11,7 +11,7 @@ import {
   DollarSign, Download, RefreshCw, Filter, ChevronDown,
   ArrowUpRight, ArrowDownRight, BarChart2, Activity,
   CreditCard, Truck, CheckCircle2, Clock, XCircle, AlertCircle,
-  Layers,
+  Layers, type LucideIcon,
 } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -97,7 +97,7 @@ function ChartTooltip({ active, payload, label }: any) {
 
 // ─── Empty State ──────────────────────────────────────────────────────────────
 
-function EmptyChart({ icon: Icon, message }: { icon: React.ElementType; message: string }) {
+function EmptyChart({ icon: Icon, message }: { icon: LucideIcon; message: string }) {
   return (
     <div className="flex flex-col items-center justify-center h-full gap-3 py-8">
       <div className="p-4 rounded-2xl bg-muted border border-border">
@@ -114,7 +114,7 @@ function KpiCard({
   label, value, sub, trend, accentColor, icon: Icon, glowColor,
 }: {
   label: string; value: string; sub: string; trend?: number;
-  accentColor: string; icon: React.ElementType; glowColor: string;
+  accentColor: string; icon: LucideIcon; glowColor: string;
 }) {
   const isPositive = (trend ?? 0) >= 0;
   return (
@@ -783,25 +783,28 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
                       { label: "Pending", count: data.paymentBreakdown.PENDING, rev: data.pendingRevenue, color: "#d4af37", icon: Clock },
                       { label: "Failed", count: data.paymentBreakdown.FAILED, rev: 0, color: "#fb7185", icon: XCircle },
                       { label: "Refunded", count: data.paymentBreakdown.REFUNDED, rev: 0, color: "#a78bfa", icon: AlertCircle },
-                    ].filter((s) => s.count > 0 || s.label === "Paid").map((s) => (
-                      <div
-                        key={s.label}
-                        className="flex items-center gap-3 p-3 rounded-xl border transition-all hover:scale-[1.01]"
-                        style={{ background: `${s.color}08`, borderColor: `${s.color}25` }}
-                      >
-                        <s.icon className="w-4 h-4 flex-shrink-0" style={{ color: s.color }} />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-bold" style={{ color: s.color }}>{s.label}</p>
-                          {s.rev > 0 && <p className="text-[10px] text-muted-foreground">{fCurrency(s.rev)}</p>}
+                    ].filter((s) => s.count > 0 || s.label === "Paid").map((s) => {
+                      const Icon = s.icon;
+                      return (
+                        <div
+                          key={s.label}
+                          className="flex items-center gap-3 p-3 rounded-xl border transition-all hover:scale-[1.01]"
+                          style={{ background: `${s.color}08`, borderColor: `${s.color}25` }}
+                        >
+                          <Icon className="w-4 h-4 flex-shrink-0" style={{ color: s.color }} />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-bold" style={{ color: s.color }}>{s.label}</p>
+                            {s.rev > 0 && <p className="text-[10px] text-muted-foreground">{fCurrency(s.rev)}</p>}
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-black text-foreground">{fNum(s.count)}</p>
+                            <p className="text-[10px] text-muted-foreground">
+                              {data.totalOrders > 0 ? ((s.count / data.totalOrders) * 100).toFixed(1) : 0}%
+                            </p>
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <p className="text-sm font-black text-foreground">{fNum(s.count)}</p>
-                          <p className="text-[10px] text-muted-foreground">
-                            {data.totalOrders > 0 ? ((s.count / data.totalOrders) * 100).toFixed(1) : 0}%
-                          </p>
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -825,23 +828,26 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
                     { label: "Confirmed", count: data.orderStatusBreakdown.CONFIRMED, color: "#135bec", icon: CheckCircle2 },
                     { label: "Pending", count: data.orderStatusBreakdown.PENDING, color: "#d4af37", icon: Clock },
                     { label: "Cancelled", count: data.orderStatusBreakdown.CANCELLED, color: "#fb7185", icon: XCircle },
-                  ].map((s) => (
-                    <div key={s.label} className="flex items-center gap-3">
-                      <s.icon className="w-3.5 h-3.5 flex-shrink-0" style={{ color: s.color }} />
-                      <span className="text-xs text-muted-foreground w-20 flex-shrink-0">{s.label}</span>
-                      <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-                        <div
-                          className="h-full rounded-full transition-all duration-700"
-                          style={{
-                            width: `${data.totalOrders > 0 ? (s.count / data.totalOrders) * 100 : 0}%`,
-                            background: `linear-gradient(90deg, ${s.color}, ${s.color}60)`,
-                            boxShadow: s.count > 0 ? `0 0 8px ${s.color}50` : "none",
-                          }}
-                        />
+                  ].map((s) => {
+                    const Icon = s.icon;
+                    return (
+                      <div key={s.label} className="flex items-center gap-3">
+                        <Icon className="w-3.5 h-3.5 flex-shrink-0" style={{ color: s.color }} />
+                        <span className="text-xs text-muted-foreground w-20 flex-shrink-0">{s.label}</span>
+                        <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                          <div
+                            className="h-full rounded-full transition-all duration-700"
+                            style={{
+                              width: `${data.totalOrders > 0 ? (s.count / data.totalOrders) * 100 : 0}%`,
+                              background: `linear-gradient(90deg, ${s.color}, ${s.color}60)`,
+                              boxShadow: s.count > 0 ? `0 0 8px ${s.color}50` : "none",
+                            }}
+                          />
+                        </div>
+                        <span className="text-xs font-bold text-foreground w-6 text-right flex-shrink-0">{s.count}</span>
                       </div>
-                      <span className="text-xs font-bold text-foreground w-6 text-right flex-shrink-0">{s.count}</span>
-                    </div>
-                  ))}
+                    );
+                  })}
 
                   {/* Shipment mini summary */}
                   {Object.values(data.shipmentBreakdown).some((v) => v > 0) && (

@@ -2,25 +2,27 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { prisma } from "@/lib/prisma";
-import { ProductCategory, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import { ProductCategory } from "@/lib/types";
 import EmptyState from "@/components/ui/EmptyState";
 import { createClient } from "@supabase/supabase-js";
 import { tryGetSupabaseEnv } from "@/lib/supabase/shared";
+import { getServerAuth } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
 const ALL_CATEGORIES: { value: ProductCategory; label: string }[] = [
-  { value: "ELECTRONICS", label: "Electronics" },
-  { value: "TEXTILES", label: "Textiles" },
-  { value: "FOOD", label: "Food" },
-  { value: "CHEMICALS", label: "Chemicals" },
-  { value: "MACHINES", label: "Machinery" },
-  { value: "MEDICAL", label: "Medical" },
-  { value: "HANDICRAFTS", label: "Handicrafts" },
-  { value: "AUTOMOTIVE", label: "Automotive" },
-  { value: "CONSTRUCTION", label: "Construction" },
-  { value: "AGRICULTURE", label: "Agriculture" },
-  { value: "OTHER", label: "Other" },
+  { value: ProductCategory.ELECTRONICS, label: "Electronics" },
+  { value: ProductCategory.TEXTILES, label: "Textiles" },
+  { value: ProductCategory.FOOD, label: "Food" },
+  { value: ProductCategory.CHEMICALS, label: "Chemicals" },
+  { value: ProductCategory.MACHINES, label: "Machinery" },
+  { value: ProductCategory.MEDICAL, label: "Medical" },
+  { value: ProductCategory.HANDICRAFTS, label: "Handicrafts" },
+  { value: ProductCategory.AUTOMOTIVE, label: "Automotive" },
+  { value: ProductCategory.CONSTRUCTION, label: "Construction" },
+  { value: ProductCategory.AGRICULTURE, label: "Agriculture" },
+  { value: ProductCategory.OTHER, label: "Other" },
 ];
 
 function formatMoney(amount: number) {
@@ -45,6 +47,9 @@ export default async function ProductsPage({
   const sortParam = typeof resolvedParams.sort === "string" ? resolvedParams.sort : "newest";
   const page = typeof resolvedParams.page === "string" ? Math.max(1, parseInt(resolvedParams.page)) : 1;
   const limit = 30;
+
+  const auth = await getServerAuth();
+  const role = auth?.role || "USER";
 
   // Build Prisma where clause
   const where: Prisma.ProductWhereInput = { available: true };
@@ -77,16 +82,18 @@ export default async function ProductsPage({
   else if (sortParam === "price_desc") orderBy = { price: "desc" };
   else if (sortParam === "name") orderBy = { name: "asc" };
 
-  let products: Array<{
+  type ProductWithExporter = {
     id: string;
     name: string;
     price: number;
+    regularPrice: number;
     originCountry: string;
     category: string;
     images: string[];
     quantity: number;
     exporter: { name: string | null; companyName: string | null; country: string | null };
-  }> = [];
+  };
+  let products: ProductWithExporter[] = [];
   let total = 0;
 
   try {
@@ -100,23 +107,29 @@ export default async function ProductsPage({
           id: true,
           name: true,
           price: true,
+          regularPrice: true,
           originCountry: true,
           category: true,
           images: true,
-          // @ts-ignore - Prisma Client needs regeneration (Server Restart Required)
           quantity: true,
           exporter: { select: { name: true, companyName: true, country: true } },
-        },
-      }),
+        } as any,
+      }) as unknown as ProductWithExporter[],
       prisma.product.count({ where }),
     ]);
+
+    // Apply role-based price swap
+    products = products.map((p) => ({
+      ...p,
+      price: role === "IMPORTER" ? p.price : (p.regularPrice || p.price)
+    }));
   } catch (error) {
     console.error("Failed to fetch products from Prisma, trying Supabase fallback:", error);
     try {
       const env = tryGetSupabaseEnv();
       if (env) {
         const supabase = createClient(env.url, env.anonKey);
-        
+
         // Match the Prisma orderBy logic
         let orderColumn = 'createdAt';
         let isAscending = false;
@@ -142,13 +155,14 @@ export default async function ProductsPage({
         }
 
         const { data: supaProducts, count, error: supaError } = await query;
-        
+
         if (!supaError && supaProducts) {
           // Format exporter to match expected Prisma output (an object, not array, since it's a many-to-one relation)
           products = supaProducts.map((p: any) => ({
             ...p,
-            exporter: Array.isArray(p.exporter) ? p.exporter[0] : p.exporter
-          })) as any;
+            exporter: Array.isArray(p.exporter) ? p.exporter[0] : p.exporter,
+            price: role === "IMPORTER" ? p.price : (p.regularPrice || p.price)
+          })) as ProductWithExporter[];
           total = count || 0;
         } else {
           console.error("Supabase fallback failed:", supaError);
@@ -275,7 +289,7 @@ export default async function ProductsPage({
           <div className="max-w-screen-xl mx-auto">
             {products.length === 0 ? (
               <div className="py-20">
-                <EmptyState 
+                <EmptyState
                   iconName="searchX"
                   title="No Listings Found"
                   description="We couldn't find any products matching your current filters. Try broadening your search or clearing filters."

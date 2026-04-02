@@ -80,3 +80,293 @@
   "certifications": [],
   "quantity": 14
 }
+[2026-03-28T09:42:11.224Z] [POST /api/products] Body: {
+  "name": "Pranav",
+  "category": "FOOD",
+  "description": "qwertyuilkjhgfdsxcvbnmqwed",
+  "price": 7,
+  "regularPrice": 10,
+  "minOrderQty": 4,
+  "unit": "kg",
+  "originCountry": "ind",
+  "hsCode": "852",
+  "images": [],
+  "certifications": [],
+  "quantity": 3
+}
+[2026-03-28T09:42:12.666Z] [POST /api/products] Body: {
+  "name": "Pranav",
+  "category": "FOOD",
+  "description": "qwertyuilkjhgfdsxcvbnmqwed",
+  "price": 7,
+  "regularPrice": 10,
+  "minOrderQty": 4,
+  "unit": "kg",
+  "originCountry": "ind",
+  "hsCode": "852",
+  "images": [],
+  "certifications": [],
+  "quantity": 3
+}
+[2026-03-28T09:42:14.123Z] [POST /api/products] Body: {
+  "name": "Pranav",
+  "category": "FOOD",
+  "description": "qwertyuilkjhgfdsxcvbnmqwed",
+  "price": 7,
+  "regularPrice": 10,
+  "minOrderQty": 4,
+  "unit": "kg",
+  "originCountry": "ind",
+  "hsCode": "852",
+  "images": [],
+  "certifications": [],
+  "quantity": 3
+}
+[2026-03-28T09:42:21.763Z] [POST /api/products] Body: {
+  "name": "Pranav",
+  "category": "FOOD",
+  "description": "qwertyuilkjhgfdsxcvbnmqwed",
+  "price": 7,
+  "regularPrice": 10,
+  "minOrderQty": 4,
+  "unit": "kg",
+  "originCountry": "ind",
+  "hsCode": "852",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1774690933/renote-exim/products/lspyvcflxhusog4iuox6.jpg"
+  ],
+  "certifications": [],
+  "quantity": 3
+}
+[2026-03-28T09:42:23.063Z] [POST /api/products] Body: {
+  "name": "Pranav",
+  "category": "FOOD",
+  "description": "qwertyuilkjhgfdsxcvbnmqwed",
+  "price": 7,
+  "regularPrice": 10,
+  "minOrderQty": 4,
+  "unit": "kg",
+  "originCountry": "ind",
+  "hsCode": "852",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1774690933/renote-exim/products/lspyvcflxhusog4iuox6.jpg"
+  ],
+  "certifications": [],
+  "quantity": 3
+}
+[2026-03-28T09:42:24.623Z] [POST /api/products] Body: {
+  "name": "Pranav",
+  "category": "FOOD",
+  "description": "qwertyuilkjhgfdsxcvbnmqwed",
+  "price": 7,
+  "regularPrice": 10,
+  "minOrderQty": 4,
+  "unit": "kg",
+  "originCountry": "ind",
+  "hsCode": "852",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1774690933/renote-exim/products/lspyvcflxhusog4iuox6.jpg"
+  ],
+  "certifications": [],
+  "quantity": 3
+}
+[2026-03-28T09:46:07.389Z] [POST /api/products] Body: {
+  "name": "Pranav",
+  "category": "FOOD",
+  "description": "qwetryioplkjhgfdszxcvbnjhgfds",
+  "price": 7,
+  "regularPrice": 12,
+  "minOrderQty": 21,
+  "unit": "kg",
+  "originCountry": "inf",
+  "hsCode": "8526",
+  "images": [],
+  "certifications": [],
+  "quantity": 14
+}
+[2026-03-28T09:46:08.569Z] [POST /api/products] Body: {
+  "name": "Pranav",
+  "category": "FOOD",
+  "description": "qwetryioplkjhgfdszxcvbnjhgfds",
+  "price": 7,
+  "regularPrice": 12,
+  "minOrderQty": 21,
+  "unit": "kg",
+  "originCountry": "inf",
+  "hsCode": "8526",
+  "images": [],
+  "certifications": [],
+  "quantity": 14
+}
+[2026-03-28T09:46:10.104Z] [POST /api/products] Body: {
+  "name": "Pranav",
+  "category": "FOOD",
+  "description": "qwetryioplkjhgfdszxcvbnjhgfds",
+  "price": 7,
+  "regularPrice": 12,
+  "minOrderQty": 21,
+  "unit": "kg",
+  "originCountry": "inf",
+  "hsCode": "8526",
+  "images": [],
+  "certifications": [],
+  "quantity": 14
+}
+[2026-03-28T10:02:08.223Z] [POST /api/products] Body: {
+  "name": "Pranav",
+  "category": "FOOD",
+  "description": "sdrtyuiokjhghjkkjhvcvhjkjbvbjklnbv ",
+  "price": 10,
+  "regularPrice": 12,
+  "minOrderQty": 1,
+  "unit": "kg",
+  "originCountry": "fghjk",
+  "hsCode": "785",
+  "images": [],
+  "certifications": [],
+  "quantity": 3
+}
+[2026-03-28T10:02:09.903Z] [POST /api/products] Body: {
+  "name": "Pranav",
+  "category": "FOOD",
+  "description": "sdrtyuiokjhghjkkjhvcvhjkjbvbjklnbv ",
+  "price": 10,
+  "regularPrice": 12,
+  "minOrderQty": 1,
+  "unit": "kg",
+  "originCountry": "fghjk",
+  "hsCode": "785",
+  "images": [],
+  "certifications": [],
+  "quantity": 3
+}
+[2026-03-28T10:02:13.471Z] [POST /api/products] Body: {
+  "name": "Pranav",
+  "category": "FOOD",
+  "description": "sdrtyuiokjhghjkkjhvcvhjkjbvbjklnbv ",
+  "price": 10,
+  "regularPrice": 12,
+  "minOrderQty": 1,
+  "unit": "kg",
+  "originCountry": "fghjk",
+  "hsCode": "785",
+  "images": [],
+  "certifications": [],
+  "quantity": 3
+}
+[2026-03-28T10:03:35.972Z] [POST /api/products] Body: {
+  "name": "Pranav",
+  "category": "FOOD",
+  "description": "sdrtyuiokjhghjkkjhvcvhjkjbvbjklnbv ",
+  "price": 10,
+  "regularPrice": 12,
+  "minOrderQty": 1,
+  "unit": "kg",
+  "originCountry": "fghjk",
+  "hsCode": "785",
+  "images": [],
+  "certifications": [],
+  "quantity": 3
+}
+[2026-03-28T10:03:37.248Z] [POST /api/products] Body: {
+  "name": "Pranav",
+  "category": "FOOD",
+  "description": "sdrtyuiokjhghjkkjhvcvhjkjbvbjklnbv ",
+  "price": 10,
+  "regularPrice": 12,
+  "minOrderQty": 1,
+  "unit": "kg",
+  "originCountry": "fghjk",
+  "hsCode": "785",
+  "images": [],
+  "certifications": [],
+  "quantity": 3
+}
+[2026-03-28T10:03:38.682Z] [POST /api/products] Body: {
+  "name": "Pranav",
+  "category": "FOOD",
+  "description": "sdrtyuiokjhghjkkjhvcvhjkjbvbjklnbv ",
+  "price": 10,
+  "regularPrice": 12,
+  "minOrderQty": 1,
+  "unit": "kg",
+  "originCountry": "fghjk",
+  "hsCode": "785",
+  "images": [],
+  "certifications": [],
+  "quantity": 3
+}
+[2026-03-28T10:07:12.863Z] [POST /api/products] Body: {
+  "name": "Pranav",
+  "category": "FOOD",
+  "description": "sdrtyuiokjhghjkkjhvcvhjkjbvbjklnbv ",
+  "price": 10,
+  "regularPrice": 12,
+  "minOrderQty": 1,
+  "unit": "kg",
+  "originCountry": "fghjk",
+  "hsCode": "785",
+  "images": [],
+  "certifications": [],
+  "quantity": 3
+}
+[2026-03-28T10:07:13.256Z] [POST /api/products] Supabase REST insert failed: {
+  "code": "42501",
+  "details": null,
+  "hint": null,
+  "message": "permission denied for schema public"
+}
+[2026-03-28T10:07:14.054Z] [POST /api/products] Body: {
+  "name": "Pranav",
+  "category": "FOOD",
+  "description": "sdrtyuiokjhghjkkjhvcvhjkjbvbjklnbv ",
+  "price": 10,
+  "regularPrice": 12,
+  "minOrderQty": 1,
+  "unit": "kg",
+  "originCountry": "fghjk",
+  "hsCode": "785",
+  "images": [],
+  "certifications": [],
+  "quantity": 3
+}
+[2026-03-28T10:07:14.225Z] [POST /api/products] Supabase REST insert failed: {
+  "code": "42501",
+  "details": null,
+  "hint": null,
+  "message": "permission denied for schema public"
+}
+[2026-03-28T10:07:15.463Z] [POST /api/products] Body: {
+  "name": "Pranav",
+  "category": "FOOD",
+  "description": "sdrtyuiokjhghjkkjhvcvhjkjbvbjklnbv ",
+  "price": 10,
+  "regularPrice": 12,
+  "minOrderQty": 1,
+  "unit": "kg",
+  "originCountry": "fghjk",
+  "hsCode": "785",
+  "images": [],
+  "certifications": [],
+  "quantity": 3
+}
+[2026-03-28T10:07:15.630Z] [POST /api/products] Supabase REST insert failed: {
+  "code": "42501",
+  "details": null,
+  "hint": null,
+  "message": "permission denied for schema public"
+}
+[2026-03-28T10:12:42.427Z] [POST /api/products] Body: {
+  "name": "Pranav",
+  "category": "FOOD",
+  "description": "sdrtyuiokjhghjkkjhvcvhjkjbvbjklnbv ",
+  "price": 10,
+  "regularPrice": 12,
+  "minOrderQty": 1,
+  "unit": "kg",
+  "originCountry": "fghjk",
+  "hsCode": "785",
+  "images": [],
+  "certifications": [],
+  "quantity": 3
+}

@@ -50,6 +50,7 @@ model Product {
   name             String
   description      String
   price            Float
+  regularPrice     Float          @default(0)
   minOrderQty      Int
   unit             String
   originCountry    String
@@ -61,7 +62,7 @@ model Product {
   updatedAt        DateTime       @updatedAt
   quantity         Int            @default(0)
   trustDocumentUrl String?
-  category         String
+  category         ProductCategory
   deletedAt        DateTime?
   orders           Order[]        @relation("ProductToOrder")
   priceHistory     PriceHistory[]

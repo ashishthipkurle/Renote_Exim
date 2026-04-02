@@ -64,6 +64,7 @@ export const productSchema = z.object({
   ]),
   description: z.string().min(20, 'Description must be at least 20 characters'),
   price: z.number().positive('Price must be positive'),
+  regularPrice: z.number().min(0, 'Regular price must be non-negative').default(0),
   minOrderQty: z.number().int().positive('Minimum order quantity must be positive'),
   unit: z.string().min(1, 'Unit is required'),
   originCountry: z.string().min(2, 'Origin country is required'),
