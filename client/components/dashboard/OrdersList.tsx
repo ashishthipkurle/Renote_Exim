@@ -10,12 +10,12 @@ import EmptyState from "@/components/ui/EmptyState";
 import { toast } from "sonner";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
-    PENDING: { label: "Pending", color: "text-yellow-500 bg-yellow-500/10 border-yellow-500/20", icon: Clock },
-    CONFIRMED: { label: "Confirmed", color: "text-blue-400 bg-blue-400/10 border-blue-400/20", icon: CheckCircle2 },
-    PROCESSING: { label: "Processing", color: "text-purple-400 bg-purple-400/10 border-purple-400/20", icon: Package },
-    SHIPPED: { label: "Shipped", color: "text-cyan-400 bg-cyan-400/10 border-cyan-400/20", icon: Truck },
-    DELIVERED: { label: "Delivered", color: "text-emerald-400 bg-emerald-400/10 border-emerald-400/20", icon: CheckCircle2 },
-    CANCELLED: { label: "Cancelled", color: "text-red-400 bg-red-400/10 border-red-400/20", icon: XCircle },
+    PENDING: { label: "Pending", color: "text-neutral-400 bg-neutral-400/10 border-neutral-400/20", icon: Clock },
+    CONFIRMED: { label: "Confirmed", color: "text-white bg-white/10 border-white/20", icon: CheckCircle2 },
+    PROCESSING: { label: "Processing", color: "text-neutral-300 bg-neutral-300/10 border-neutral-300/20", icon: Package },
+    SHIPPED: { label: "Shipped", color: "text-white bg-white/5 border-white/10", icon: Truck },
+    DELIVERED: { label: "Delivered", color: "text-neutral-400 bg-neutral-400/10 border-neutral-400/20", icon: CheckCircle2 },
+    CANCELLED: { label: "Cancelled", color: "text-neutral-500 bg-neutral-500/10 border-neutral-500/20", icon: XCircle },
 };
 
 const LOCAL_ORDERS_KEY = "renote_local_orders";
@@ -140,19 +140,19 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
 
     if (orders.length === 0) {
         return (
-            <EmptyState 
-              icon={ShoppingCart}
-              title="No Orders Yet"
-              description="Your order history is currently empty. Explore the global marketplace to discover premium products."
-              actionLabel="Explore Marketplace"
-              href="/products"
+            <EmptyState
+                icon={ShoppingCart}
+                title="No Orders Yet"
+                description="Your order history is currently empty. Explore the global marketplace to discover premium products."
+                actionLabel="Explore Marketplace"
+                href="/products"
             />
         );
     }
 
     return (
         <>
-            <div className="hidden lg:grid grid-cols-12 gap-4 px-6 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+            <div className="hidden lg:grid grid-cols-12 gap-4 px-6 text-xs font-bold text-muted-foreground/80 dark:text-muted-foreground uppercase tracking-wider">
                 <div className="col-span-4">Product & Seller</div>
                 <div className="col-span-2">Amount</div>
                 <div className="col-span-2">Status</div>
@@ -172,29 +172,29 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
                     return (
                         <div
                             key={order.id}
-                            className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 hover:border-primary/30 hover:bg-[#172033]/70 transition-all duration-300 shadow-xl rounded-2xl p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4 items-center group"
+                            className="bg-muted/40 backdrop-blur-xl border border-border hover:border-white/20 transition-all duration-300 shadow-xl rounded-2xl p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4 items-center group"
                         >
                             <div
                                 className="lg:col-span-4 flex items-center gap-4 cursor-pointer"
                                 onClick={() => setExpandedOrderId(isExpanded ? null : order.id)}
                             >
-                                <div className="size-12 rounded-xl bg-slate-800 border border-white/5 flex-shrink-0 flex items-center justify-center overflow-hidden">
+                                <div className="size-12 rounded-xl bg-card border border-border flex-shrink-0 flex items-center justify-center overflow-hidden">
                                     {order.product?.images?.[0] ? (
                                         <img src={order.product.images[0]} alt="" className="w-full h-full object-cover" />
                                     ) : (
-                                        <Package className="w-5 h-5 text-slate-400 dark:text-slate-500" />
+                                        <Package className="w-5 h-5 text-muted-foreground/40" />
                                     )}
                                 </div>
                                 <div>
-                                    <div className="text-sm font-bold text-white group-hover:text-primary transition-colors">{order.product?.name ?? "Unknown Product"}</div>
-                                    <div className="text-xs text-slate-400 mt-0.5">by {order.product?.exporter?.companyName || order.product?.exporter?.name || "Exporter"}</div>
-                                    <div className="text-[11px] text-primary/90 mt-1 font-semibold">{formatCurrency(order.totalPrice)}</div>
+                                    <div className="text-sm font-black text-white group-hover:text-muted-foreground transition-colors uppercase italic tracking-tighter">{order.product?.name ?? "Unknown Asset"}</div>
+                                    <div className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-0.5">VIA: {order.product?.exporter?.companyName || order.product?.exporter?.name || "EXPORTER"}</div>
+                                    <div className="text-[11px] text-white mt-1 font-black tracking-tighter">{formatCurrency(order.totalPrice)}</div>
                                 </div>
                             </div>
 
                             <div className="lg:col-span-2">
-                                <div className="text-white font-bold">{formatCurrency(order.totalPrice)}</div>
-                                <div className="text-[10px] text-slate-500 capitalize">{(order.paymentStatus ?? "pending").toLowerCase()}</div>
+                                <div className="text-foreground font-bold">{formatCurrency(order.totalPrice)}</div>
+                                <div className="text-[10px] text-muted-foreground/80 capitalize">{(order.paymentStatus ?? "pending").toLowerCase()}</div>
                             </div>
 
                             <div className="lg:col-span-2">
@@ -205,7 +205,7 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
                             </div>
 
                             <div className="lg:col-span-2">
-                                <div className="text-sm text-slate-600 dark:text-slate-300">{formatDate(order.createdAt)}</div>
+                                <div className="text-sm text-muted-foreground font-black uppercase tracking-widest">{formatDate(order.createdAt)}</div>
                             </div>
 
                             <div className="lg:col-span-2 flex justify-end gap-2">
@@ -213,7 +213,7 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
                                     <Link
                                         href={`/products/${order.product.id}`}
                                         onClick={(e) => e.stopPropagation()}
-                                        className="px-3 py-2 rounded-lg bg-primary/15 hover:bg-primary/25 text-primary text-xs font-bold transition-colors"
+                                        className="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-colors border border-white/10"
                                         title="Vire Product"
                                     >
                                         Vire Product
@@ -221,7 +221,7 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
                                 ) : null}
                                 <button
                                     onClick={(e) => { e.stopPropagation(); openDetails(order); }}
-                                    className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"
+                                    className="p-2 rounded-lg bg-card hover:bg-white/5 text-muted-foreground hover:text-white transition-all border border-border"
                                     title="Order Details"
                                 >
                                     <Info className="w-4 h-4" />
@@ -231,7 +231,7 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
                                         e.stopPropagation();
                                         setExpandedOrderId(isExpanded ? null : order.id);
                                     }}
-                                    className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+                                    className="p-2 rounded-lg bg-muted/50 hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors"
                                     title="Expand"
                                 >
                                     <ChevronDown className={`w-4 h-4 transition-transform ${isExpanded ? "rotate-180" : ""}`} />
@@ -248,14 +248,14 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
                             </div>
 
                             <div className={`lg:col-span-12 overflow-hidden transition-all duration-300 ease-out ${isExpanded ? "max-h-[1200px] opacity-100 mt-2" : "max-h-0 opacity-0"}`}>
-                                <div className="rounded-xl border border-white/10 bg-[#0f1522]/70 p-4 lg:p-5 space-y-4">
+                                <div className="rounded-xl border border-border bg-card p-4 lg:p-5 space-y-4 shadow-2xl">
                                     <div className="flex flex-col lg:flex-row gap-4">
                                         <div className="lg:w-48 w-full">
-                                            <div className="aspect-[4/3] rounded-xl border border-white/10 bg-slate-900/70 overflow-hidden">
+                                            <div className="aspect-[4/3] rounded-xl border border-border bg-card/70 overflow-hidden">
                                                 {order.product?.images?.[0] ? (
                                                     <img src={order.product.images[0]} alt={order.product?.name ?? "Product"} className="w-full h-full object-cover" />
                                                 ) : (
-                                                    <div className="w-full h-full flex items-center justify-center text-slate-500">
+                                                    <div className="w-full h-full flex items-center justify-center text-muted-foreground/20">
                                                         <Package className="w-8 h-8" />
                                                     </div>
                                                 )}
@@ -263,45 +263,45 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
                                         </div>
 
                                         <div className="flex-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 text-sm">
-                                            <div className="rounded-lg bg-white/5 border border-white/10 p-3">
-                                                <div className="text-slate-400 text-xs uppercase tracking-widest">Order ID</div>
-                                                <div className="text-white font-semibold mt-1 break-all">{order.orderNumber ?? order.id}</div>
+                                            <div className="rounded-lg bg-muted/50 border border-border p-3">
+                                                <div className="text-muted-foreground text-xs uppercase tracking-widest">Order ID</div>
+                                                <div className="text-foreground font-semibold mt-1 break-all">{order.orderNumber ?? order.id}</div>
                                             </div>
-                                            <div className="rounded-lg bg-white/5 border border-white/10 p-3">
-                                                <div className="text-slate-400 text-xs uppercase tracking-widest">Product Price</div>
-                                                <div className="text-white font-semibold mt-1">{formatCurrency(order.totalPrice)}</div>
+                                            <div className="rounded-lg bg-muted/50 border border-border p-3">
+                                                <div className="text-muted-foreground text-xs uppercase tracking-widest">Product Price</div>
+                                                <div className="text-foreground font-semibold mt-1">{formatCurrency(order.totalPrice)}</div>
                                             </div>
-                                            <div className="rounded-lg bg-white/5 border border-white/10 p-3">
-                                                <div className="text-slate-400 text-xs uppercase tracking-widest">Quantity</div>
-                                                <div className="text-white font-semibold mt-1">{order.quantity ?? 0}</div>
+                                            <div className="rounded-lg bg-muted/50 border border-border p-3">
+                                                <div className="text-muted-foreground text-xs uppercase tracking-widest">Quantity</div>
+                                                <div className="text-foreground font-semibold mt-1">{order.quantity ?? 0}</div>
                                             </div>
-                                            <div className="rounded-lg bg-white/5 border border-white/10 p-3">
-                                                <div className="text-slate-400 text-xs uppercase tracking-widest">Category</div>
-                                                <div className="text-white font-semibold mt-1">{order.product?.category ?? "N/A"}</div>
+                                            <div className="rounded-lg bg-muted/50 border border-border p-3">
+                                                <div className="text-muted-foreground text-xs uppercase tracking-widest">Category</div>
+                                                <div className="text-foreground font-semibold mt-1">{order.product?.category ?? "N/A"}</div>
                                             </div>
-                                            <div className="rounded-lg bg-white/5 border border-white/10 p-3 md:col-span-2 xl:col-span-2">
-                                                <div className="text-slate-400 text-xs uppercase tracking-widest">Product Name</div>
-                                                <div className="text-white font-semibold mt-1">{order.product?.name ?? "Unknown Product"}</div>
+                                            <div className="rounded-lg bg-muted/50 border border-border p-3 md:col-span-2 xl:col-span-2">
+                                                <div className="text-muted-foreground text-xs uppercase tracking-widest">Product Name</div>
+                                                <div className="text-foreground font-semibold mt-1">{order.product?.name ?? "Unknown Product"}</div>
                                             </div>
-                                            <div className="rounded-lg bg-white/5 border border-white/10 p-3">
-                                                <div className="text-slate-400 text-xs uppercase tracking-widest">Seller</div>
-                                                <div className="text-white font-semibold mt-1">{order.product?.exporter?.companyName || order.product?.exporter?.name || "Exporter"}</div>
+                                            <div className="rounded-lg bg-muted/50 border border-border p-3">
+                                                <div className="text-muted-foreground text-xs uppercase tracking-widest">Seller</div>
+                                                <div className="text-foreground font-semibold mt-1">{order.product?.exporter?.companyName || order.product?.exporter?.name || "Exporter"}</div>
                                             </div>
-                                            <div className="rounded-lg bg-white/5 border border-white/10 p-3">
-                                                <div className="text-slate-400 text-xs uppercase tracking-widest">Seller Country</div>
-                                                <div className="text-white font-semibold mt-1">{order.product?.exporter?.country ?? "N/A"}</div>
+                                            <div className="rounded-lg bg-muted/50 border border-border p-3">
+                                                <div className="text-muted-foreground text-xs uppercase tracking-widest">Seller Country</div>
+                                                <div className="text-foreground font-semibold mt-1">{order.product?.exporter?.country ?? "N/A"}</div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-3">
+                                    <div className="rounded-xl border border-border bg-white/5 p-4 space-y-3 shadow-inner">
                                         <div className="flex items-center justify-between gap-3">
-                                            <h4 className="text-sm font-bold text-white">Give a Review</h4>
-                                            {review && <span className="text-xs text-emerald-400 font-semibold">Submitted</span>}
+                                            <h4 className="text-[10px] font-black text-white uppercase tracking-[0.2em] italic">Procurement Intelligence Feedback</h4>
+                                            {review && <span className="text-[9px] font-black text-white px-2 py-0.5 rounded-full border border-white/20 bg-white/5 uppercase tracking-widest">Logged</span>}
                                         </div>
 
                                         {!isReviewEligible ? (
-                                            <p className="text-xs text-slate-400">Review option unlocks once order is shipped or delivered.</p>
+                                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Feedback transmission locked until asset delivery.</p>
                                         ) : (
                                             <>
                                                 <div className="flex items-center gap-2">
@@ -310,29 +310,29 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
                                                             key={star}
                                                             type="button"
                                                             onClick={() => setRatingDraftByOrder((prev) => ({ ...prev, [order.id]: star }))}
-                                                            className="text-amber-400 hover:scale-110 transition-transform"
-                                                            title={`${star} star`}
+                                                            className="text-white hover:scale-125 transition-transform"
+                                                            title={`${star} star metadata`}
                                                         >
-                                                            <Star className={`w-5 h-5 ${star <= currentRating ? "fill-current" : ""}`} />
+                                                            <Star className={`w-5 h-5 ${star <= currentRating ? "fill-white" : ""}`} />
                                                         </button>
                                                     ))}
-                                                    <span className="text-xs text-slate-300 ml-2">{currentRating || 0}/5</span>
+                                                    <span className="text-[10px] font-black text-muted-foreground ml-2 tracking-widest">{currentRating || 0} / 5.0 CNS</span>
                                                 </div>
 
                                                 <textarea
                                                     value={currentComment}
                                                     onChange={(e) => setCommentDraftByOrder((prev) => ({ ...prev, [order.id]: e.target.value }))}
-                                                    className="w-full min-h-24 rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/40"
-                                                    placeholder="Share product quality, packaging, and delivery experience..."
+                                                    className="w-full min-h-24 rounded-lg bg-background border border-border px-3 py-2 text-sm text-white placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-white/20 transition-all font-medium leading-relaxed italic"
+                                                    placeholder="Report asset quality, logistics protocol efficiency, and node synchronization..."
                                                 />
 
                                                 <div className="flex justify-end">
                                                     <button
                                                         type="button"
                                                         onClick={() => submitReview(order)}
-                                                        className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-colors"
+                                                        className="px-6 py-2.5 rounded-xl bg-white text-black text-[10px] font-black uppercase tracking-[0.2em] hover:bg-primary/90 transition-all shadow-xl shadow-white/10 active:scale-95"
                                                     >
-                                                        {review ? "Update Review" : "Submit Review"}
+                                                        {review ? "Patch Intelligence" : "Broadcast Feedback"}
                                                     </button>
                                                 </div>
                                             </>
@@ -350,3 +350,4 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
         </>
     );
 }
+

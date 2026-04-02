@@ -90,10 +90,10 @@ export default async function ExporterShipmentsPage({
             </p>
           </div>
           <div className="flex gap-2">
-            <span className="px-3 py-1.5 rounded-lg bg-cyan-400/10 border border-cyan-400/20 text-cyan-400 text-xs font-bold uppercase">
+            <span className="px-3 py-1.5 rounded-lg bg-black/10 dark:bg-white/15 border border-border dark:border-white/20 text-foreground dark:text-white text-xs font-bold uppercase">
               {activeCount} Active
             </span>
-            <span className="px-3 py-1.5 rounded-lg bg-emerald-400/10 border border-emerald-400/20 text-emerald-400 text-xs font-bold uppercase">
+            <span className="px-3 py-1.5 rounded-lg bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 text-white/50 text-xs font-bold uppercase">
               {deliveredCount} Delivered
             </span>
           </div>
@@ -122,7 +122,7 @@ export default async function ExporterShipmentsPage({
                         <Link
                           key={p}
                           href={`?${new URLSearchParams({ ...searchParams, page: p.toString() })}`}
-                          className={`w-10 h-10 flex items-center justify-center rounded-xl border text-xs font-bold transition-all ${page === p ? "bg-primary border-primary text-white" : "border-border hover:bg-muted text-muted-foreground"
+                          className={`w-10 h-10 flex items-center justify-center rounded-xl border text-xs font-bold transition-all ${page === p ? "bg-primary border-border dark:border-white text-primary-foreground" : "border-border hover:bg-muted text-muted-foreground"
                             }`}
                         >
                           {p}
@@ -149,3 +149,4 @@ export default async function ExporterShipmentsPage({
     </div>
   );
 }
+

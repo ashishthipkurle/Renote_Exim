@@ -78,15 +78,15 @@ export default function AdminNotificationsPage() {
   };
 
   return (
-    <div className="h-dvh flex flex-col bg-[#0b1019] relative overflow-hidden">
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f2937_1px,transparent_1px),linear-gradient(to_bottom,#1f2937_1px,transparent_1px)] bg-[length:40px_40px] opacity-[0.03] pointer-events-none" />
+    <div className="h-dvh flex flex-col bg-background relative overflow-hidden">
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#333_1px,transparent_1px),linear-gradient(to_bottom,#333_1px,transparent_1px)] bg-[length:40px_40px] opacity-[0.03] pointer-events-none" />
 
       {/* Header */}
-      <header className="flex-shrink-0 h-20 px-8 flex items-center justify-between border-b border-white/5 bg-[#0b1019]/30 backdrop-blur-md z-30">
+      <header className="flex-shrink-0 h-20 px-8 flex items-center justify-between border-b border-border bg-background/30 backdrop-blur-md z-30">
         <div>
           <h1 className="text-xl font-black text-white uppercase tracking-widest flex items-center gap-2">
             Signal Broadcaster
-            <span className="text-[10px] bg-primary/20 text-primary border border-primary/30 px-2 py-0.5 rounded">
+            <span className="text-[10px] bg-white/20 text-white border border-white/30 px-2 py-0.5 rounded">
               NODE_COMMS
             </span>
           </h1>
@@ -100,9 +100,9 @@ export default function AdminNotificationsPage() {
 
           {/* Dispatch Center */}
           <div className="space-y-6">
-            <div className="bg-[#151c2a]/40 backdrop-blur-xl border border-white/5 p-8 rounded-3xl relative overflow-hidden shadow-2xl">
+            <div className="bg-muted/40 backdrop-blur-xl border border-border p-8 rounded-3xl relative overflow-hidden shadow-2xl">
               <div className="flex items-center gap-3 mb-8">
-                <div className="size-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                <div className="size-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-white">
                   <Send className="w-5 h-5" />
                 </div>
                 <h2 className="text-white font-black text-lg uppercase tracking-widest">Global Dispatch</h2>
@@ -114,7 +114,7 @@ export default function AdminNotificationsPage() {
                   <input
                     type="text"
                     placeholder="Enter urgent title..."
-                    className="w-full bg-[#0b1019]/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all"
+                    className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-white/20 focus:border-white/50 outline-none transition-all"
                     value={form.title}
                     onChange={(e) => setForm({ ...form, title: e.target.value })}
                   />
@@ -125,7 +125,7 @@ export default function AdminNotificationsPage() {
                   <textarea
                     rows={4}
                     placeholder="Compose system announcement..."
-                    className="w-full bg-[#0b1019]/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all resize-none"
+                    className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-white/20 focus:border-white/50 outline-none transition-all resize-none"
                     value={form.message}
                     onChange={(e) => setForm({ ...form, message: e.target.value })}
                   />
@@ -135,7 +135,7 @@ export default function AdminNotificationsPage() {
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Target Sector</label>
                     <select
-                      className="w-full bg-[#0b1019]/50 border border-white/10 rounded-xl px-4 py-3 text-xs text-slate-300 outline-none focus:border-primary/50"
+                      className="w-full bg-background border border-border rounded-xl px-4 py-3 text-xs text-slate-300 outline-none focus:border-white/50"
                       value={form.targetRole}
                       onChange={(e) => setForm({ ...form, targetRole: e.target.value })}
                     >
@@ -148,7 +148,7 @@ export default function AdminNotificationsPage() {
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Signal Protocol</label>
                     <select
-                      className="w-full bg-[#0b1019]/50 border border-white/10 rounded-xl px-4 py-3 text-xs text-slate-300 outline-none focus:border-primary/50"
+                      className="w-full bg-background border border-border rounded-xl px-4 py-3 text-xs text-slate-300 outline-none focus:border-white/50"
                       value={form.type}
                       onChange={(e) => setForm({ ...form, type: e.target.value })}
                     >
@@ -163,9 +163,9 @@ export default function AdminNotificationsPage() {
                 <button
                   type="submit"
                   disabled={broadcasting || !form.title || !form.message}
-                  className="w-full bg-primary text-white py-4 rounded-2xl text-xs font-black uppercase tracking-[0.2em] shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-3"
+                  className="w-full bg-white text-black py-4 rounded-2xl text-xs font-black uppercase tracking-[0.2em] shadow-lg shadow-white/5 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-3"
                 >
-                  {broadcasting ? <Zap className="w-4 h-4 animate-spin" /> : <Volume2 className="w-4 h-4" />}
+                  {broadcasting ? <Zap className="w-4 h-4 animate-spin text-black" /> : <Volume2 className="w-4 h-4" />}
                   {broadcasting ? "DISPATCHING..." : "DISPATCH BROADCAST"}
                 </button>
               </form>
@@ -198,20 +198,20 @@ export default function AdminNotificationsPage() {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.05 }}
-                    className="bg-[#151c2a]/40 backdrop-blur-xl border border-white/5 p-5 rounded-2xl group hover:border-primary/20 transition-all shadow-xl"
+                    className="bg-muted/40 backdrop-blur-xl border border-border p-5 rounded-2xl group hover:border-white/20 transition-all shadow-xl"
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex gap-3">
                         <div className={clsx(
                           "size-8 rounded-lg flex items-center justify-center border",
-                          n.type === "ALERT" ? "bg-red-500/10 text-red-500 border-red-500/20" :
-                            n.type === "SUCCESS" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" :
-                              "bg-blue-500/10 text-blue-400 border-blue-500/20"
+                          n.type === "ALERT" ? "bg-white/10 text-white border-white/20" :
+                            n.type === "SUCCESS" ? "bg-white/10 text-white border-white/20" :
+                              "bg-white/10 text-white border-white/20"
                         )}>
                           <Bell className="w-4 h-4" />
                         </div>
                         <div>
-                          <div className="text-sm font-bold text-white group-hover:text-primary transition-colors">{n.title}</div>
+                          <div className="text-sm font-bold text-white group-hover:text-white transition-colors">{n.title}</div>
                           <div className="text-[9px] text-slate-500 font-mono flex items-center gap-1.5 mt-0.5">
                             <Clock className="w-2.5 h-2.5" />
                             {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })}

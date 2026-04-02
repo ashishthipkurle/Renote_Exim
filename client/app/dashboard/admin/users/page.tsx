@@ -3,8 +3,6 @@
 import { useState, useEffect } from "react";
 import {
   Search,
-  CheckCircle2,
-  XCircle,
   ChevronLeft,
   ChevronRight,
   ShieldCheck,
@@ -73,15 +71,15 @@ export default function AdminUsersPage() {
   };
 
   return (
-    <div className="h-dvh flex flex-col bg-[#0b1019] relative overflow-hidden">
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f2937_1px,transparent_1px),linear-gradient(to_bottom,#1f2937_1px,transparent_1px)] bg-[length:40px_40px] opacity-[0.03] pointer-events-none" />
+    <div className="h-dvh flex flex-col bg-background relative overflow-hidden">
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#333_1px,transparent_1px),linear-gradient(to_bottom,#333_1px,transparent_1px)] bg-[length:40px_40px] opacity-[0.03] pointer-events-none" />
 
       {/* Header */}
-      <header className="flex-shrink-0 h-20 px-8 flex items-center justify-between border-b border-white/5 bg-[#0b1019]/30 backdrop-blur-md z-30">
+      <header className="flex-shrink-0 h-20 px-8 flex items-center justify-between border-b border-border bg-background/30 backdrop-blur-md z-30">
         <div>
           <h1 className="text-xl font-black text-white uppercase tracking-widest flex items-center gap-2">
             User Authority
-            <span className="text-[10px] bg-primary/20 text-primary border border-primary/30 px-2 py-0.5 rounded">
+            <span className="text-[10px] bg-white/20 text-white border border-white/30 px-2 py-0.5 rounded">
               {total} ENTITIES
             </span>
           </h1>
@@ -90,11 +88,11 @@ export default function AdminUsersPage() {
 
         <div className="flex items-center gap-4">
           <div className="relative group">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-primary transition-colors" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-white transition-colors" />
             <input
               type="text"
               placeholder="Search ID, Name, Company..."
-              className="bg-[#151c2a]/50 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-sm text-white focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none w-64 transition-all"
+              className="bg-muted/50 border border-border rounded-xl pl-10 pr-4 py-2 text-sm text-white focus:ring-2 focus:ring-white/20 focus:border-white/50 outline-none w-64 transition-all"
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
             />
@@ -102,7 +100,7 @@ export default function AdminUsersPage() {
 
           <div className="flex gap-2">
             <select
-              className="bg-[#151c2a]/50 border border-white/10 rounded-xl px-3 py-2 text-xs text-slate-300 outline-none focus:border-primary/50"
+              className="bg-muted/50 border border-border rounded-xl px-3 py-2 text-xs text-slate-300 outline-none focus:border-white/50"
               value={roleFilter}
               onChange={(e) => { setRoleFilter(e.target.value); setPage(1); }}
             >
@@ -113,7 +111,7 @@ export default function AdminUsersPage() {
             </select>
 
             <select
-              className="bg-[#151c2a]/50 border border-white/10 rounded-xl px-3 py-2 text-xs text-slate-300 outline-none focus:border-primary/50"
+              className="bg-muted/50 border border-border rounded-xl px-3 py-2 text-xs text-slate-300 outline-none focus:border-white/50"
               value={verifiedFilter}
               onChange={(e) => { setVerifiedFilter(e.target.value); setPage(1); }}
             >
@@ -127,7 +125,7 @@ export default function AdminUsersPage() {
 
       {/* Table Area */}
       <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
-        <div className="bg-[#151c2a]/40 backdrop-blur-xl border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
+        <div className="bg-muted/40 backdrop-blur-xl border border-border rounded-2xl overflow-hidden shadow-2xl">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-white/5 bg-white/5">
@@ -154,11 +152,11 @@ export default function AdminUsersPage() {
                   <tr key={u.id} className="group hover:bg-white/[0.02] transition-colors">
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-3">
-                        <div className="size-10 rounded-xl bg-gradient-to-br from-primary/10 to-blue-600/10 border border-white/5 flex items-center justify-center text-primary font-bold text-sm">
+                        <div className="size-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-white font-bold text-sm">
                           {u.name.charAt(0)}
                         </div>
                         <div>
-                          <div className="text-sm font-bold text-white group-hover:text-primary transition-colors">{u.name}</div>
+                          <div className="text-sm font-bold text-white group-hover:text-white transition-colors">{u.name}</div>
                           <div className="text-[10px] text-slate-500 font-medium">{u.email}</div>
                         </div>
                       </div>
@@ -178,9 +176,9 @@ export default function AdminUsersPage() {
                     <td className="px-6 py-5 text-center">
                       <span className={clsx(
                         "text-[9px] font-black tracking-widest px-2.5 py-1 rounded-full border uppercase",
-                        u.role === "ADMIN" ? "bg-purple-500/10 text-purple-400 border-purple-500/20" :
-                          u.role === "EXPORTER" ? "bg-blue-500/10 text-blue-400 border-blue-500/20" :
-                            "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                        u.role === "ADMIN" ? "bg-white/10 text-white border-white/20" :
+                          u.role === "EXPORTER" ? "bg-neutral-800 text-neutral-400 border-white/10" :
+                            "bg-neutral-900 text-neutral-500 border-white/5"
                       )}>
                         {u.role}
                       </span>
@@ -189,18 +187,18 @@ export default function AdminUsersPage() {
                       <div className="flex items-center gap-2">
                         {u.verified ? (
                           <div className="flex flex-col gap-1">
-                            <div className="flex items-center gap-1.5 text-emerald-400 text-[10px] font-black">
-                              <CheckCircle2 className="w-3.5 h-3.5" />
+                            <div className="flex items-center gap-1.5 text-white text-[10px] font-black">
+                              <ShieldCheck className="w-3.5 h-3.5" />
                               VERIFIED
                             </div>
-                            <div className="flex items-center gap-1 text-[8px] font-black text-primary bg-primary/10 border border-primary/20 px-1.5 py-0.5 rounded shadow-[0_0_10px_rgba(19,91,236,0.2)]">
+                            <div className="flex items-center gap-1 text-[8px] font-black text-white/50 bg-white/5 border border-white/10 px-1.5 py-0.5 rounded">
                               <ShieldCheck className="w-2.5 h-2.5" />
                               SEAL OF TRUST
                             </div>
                           </div>
                         ) : (
                           <div className="flex items-center gap-1.5 text-slate-500 text-[10px] font-bold">
-                            <XCircle className="w-3.5 h-3.5" />
+                            <ShieldCheck className="w-3.5 h-3.5 opacity-50" />
                             PENDING
                           </div>
                         )}
@@ -213,7 +211,7 @@ export default function AdminUsersPage() {
                           onClick={() => handleAction(u.id, u.verified ? "unverify" : "verify")}
                           className={clsx(
                             "w-8 h-8 flex items-center justify-center rounded-lg border transition-all",
-                            u.verified ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500 hover:bg-emerald-500 hover:text-white" : "bg-white/5 border-white/10 text-slate-400 hover:border-primary hover:text-primary"
+                            u.verified ? "bg-white/10 border-white/20 text-white hover:bg-white hover:text-black" : "bg-white/5 border-white/10 text-slate-400 hover:border-white hover:text-white"
                           )}
                         >
                           <ShieldCheck className="w-4 h-4" />
@@ -226,7 +224,7 @@ export default function AdminUsersPage() {
                               handleAction(u.id, "changeRole", { role: newRole });
                             }
                           }}
-                          className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:border-blue-500 hover:text-blue-500 transition-all"
+                          className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:border-white hover:text-white transition-all"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
@@ -237,7 +235,7 @@ export default function AdminUsersPage() {
                               handleAction(u.id, "delete");
                             }
                           }}
-                          className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all shadow-lg hover:shadow-red-500/20"
+                          className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:bg-red-900 hover:text-white hover:border-red-900 transition-all shadow-lg hover:shadow-red-900/20"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -259,17 +257,17 @@ export default function AdminUsersPage() {
             <button
               disabled={page === 1}
               onClick={() => setPage(p => p - 1)}
-              className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#151c2a]/60 border border-white/5 text-slate-400 hover:text-white hover:border-primary/50 transition-all disabled:opacity-30 disabled:pointer-events-none"
+              className="w-10 h-10 flex items-center justify-center rounded-xl bg-muted/60 border border-border text-slate-400 hover:text-white hover:border-white/50 transition-all disabled:opacity-30 disabled:pointer-events-none"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
-            <div className="h-10 px-4 flex items-center rounded-xl bg-primary text-white text-xs font-bold shadow-lg shadow-primary/20">
+            <div className="h-10 px-4 flex items-center rounded-xl bg-white text-black text-xs font-bold shadow-lg shadow-white/5">
               {page}
             </div>
             <button
               disabled={page >= totalPages}
               onClick={() => setPage(p => p + 1)}
-              className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#151c2a]/60 border border-white/5 text-slate-400 hover:text-white hover:border-primary/50 transition-all disabled:opacity-30 disabled:pointer-events-none"
+              className="w-10 h-10 flex items-center justify-center rounded-xl bg-muted/60 border border-border text-slate-400 hover:text-white hover:border-white/50 transition-all disabled:opacity-30 disabled:pointer-events-none"
             >
               <ChevronRight className="w-5 h-5" />
             </button>

@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { authFetch } from "@/lib/api-utils";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { User, Globe } from "lucide-react";
+import { User, Globe, ShieldCheck, Mail, Building, Phone, Link2, Linkedin, Twitter, FileText, Zap, Camera } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface ProfileData {
   id: string;
@@ -74,152 +75,170 @@ export default function ExporterSettingsPage() {
         body: JSON.stringify(payload),
       });
       setProfile(res.user);
-      setMsg({ type: "ok", text: "Profile updated successfully" });
+      setMsg({ type: "ok", text: "IDENTITY_UPDATE_SUCCESS" });
       refreshUser();
     } catch {
-      setMsg({ type: "err", text: "Failed to update profile" });
+      setMsg({ type: "err", text: "IDENTITY_UPDATE_FAILURE" });
     } finally {
       setSaving(false);
     }
   };
 
-  const fields: { label: string; key: keyof typeof form; type?: string; placeholder: string }[] = [
-    { label: "Full Name", key: "name", placeholder: "John Doe" },
-    { label: "Company Name", key: "companyName", placeholder: "Acme Exports Ltd." },
-    { label: "Country", key: "country", placeholder: "India" },
-    { label: "Phone Number", key: "phone", type: "tel", placeholder: "+91 9876543210" },
-    { label: "Website", key: "website", type: "url", placeholder: "https://example.com" },
-    { label: "LinkedIn URL", key: "linkedin", type: "url", placeholder: "https://linkedin.com/company/acme" },
-    { label: "X / Twitter URL", key: "twitter", type: "url", placeholder: "https://x.com/acme" },
+  const fields: { label: string; key: keyof typeof form; type?: string; placeholder: string; icon: any }[] = [
+    { label: "Identity Name", key: "name", placeholder: "NODE_ALPHA_ADMIN", icon: User },
+    { label: "Registry Company", key: "companyName", placeholder: "SECURE_EXPORTS_INC", icon: Building },
+    { label: "Origin Node", key: "country", placeholder: "GLOBAL_SYSTEM", icon: Globe },
+    { label: "Signal Comms", key: "phone", type: "tel", placeholder: "+00 0000000000", icon: Phone },
+    { label: "Network URL", key: "website", type: "url", placeholder: "HTTPS://NODE.NETWORK", icon: Link2 },
+    { label: "LinkedIn_Link", key: "linkedin", type: "url", placeholder: "LINKEDIN_URI", icon: Linkedin },
+    { label: "X_Telemetry", key: "twitter", type: "url", placeholder: "X_SIGNAL_URI", icon: Twitter },
   ];
 
+  if (loading) return (
+    <div className="h-screen flex flex-col items-center justify-center bg-card dark:bg-[#0a0a0a]">
+      <div className="flex flex-col items-center gap-6 opacity-40">
+        <div className="p-8 rounded-[2.5rem] bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 animate-pulse">
+          <ShieldCheck className="w-12 h-12 text-foreground dark:text-white animate-spin-slow" />
+        </div>
+        <p className="text-[10px] font-black text-foreground dark:text-white uppercase tracking-[0.4em] italic">Indexing Profile Data...</p>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="h-full overflow-hidden flex flex-col bg-background">
-      <header className="flex-shrink-0 p-6 lg:p-8 border-b border-border bg-header/80 backdrop-blur-md">
-        <div>
-          <h1 className="text-3xl font-black tracking-tight text-foreground uppercase italic">Account Settings</h1>
-          <p className="text-muted-foreground mt-1">Manage your profile and company information.</p>
+    <div className="h-full overflow-hidden flex flex-col bg-background selection:bg-primary selection:text-primary-foreground">
+      {/* ── Header ── */}
+      <header className="flex-shrink-0 px-10 py-10 border-b border-border dark:border-white/5 bg-background/40 backdrop-blur-3xl z-40">
+        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-10">
+          <div>
+            <h1 className="text-5xl font-black tracking-tighter text-foreground dark:text-white uppercase italic">Account Intel</h1>
+            <p className="text-muted-foreground/40 mt-3 text-[10px] font-black uppercase tracking-[0.3em] italic">
+              Registry Configuration: IDENTITY_SOURCE_NODE // {profile?.id?.slice(0, 12).toUpperCase()}
+            </p>
+          </div>
+          <div className="flex items-center gap-5">
+            <div className="px-6 py-4 rounded-2xl bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 text-foreground dark:text-white text-[9px] font-black uppercase tracking-[0.2em] italic shadow-xl dark:shadow-2xl">
+              Level: Verified_Exporter
+            </div>
+          </div>
         </div>
       </header>
-      <div className="flex-1 overflow-y-auto p-6 lg:p-8 custom-scrollbar">
-        <div className="max-w-[800px] mx-auto space-y-8">
-          {loading ? (
-            <div className="space-y-4">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="h-16 bg-card rounded-xl animate-pulse border border-border" />
-              ))}
-            </div>
-          ) : (
-            <>
-              {/* Avatar + Email header */}
-              <div className="bg-card backdrop-blur-xl border border-border rounded-2xl p-6 flex items-center gap-6">
-                <div className="relative group">
-                  <div className="w-20 h-20 rounded-2xl bg-primary/20 flex items-center justify-center text-primary font-black text-2xl border border-primary/30 overflow-hidden shadow-2xl shadow-primary/20">
-                    {profile?.avatar ? (
-                      <img src={profile.avatar} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      form.name ? form.name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2) : "?"
-                    )}
-                  </div>
-                  <button className="absolute -bottom-2 -right-2 bg-primary text-white p-1.5 rounded-lg border border-[#0b1019] shadow-xl opacity-0 group-hover:opacity-100 transition-opacity">
-                    <User className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-                <div>
-                  <div className="text-foreground font-black text-xl tracking-tight uppercase italic">{profile?.name || "—"}</div>
-                  <div className="text-muted-foreground text-sm flex items-center gap-2">
-                    {profile?.email}
-                    <span className="size-1 rounded-full bg-border" />
-                    <span className="text-primary font-black text-[10px] tracking-widest uppercase">Exporter</span>
-                  </div>
-                  {profile?.companyName && (
-                    <div className="text-xs text-muted-foreground mt-1 font-medium">{profile.companyName}</div>
+
+      <div className="flex-1 overflow-y-auto p-10 space-y-16 custom-scrollbar animate-in fade-in slide-in-from-bottom-4 duration-1000 pb-20">
+        <div className="max-w-[1200px] mx-auto space-y-16">
+          
+          {/* Identity Header Card */}
+          <div className="bg-card/40 dark:bg-white/5 backdrop-blur-3xl border border-border dark:border-white/5 rounded-[3rem] p-10 flex flex-col md:flex-row items-center gap-10 shadow-xl dark:shadow-2xl group">
+             <div className="relative">
+                <div className="w-32 h-32 rounded-[2.5rem] bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 flex items-center justify-center text-foreground dark:text-white font-black text-4xl italic shadow-2xl shadow-white/5 overflow-hidden group-hover:border-white/30 transition-all duration-700">
+                  {profile?.avatar ? (
+                    <img src={profile.avatar} alt="" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
+                  ) : (
+                    form.name ? form.name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2) : "ID"
                   )}
                 </div>
-              </div>
-
-              {/* Form Sections */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Basic Info */}
-                <div className="bg-card border border-border rounded-3xl p-8 space-y-6">
-                  <h3 className="text-sm font-black text-foreground tracking-[0.2em] uppercase opacity-50 mb-4 italic">Basic Information</h3>
-                  {fields.slice(0, 5).map((f) => (
-                    <div key={f.key}>
-                      <label className="block text-[10px] font-black text-muted-foreground uppercase tracking-[0.15em] mb-2.5 ml-1">{f.label}</label>
-                      <input
-                        type={f.type || "text"}
-                        value={form[f.key]}
-                        onChange={(e) => setForm((prev) => ({ ...prev, [f.key]: e.target.value }))}
-                        placeholder={f.placeholder}
-                        className="w-full bg-muted border border-border focus:border-primary/50 rounded-2xl px-5 py-3.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none transition-all shadow-inner"
-                      />
-                    </div>
-                  ))}
+                <button className="absolute -bottom-3 -right-3 size-12 bg-primary text-primary-foreground p-3 rounded-2xl shadow-xl dark:shadow-2xl active:scale-90 transition-transform flex items-center justify-center">
+                  <Camera className="w-5 h-5 font-black" />
+                </button>
+             </div>
+             <div className="text-center md:text-left flex-1">
+                <div className="text-3xl font-black text-foreground dark:text-white italic tracking-tighter uppercase group-hover:translate-x-1 transition-transform mb-2">
+                  {profile?.name || "NULL_IDENTITY"}
                 </div>
+                <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-muted-foreground/30 text-[10px] font-black uppercase tracking-widest italic group-hover:text-muted-foreground/60 transition-colors">
+                  <span className="flex items-center gap-2 underline underline-offset-4 decoration-white/10">{profile?.email}</span>
+                  <span className="size-1.5 rounded-full bg-black/10 dark:bg-white/15" />
+                  <span className="flex items-center gap-2"><Globe className="w-3 h-3" /> {profile?.country || "GLOBAL_NODE"}</span>
+                </div>
+             </div>
+             <div className="px-8 py-4 rounded-2xl bg-white/[0.02] border border-border dark:border-white/5 flex items-center gap-4 group-hover:border-border dark:border-white/20 transition-all">
+                <ShieldCheck className="w-6 h-6 text-foreground dark:text-white opacity-20" />
+                <div className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em] italic">SECURE_ID_LOCK: ON</div>
+             </div>
+          </div>
 
-                {/* Company & Socials */}
-                <div className="space-y-8">
-                  <div className="bg-card border border-border rounded-3xl p-8 space-y-6">
-                    <h3 className="text-sm font-black text-foreground tracking-[0.2em] uppercase opacity-50 mb-4 italic">Social & Online</h3>
-                    {fields.slice(5).map((f) => (
-                      <div key={f.key}>
-                        <label className="block text-[10px] font-black text-muted-foreground uppercase tracking-[0.15em] mb-2.5 ml-1">{f.label}</label>
+          {/* Configuration Grid */}
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
+            {/* Primary Source Data */}
+            <div className="xl:col-span-12 bg-card/40 dark:bg-white/5 backdrop-blur-3xl border border-border dark:border-white/5 rounded-[3rem] p-12 shadow-xl dark:shadow-2xl space-y-12">
+               <div className="flex items-center gap-4 border-b border-border dark:border-white/5 pb-8">
+                  <User className="w-5 h-5 text-foreground dark:text-white" />
+                  <h3 className="text-[10px] font-black text-foreground dark:text-white uppercase tracking-[0.3em] italic opacity-40">Identity_Telemetry_Buffer</h3>
+               </div>
+               
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                  {fields.map((f) => (
+                    <div key={f.key} className="group/field">
+                      <label className="block text-[9px] font-black text-muted-foreground/20 uppercase tracking-[0.3em] mb-4 ml-2 italic group-focus-within/field:text-foreground dark:text-white transition-colors">
+                        {f.label}
+                      </label>
+                      <div className="relative">
+                        <f.icon className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/20 group-focus-within/field:text-foreground dark:text-white transition-colors" />
                         <input
                           type={f.type || "text"}
                           value={form[f.key]}
                           onChange={(e) => setForm((prev) => ({ ...prev, [f.key]: e.target.value }))}
                           placeholder={f.placeholder}
-                          className="w-full bg-muted border border-border focus:border-primary/50 rounded-2xl px-5 py-3.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none transition-all shadow-inner"
+                          className="w-full bg-white/[0.02] border border-border dark:border-white/5 focus:border-border dark:border-white/20 rounded-2xl px-16 py-4.5 text-[11px] text-foreground dark:text-white font-black uppercase tracking-widest placeholder:text-muted-foreground/10 focus:outline-none transition-all shadow-inner italic"
                         />
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
+               </div>
+            </div>
 
-                  <div className="bg-primary/5 border border-primary/20 rounded-3xl p-8 text-center relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-[60px] rounded-full -mr-16 -mt-16 group-hover:bg-primary/30 transition-colors" />
-                    < Globe className="w-8 h-8 text-primary mx-auto mb-3 opacity-50" />
-                    <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Global Presence</p>
-                    <p className="text-muted-foreground text-xs mt-2 px-4 italic">
-                      Your profile is visible to verified importers across 140+ countries.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* About Company */}
-              <div className="bg-card border border-border rounded-3xl p-8 space-y-6">
-                <h3 className="text-sm font-black text-foreground tracking-[0.2em] uppercase opacity-50 mb-4 italic">About Your Company</h3>
-                <div>
-                  <label className="block text-[10px] font-black text-muted-foreground uppercase tracking-[0.15em] mb-2.5 ml-1 text-right">Company Description</label>
+            {/* Global Description */}
+            <div className="xl:col-span-12 bg-card/40 dark:bg-white/5 backdrop-blur-3xl border border-border dark:border-white/5 rounded-[3rem] p-12 shadow-xl dark:shadow-2xl space-y-12">
+               <div className="flex items-center gap-4 border-b border-border dark:border-white/5 pb-8">
+                  <FileText className="w-5 h-5 text-foreground dark:text-white" />
+                  <h3 className="text-[10px] font-black text-foreground dark:text-white uppercase tracking-[0.3em] italic opacity-40">Market_Position_Manifesto</h3>
+               </div>
+               <div className="group/field">
                   <textarea
                     value={form.description}
                     onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
-                    placeholder="Tell importers about your expertise, production capacity, and values..."
+                    placeholder="Broadcast your node's operational history, production telemetry, and global scaling values..."
                     rows={6}
-                    className="w-full bg-muted border border-border focus:border-primary/50 rounded-2xl px-5 py-4 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none transition-all shadow-inner resize-none"
+                    className="w-full bg-white/[0.02] border border-border dark:border-white/5 focus:border-border dark:border-white/20 rounded-[2.5rem] px-10 py-8 text-[11px] text-foreground dark:text-white font-black uppercase tracking-widest placeholder:text-muted-foreground/10 focus:outline-none transition-all shadow-inner resize-none italic leading-relaxed"
                   />
-                </div>
-              </div>
+               </div>
+            </div>
+          </div>
 
-              {/* Action */}
-              <div className="flex flex-col items-center gap-4 py-8">
+          {/* Final Protocol Action */}
+          <div className="flex flex-col items-center gap-10 py-10">
+            <AnimatePresence>
                 {msg && (
-                  <div className={`text-[10px] font-black uppercase tracking-[0.15em] px-6 py-3 rounded-xl shadow-2xl ${msg.type === "ok" ? "bg-emerald-500/10 border border-emerald-500/20 text-emerald-400" : "bg-red-500/10 border border-red-500/20 text-red-400"}`}>
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className={`text-[10px] font-black uppercase tracking-[0.3em] px-10 py-4 rounded-2xl shadow-xl dark:shadow-2xl italic flex items-center gap-4 ${msg.type === "ok" ? "bg-black/10 dark:bg-white/15 border border-border dark:border-white/20 text-foreground dark:text-white shadow-white/5" : "bg-black/5 dark:bg-white/10 border border-border dark:border-white/5 text-muted-foreground/20"}`}
+                  >
+                    <div className="size-2 rounded-full bg-primary animate-pulse" />
                     {msg.text}
-                  </div>
+                  </motion.div>
                 )}
+            </AnimatePresence>
 
-                <button
-                  onClick={handleSave}
-                  disabled={saving}
-                  className="group relative px-12 py-4 bg-primary hover:bg-primary/90 disabled:opacity-50 text-white font-black text-xs uppercase tracking-[0.3em] rounded-2xl shadow-2xl shadow-primary/30 transition-all active:scale-95 overflow-hidden"
-                >
-                  <span className="relative z-10">{saving ? "Saving Changes..." : "Save Profile"}</span>
-                  <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-                </button>
-              </div>
-            </>
-          )}
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="group relative px-16 py-5 bg-primary hover:bg-primary/90 disabled:opacity-20 text-primary-foreground font-black text-[10px] uppercase tracking-[0.4em] rounded-2xl shadow-2xl shadow-white/5 transition-all active:scale-95 overflow-hidden italic"
+            >
+              <span className="relative z-10 flex items-center gap-4">
+                {saving ? "SYNCING..." : "COMMIT_IDENTITY_UPDATE"} 
+                <Zap className="w-4 h-4 group-hover:scale-125 transition-transform" />
+              </span>
+              <div className="absolute inset-0 bg-white/2 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+            </button>
+            
+            <div className="flex items-center gap-6 opacity-20">
+               <div className="h-px w-20 bg-primary" />
+               <p className="text-[8px] font-black text-foreground dark:text-white uppercase tracking-[0.5em] italic">End Registry Session</p>
+               <div className="h-px w-20 bg-primary" />
+            </div>
+          </div>
         </div>
       </div>
     </div>

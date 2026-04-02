@@ -132,11 +132,11 @@ export default {
         "pulse-glow": {
           "0%, 100%": {
             opacity: "1",
-            boxShadow: "0 0 20px rgba(19, 91, 236, 0.3)",
+            boxShadow: "0 0 20px rgba(255, 255, 255, 0.2)",
           },
           "50%": {
             opacity: ".7",
-            boxShadow: "0 0 40px rgba(19, 91, 236, 0.6)",
+            boxShadow: "0 0 40px rgba(255, 255, 255, 0.4)",
           },
         },
         "scan-vertical": {

@@ -259,7 +259,7 @@ export default function ProductForm({
     };
 
     const inputClass =
-        "w-full px-5 py-4 bg-slate-900/60 border border-white/5 focus:border-primary/50 rounded-2xl text-sm text-white placeholder:text-slate-600 focus:outline-none transition-all shadow-inner";
+        "w-full px-5 py-4 bg-card/60 border border-white/5 focus:border-white/50 rounded-2xl text-sm text-white placeholder:text-slate-600 focus:outline-none transition-all shadow-inner";
     const labelClass = "block text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-2.5 ml-1";
     const errorClass = "text-[10px] font-bold text-red-400 mt-1.5 ml-1 uppercase tracking-wider";
 
@@ -289,7 +289,7 @@ export default function ProductForm({
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="inline-flex items-center gap-2 bg-primary hover:bg-[#0f49bd] text-white font-black text-xs uppercase tracking-[0.2em] py-4 px-8 rounded-2xl shadow-2xl shadow-primary/20 transition-all active:scale-95 disabled:opacity-50"
+                        className="inline-flex items-center gap-2 bg-white hover:bg-neutral-100 text-black font-black text-xs uppercase tracking-[0.2em] py-4 px-8 rounded-2xl shadow-2xl shadow-white/10 transition-all active:scale-95 disabled:opacity-50"
                     >
                         {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                         {isEdit ? "Save Profile" : "Deploy Asset"}
@@ -302,7 +302,7 @@ export default function ProductForm({
                 <div className="lg:col-span-12 xl:col-span-8 space-y-8">
                     {/* Basic Info */}
                     <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-2xl rounded-[2.5rem] p-10 space-y-8 relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[80px] rounded-full -mr-32 -mt-32 group-hover:bg-primary/10 transition-colors pointer-events-none" />
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 blur-[80px] rounded-full -mr-32 -mt-32 group-hover:bg-white/10 transition-colors pointer-events-none" />
 
                         <h2 className="text-sm font-black text-white tracking-[0.25em] uppercase opacity-50 mb-4 italic">Core Specifications</h2>
 
@@ -354,9 +354,9 @@ export default function ProductForm({
                                                 value={customCategory}
                                                 onChange={(e) => setCustomCategory(e.target.value)}
                                                 placeholder="e.g. Artisanal Rare Earth Magnets"
-                                                className={inputClass + " border-primary/30 bg-primary/5"}
+                                                className={inputClass + " border-white/30 bg-white/5"}
                                             />
-                                            <p className="text-[9px] text-primary/60 mt-2 ml-1 italic font-medium uppercase tracking-wider">This will create a new unique sector for your listing</p>
+                                            <p className="text-[9px] text-white/60 mt-2 ml-1 italic font-medium uppercase tracking-wider">This will create a new unique sector for your listing</p>
                                         </div>
                                     )}
                                 </div>
@@ -490,7 +490,7 @@ export default function ProductForm({
                                 {form.images.map((url, i) => (
                                     <div 
                                         key={i} 
-                                        className="relative group rounded-xl overflow-hidden border border-white/10 aspect-square bg-slate-900 shadow-xl cursor-zoom-in"
+                                        className="relative group rounded-xl overflow-hidden border border-white/10 aspect-square bg-card shadow-xl cursor-zoom-in"
                                         onClick={() => setPreviewImage(url)}
                                     >
                                         <img src={url} alt="asset" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
@@ -544,9 +544,9 @@ export default function ProductForm({
                     </div>
 
                     {/* Status Guard */}
-                    <div className="bg-primary/5 border border-primary/20 rounded-[2.5rem] p-8 relative overflow-hidden group">
-                        <Save className="w-10 h-10 text-primary mb-4 opacity-30" />
-                        <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Listing Protocols</p>
+                    <div className="bg-white/5 border border-white/20 rounded-[2.5rem] p-8 relative overflow-hidden group">
+                        <Save className="w-10 h-10 text-white mb-4 opacity-30" />
+                        <p className="text-[10px] font-black text-white uppercase tracking-[0.2em]">Listing Protocols</p>
                         <ul className="text-[10px] text-slate-500 mt-4 space-y-2 italic font-medium leading-relaxed">
                             <li>• Prices should be in USD.</li>
                             <li>• Weights must use metric units.</li>
@@ -571,7 +571,7 @@ export default function ProductForm({
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="flex-1 sm:flex-none relative group px-12 py-4 bg-primary hover:bg-[#0f49bd] disabled:opacity-50 text-white font-black text-[10px] uppercase tracking-[0.3em] rounded-2xl shadow-2xl shadow-primary/30 transition-all active:scale-95 overflow-hidden"
+                            className="flex-1 sm:flex-none relative group px-12 py-4 bg-white hover:bg-neutral-100 disabled:opacity-50 text-black font-black text-[10px] uppercase tracking-[0.3em] rounded-2xl shadow-2xl shadow-white/10 transition-all active:scale-95 overflow-hidden"
                         >
                             <span className="relative z-10 flex items-center gap-3">
                                 {isSubmitting ? (

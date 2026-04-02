@@ -92,24 +92,24 @@ export default function ImporterSettingsPage() {
 
   if (loading) {
     return (
-      <div className="h-full flex items-center justify-center">
-        <Loader2 className="w-10 h-10 text-primary animate-spin" />
+      <div className="h-full flex items-center justify-center bg-background">
+        <Loader2 className="w-10 h-10 text-foreground animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="h-dvh overflow-hidden flex flex-col bg-slate-50 dark:bg-[#0a0c12] transition-colors duration-300">
-      <header className="flex-shrink-0 p-6 lg:p-8 border-b border-slate-200 dark:border-white/5 bg-white dark:bg-transparent transition-colors duration-300">
+    <div className="h-dvh overflow-hidden flex flex-col bg-background transition-colors duration-300">
+      <header className="flex-shrink-0 p-6 lg:p-8 border-b border-border bg-header backdrop-blur-xl z-20">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white italic">OPERATIONAL SETTINGS</h1>
-            <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-1">Configure your global procurement identity</p>
+            <h1 className="text-3xl font-black tracking-tight text-foreground uppercase italic">Management Console</h1>
+            <p className="text-muted-foreground font-black text-[10px] uppercase tracking-widest mt-1">Configure your global procurement identity and node protocols</p>
           </div>
           <button
             onClick={handleSave}
             disabled={saving}
-            className="bg-primary hover:bg-[#0f49bd] disabled:opacity-50 text-white font-black px-8 py-3.5 rounded-2xl flex items-center gap-2 transition-all shadow-xl shadow-primary/20 active:scale-95"
+            className="bg-primary hover:bg-primary/90 disabled:opacity-50 text-primary-foreground border-transparent font-black px-8 py-3.5 rounded-2xl flex items-center gap-3 transition-all shadow-xl shadow-primary/5 active:scale-95 text-[10px] uppercase tracking-[0.2em]"
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             Save Manifest
@@ -119,7 +119,7 @@ export default function ImporterSettingsPage() {
 
       <div className="flex-1 flex overflow-hidden">
         {/* Nav Sidebar */}
-        <aside className="w-72 border-r border-slate-200 dark:border-white/5 bg-white dark:bg-transparent p-6 space-y-2 overflow-y-auto hidden lg:block transition-colors duration-300">
+        <aside className="w-72 border-r border-border bg-header backdrop-blur-xl p-6 space-y-3 overflow-y-auto hidden lg:block transition-all">
           <TabButton active={activeTab === "profile"} onClick={() => setActiveTab("profile")} icon={User} label="Profile Persona" />
           <TabButton active={activeTab === "business"} onClick={() => setActiveTab("business")} icon={Building2} label="Entity Details" />
           <TabButton active={activeTab === "security"} onClick={() => setActiveTab("security")} icon={Lock} label="Security Core" />
@@ -131,30 +131,31 @@ export default function ImporterSettingsPage() {
             {activeTab === "profile" && (
               <section className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-10">
                 {/* Header Section */}
-                <div className="flex items-center gap-8">
+                <div className="flex items-center gap-10">
                   <div className="relative group">
-                    <div className="size-32 rounded-[2.5rem] bg-gradient-to-br from-primary/20 to-indigo-500/10 border-2 border-slate-200 dark:border-white/5 flex items-center justify-center text-4xl shadow-sm dark:shadow-2xl relative overflow-hidden bg-white dark:bg-transparent">
+                    <div className="size-36 rounded-[2.5rem] bg-muted/40 border border-border flex items-center justify-center text-5xl shadow-2xl relative overflow-hidden backdrop-blur-xl group-hover:border-border transition-all">
                       {profile?.avatar ? (
-                        <img src={profile.avatar} className="w-full h-full object-cover" />
+                        <img src={profile.avatar} className="w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all" />
                       ) : (
-                        <span className="font-black text-slate-900 dark:text-white">{form.name?.[0]?.toUpperCase() || "I"}</span>
+                        <span className="font-black text-foreground italic">{form.name?.[0]?.toUpperCase() || "I"}</span>
                       )}
                     </div>
-                    <button className="absolute -bottom-2 -right-2 size-10 rounded-2xl bg-primary text-white flex items-center justify-center shadow-xl border-4 border-slate-50 dark:border-[#0a0c12] group-hover:scale-110 transition-transform">
-                      <Camera className="w-4 h-4" />
+                    <button className="absolute -bottom-3 -right-3 size-12 rounded-2xl bg-primary text-primary-foreground border-transparent flex items-center justify-center shadow-2xl border-4 border-background group-hover:scale-110 transition-transform active:scale-90">
+                      <Camera className="w-5 h-5" />
                     </button>
                   </div>
                   <div>
-                    <h2 className="text-2xl font-black text-slate-900 dark:text-white px-1">Institutional Profile</h2>
-                    <p className="text-slate-500 text-sm mt-1 px-1">How your entity appears to global exporters.</p>
-                    <div className="flex items-center gap-3 mt-4">
-                      <span className="px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest">Importer</span>
-                      <span className="flex items-center gap-1.5 text-slate-500 text-[10px] font-black uppercase tracking-widest italic">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-500" /> Verified Node
+                    <h2 className="text-3xl font-black text-foreground uppercase italic tracking-tighter">Institutional Profile</h2>
+                    <p className="text-muted-foreground text-[10px] font-black uppercase tracking-widest mt-2">How your entity appears to global resource nodes.</p>
+                    <div className="flex items-center gap-4 mt-6">
+                      <span className="px-4 py-1.5 rounded-full bg-muted/20 border border-border text-foreground text-[9px] font-black uppercase tracking-widest shadow-xl">Importer Node</span>
+                      <span className="flex items-center gap-2 text-muted-foreground text-[9px] font-black uppercase tracking-widest italic">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-foreground/40" /> Verified Protocol
                       </span>
                     </div>
                   </div>
                 </div>
+
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <InputGroup label="Display Name" value={form.name} onChange={(v) => setForm({ ...form, name: v })} icon={User} placeholder="Operations Lead" />
@@ -167,9 +168,9 @@ export default function ImporterSettingsPage() {
 
             {activeTab === "business" && (
               <section className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-10">
-                <div className="flex items-center gap-4 border-b border-slate-200 dark:border-white/5 pb-6">
-                  <Building2 className="w-6 h-6 text-primary" />
-                  <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Corporate Identity</h2>
+                <div className="flex items-center gap-5 border-b border-white/5 pb-8">
+                  <Building2 className="w-7 h-7 text-foreground" />
+                  <h2 className="text-2xl font-black text-foreground uppercase italic tracking-tighter">Corporate Identity</h2>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -188,16 +189,16 @@ export default function ImporterSettingsPage() {
 
             {activeTab === "security" && (
               <section className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-10">
-                <div className="flex items-center gap-4 border-b border-slate-200 dark:border-white/5 pb-6">
-                  <ShieldCheck className="w-6 h-6 text-primary" />
-                  <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Security Protocols</h2>
+                <div className="flex items-center gap-5 border-b border-white/5 pb-8">
+                  <ShieldCheck className="w-7 h-7 text-foreground" />
+                  <h2 className="text-2xl font-black text-foreground uppercase italic tracking-tighter">Security Protocols</h2>
                 </div>
 
-                <div className="p-8 rounded-[2.5rem] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/5 border-dashed text-center space-y-4 shadow-sm dark:shadow-none">
-                  <Lock className="w-12 h-12 text-slate-400 dark:text-slate-700 mx-auto" />
-                  <h3 className="text-slate-900 dark:text-white font-black uppercase tracking-widest text-sm">Access Credential Management</h3>
-                  <p className="text-slate-500 text-xs max-w-sm mx-auto">Update your security passcodes to maintain integrity within the global marketplace network.</p>
-                  <button className="px-6 py-3 rounded-2xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-white font-black text-[10px] uppercase tracking-widest transition-all">
+                <div className="p-12 rounded-[2.5rem] bg-muted/20 border border-border border-dashed text-center space-y-6 shadow-2xl backdrop-blur-xl">
+                  <Lock className="w-16 h-16 text-muted-foreground/20 mx-auto" />
+                  <h3 className="text-foreground font-black uppercase tracking-[0.2em] text-sm italic">Access Credential Management</h3>
+                  <p className="text-muted-foreground text-[10px] font-black uppercase tracking-widest max-w-sm mx-auto leading-relaxed">Update your security passcodes to maintain integrity within the global marketplace network.</p>
+                  <button className="px-8 py-4 rounded-2xl bg-primary text-primary-foreground border-transparent hover:bg-primary/90 font-black text-[10px] uppercase tracking-[0.2em] transition-all shadow-xl active:scale-95">
                     Initialize Password Reset
                   </button>
                 </div>
@@ -215,30 +216,30 @@ function TabButton({ active, onClick, icon: Icon, label }: { active: boolean; on
   return (
     <button
       onClick={onClick}
-      className={`w-full flex items-center gap-4 p-4 rounded-2xl transition-all group ${active
-        ? "bg-primary text-white shadow-xl shadow-primary/20"
-        : "text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-slate-200"
+      className={`w-full flex items-center gap-4 p-5 rounded-2xl transition-all group ${active
+        ? "bg-primary text-primary-foreground border-transparent shadow-2xl shadow-primary/5 scale-105 z-10"
+        : "text-muted-foreground hover:bg-muted/20 hover:text-foreground"
         }`}
     >
-      <Icon className={`w-4 h-4 ${active ? "animate-pulse" : ""}`} />
-      <span className="text-xs font-black uppercase tracking-widest">{label}</span>
+      <Icon className={`w-4 h-4 ${active ? "animate-pulse" : "opacity-30 group-hover:opacity-100 transition-opacity"}`} />
+      <span className="text-[10px] font-black uppercase tracking-[0.2em]">{label}</span>
     </button>
   );
 }
 
 function InputGroup({ label, value, onChange, icon: Icon, placeholder, readOnly }: { label: string; value: string; onChange?: (v: string) => void; icon: any; placeholder?: string; readOnly?: boolean }) {
   return (
-    <div className="space-y-2.5">
-      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">{label}</label>
+    <div className="space-y-3">
+      <label className="block text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] ml-1">{label}</label>
       <div className="relative group/input">
-        <Icon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-600 transition-colors group-focus-within/input:text-primary" />
+        <Icon className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/30 transition-all group-focus-within/input:text-foreground group-focus-within/input:scale-110" />
         <input
           type="text"
           value={value}
           readOnly={readOnly}
           onChange={(e) => onChange?.(e.target.value)}
           placeholder={placeholder}
-          className={`w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-2xl py-4 pl-12 pr-6 text-slate-900 dark:text-white shadow-sm dark:shadow-none font-bold text-sm focus:ring-2 focus:ring-primary/40 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-700 ${readOnly ? "opacity-60 cursor-not-allowed bg-slate-50 dark:bg-transparent" : "hover:border-slate-300 dark:hover:border-white/10"}`}
+          className={`w-full bg-muted/40 border border-border rounded-2xl py-5 pl-14 pr-6 text-foreground shadow-2xl font-black text-sm italic focus:ring-1 focus:ring-white/20 outline-none transition-all placeholder:text-muted-foreground/20 uppercase tracking-widest ${readOnly ? "opacity-40 cursor-not-allowed bg-muted/20" : "hover:border-border"}`}
         />
       </div>
     </div>

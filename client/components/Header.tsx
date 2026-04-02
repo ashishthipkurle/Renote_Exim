@@ -4,10 +4,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Globe2, User, LogOut } from "lucide-react";
+import { Menu, X, User, LogOut } from "lucide-react";
 import { Button } from "./ui/button";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { useAuth } from "@/components/auth/AuthProvider";
+import LogoImg from "@/assests/LOGO.png";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -25,14 +26,8 @@ export default function Header() {
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="relative">
-              <div className="absolute inset-0 bg-primary/15 blur-lg group-hover:bg-primary/25 transition-all rounded-full" />
-              <Globe2 className="w-8 h-8 text-primary relative z-10" />
-            </div>
-            <span className="text-xl font-bold">
-              Ranote <span className="text-primary">Exim</span>
-            </span>
+          <Link href="/" className="flex items-center gap-2 group pl-2">
+             <Image src={LogoImg} alt="Ranote Exim Logo" className="w-48 md:w-64 lg:w-72 h-auto object-contain scale-[1.35] origin-left" unoptimized />
           </Link>
 
           {/* Desktop Navigation */}

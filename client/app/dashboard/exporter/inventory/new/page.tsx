@@ -11,3 +11,4 @@ export default async function NewProductPage() {
 
     return <ProductForm />;
 }
+

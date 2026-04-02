@@ -22,23 +22,23 @@ export default function LoadingSpinner({
   const spinnerContent = (
     <div className={`relative ${sizeClasses[size]}`}>
       {/* Outer rotating ring */}
-      <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-primary border-r-primary/60 animate-spin" />
+      <div className="absolute inset-0 rounded-full border border-transparent border-t-white/80 border-r-white/20 animate-spin" />
       
       {/* Middle pulsing ring */}
-      <div className="absolute inset-1 rounded-full border-2 border-primary/20 animate-pulse" />
+      <div className="absolute inset-1.5 rounded-full border border-white/10 animate-pulse" />
       
       {/* Inner rotating ring (counter-clockwise) */}
       <div
-        className="absolute inset-0 rounded-full border-2 border-transparent border-b-primary border-l-primary/60 animate-spin"
+        className="absolute inset-0 rounded-full border border-transparent border-b-white/40 border-l-white/10 animate-spin"
         style={{ animationDirection: "reverse" }}
       />
-
+-
       {/* Glow effect */}
       <div
-        className="absolute inset-0 rounded-full blur-sm"
+        className="absolute inset-0 rounded-full blur-md opacity-20"
         style={{
           background:
-            "radial-gradient(circle, rgba(19, 91, 236, 0.4) 0%, rgba(19, 91, 236, 0) 70%)",
+            "radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 70%)",
           animation: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         }}
       />
@@ -51,20 +51,20 @@ export default function LoadingSpinner({
 
   if (variant === "overlay") {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm z-50">
-        <div className="flex flex-col items-center gap-4">
+      <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-xl z-50">
+        <div className="flex flex-col items-center gap-6 animate-in zoom-in-95 fade-in duration-500">
           {spinnerContent}
-          {text && <p className="text-sm text-white font-medium">{text}</p>}
+          {text && <p className="text-[10px] font-black text-white uppercase tracking-[0.2em] italic opacity-60">{text}</p>}
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-6">
       {spinnerContent}
       {text && (
-        <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
+        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] italic opacity-40">
           {text}
         </p>
       )}

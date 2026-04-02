@@ -60,15 +60,15 @@ export default function AdminAnalyticsPage() {
   ];
 
   return (
-    <div className="h-dvh flex flex-col bg-[#0b1019] relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.05)_0%,transparent_100%)] pointer-events-none" />
+    <div className="h-dvh flex flex-col bg-background relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.05)_0%,transparent_100%)] pointer-events-none" />
 
       {/* Header */}
-      <header className="flex-shrink-0 h-20 px-8 flex items-center justify-between border-b border-white/5 bg-[#0b1019]/30 backdrop-blur-md z-30">
+      <header className="flex-shrink-0 h-20 px-8 flex items-center justify-between border-b border-border bg-background/30 backdrop-blur-md z-30">
         <div>
           <h1 className="text-xl font-black text-white uppercase tracking-widest flex items-center gap-2">
             Neural Analytics
-            <span className="text-[10px] bg-primary/20 text-primary border border-primary/30 px-2 py-0.5 rounded">
+            <span className="text-[10px] bg-white/20 text-white border border-white/30 px-2 py-0.5 rounded">
               L4 INTEL
             </span>
           </h1>
@@ -76,20 +76,20 @@ export default function AdminAnalyticsPage() {
         </div>
 
         <div className="flex gap-2">
-          <div className="flex bg-[#151c2a]/50 border border-white/10 p-1 rounded-xl">
+          <div className="flex bg-muted/50 border border-border p-1 rounded-xl">
             {["24H", "7D", "30D", "1Y"].map((t) => (
               <button
                 key={t}
                 className={clsx(
                   "px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all",
-                  t === "30D" ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-slate-500 hover:text-slate-300"
+                  t === "30D" ? "bg-white text-black shadow-lg shadow-white/5" : "text-slate-500 hover:text-slate-300"
                 )}
               >
                 {t}
               </button>
             ))}
           </div>
-          <button className="flex items-center gap-2 bg-[#151c2a]/50 border border-white/10 px-4 rounded-xl text-xs font-bold text-slate-300 hover:text-white transition-colors">
+          <button className="flex items-center gap-2 bg-muted/50 border border-border px-4 rounded-xl text-xs font-bold text-slate-300 hover:text-white transition-colors">
             <Calendar className="w-4 h-4" />
             Export Intel
           </button>
@@ -106,20 +106,20 @@ export default function AdminAnalyticsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className="bg-[#151c2a]/40 backdrop-blur-xl border border-white/5 p-6 rounded-2xl group hover:border-primary/30 transition-all shadow-xl"
+              className="bg-muted/40 backdrop-blur-xl border border-border p-6 rounded-2xl group hover:border-white/30 transition-all shadow-xl"
             >
               <div className="flex justify-between items-start mb-4">
                 <div className="text-[10px] text-slate-500 font-black uppercase tracking-[0.2em]">{kpi.label}</div>
                 <div className={clsx(
                   "flex items-center gap-0.5 text-[10px] font-black px-1.5 py-0.5 rounded border uppercase",
-                  kpi.trend === "up" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-red-500/10 text-red-500 border-red-500/20"
+                  kpi.trend === "up" ? "bg-white/10 text-white border-white/20" : "bg-neutral-800 text-neutral-400 border-white/10"
                 )}>
                   {kpi.trend === "up" ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
                   {kpi.change}%
                 </div>
               </div>
               <div className="flex items-end gap-1.5">
-                <div className="text-3xl font-black text-white group-hover:text-primary transition-colors">
+                <div className="text-3xl font-black text-white group-hover:text-white transition-colors">
                   {kpi.label.includes("Capital") ? `$${kpi.value}M` : kpi.label.includes("Saturation") ? `${kpi.value}%` : kpi.value.toLocaleString()}
                 </div>
               </div>
@@ -130,7 +130,7 @@ export default function AdminAnalyticsPage() {
         {/* Charts Row */}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
           {/* Main Growth Chart */}
-          <div className="xl:col-span-2 bg-[#151c2a]/40 backdrop-blur-xl border border-white/5 p-8 rounded-3xl relative overflow-hidden h-[450px]">
+          <div className="xl:col-span-2 bg-muted/40 backdrop-blur-xl border border-border p-8 rounded-3xl relative overflow-hidden h-[450px]">
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h3 className="text-white font-black text-lg uppercase tracking-widest flex items-center gap-2">
@@ -141,17 +141,17 @@ export default function AdminAnalyticsPage() {
               </div>
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-2">
-                  <span className="size-2.5 rounded-full bg-primary" />
+                  <span className="size-2.5 rounded-full bg-white" />
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Signups</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="size-2.5 rounded-full bg-emerald-500" />
+                  <span className="size-2.5 rounded-full bg-slate-600" />
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Revenue</span>
                 </div>
               </div>
             </div>
 
-            <div className="absolute inset-x-8 bottom-12 top-32 flex items-end gap-4 p-4 border-l border-b border-white/5">
+            <div className="absolute inset-x-8 bottom-12 top-32 flex items-end gap-4 p-4 border-l border-b border-border">
               {loading ? (
                 <div className="w-full h-full animate-pulse bg-white/5 rounded-2xl" />
               ) : (
@@ -161,12 +161,12 @@ export default function AdminAnalyticsPage() {
                       <motion.div
                         initial={{ height: 0 }}
                         animate={{ height: `${(g.signups / 500) * 100}%` }}
-                        className="w-4 bg-primary rounded-t-lg shadow-[0_0_15px_rgba(59,130,246,0.2)] group-hover:w-6 transition-all"
+                        className="w-4 bg-white rounded-t-lg shadow-[0_0_15px_rgba(255,255,255,0.1)] group-hover:w-6 transition-all"
                       />
                       <motion.div
                         initial={{ height: 0 }}
                         animate={{ height: `${(g.revenue / 5000000) * 100}%` }}
-                        className="w-4 bg-emerald-500 rounded-t-lg shadow-[0_0_15px_rgba(16,185,129,0.2)] group-hover:w-6 transition-all"
+                        className="w-4 bg-slate-600 rounded-t-lg shadow-[0_0_15px_rgba(255,255,255,0.05)] group-hover:w-6 transition-all"
                       />
                     </div>
                     <span className="text-[9px] font-black text-slate-500 uppercase rotate-45 mt-4 min-w-[30px]">{g.month}</span>
@@ -177,10 +177,10 @@ export default function AdminAnalyticsPage() {
           </div>
 
           {/* Sector Distribution */}
-          <div className="bg-[#151c2a]/40 backdrop-blur-xl border border-white/5 p-8 rounded-3xl h-[450px] flex flex-col">
+          <div className="bg-muted/40 backdrop-blur-xl border border-border p-8 rounded-3xl h-[450px] flex flex-col">
             <div className="mb-8">
               <h3 className="text-white font-black text-lg uppercase tracking-widest flex items-center gap-2">
-                <PieChart className="w-5 h-5 text-purple-500" />
+                <PieChart className="w-5 h-5 text-white" />
                 Sector Share
               </h3>
               <p className="text-slate-500 text-xs font-medium">Platform engagement by industry sector.</p>
@@ -195,7 +195,7 @@ export default function AdminAnalyticsPage() {
                 data?.categories.map((c, i) => (
                   <div key={c.name} className="space-y-2 group">
                     <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
-                      <span className="text-slate-300 group-hover:text-primary transition-colors">{c.name}</span>
+                      <span className="text-slate-300 group-hover:text-white transition-colors">{c.name}</span>
                       <span className="text-white">{c.count} Listings</span>
                     </div>
                     <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
@@ -204,7 +204,7 @@ export default function AdminAnalyticsPage() {
                         animate={{ width: `${(c.count / 1000) * 100}%` }}
                         className={clsx(
                           "h-full rounded-full shadow-[0_0_10px_rgba(255,255,255,0.1)]",
-                          i === 0 ? "bg-primary" : i === 1 ? "bg-emerald-500" : i === 2 ? "bg-purple-500" : "bg-amber-500"
+                          i === 0 ? "bg-white" : i === 1 ? "bg-white/60" : i === 2 ? "bg-white/40" : "bg-white/20"
                         )}
                       />
                     </div>
@@ -221,15 +221,15 @@ export default function AdminAnalyticsPage() {
         </div>
 
         {/* Heatmap/Activity Visualization Placeholder */}
-        <div className="mt-8 bg-gradient-to-r from-primary/5 via-transparent to-emerald-500/5 border border-white/5 p-12 rounded-3xl flex flex-col items-center justify-center text-center space-y-4">
-          <Globe className="w-12 h-12 text-primary animate-pulse" />
+        <div className="mt-8 bg-gradient-to-r from-white/5 via-transparent to-white/5 border border-border p-12 rounded-3xl flex flex-col items-center justify-center text-center space-y-4">
+          <Globe className="w-12 h-12 text-white animate-pulse" />
           <div>
             <h4 className="text-white font-black uppercase tracking-widest">Global Heat Map Matrix</h4>
             <p className="text-slate-500 text-xs font-medium max-w-md mx-auto mt-2">
               Advanced visualization for geographic order density and trade corridors currently calculating in secondary core.
             </p>
           </div>
-          <button className="bg-primary/20 text-primary border border-primary/30 px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all">
+          <button className="bg-white/20 text-white border border-white/30 px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all">
             Access Secondary Node
           </button>
         </div>

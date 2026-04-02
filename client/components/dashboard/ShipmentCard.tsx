@@ -10,12 +10,12 @@ interface ShipmentCardProps {
 }
 
 const SHIPMENT_STATUS: Record<string, { label: string; color: string; icon: any }> = {
-    PREPARING: { label: "Preparing", color: "text-yellow-500 bg-yellow-500/10 border-yellow-500/20", icon: Package },
-    IN_TRANSIT: { label: "In Transit", color: "text-cyan-400 bg-cyan-400/10 border-cyan-400/20", icon: Truck },
-    CUSTOMS: { label: "Customs", color: "text-purple-400 bg-purple-400/10 border-purple-400/20", icon: ShieldCheck },
-    OUT_FOR_DELIVERY: { label: "Out for Delivery", color: "text-blue-400 bg-blue-400/10 border-blue-400/20", icon: Truck },
-    DELIVERED: { label: "Delivered", color: "text-emerald-400 bg-emerald-400/10 border-emerald-400/20", icon: CheckCircle2 },
-    RETURNED: { label: "Returned", color: "text-red-400 bg-red-400/10 border-red-400/20", icon: Package },
+    PREPARING: { label: "Preparing", color: "text-neutral-400 bg-neutral-400/10 border-neutral-400/20", icon: Package },
+    IN_TRANSIT: { label: "In Transit", color: "text-white bg-white/10 border-white/20", icon: Truck },
+    CUSTOMS: { label: "Customs", color: "text-neutral-300 bg-neutral-300/10 border-neutral-300/20", icon: ShieldCheck },
+    OUT_FOR_DELIVERY: { label: "Out for Delivery", color: "text-white bg-white/20 border-white/30", icon: Truck },
+    DELIVERED: { label: "Delivered", color: "text-neutral-400 bg-neutral-400/10 border-neutral-400/20", icon: CheckCircle2 },
+    RETURNED: { label: "Returned", color: "text-neutral-500 bg-neutral-500/10 border-neutral-500/20", icon: Package },
 };
 
 export default function ShipmentCard({ shipment }: ShipmentCardProps) {
@@ -56,11 +56,11 @@ export default function ShipmentCard({ shipment }: ShipmentCardProps) {
     const daysLeft = calculateDaysLeft();
 
     return (
-        <div className="bg-white dark:bg-[#151c2a]/60 shadow-sm dark:shadow-xl backdrop-blur-xl border border-slate-200 dark:border-white/5 rounded-3xl overflow-hidden group hover:border-primary/50 dark:hover:border-primary/20 transition-all">
+        <div className="bg-white dark:bg-card shadow-sm dark:shadow-xl backdrop-blur-xl border border-slate-200 dark:border-white/5 rounded-3xl overflow-hidden group hover:border-white/50 dark:hover:border-white/20 transition-all">
             {/* Header */}
             <div className="p-6 border-b border-slate-200 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
-                    <div className="size-12 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                    <div className="size-12 rounded-2xl bg-slate-100 dark:bg-muted flex items-center justify-center text-white group-hover:scale-110 transition-transform">
                         <StatusIcon className="w-6 h-6" />
                     </div>
                     <div>
@@ -72,7 +72,7 @@ export default function ShipmentCard({ shipment }: ShipmentCardProps) {
                                 {cfg.label}
                             </span>
                         </div>
-                        <div className="text-slate-500 dark:text-slate-400 text-[10px] mt-1 font-bold uppercase tracking-wider">
+                        <div className="text-slate-500 dark:text-muted-foreground text-[10px] mt-1 font-bold uppercase tracking-wider">
                             {shipment.order.product.name}
                         </div>
                     </div>
@@ -87,17 +87,17 @@ export default function ShipmentCard({ shipment }: ShipmentCardProps) {
             <div className="p-6 space-y-8">
                 {/* ETA Section */}
                 {status !== "DELIVERED" && daysLeft !== null && (
-                    <div className="flex items-center justify-between p-4 rounded-2xl bg-blue-50 dark:bg-primary/5 border border-blue-200 dark:border-primary/10">
+                    <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 dark:bg-white/5 border border-white/10">
                         <div className="flex items-center gap-3">
-                            <Timer className="w-5 h-5 text-primary" />
+                            <Timer className="w-5 h-5 text-white" />
                             <div>
-                                <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest leading-none">Estimate Arrival</div>
+                                <div className="text-[10px] font-bold text-slate-500 dark:text-muted-foreground uppercase tracking-widest leading-none">Estimate Arrival</div>
                                 <div className="text-sm font-black text-slate-900 dark:text-white mt-1">{formatDate(shipment.estimatedDelivery)}</div>
                             </div>
                         </div>
                         <div className="text-right">
-                            <div className="text-2xl font-black text-primary leading-none">{daysLeft}</div>
-                            <div className="text-[10px] font-bold text-primary uppercase mt-1">Days Left</div>
+                            <div className="text-2xl font-black text-white leading-none">{daysLeft}</div>
+                            <div className="text-[10px] font-bold text-white uppercase mt-1">Days Left</div>
                         </div>
                     </div>
                 )}
@@ -109,8 +109,8 @@ export default function ShipmentCard({ shipment }: ShipmentCardProps) {
                         {steps.map((step, idx) => (
                             <div key={idx} className="flex flex-col items-center gap-2 group/step">
                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-500 ${step.status === "COMPLETED"
-                                        ? "bg-primary border-primary text-white shadow-md dark:shadow-[0_0_15px_rgba(37,99,235,0.4)]"
-                                        : "bg-slate-100 dark:bg-[#1d2636] border-slate-300 dark:border-slate-700 text-slate-400 dark:text-slate-600"
+                                    ? "bg-white border-white text-black shadow-md dark:shadow-white/20"
+                                    : "bg-slate-100 dark:bg-muted border-slate-300 dark:border-border text-muted-foreground"
                                     }`}>
                                     {step.status === "COMPLETED" ? (
                                         <CheckCircle2 className="w-4 h-4 animate-in fade-in zoom-in duration-500" />
@@ -128,14 +128,14 @@ export default function ShipmentCard({ shipment }: ShipmentCardProps) {
 
                 {/* Status Message */}
                 <div className="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5">
-                    <MapPin className="w-4 h-4 text-primary" />
+                    <MapPin className="w-4 h-4 text-white" />
                     <div className="text-xs text-slate-600 dark:text-slate-300">
                         {status === "CUSTOMS" ? (
-                            <span className="text-purple-600 dark:text-purple-400 font-bold">In Customs: Clearance documents verified. Processing.</span>
+                            <span className="text-white font-bold opacity-80 uppercase tracking-widest text-[10px]">In Customs: Clearance documents verified.</span>
                         ) : status === "IN_TRANSIT" ? (
                             <span>Departure from exchange office in origin country.</span>
                         ) : status === "DELIVERED" ? (
-                            <span className="text-emerald-600 dark:text-emerald-400 font-bold">Successfully delivered to destination hub.</span>
+                            <span className="text-white font-bold uppercase tracking-widest text-[10px]">Successfully delivered to destination hub.</span>
                         ) : (
                             <span>Shipment is being prepared for dispatch.</span>
                         )}
@@ -148,8 +148,8 @@ export default function ShipmentCard({ shipment }: ShipmentCardProps) {
                         onClick={handleConfirmDelivery}
                         disabled={loading || status !== "OUT_FOR_DELIVERY"}
                         className={`w-full py-3.5 rounded-2xl font-bold text-sm transition-all shadow-sm dark:shadow-xl flex items-center justify-center gap-2 ${status === "OUT_FOR_DELIVERY"
-                                ? "bg-primary hover:bg-[#0f49bd] text-white shadow-md dark:shadow-primary/20"
-                                : "bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-white/5 cursor-not-allowed opacity-50"
+                            ? "bg-white hover:bg-neutral-100 text-black shadow-md shadow-white/10"
+                            : "bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-white/5 cursor-not-allowed opacity-50"
                             }`}
                     >
                         {loading ? <Clock className="w-4 h-4 animate-spin" /> : <ShieldCheck className="w-4 h-4" />}

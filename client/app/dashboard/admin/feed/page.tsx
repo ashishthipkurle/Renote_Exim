@@ -59,23 +59,23 @@ export default function AdminFeedPage() {
 
   const getIcon = (type: string) => {
     switch (type) {
-      case "USER": return <UserPlus className="w-5 h-5 text-blue-400" />;
-      case "ORDER": return <ShoppingCart className="w-5 h-5 text-emerald-400" />;
-      case "PRODUCT": return <Package className="w-5 h-5 text-amber-400" />;
-      default: return <Zap className="w-5 h-5 text-primary" />;
+      case "USER": return <UserPlus className="w-5 h-5 text-white" />;
+      case "ORDER": return <ShoppingCart className="w-5 h-5 text-white" />;
+      case "PRODUCT": return <Package className="w-5 h-5 text-white" />;
+      default: return <Zap className="w-5 h-5 text-white" />;
     }
   };
 
   return (
-    <div className="h-dvh flex flex-col bg-[#0b1019] relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(59,130,246,0.05)_0%,transparent_70%)] pointer-events-none" />
+    <div className="h-dvh flex flex-col bg-background relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.05)_0%,transparent_70%)] pointer-events-none" />
 
       {/* Header */}
-      <header className="flex-shrink-0 h-20 px-8 flex items-center justify-between border-b border-white/5 bg-[#0b1019]/30 backdrop-blur-md z-30">
+      <header className="flex-shrink-0 h-20 px-8 flex items-center justify-between border-b border-border bg-background/30 backdrop-blur-md z-30">
         <div>
           <h1 className="text-xl font-black text-white uppercase tracking-widest flex items-center gap-2">
             System Operations Pulse
-            <span className="text-[10px] bg-red-500/20 text-red-500 border border-red-500/30 px-2 py-0.5 rounded animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.2)]">
+            <span className="text-[10px] bg-white/20 text-white border border-white/30 px-2 py-0.5 rounded animate-pulse shadow-[0_0_10px_rgba(255,255,255,0.1)]">
               LIVE SIGNAL
             </span>
           </h1>
@@ -83,14 +83,14 @@ export default function AdminFeedPage() {
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="flex bg-[#151c2a]/50 border border-white/10 p-1 rounded-xl">
+          <div className="flex bg-muted/50 border border-border p-1 rounded-xl">
             {["ALL", "USER", "ORDER", "PRODUCT"].map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
                 className={clsx(
                   "px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all",
-                  filter === f ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-slate-500 hover:text-slate-300"
+                  filter === f ? "bg-white text-black shadow-lg shadow-white/5" : "text-slate-500 hover:text-slate-300"
                 )}
               >
                 {f}
@@ -99,7 +99,7 @@ export default function AdminFeedPage() {
           </div>
           <button
             onClick={fetchFeed}
-            className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#151c2a]/50 border border-white/10 text-slate-400 hover:text-white transition-all group"
+            className="w-10 h-10 flex items-center justify-center rounded-xl bg-muted/50 border border-border text-slate-400 hover:text-white transition-all group"
           >
             <RefreshCcw className="w-4 h-4 group-active:rotate-180 transition-transform duration-500" />
           </button>
@@ -132,10 +132,10 @@ export default function AdminFeedPage() {
                   className="relative ml-12 group"
                 >
                   {/* Timeline Dot */}
-                  <div className="absolute -left-[30px] top-4 z-10 size-4 rounded-full bg-[#0b1019] border-2 border-primary group-hover:scale-125 group-hover:bg-primary transition-all shadow-[0_0_10px_rgba(59,130,246,0.3)]" />
+                  <div className="absolute -left-[30px] top-4 z-10 size-4 rounded-full bg-background border-2 border-white group-hover:scale-125 group-hover:bg-white transition-all shadow-[0_0_10px_rgba(255,255,255,0.1)]" />
 
-                  <div className="bg-[#151c2a]/40 backdrop-blur-xl border border-white/5 p-6 rounded-2xl hover:border-primary/20 transition-all shadow-xl flex items-center gap-6">
-                    <div className="size-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-primary/30 transition-all">
+                  <div className="bg-muted/40 backdrop-blur-xl border border-border p-6 rounded-2xl hover:border-white/20 transition-all shadow-xl flex items-center gap-6">
+                    <div className="size-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-white/30 transition-all">
                       {getIcon(item.type)}
                     </div>
 
@@ -166,14 +166,14 @@ export default function AdminFeedPage() {
       </div>
 
       {/* Status Bar */}
-      <footer className="h-12 border-t border-white/5 bg-[#0b1019]/50 backdrop-blur-md px-8 flex items-center justify-between">
+      <footer className="h-12 border-t border-border bg-background/50 backdrop-blur-md px-8 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
-            <span className="size-2 rounded-full bg-emerald-500" />
+            <span className="size-2 rounded-full bg-white" />
             Core Synced
           </div>
           <div className="text-[10px] font-black text-slate-600 uppercase">
-            Ops Velocity: <span className="text-primary">High</span>
+            Ops Velocity: <span className="text-white">High</span>
           </div>
         </div>
         <div className="text-[10px] font-mono text-slate-700">SIGNAL_INTEGRITY: 99.8%</div>

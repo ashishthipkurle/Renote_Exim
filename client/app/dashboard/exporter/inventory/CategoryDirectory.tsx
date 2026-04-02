@@ -1,17 +1,18 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Search, Plus, ChevronRight, X, Sparkles } from "lucide-react";
+import { Search, Plus, ChevronRight, X, Sparkles, Globe, Layers, ShieldCheck, TrendingUp, Package } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import ProductForm from "@/components/dashboard/ProductForm";
+import { motion, AnimatePresence } from "framer-motion";
 
 const TOP_SECTORS = [
-    { name: "Agriculture", icon: "🌱", color: "text-lime-400" },
-    { name: "Textiles", icon: "🧶", color: "text-pink-400" },
-    { name: "Chemicals", icon: "🧪", color: "text-violet-400" },
-    { name: "Machinery", icon: "⚙️", color: "text-sky-400" },
-    { name: "Food", icon: "🍎", color: "text-orange-400" },
-    { name: "Electronics", icon: "💻", color: "text-blue-400" },
+    { name: "Agriculture", icon: "🌱", color: "text-foreground dark:text-white" },
+    { name: "Textiles", icon: "🧶", color: "text-foreground dark:text-white" },
+    { name: "Chemicals", icon: "🧪", color: "text-foreground dark:text-white" },
+    { name: "Machinery", icon: "⚙️", color: "text-foreground dark:text-white" },
+    { name: "Food", icon: "🍎", color: "text-foreground dark:text-white" },
+    { name: "Electronics", icon: "💻", color: "text-foreground dark:text-white" },
 ];
 
 const ALL_INDUSTRIES = [
@@ -69,7 +70,7 @@ const DISPLAY_TO_ENUM: Record<string, string> = {
     "AGRICULTURE": "AGRICULTURE",
     "TEXTILES": "TEXTILES",
     "CHEMICALS": "CHEMICALS",
-    "MACHINERY": "MACHINES", // Fix: Machinery -> MACHINES
+    "MACHINERY": "MACHINES",
     "FOOD": "FOOD",
     "ELECTRONICS": "ELECTRONICS",
     "AUTOMOTIVE": "AUTOMOTIVE",
@@ -87,12 +88,11 @@ export default function CategoryDirectory({ usedCategories = [] }: { usedCategor
     const isSelected = searchParams.get("action") === "new";
     const selectedCategory = searchParams.get("category");
 
-    // Map usedCategories (ENUMS) back to display names if possible
     const usedDisplayNames = useMemo(() => {
         return usedCategories.map(cat => {
             const entry = Object.entries(DISPLAY_TO_ENUM).find(([_, val]) => val === cat);
-            if (entry) return entry[0].charAt(0) + entry[0].slice(1).toLowerCase();
-            return cat.charAt(0) + cat.slice(1).toLowerCase();
+            if (entry) return entry[0];
+            return cat;
         });
     }, [usedCategories]);
 
@@ -103,144 +103,160 @@ export default function CategoryDirectory({ usedCategories = [] }: { usedCategor
 
     const handleSelect = (category: string) => {
         const upper = category.toUpperCase();
-        // Check if it's already a valid enum or needs mapping
         const enumValue = DISPLAY_TO_ENUM[upper] || (["MACHINERY", "MACHINES"].includes(upper) ? "MACHINES" : "OTHER");
         router.push(`/dashboard/exporter/inventory/add?action=new&category=${enumValue}`, { scroll: false });
     };
 
     const handleBack = () => {
-        // If we are in the "form" view (isSelected), go back to the "directory" view on the same page
         if (isSelected) {
             router.push(`/dashboard/exporter/inventory/add`, { scroll: false });
         } else {
-            // Otherwise go back to the inventory index
             router.push(`/dashboard/exporter/inventory`, { scroll: false });
         }
     };
 
     return (
-        <div className="bg-card backdrop-blur-xl border border-border rounded-[2.5rem] p-8 lg:p-10 shadow-xl dark:shadow-2xl relative overflow-hidden group min-h-[600px] transition-all duration-700">
-            {/* Background Glow */}
-            <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/5 via-transparent to-transparent pointer-events-none transition-opacity duration-700 ${isSelected ? 'opacity-30' : 'opacity-100'}`} />
-            <div className={`absolute -bottom-24 -right-24 w-96 h-96 bg-primary/10 blur-[120px] rounded-full transition-all duration-1000 ${isSelected ? 'scale-150 -translate-x-1/2 -translate-y-1/2 opacity-40' : 'group-hover:bg-primary/20'}`} />
+        <div className="bg-card/40 dark:bg-white/5 backdrop-blur-3xl border border-border dark:border-white/5 rounded-[3rem] p-10 lg:p-12 shadow-xl dark:shadow-2xl relative overflow-hidden group min-h-[700px] transition-all duration-700">
+            {/* ── Background Elements ── */}
+            <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/5 via-transparent to-transparent pointer-events-none transition-opacity duration-1000 ${isSelected ? 'opacity-20' : 'opacity-100'}`} />
+            <div className={`absolute -bottom-48 -right-48 w-[600px] h-[600px] bg-black/5 dark:bg-white/10 blur-[150px] rounded-full transition-all duration-1000 pointer-events-none ${isSelected ? 'scale-150 -translate-x-1/2 -translate-y-1/2 opacity-20' : 'group-hover:bg-black/10 dark:bg-white/15'}`} />
 
             <div className="relative z-10 flex flex-col h-full">
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-10">
-                    <div className={`transition-all duration-500 ${isSelected ? 'opacity-40 filter grayscale scale-95 origin-left' : 'opacity-100'}`}>
-                        <h2 className="text-2xl font-black text-foreground uppercase  tracking-tight flex items-center gap-3">
-                            Products
-                            {isSelected && <Sparkles className="w-5 h-5 text-primary animate-pulse" />}
+                {/* ── Header ── */}
+                <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-10 mb-12">
+                    <div className={`transition-all duration-700 ${isSelected ? 'opacity-20 filter grayscale scale-95 origin-left' : 'opacity-100'}`}>
+                        <h2 className="text-4xl font-black text-foreground dark:text-white uppercase italic tracking-tighter flex items-center gap-5">
+                            Sector Registry
+                            {isSelected && <Sparkles className="w-6 h-6 text-foreground dark:text-white animate-pulse" />}
                         </h2>
-                        <p className="text-muted-foreground text-sm mt-1 font-medium">Explore thousands of global trade categories</p>
+                        <p className="text-muted-foreground/40 text-[10px] font-black uppercase tracking-[0.3em] mt-3 italic">Discover thousands of global trade neural nodes</p>
                     </div>
 
-                    {!isSelected && (
-                        <div className="relative w-full lg:w-[400px] animate-in fade-in slide-in-from-right-4 duration-500">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                            <input
-                                type="text"
-                                placeholder="Search 1000+ industry sectors..."
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                className="w-full pl-12 pr-4 py-4 bg-muted border border-border focus:border-primary/50 rounded-2xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none transition-all shadow-inner"
-                            />
-                        </div>
-                    )}
-
-                    {isSelected && (
-                        <button
-                            onClick={handleBack}
-                            className="flex items-center gap-2 px-6 py-3 bg-muted border border-border rounded-2xl text-muted-foreground hover:text-foreground hover:bg-accent transition-all font-black text-[10px] uppercase tracking-widest animate-in fade-in slide-in-from-right-4"
-                        >
-                            <X className="w-4 h-4" />
-                            Back to Index
-                        </button>
-                    )}
+                    <div className="flex items-center gap-4 flex-wrap">
+                        {!isSelected ? (
+                            <div className="relative w-full xl:w-[500px] group">
+                                <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/40 group-focus-within:text-foreground dark:text-white transition-colors" />
+                                <input
+                                    type="text"
+                                    placeholder="Search 1000+ industry clusters..."
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    className="w-full pl-14 pr-6 py-5 bg-card/40 dark:bg-white/5 border border-border dark:border-white/5 rounded-2xl text-[10px] text-foreground dark:text-white font-black uppercase placeholder:text-muted-foreground/20 focus:outline-none focus:border-border dark:border-white/20 transition-all shadow-inner tracking-widest italic"
+                                />
+                            </div>
+                        ) : (
+                            <button
+                                onClick={handleBack}
+                                className="flex items-center gap-3 px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl transition-all font-black text-[10px] uppercase tracking-[0.2em] italic shadow-2xl shadow-white/5 active:scale-95"
+                            >
+                                <X className="w-4 h-4" />
+                                Return to Index
+                            </button>
+                        )}
+                    </div>
                 </div>
 
-                <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-12 relative overflow-hidden">
-                    {/* LEFT PANEL: Directory (Blurred when selected) */}
-                    <div className={`lg:col-span-1 transition-all duration-700 ease-in-out ${isSelected ? 'blur-md opacity-30 pointer-events-none scale-[0.98]' : 'blur-none opacity-100'}`}>
-                        <div className="grid grid-cols-1 gap-10">
-                            {/* Featured Grid - Only show if no used categories or searching */}
-                            {(usedDisplayNames.length === 0 || search) && (
+                <div className="flex-1 grid grid-cols-1 xl:grid-cols-12 gap-12 relative">
+                    {/* ── Desktop Sidebar Content (Left or Center depending on state) ── */}
+                    <div className={`xl:col-span-12 transition-all duration-1000 ease-in-out ${isSelected ? 'opacity-0 invisible scale-95' : 'opacity-100 visible scale-100'}`}>
+                        <div className="grid grid-cols-1 xl:grid-cols-4 gap-12 h-fit">
+                            <div className="xl:col-span-1 space-y-12 h-fit">
                                 <div>
-                                    <div className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-4 ml-1">Featured Global Sectors</div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <h3 className="text-[10px] font-black text-foreground dark:text-white uppercase tracking-[0.4em] mb-8 italic">Primary Clusters</h3>
+                                    <div className="grid grid-cols-2 gap-4">
                                         {TOP_SECTORS.map((s) => (
                                             <button
                                                 key={s.name}
                                                 onClick={() => handleSelect(s.name)}
-                                                className="flex flex-col items-center justify-center p-5 bg-white/5 border border-white/5 rounded-2xl hover:bg-primary hover:border-primary transition-all group/btn active:scale-95 shadow-xl"
+                                                className="flex flex-col items-center justify-center p-6 bg-black/5 dark:bg-white/10 border border-border dark:border-white/5 rounded-3xl hover:bg-primary hover:border-transparent transition-all duration-500 group/btn active:scale-95 shadow-xl dark:shadow-2xl backdrop-blur-xl"
                                             >
-                                                <span className="text-2xl mb-2 group-hover/btn:scale-125 transition-transform">{s.icon}</span>
-                                                <span className="text-[10px] font-black uppercase tracking-widest text-white">{s.name}</span>
+                                                <span className="text-3xl mb-3 group-hover/btn:scale-125 transition-transform duration-500">{s.icon}</span>
+                                                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-foreground dark:text-white group-hover/btn:text-primary-foreground transition-colors">{s.name}</span>
                                             </button>
                                         ))}
-                                    <button
-                                        onClick={() => handleSelect("OTHER")}
-                                        className="flex flex-col items-center justify-center p-5 bg-primary/10 border border-primary/20 rounded-2xl hover:bg-primary transition-all group/btn active:scale-95 shadow-lg"
-                                    >
-                                        <Plus className="w-6 h-6 text-primary group-hover/btn:text-white mb-2" />
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-foreground group-hover/btn:text-white">Other</span>
-                                    </button>
+                                        <button
+                                            onClick={() => handleSelect("OTHER")}
+                                            className="flex flex-col items-center justify-center p-6 bg-black/5 dark:bg-white/10 border border-border dark:border-white/5 rounded-3xl hover:bg-primary transition-all duration-500 group/btn active:scale-95 shadow-xl dark:shadow-2xl backdrop-blur-xl"
+                                        >
+                                            <Plus className="w-7 h-7 text-foreground dark:text-white group-hover/btn:text-primary-foreground mb-3" />
+                                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-foreground dark:text-white group-hover/btn:text-primary-foreground transition-colors">Other</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="pt-10 border-t border-border dark:border-white/5">
+                                    <div className="flex items-center justify-between mb-8 italic">
+                                        <div className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-[0.3em]">{search ? 'Search Node Result' : 'System Sequence'}</div>
+                                        <Layers className="w-4 h-4 text-muted-foreground/20" />
+                                    </div>
+                                    <div className="grid grid-cols-1 gap-3 h-fit">
+                                        {(search ? filtered : ALL_INDUSTRIES.slice(0, 10)).map((item) => (
+                                            <button
+                                                key={item}
+                                                onClick={() => handleSelect(item)}
+                                                className="flex items-center justify-between p-5 bg-white/[0.02] hover:bg-black/10 dark:bg-white/15 border border-border dark:border-white/5 rounded-2xl transition-all duration-500 group/item text-left shadow-xl"
+                                            >
+                                                <span className="text-[10px] font-black text-muted-foreground group-hover/item:text-foreground dark:text-white transition-all uppercase tracking-widest italic">{item}</span>
+                                                <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/20 group-hover/item:text-foreground dark:text-white transition-all group-hover/item:translate-x-1" />
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
-                        )}
 
-                            {/* Industry List - Shows Used Categories by default, or all when searching */}
-                            <div>
-                                <div className="flex items-center justify-between mb-4 ml-1">
-                                    <div className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">{search ? 'Search' : 'Latest'}</div>
+                            {/* Center Content when not selected */}
+                            <div className="xl:col-span-3 flex flex-col items-center justify-center text-center p-20 bg-white/[0.01] border border-dashed border-border dark:border-white/5 rounded-[4rem] min-h-[500px] h-full group/main">
+                                <div className="w-32 h-32 bg-black/5 dark:bg-white/10 rounded-[2.5rem] flex items-center justify-center mb-10 border border-border dark:border-white/10 transition-all duration-700 group-hover/main:scale-110 group-hover/main:rotate-45">
+                                    <Globe className="w-12 h-12 text-white/20 animate-spin-slow" />
                                 </div>
-                                <div className="grid grid-cols-1 gap-2">
-                                    {(search ? filtered : ALL_INDUSTRIES.slice(0, 8)).map((item) => (
-                                        <button
-                                            key={item}
-                                            onClick={() => handleSelect(item)}
-                                            className="flex items-center justify-between p-4 bg-muted/20 hover:bg-accent border border-border rounded-xl transition-all group/item text-left"
-                                        >
-                                            <span className="text-xs font-bold text-muted-foreground group-hover/item:text-foreground transition-colors">{item}</span>
-                                            <ChevronRight className="w-3 h-3 text-muted-foreground/50 group-hover/item:text-primary transition-all" />
-                                        </button>
-                                    ))}
+                                <h3 className="text-xl font-black text-foreground dark:text-white uppercase italic tracking-tighter mb-5 opacity-40">Awaiting Sector Sequence</h3>
+                                <p className="max-w-[320px] text-[10px] text-muted-foreground/60 font-black uppercase tracking-[0.2em] leading-relaxed italic">
+                                    Initialize an industry node from the global registry to begin primary market deployment protocols.
+                                </p>
+                                <div className="mt-12 flex items-center gap-10 opacity-20">
+                                    <ShieldCheck className="w-6 h-6" />
+                                    <TrendingUp className="w-6 h-6" />
+                                    <Package className="w-6 h-6" />
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* RIGHT PANEL: The Form (Visible when selected) */}
-                    <div className={`absolute top-0 right-0 w-full lg:w-3/4 h-full transition-all duration-700 ease-in-out ${isSelected ? 'translate-x-0 opacity-100 visible' : 'translate-x-full opacity-0 invisible'}`}>
+                    {/* ── Selection View ── */}
+                    <AnimatePresence>
                         {isSelected && (
-                            <div className="bg-card backdrop-blur-2xl border border-primary/20 rounded-3xl p-8 lg:p-10 shadow-2xl h-full overflow-y-auto custom-scrollbar animate-in slide-in-from-right-12 duration-700">
-                                <div className="flex items-center justify-between mb-8">
-                                    <div>
-                                        <h3 className="text-xl font-black text-foreground uppercase italic tracking-tighter">Listing Profile</h3>
-                                        <div className="flex items-center gap-2 mt-1">
-                                            <div className="px-2 py-0.5 bg-primary/20 border border-primary/30 rounded-md text-[9px] font-black text-primary uppercase tracking-widest">{selectedCategory}</div>
-                                            <span className="text-muted-foreground font-bold uppercase text-[9px] tracking-widest">Global Protocol</span>
+                            <motion.div 
+                                initial={{ x: 100, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                exit={{ x: 100, opacity: 0 }}
+                                className="absolute inset-0 z-20 h-full"
+                            >
+                                <div className="bg-card/60 dark:bg-white/[0.07] backdrop-blur-3xl border border-border dark:border-white/10 rounded-[4rem] p-12 lg:p-16 shadow-[0_0_100px_rgba(0,0,0,0.5)] h-full overflow-y-auto custom-scrollbar">
+                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-10 mb-16">
+                                        <div>
+                                            <h3 className="text-4xl font-black text-foreground dark:text-white uppercase italic tracking-tighter">Listing Protocol</h3>
+                                            <div className="flex items-center gap-4 mt-4">
+                                                <div className="px-5 py-2 bg-primary text-primary-foreground rounded-xl text-[9px] font-black uppercase tracking-[0.2em] italic shadow-xl dark:shadow-2xl">
+                                                    NODE: {selectedCategory}
+                                                </div>
+                                                <span className="text-muted-foreground/40 font-black uppercase text-[8px] tracking-[0.3em] flex items-center gap-2 italic">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-black/20 dark:bg-white/20" /> 
+                                                    Primary Trade Link Verified
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="p-6 rounded-3xl bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 text-foreground dark:text-white animate-pulse">
+                                            <ShieldCheck className="w-8 h-8" />
                                         </div>
                                     </div>
-                                    <Sparkles className="w-6 h-6 text-primary/40" />
+
+                                    <div className="max-w-5xl">
+                                        <ProductForm hideHeader={true} />
+                                    </div>
                                 </div>
-
-                                <ProductForm hideHeader={true} />
-                            </div>
+                            </motion.div>
                         )}
-                    </div>
-
-                    {/* Placeholder for dual pane when not selected (Empty right side or instructions) */}
-                    {!isSelected && (
-                        <div className="hidden lg:flex lg:col-span-3 flex-col items-center justify-center text-center p-12 bg-muted/10 border border-dashed border-border rounded-3xl animate-in fade-in duration-1000">
-                            <div className="w-20 h-20 bg-primary/5 rounded-full flex items-center justify-center mb-6 border border-primary/10">
-                                <Plus className="w-8 h-8 text-primary/40" />
-                            </div>
-                            <h3 className="text-sm font-black text-foreground uppercase tracking-widest mb-3 opacity-60">Ready for Global Trade?</h3>
-                            <p className="max-w-[280px] text-xs text-muted-foreground font-medium leading-relaxed">
-                                Select an industry sector from the index on the left to initialize your next market deployment.
-                            </p>
-                        </div>
-                    )}
+                    </AnimatePresence>
                 </div>
             </div>
         </div>

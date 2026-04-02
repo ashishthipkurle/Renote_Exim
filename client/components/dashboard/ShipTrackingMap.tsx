@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import dynamic from "next/dynamic";
 import { authFetch } from "@/lib/api-utils";
 import { Globe, RefreshCw, Ship, Plane, Anchor } from "lucide-react";
+import { useTheme } from "next-themes";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 interface LiveRoute {
@@ -52,7 +52,7 @@ const PORT_COORDS: Record<string, { lat: number; lng: number; name: string }> = 
 };
 
 // ── The actual Leaflet map (loaded dynamically to avoid SSR) ────────────────
-function LeafletMapInner({ routes }: { routes: LiveRoute[] }) {
+function LeafletMapInner({ routes, theme }: { routes: LiveRoute[], theme?: string }) {
   const mapRef = useRef<any>(null);
   const [L, setL] = useState<any>(null);
   const [mapReady, setMapReady] = useState(false);
@@ -90,9 +90,12 @@ function LeafletMapInner({ routes }: { routes: LiveRoute[] }) {
       maxBoundsViscosity: 1.0,
     });
 
-    // Dark theme tiles from CartoDB
+    // Theme responsive tiles from CartoDB
+    const isDark = theme === "dark";
     L.tileLayer(
-      "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+      isDark 
+        ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+        : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
       { subdomains: "abcd", maxZoom: 19 }
     ).addTo(map);
 
@@ -139,10 +142,10 @@ function LeafletMapInner({ routes }: { routes: LiveRoute[] }) {
       allLatLngs.push(fromLatLng, toLatLng);
 
       // Route color
-      const color = route.type === "air" ? "#818cf8" : "#22d3ee";
+      const color = "#ffffff";
 
       // Draw the shipping route line
-      const routeLine = L.polyline([fromLatLng, toLatLng], {
+      L.polyline([fromLatLng, toLatLng], {
         color,
         weight: 2.5,
         opacity: 0.7,
@@ -162,9 +165,9 @@ function LeafletMapInner({ routes }: { routes: LiveRoute[] }) {
         className: "",
         html: `<div style="
           width: 14px; height: 14px; border-radius: 50%;
-          background: ${isIndianPort ? "#fbbf24" : color};
+          background: white;
           border: 2px solid white;
-          box-shadow: 0 0 12px ${isIndianPort ? "#fbbf2488" : color + "88"};
+          box-shadow: 0 0 12px rgba(255,255,255,0.4);
         "></div>`,
         iconSize: [14, 14],
         iconAnchor: [7, 7],
@@ -173,7 +176,7 @@ function LeafletMapInner({ routes }: { routes: LiveRoute[] }) {
         .addTo(map)
         .bindPopup(`
           <div style="font-family:monospace;font-size:12px">
-            <b style="color:${isIndianPort ? "#fbbf24" : color}">📦 ORIGIN</b><br/>
+            <b style="color:white">📦 ORIGIN</b><br/>
             <b>${from?.name || route.fromPort}</b><br/>
             Cargo: ${route.cargo || "N/A"}<br/>
             Vessel: ${route.vessel || "N/A"}
@@ -196,7 +199,7 @@ function LeafletMapInner({ routes }: { routes: LiveRoute[] }) {
         .addTo(map)
         .bindPopup(`
           <div style="font-family:monospace;font-size:12px">
-            <b style="color:${color}">🏁 DESTINATION</b><br/>
+            <b style="color:white">🏁 DESTINATION</b><br/>
             <b>${to?.name || route.toPort}</b><br/>
             Buyer: ${route.importer || "N/A"}
           </div>
@@ -231,7 +234,7 @@ function LeafletMapInner({ routes }: { routes: LiveRoute[] }) {
           .addTo(map)
           .bindPopup(`
             <div style="font-family:monospace;font-size:12px">
-              <b style="color:#22d3ee">🚢 VESSEL POSITION</b><br/>
+              <b style="color:white">🚢 VESSEL POSITION</b><br/>
               <b>${route.vessel || "Unknown Vessel"}</b><br/>
               Location: ${route.lastLocation || "At Sea"}<br/>
               Lat: ${route.lat.toFixed(4)}° Lng: ${route.lng.toFixed(4)}°<br/>
@@ -261,30 +264,45 @@ function LeafletMapInner({ routes }: { routes: LiveRoute[] }) {
           75%, 100% { transform: scale(2.5); opacity: 0; }
         }
         .leaflet-popup-content-wrapper {
-          background: #0f172a !important;
-          color: #e2e8f0 !important;
-          border: 1px solid rgba(34, 211, 238, 0.3) !important;
+          background: white !important;
+          color: #000000 !important;
+          border: 1px solid rgba(255, 255, 255, 0.2) !important;
           border-radius: 12px !important;
-          box-shadow: 0 0 20px rgba(34, 211, 238, 0.15) !important;
+          box-shadow: 0 0 20px rgba(0, 0, 0, 0.1) !important;
+        }
+        .dark .leaflet-popup-content-wrapper {
+          background: #000000 !important;
+          color: #ffffff !important;
+          box-shadow: 0 0 20px rgba(255, 255, 255, 0.1) !important;
         }
         .leaflet-popup-tip {
-          background: #0f172a !important;
-          border-color: rgba(34, 211, 238, 0.3) !important;
+          background: white !important;
+        }
+        .dark .leaflet-popup-tip {
+          background: #000000 !important;
         }
         .leaflet-control-zoom a {
+          background: white !important;
+          color: #64748b !important;
+          border-color: #e2e8f0 !important;
+        }
+        .dark .leaflet-control-zoom a {
           background: #1e293b !important;
           color: #94a3b8 !important;
           border-color: #334155 !important;
         }
         .leaflet-control-zoom a:hover {
+          background: #f1f5f9 !important;
+          color: #0f172a !important;
+        }
+        .dark .leaflet-control-zoom a:hover {
           background: #334155 !important;
           color: white !important;
         }
       `}</style>
       <div
         ref={containerRef}
-        className="absolute inset-0 z-0"
-        style={{ background: "#0a1628" }}
+        className="absolute inset-0 z-0 bg-slate-100 dark:bg-background"
       />
     </>
   );
@@ -296,6 +314,7 @@ export default function ShipTrackingMap() {
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
     setLoading(true);
@@ -316,23 +335,23 @@ export default function ShipTrackingMap() {
   // Manual refresh only — no auto-refresh
 
   return (
-    <div className="w-full h-full flex flex-col rounded-2xl overflow-hidden bg-[#0a1628] border border-white/5">
+    <div className="w-full h-full flex flex-col rounded-2xl overflow-hidden bg-white dark:bg-background border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-none">
       {/* Header */}
-      <div className="flex-shrink-0 flex items-center justify-between px-5 py-3 z-20 relative border-b border-white/5">
+      <div className="flex-shrink-0 flex items-center justify-between px-5 py-3 z-20 relative border-b border-slate-200 dark:border-white/5 bg-white/50 dark:bg-card/40 backdrop-blur-sm">
         <div className="flex items-center gap-3">
-          <Globe className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+          <Globe className="w-4 h-4 text-white flex-shrink-0" />
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-[14px] font-bold text-white tracking-tight">
+              <h2 className="text-[14px] font-bold text-slate-900 dark:text-white tracking-tight">
                 India Global Trade Network
               </h2>
               <span className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase border ${
                 routes.length > 0
-                  ? "bg-green-500/12 border-green-500/30 text-green-400"
-                  : "bg-slate-500/12 border-slate-500/30 text-slate-400"
+                  ? "bg-white/10 border-white/20 text-white"
+                  : "bg-neutral-500/12 border-neutral-500/30 text-neutral-400"
               }`}>
                 <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${
-                  routes.length > 0 ? "bg-green-400" : "bg-slate-400"
+                  routes.length > 0 ? "bg-white" : "bg-neutral-400"
                 }`} />
                 {routes.length > 0 ? "LIVE" : "NO ROUTES"}
               </span>
@@ -346,7 +365,7 @@ export default function ShipTrackingMap() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setRefreshKey((n) => n + 1)}
-            className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-all"
+            className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all"
             title="Refresh"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
@@ -373,19 +392,19 @@ export default function ShipTrackingMap() {
         ) : null}
 
         {loading ? (
-          <div className="absolute inset-0 flex items-center justify-center z-10 bg-[#0a1628]">
+          <div className="absolute inset-0 flex items-center justify-center z-10 bg-slate-100 dark:bg-background">
             <div className="text-center space-y-3">
-              <div className="w-8 h-8 border-2 border-cyan-400/30 border-t-cyan-400 rounded-full animate-spin mx-auto" />
-              <p className="text-slate-400 text-sm">Loading live tracking...</p>
+              <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin mx-auto" />
+              <p className="text-slate-500 dark:text-slate-400 text-sm">Loading live tracking...</p>
             </div>
           </div>
         ) : null}
 
-        <LeafletMapInner routes={routes} />
+        <LeafletMapInner key={resolvedTheme} routes={routes} theme={resolvedTheme} />
       </div>
 
       {/* Footer stats */}
-      <div className="flex-shrink-0 flex items-center justify-between px-5 py-2 border-t border-white/5 text-[11px] text-slate-500">
+      <div className="flex-shrink-0 flex items-center justify-between px-5 py-2 border-t border-slate-200 dark:border-white/5 text-[11px] text-slate-500 bg-white/50 dark:bg-transparent backdrop-blur-sm">
         <div className="flex items-center gap-4">
           <span className="flex items-center gap-1">
             <Plane className="w-3 h-3" />
@@ -396,7 +415,7 @@ export default function ShipTrackingMap() {
             Ocean {routes.filter((r) => r.type === "ocean").length}
           </span>
         </div>
-        <span className="text-cyan-400/60 text-[10px]">
+        <span className="text-white/40 text-[10px]">
           Only showing your active shipments
         </span>
       </div>

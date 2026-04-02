@@ -45,19 +45,19 @@ export default function CartSheet() {
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon" className="relative group">
-          <ShoppingCart className="w-5 h-5 text-slate-400 group-hover:text-blue-500 transition-colors" />
+          <ShoppingCart className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
           {totalItems > 0 && (
-            <span className="absolute -top-1 -right-1 w-4 h-4 bg-blue-600 text-white text-[10px] flex items-center justify-center rounded-full animate-in zoom-in">
+            <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-primary-foreground font-black text-[10px] flex items-center justify-center rounded-full animate-in zoom-in shadow-lg">
               {totalItems}
             </span>
           )}
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-md bg-slate-950 border-slate-900 p-0 flex flex-col">
-        <SheetHeader className="p-6 border-b border-slate-900">
+      <SheetContent className="w-full sm:max-w-md bg-background border-border dark:border-white/5 p-0 flex flex-col backdrop-blur-3xl">
+        <SheetHeader className="p-6 border-b border-border dark:border-white/5 bg-background/40">
           <div className="flex items-center justify-between">
-            <SheetTitle className="text-white flex items-center gap-2">
-              <ShoppingBag className="w-5 h-5 text-blue-500" />
+            <SheetTitle className="text-foreground dark:text-white flex items-center gap-2 tracking-tighter uppercase italic font-black">
+              <ShoppingBag className="w-5 h-5 text-primary" />
               Your Cart
             </SheetTitle>
           </div>
@@ -65,51 +65,53 @@ export default function CartSheet() {
 
         <div className="flex-1 overflow-y-auto p-6">
           {items.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center">
-              <div className="w-16 h-16 bg-slate-900 rounded-2xl flex items-center justify-center mb-4 text-slate-500">
-                <ShoppingCart className="w-8 h-8" />
+            <div className="h-full flex flex-col items-center justify-center text-center p-6">
+              <div className="w-16 h-16 bg-card dark:bg-white/5 border border-border dark:border-white/5 rounded-2xl flex items-center justify-center mb-6 text-muted-foreground shadow-2xl">
+                <ShoppingCart className="w-8 h-8 opacity-50" />
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">Cart is empty</h3>
-              <p className="text-slate-500 text-sm max-w-[200px] mb-8">
-                Looks like you haven't added any international products yet.
+              <h3 className="text-xl font-black text-foreground dark:text-white uppercase italic tracking-tighter mb-2">Cart is empty</h3>
+              <p className="text-muted-foreground text-xs uppercase tracking-widest leading-relaxed max-w-[200px] mb-8 font-bold opacity-60">
+                You haven't added any secondary port assets yet.
               </p>
-              <Button asChild variant="outline" className="border-slate-800 text-slate-300">
+              <Button asChild variant="outline" className="border-border dark:border-white/10 text-muted-foreground hover:text-foreground dark:hover:text-white rounded-xl shadow-lg">
                 <Link href="/marketplace" onClick={() => setIsOpen(false)}>
-                  Browse Marketplace
+                  Browse Registry
                 </Link>
               </Button>
             </div>
           ) : (
             <div className="space-y-6">
               {items.map((item) => (
-                <div key={item.productId} className="flex gap-4">
-                  <div className="w-20 h-20 bg-slate-900 rounded-xl border border-slate-800 flex-shrink-0 flex items-center justify-center">
-                    <ShoppingBag className="w-8 h-8 text-slate-700" />
+                <div key={item.productId} className="flex gap-4 p-4 rounded-[2rem] border border-border dark:border-white/5 bg-card/40 dark:bg-white/5 backdrop-blur-xl shadow-xl transition-all hover:-translate-y-1 hover:border-border dark:hover:border-white/10">
+                  <div className="w-20 h-20 bg-background dark:bg-black rounded-xl border border-border dark:border-white/5 flex-shrink-0 flex items-center justify-center shadow-inner">
+                    <ShoppingBag className="w-8 h-8 text-muted-foreground opacity-30" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-white font-medium truncate mb-1">
-                      Product {item.productId.slice(0, 8)}...
-                    </h4>
-                    <p className="text-slate-500 text-xs mb-3">Verified Exporter</p>
+                  <div className="flex-1 min-w-0 flex flex-col justify-between py-1">
+                    <div>
+                      <h4 className="text-foreground dark:text-white font-black tracking-tighter italic uppercase truncate mb-1 text-sm">
+                        Product {item.productId.slice(0, 8)}...
+                      </h4>
+                      <p className="text-muted-foreground/60 text-[10px] uppercase font-black tracking-widest mb-3">Verified Exporter</p>
+                    </div>
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 bg-slate-900 rounded-lg p-1 border border-slate-800">
+                      <div className="flex items-center gap-2 bg-background dark:bg-black/50 rounded-lg p-1 border border-border dark:border-white/5">
                         <button 
                           onClick={() => handleUpdateQuantity(item.productId, item.quantity - 1)}
-                          className="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+                          className="w-6 h-6 flex items-center justify-center text-muted-foreground hover:text-foreground dark:hover:text-white bg-card dark:bg-white/5 rounded transition-all active:scale-95"
                         >
                           <Minus className="w-3 h-3" />
                         </button>
-                        <span className="text-sm text-white w-6 text-center">{item.quantity}</span>
+                        <span className="text-sm font-black text-foreground dark:text-white w-6 text-center italic">{item.quantity}</span>
                         <button 
                           onClick={() => handleUpdateQuantity(item.productId, item.quantity + 1)}
-                          className="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+                          className="w-6 h-6 flex items-center justify-center text-muted-foreground hover:text-foreground dark:hover:text-white bg-card dark:bg-white/5 rounded transition-all active:scale-95"
                         >
                           <Plus className="w-3 h-3" />
                         </button>
                       </div>
                       <button 
                         onClick={() => handleRemove(item.productId)}
-                        className="text-slate-500 hover:text-red-500 transition-colors"
+                        className="text-muted-foreground hover:text-destructive transition-colors p-2 rounded-lg hover:bg-destructive/10"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -122,16 +124,16 @@ export default function CartSheet() {
         </div>
 
         {items.length > 0 && (
-          <SheetFooter className="p-6 border-t border-slate-900 bg-slate-950/50">
+          <SheetFooter className="p-6 border-t border-border dark:border-white/5 bg-background/60 backdrop-blur-3xl">
             <div className="w-full space-y-4">
-              <div className="flex items-center justify-between text-white font-bold text-lg">
+              <div className="flex items-center justify-between text-foreground dark:text-white font-black text-xl italic uppercase tracking-tighter">
                 <span>Total Items</span>
                 <span>{totalItems}</span>
               </div>
-              <p className="text-[10px] text-slate-500 uppercase tracking-widest text-center">
-                Shipping and taxes calculated at checkout
+              <p className="text-[10px] text-muted-foreground/60 font-black uppercase tracking-[0.2em] italic text-center">
+                Transit logistics calculated at port departure
               </p>
-              <Button asChild className="w-full bg-blue-600 hover:bg-blue-500 text-white h-12 rounded-xl">
+              <Button asChild className="w-full bg-primary hover:bg-primary/90 text-primary-foreground h-14 rounded-2xl font-black text-xs uppercase tracking-widest italic shadow-2xl shadow-primary/20 hover:-translate-y-1 transition-all">
                 <Link href="/checkout" onClick={() => setIsOpen(false)}>
                   Proceed to Checkout
                 </Link>

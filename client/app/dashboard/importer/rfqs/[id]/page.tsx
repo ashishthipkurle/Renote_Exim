@@ -70,126 +70,126 @@ export default function RFQDetailPage({ params }: { params: Promise<{ id: string
     }
   };
 
-  if (loading) return <div className="p-8 text-white">Loading RFQ details...</div>;
-  if (!rfq) return <div className="p-8 text-white text-center">RFQ not found</div>;
+  if (loading) return <div className="p-8 text-foreground">Loading RFQ details...</div>;
+  if (!rfq) return <div className="p-8 text-foreground text-center">RFQ not found</div>;
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto pb-20">
-      <div className="flex items-center gap-4">
-        <Link href="/dashboard/importer/rfqs" className="size-10 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white transition-colors">
+      <div className="flex items-center gap-6 border-b border-border pb-8">
+        <Link href="/dashboard/importer/rfqs" className="size-12 rounded-2xl bg-muted/20 border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-all hover:border-border shadow-xl">
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="text-3xl font-bold text-white">{rfq.title}</h1>
-          <p className="text-slate-400 text-sm">RFQ ID: {rfq.id.slice(0, 8).toUpperCase()}</p>
+          <h1 className="text-3xl font-black text-foreground uppercase italic tracking-tighter">{rfq.title}</h1>
+          <p className="text-muted-foreground font-black text-[10px] uppercase tracking-[0.2em] mt-1.5 opacity-60">RESOURCE NODE: {rfq.id.slice(0, 12).toUpperCase()}</p>
         </div>
-        <div className={`ml-auto px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest border ${
-          rfq.status === 'OPEN' ? 'border-green-500/20 text-green-500 bg-green-500/5' : 'border-slate-700 text-slate-500'
+        <div className={`ml-auto px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] border shadow-xl ${
+          rfq.status === 'OPEN' ? 'border-border text-foreground bg-muted/20 animate-pulse' : 'border-border text-muted-foreground bg-muted/20'
         }`}>
-          {rfq.status}
+          {rfq.status} PROTOCOL
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
           {/* RFQ Details */}
-          <div className="bg-slate-900/50 border border-slate-800 rounded-3xl p-8">
-            <h2 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
-              <Info className="w-5 h-5 text-blue-500" /> Specifications
+          <div className="bg-muted/40 backdrop-blur-xl border border-border rounded-[2.5rem] p-10 shadow-2xl">
+            <h2 className="text-sm font-black text-foreground mb-8 flex items-center gap-3 uppercase italic tracking-tighter">
+              <Info className="w-5 h-5 text-foreground/40" /> Technical Specifications
             </h2>
-            <p className="text-slate-400 leading-relaxed mb-8">
-              {rfq.description}
+            <p className="text-muted-foreground text-xs font-black uppercase tracking-[0.1em] leading-relaxed mb-10 opacity-70 italic">
+              &ldquo;{rfq.description}&rdquo;
             </p>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-              <div className="space-y-1">
-                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Quantity</p>
-                <p className="text-white font-bold">{rfq.quantity} {rfq.unit}</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="space-y-2">
+                <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">Quantity Matrix</p>
+                <p className="text-foreground font-black text-lg italic tracking-tighter">{rfq.quantity} {rfq.unit}</p>
               </div>
-              <div className="space-y-1">
-                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Deadline</p>
-                <p className="text-white font-bold">{rfq.deadline ? new Date(rfq.deadline).toLocaleDateString() : 'None'}</p>
+              <div className="space-y-2">
+                <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">Temporal Deadline</p>
+                <p className="text-foreground font-black text-lg italic tracking-tighter">{rfq.deadline ? new Date(rfq.deadline).toLocaleDateString() : 'INDETERMINATE'}</p>
               </div>
-              <div className="space-y-1">
-                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Category</p>
-                <p className="text-blue-500 font-bold">{rfq.category}</p>
+              <div className="space-y-2">
+                <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">Market Category</p>
+                <p className="text-foreground font-black text-lg italic tracking-tighter uppercase">{rfq.category}</p>
               </div>
             </div>
           </div>
 
           {/* Quotes Received */}
-          <div className="space-y-4">
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-blue-500" /> Received Quotes ({quotes.length})
+          <div className="space-y-6">
+            <h2 className="text-lg font-black text-foreground flex items-center gap-3 uppercase italic tracking-tighter">
+              <MessageSquare className="w-5 h-5 text-foreground/40" /> Transmission Logs ({quotes.length})
             </h2>
             
             {quotes.length === 0 ? (
-              <div className="py-20 bg-slate-950/50 border border-slate-900 border-dashed rounded-3xl text-center">
-                <p className="text-slate-500 italic">No quotes received yet. Exporters are reviewing your request.</p>
+              <div className="py-24 bg-muted/20 border border-border border-dashed rounded-[2.5rem] text-center shadow-inner">
+                <p className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.3em] italic opacity-40">Awaiting vendor broadcast trace...</p>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {quotes.map((quote) => (
-                  <div key={quote.id} className={`p-6 bg-slate-900/40 border rounded-3xl transition-all ${
-                    quote.status === 'ACCEPTED' ? 'border-green-500/30' : 'border-slate-800'
+                  <div key={quote.id} className={`p-8 bg-muted/40 backdrop-blur-xl border rounded-[2.5rem] transition-all shadow-2xl ${
+                    quote.status === 'ACCEPTED' ? 'border-border bg-muted/20' : 'border-border'
                   }`}>
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                      <div className="flex items-center gap-4">
-                        <div className="size-12 rounded-2xl bg-slate-800 flex items-center justify-center text-slate-400 overflow-hidden ring-2 ring-white/5">
+                    <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-8">
+                      <div className="flex items-center gap-5">
+                        <div className="size-16 rounded-[1.5rem] bg-muted border border-border flex items-center justify-center text-muted-foreground/30 overflow-hidden shadow-xl">
                           {quote.exporter?.avatar ? (
-                            <img src={quote.exporter.avatar} alt="" className="w-full h-full object-cover" />
+                            <img src={quote.exporter.avatar} alt="" className="w-full h-full object-cover grayscale opacity-80" />
                           ) : (
-                            <User className="w-6 h-6" />
+                            <User className="w-8 h-8" />
                           )}
                         </div>
                         <div>
-                          <p className="text-white font-bold text-lg">{quote.exporter?.companyName || quote.exporter?.name}</p>
-                          <p className="text-xs text-slate-500 font-medium uppercase tracking-widest">{quote.exporter?.country}</p>
+                          <p className="text-foreground font-black text-xl italic tracking-tighter uppercase">{quote.exporter?.companyName || quote.exporter?.name}</p>
+                          <p className="text-[9px] text-muted-foreground font-black uppercase tracking-[0.2em] mt-1 opacity-60">{quote.exporter?.country} · VERIFIED ORIGIN</p>
                         </div>
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-8">
-                        <div className="text-center">
-                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Total Price</p>
-                          <p className="text-2xl font-black text-green-500">${quote.price.toLocaleString()}</p>
+                      <div className="flex flex-wrap items-center gap-10">
+                        <div className="space-y-1">
+                          <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] opacity-40">Valuation</p>
+                          <p className="text-3xl font-black text-foreground italic tracking-tighter">${quote.price.toLocaleString()}</p>
                         </div>
-                        <div className="text-center">
-                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Lead Time</p>
-                          <p className="text-lg font-black text-white">{quote.leadTime} Days</p>
+                        <div className="space-y-1">
+                          <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] opacity-40">Latency</p>
+                          <p className="text-xl font-black text-foreground italic tracking-tighter">{quote.leadTime} DAYS</p>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 md:ml-auto">
+                      <div className="flex items-center gap-3">
                         {quote.status === 'PENDING' && rfq.status === 'OPEN' ? (
                           <>
                             <Button 
                               onClick={() => handleQuoteAction(quote.id, 'ACCEPTED')}
                               disabled={!!processingId}
-                              className="bg-green-600 hover:bg-green-500 text-white h-11 px-6 rounded-xl font-bold gap-2"
+                              className="bg-primary hover:bg-primary/90 text-primary-foreground border-transparent h-14 px-8 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-primary/5 active:scale-95 transition-all"
                             >
-                              <Check className="w-4 h-4" /> Accept
+                              <Check className="w-4 h-4" /> Initialize
                             </Button>
                             <Button 
                               variant="outline"
                               onClick={() => handleQuoteAction(quote.id, 'REJECTED')}
                               disabled={!!processingId}
-                              className="border-slate-800 text-slate-400 hover:text-white h-11 px-4 rounded-xl font-bold"
+                              className="border-border text-muted-foreground/40 hover:text-foreground hover:bg-muted/20 h-14 px-6 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl transition-all"
                             >
                               <X className="w-4 h-4" />
                             </Button>
                           </>
                         ) : (
-                          <div className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest border ${
-                            quote.status === 'ACCEPTED' ? 'border-green-500/20 text-green-500 bg-green-500/5' : 'border-slate-700 text-slate-500'
+                          <div className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] border shadow-xl ${
+                            quote.status === 'ACCEPTED' ? 'border-border text-foreground bg-muted/20' : 'border-border text-muted-foreground bg-muted/20'
                           }`}>
-                            {quote.status}
+                            {quote.status} LOGGED
                           </div>
                         )}
                       </div>
                     </div>
                     
                     {quote.note && (
-                      <div className="mt-6 p-4 bg-slate-950/50 rounded-2xl border border-white/5 text-sm text-slate-400 italic">
-                        "{quote.note}"
+                      <div className="mt-6 p-4 bg-muted/20 backdrop-blur-xl rounded-2xl border border-border text-[10px] font-black uppercase tracking-widest text-muted-foreground italic leading-relaxed">
+                        &ldquo;{quote.note}&rdquo;
                       </div>
                     )}
                   </div>
@@ -201,17 +201,18 @@ export default function RFQDetailPage({ params }: { params: Promise<{ id: string
 
         <div className="space-y-8">
           {/* Exporter Trust Card */}
-          <div className="bg-gradient-to-br from-indigo-600 to-blue-700 p-8 rounded-3xl shadow-2xl shadow-blue-500/10 relative overflow-hidden group">
-            <ShieldCheck className="w-12 h-12 text-white/20 absolute -top-2 -right-2 rotate-12" />
-            <h3 className="text-xl font-black text-white leading-tight mb-4">Trade Assurance</h3>
-            <p className="text-blue-100/80 text-sm leading-relaxed mb-6">
-              When you accept a quote, the platform secures your trade with verification and escrow-like protections.
+          <div className="bg-muted/40 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden group border border-border">
+            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-50" />
+            <ShieldCheck className="w-16 h-16 text-foreground/5 absolute -top-4 -right-4 rotate-12" />
+            <h3 className="text-xl font-black text-foreground italic tracking-tighter mb-4 uppercase">Trade Integrity</h3>
+            <p className="text-muted-foreground text-[10px] font-black uppercase tracking-widest leading-relaxed mb-8 opacity-60">
+              Platform-level secure node verification and liquidated escrow protocols.
             </p>
-            <div className="space-y-3">
-              {['Verified Exporters', 'Payment Protection', 'Escrow Support'].map(item => (
-                <div key={item} className="flex items-center gap-2 text-xs font-bold text-white">
-                  <div className="size-4 rounded-full bg-white/20 flex items-center justify-center">
-                    <Check className="w-2.5 h-2.5" />
+            <div className="space-y-4">
+              {['Verified Exporters', 'Protocol Protection', 'Escrow Support'].map(item => (
+                <div key={item} className="flex items-center gap-3 text-[10px] font-black text-foreground uppercase tracking-[0.2em]">
+                  <div className="size-5 rounded-lg bg-muted/20 border border-border flex items-center justify-center shadow-xl">
+                    <Check className="w-3 h-3 text-foreground" />
                   </div>
                   {item}
                 </div>
@@ -219,10 +220,10 @@ export default function RFQDetailPage({ params }: { params: Promise<{ id: string
             </div>
           </div>
 
-          <div className="p-8 border border-slate-800 bg-slate-900/50 rounded-3xl space-y-6">
-            <h4 className="text-xs font-black text-slate-500 uppercase tracking-widest">Support</h4>
-            <Button variant="outline" className="w-full border-slate-800 text-slate-300 h-12 rounded-xl font-bold gap-2">
-              <MessageSquare className="w-4 h-4" /> Contact Admin
+          <div className="p-8 border border-border bg-muted/40 backdrop-blur-xl rounded-[2.5rem] space-y-6 shadow-2xl">
+            <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] opacity-40">Operational Support</h4>
+            <Button variant="outline" className="w-full border-border bg-muted/20 hover:bg-muted/30 text-foreground h-14 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl transition-all">
+              <MessageSquare className="w-4 h-4" /> Dispatch Signal
             </Button>
           </div>
         </div>

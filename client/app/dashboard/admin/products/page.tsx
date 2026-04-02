@@ -5,18 +5,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Package,
   Search,
-  Filter,
-  CheckCircle2,
-  XCircle,
-  Eye,
   Trash2,
   ChevronLeft,
   ChevronRight,
-  TrendingUp,
   Building2,
-  Boxes,
   Zap,
-  MoreVertical,
   CheckSquare
 } from "lucide-react";
 import { useAuthFetch } from "@/lib/hooks/useAuthFetch";
@@ -89,15 +82,15 @@ export default function AdminProductsPage() {
   };
 
   return (
-    <div className="h-dvh flex flex-col bg-[#0b1019] relative overflow-hidden">
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f2937_1px,transparent_1px),linear-gradient(to_bottom,#1f2937_1px,transparent_1px)] bg-[length:40px_40px] opacity-[0.03] pointer-events-none" />
+    <div className="h-dvh flex flex-col bg-background relative overflow-hidden">
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#333_1px,transparent_1px),linear-gradient(to_bottom,#333_1px,transparent_1px)] bg-[length:40px_40px] opacity-[0.03] pointer-events-none" />
 
       {/* Header */}
-      <header className="flex-shrink-0 h-20 px-8 flex items-center justify-between border-b border-white/5 bg-[#0b1019]/30 backdrop-blur-md z-30">
+      <header className="flex-shrink-0 h-20 px-8 flex items-center justify-between border-b border-border bg-background/30 backdrop-blur-md z-30">
         <div>
           <h1 className="text-xl font-black text-white uppercase tracking-widest flex items-center gap-2">
             Catalog Moderation
-            <span className="text-[10px] bg-primary/20 text-primary border border-primary/30 px-2 py-0.5 rounded">
+            <span className="text-[10px] bg-white/20 text-white border border-white/30 px-2 py-0.5 rounded">
               {total} ITEMS
             </span>
           </h1>
@@ -113,16 +106,16 @@ export default function AdminProductsPage() {
                 exit={{ opacity: 0, x: 20 }}
                 className="flex items-center gap-2 pr-4 border-r border-white/10"
               >
-                <span className="text-[10px] font-black text-primary uppercase mr-2">{selectedProducts.length} SELECTED</span>
+                <span className="text-[10px] font-black text-white uppercase mr-2">{selectedProducts.length} SELECTED</span>
                 <button
                   onClick={() => handleAction(selectedProducts, "toggleAvailability", { available: true })}
-                  className="bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase hover:bg-emerald-500 hover:text-white transition-all"
+                  className="bg-white/10 text-white border border-white/20 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase hover:bg-white hover:text-black transition-all"
                 >
                   Enable
                 </button>
                 <button
                   onClick={() => handleAction(selectedProducts, "toggleAvailability", { available: false })}
-                  className="bg-amber-500/10 text-amber-500 border border-amber-500/20 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase hover:bg-amber-500 hover:text-white transition-all"
+                  className="bg-neutral-800 text-neutral-400 border border-white/10 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase hover:bg-neutral-700 hover:text-white transition-all"
                 >
                   Disable
                 </button>
@@ -132,7 +125,7 @@ export default function AdminProductsPage() {
                       handleAction(selectedProducts, "delete");
                     }
                   }}
-                  className="bg-red-500/10 text-red-500 border border-red-500/20 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase hover:bg-red-500 hover:text-white transition-all"
+                  className="bg-neutral-900 text-neutral-500 border border-white/5 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase hover:bg-red-900 hover:text-white transition-all"
                 >
                   Delete
                 </button>
@@ -141,18 +134,18 @@ export default function AdminProductsPage() {
           </AnimatePresence>
 
           <div className="relative group">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-primary transition-colors" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-white transition-colors" />
             <input
               type="text"
               placeholder="Search Listings..."
-              className="bg-[#151c2a]/50 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-sm text-white focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none w-64 transition-all"
+              className="bg-muted/50 border border-border rounded-xl pl-10 pr-4 py-2 text-sm text-white focus:ring-2 focus:ring-white/20 focus:border-white/50 outline-none w-64 transition-all"
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
             />
           </div>
 
           <select
-            className="bg-[#151c2a]/50 border border-white/10 rounded-xl px-3 py-2 text-xs text-slate-300 outline-none focus:border-primary/50"
+            className="bg-muted/50 border border-border rounded-xl px-3 py-2 text-xs text-slate-300 outline-none focus:border-white/50"
             value={categoryFilter}
             onChange={(e) => { setCategoryFilter(e.target.value); setPage(1); }}
           >
@@ -184,8 +177,8 @@ export default function AdminProductsPage() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className={clsx(
-                  "group relative bg-[#151c2a]/40 backdrop-blur-xl border rounded-2xl overflow-hidden transition-all duration-300",
-                  selectedProducts.includes(p.id) ? "border-primary ring-1 ring-primary/20" : "border-white/5 hover:border-white/20"
+                  "group relative bg-muted/40 backdrop-blur-xl border rounded-2xl overflow-hidden transition-all duration-300",
+                  selectedProducts.includes(p.id) ? "border-white ring-1 ring-white/20" : "border-border hover:border-white/20"
                 )}
               >
                 {/* Select Toggle */}
@@ -193,7 +186,7 @@ export default function AdminProductsPage() {
                   onClick={() => toggleSelect(p.id)}
                   className={clsx(
                     "absolute top-3 left-3 z-10 size-5 rounded border flex items-center justify-center transition-colors",
-                    selectedProducts.includes(p.id) ? "bg-primary border-primary text-white" : "bg-black/40 border-white/20 text-transparent"
+                    selectedProducts.includes(p.id) ? "bg-white border-white text-black" : "bg-black/40 border-white/20 text-transparent"
                   )}
                 >
                   <CheckSquare className="w-3.5 h-3.5" />
@@ -216,7 +209,7 @@ export default function AdminProductsPage() {
                   <div className="absolute top-3 right-3">
                     <span className={clsx(
                       "text-[9px] font-black px-2 py-0.5 rounded-full border uppercase tracking-widest",
-                      p.available ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-red-500/10 text-red-500 border-red-500/20"
+                      p.available ? "bg-white/10 text-white border-white/20 shadow-[0_0_10px_rgba(255,255,255,0.1)]" : "bg-neutral-800 text-neutral-400 border-white/5"
                     )}>
                       {p.available ? "Active" : "Disabled"}
                     </span>
@@ -225,7 +218,7 @@ export default function AdminProductsPage() {
 
                 <div className="p-4 space-y-3">
                   <div>
-                    <h3 className="text-white font-bold text-sm truncate group-hover:text-primary transition-colors">{p.name}</h3>
+                    <h3 className="text-white font-bold text-sm truncate group-hover:text-white transition-colors">{p.name}</h3>
                     <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mt-1">{p.category}</p>
                   </div>
 
@@ -235,11 +228,11 @@ export default function AdminProductsPage() {
                   </div>
 
                   <div className="flex items-center justify-between pt-2 border-t border-white/5">
-                    <div className="text-primary font-black text-sm">${p.price.toLocaleString()}</div>
+                    <div className="text-white font-black text-sm">${p.price.toLocaleString()}</div>
                     <div className="flex gap-1">
                       <button
                         onClick={() => handleAction([p.id], "toggleAvailability", { available: !p.available })}
-                        className="p-2 rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:border-primary transition-all"
+                        className="p-2 rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:border-white transition-all"
                       >
                         <Zap className="w-3.5 h-3.5" />
                       </button>
@@ -266,17 +259,17 @@ export default function AdminProductsPage() {
             <button
               disabled={page === 1}
               onClick={() => setPage(p => p - 1)}
-              className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#151c2a]/60 border border-white/5 text-slate-400 hover:text-white hover:border-primary/50 transition-all disabled:opacity-30 disabled:pointer-events-none"
+              className="w-10 h-10 flex items-center justify-center rounded-xl bg-muted/60 border border-border text-slate-400 hover:text-white hover:border-white/50 transition-all disabled:opacity-30 disabled:pointer-events-none"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
-            <div className="h-10 px-4 flex items-center rounded-xl bg-primary text-white text-[10px] font-black shadow-lg shadow-primary/20">
+            <div className="h-10 px-4 flex items-center rounded-xl bg-white text-black text-[10px] font-black shadow-lg shadow-white/5">
               {page}
             </div>
             <button
               disabled={page >= totalPages}
               onClick={() => setPage(p => p + 1)}
-              className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#151c2a]/60 border border-white/5 text-slate-400 hover:text-white hover:border-primary/50 transition-all disabled:opacity-30 disabled:pointer-events-none"
+              className="w-10 h-10 flex items-center justify-center rounded-xl bg-muted/60 border border-border text-slate-400 hover:text-white hover:border-white/50 transition-all disabled:opacity-30 disabled:pointer-events-none"
             >
               <ChevronRight className="w-5 h-5" />
             </button>

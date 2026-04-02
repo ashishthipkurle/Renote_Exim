@@ -39,18 +39,18 @@ export default async function ImporterOrdersPage() {
     .reduce((acc, o) => acc + o.totalPrice, 0);
 
   return (
-    <div className="h-dvh overflow-hidden flex flex-col bg-slate-50 dark:bg-gradient-to-br dark:from-[#0a0c12] dark:via-[#0d1017] dark:to-[#0a0c12] transition-colors duration-300">
-      <header className="flex-shrink-0 p-6 lg:p-8 border-b border-slate-200 dark:border-white/5 bg-white dark:bg-transparent transition-colors duration-300">
+    <div className="h-dvh overflow-hidden flex flex-col bg-background transition-colors duration-300">
+      <header className="flex-shrink-0 p-6 lg:p-8 border-b border-border bg-header backdrop-blur-xl z-20">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">My Orders</h1>
-            <p className="text-slate-500 dark:text-slate-400 mt-1">
-              {orders.length} orders · {formatCurrency(totalSpent)} total spent
+            <h1 className="text-3xl font-black tracking-tight text-foreground uppercase italic">Procurement Archive</h1>
+            <p className="text-muted-foreground mt-1 font-black text-[10px] uppercase tracking-widest leading-none">
+              {orders.length} Assets Logged · {formatCurrency(totalSpent)} Cumulative Capital Outflow
             </p>
           </div>
           <Link
             href="/products"
-            className="inline-flex items-center gap-2 bg-primary hover:bg-[#0f49bd] text-white font-bold py-2.5 px-6 rounded-xl shadow-lg shadow-primary/20 transition-colors"
+            className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground border-transparent font-bold py-2.5 px-6 rounded-xl shadow-lg shadow-primary/5 border border-border transition-all hover:-translate-y-0.5 active:translate-y-0"
           >
             <ShoppingCart className="w-4 h-4" />
             Browse Products

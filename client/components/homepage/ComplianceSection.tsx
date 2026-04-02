@@ -3,7 +3,7 @@
 export default function ComplianceSection() {
   return (
     <section className="py-24 bg-[url('/assets/pexels-yankrukov-8867376.jpg')] bg-cover bg-top bg-fixed border-t border-border relative z-20">
-      <div className="absolute inset-0 bg-background/20 dark:bg-background/80 backdrop-blur-[2px]"></div>
+      <div className="absolute inset-0 bg-background/20 backdrop-blur-[2px]"></div>
       <div className="max-w-6xl mx-auto px-6 relative z-10 reveal-on-scroll">
         <div className="text-center mb-16">
           <span className="text-primary text-sm font-bold uppercase tracking-widest mb-2 block drop-shadow-sm">Bureaucracy Simplified</span>

@@ -3,10 +3,11 @@
 import { useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Package, Search, Edit2, Trash2, Filter } from "lucide-react";
+import { Package, Search, Edit2, Trash2, Filter, Globe, ShieldCheck, ShoppingCart, ArrowRight, ArrowLeft, Layers, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/utils";
 import { authFetch } from "@/lib/api-utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 type Product = {
     id: string;
@@ -103,58 +104,56 @@ export default function InventoryTable({
     };
 
     return (
-        <div className="space-y-6">
-            <div className="flex flex-col md:flex-row gap-4">
-                {/* Search */}
-                <form onSubmit={handleSearch} className="flex-1 relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <div className="space-y-10">
+            {/* ── Filters ── */}
+            <div className="flex flex-col xl:flex-row gap-6">
+                <form onSubmit={handleSearch} className="flex-1 relative group">
+                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/40 group-focus-within:text-foreground dark:text-white transition-colors" />
                     <input
                         type="text"
-                        placeholder="Search products by name or description..."
+                        placeholder="Search global asset registry..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
+                        className="w-full pl-14 pr-6 py-4 bg-card/40 dark:bg-white/5 border border-border dark:border-white/5 rounded-2xl text-foreground dark:text-white placeholder:text-muted-foreground/30 focus:outline-none focus:border-border dark:border-white/20 focus:bg-card/60 dark:bg-white/[0.07] transition-all text-xs font-black uppercase tracking-widest italic backdrop-blur-xl"
                     />
                     <button type="submit" className="hidden" />
                 </form>
 
-                {/* Filters */}
-                <div className="flex flex-col sm:flex-row gap-3">
-                    <div className="relative">
-                        <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                <div className="flex items-center gap-4 flex-wrap">
+                    <div className="relative group">
+                        <Filter className="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/40 group-hover:text-foreground dark:text-white transition-colors pointer-events-none" />
                         <select
                             value={categoryFilter}
                             onChange={(e) => {
                                 setCategoryFilter(e.target.value);
-                                // Trigger right away for select
                                 setTimeout(updateFilters, 0);
                             }}
-                            className="w-full sm:w-40 appearance-none pl-10 pr-8 py-2.5 bg-card border border-border rounded-xl text-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all text-sm"
+                            className="appearance-none pl-12 pr-10 py-4 bg-card/40 dark:bg-white/5 border border-border dark:border-white/5 rounded-2xl text-[10px] text-foreground dark:text-white font-black uppercase tracking-widest focus:outline-none focus:border-border dark:border-white/20 hover:bg-card/60 dark:bg-white/[0.07] transition-all cursor-pointer backdrop-blur-xl italic"
                         >
-                            <option value="">All Categories</option>
+                            <option value="" className="bg-card dark:bg-[#0a0a0a] text-foreground dark:text-white italic lowercase font-sans">Global Sector</option>
                             {(availableCategories.length > 0 ? availableCategories : [
                                 "CHEMICALS", "MACHINES", "TEXTILES", "MEDICAL", "HANDICRAFTS",
                                 "FOOD", "ELECTRONICS", "AUTOMOTIVE", "CONSTRUCTION", "AGRICULTURE", "OTHER"
                             ]).map((c) => (
-                                <option key={c} value={c}>
-                                    {c.charAt(0) + c.slice(1).toLowerCase()}
+                                <option key={c} value={c} className="bg-card dark:bg-[#0a0a0a] text-foreground dark:text-white italic lowercase font-sans">
+                                    {c}
                                 </option>
                             ))}
                         </select>
                     </div>
 
-                    <div className="relative">
+                    <div className="relative group">
                         <select
                             value={statusFilter}
                             onChange={(e) => {
                                 setStatusFilter(e.target.value);
                                 setTimeout(updateFilters, 0);
                             }}
-                            className="w-full sm:w-36 appearance-none px-4 py-2.5 bg-card border border-border rounded-xl text-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all text-sm"
+                            className="appearance-none px-6 py-4 bg-card/40 dark:bg-white/5 border border-border dark:border-white/5 rounded-2xl text-[10px] text-foreground dark:text-white font-black uppercase tracking-widest focus:outline-none focus:border-border dark:border-white/20 hover:bg-card/60 dark:bg-white/[0.07] transition-all cursor-pointer backdrop-blur-xl italic"
                         >
-                            <option value="ALL">All Status</option>
-                            <option value="ACTIVE">Active</option>
-                            <option value="INACTIVE">Inactive</option>
+                            <option value="ALL" className="bg-card dark:bg-[#0a0a0a] text-foreground dark:text-white">Full Registry</option>
+                            <option value="ACTIVE" className="bg-card dark:bg-[#0a0a0a] text-foreground dark:text-white">Active Nodes</option>
+                            <option value="INACTIVE" className="bg-card dark:bg-[#0a0a0a] text-foreground dark:text-white">Dormant Nodes</option>
                         </select>
                     </div>
 
@@ -168,137 +167,136 @@ export default function InventoryTable({
                                     router.push("?");
                                 });
                             }}
-                            className="px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                            className="px-6 py-4 text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 hover:text-foreground dark:text-white transition-all italic"
                         >
-                            Clear
+                            Reset Grid
                         </button>
                     )}
                 </div>
             </div>
 
-            <div className="space-y-4 relative">
-                {isPending && (
-                    <div className="absolute inset-0 bg-[#0a0c12]/50 backdrop-blur-sm z-10 flex items-center justify-center rounded-[2rem]">
-                        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
-                    </div>
-                )}
+            {/* ── Table Header ── */}
+            <div className="space-y-6 relative">
+                <AnimatePresence>
+                    {isPending && (
+                        <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-card/40 dark:bg-white/5 backdrop-blur-sm z-50 flex items-center justify-center rounded-[2.5rem]"
+                        >
+                            <div className="flex flex-col items-center gap-6">
+                                <div className="p-6 rounded-[2rem] bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 animate-pulse">
+                                    <Globe className="w-8 h-8 text-foreground dark:text-white animate-spin-slow" />
+                                </div>
+                                <p className="text-[9px] font-black text-foreground dark:text-white uppercase tracking-[0.3em] italic">Updating Registry...</p>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
-                <div className="hidden lg:grid grid-cols-12 gap-4 px-8 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
-                    <div className="col-span-4 text-primary opacity-50">Global Market Identity</div>
+                <div className="hidden lg:grid grid-cols-12 gap-8 px-10 text-[9px] font-black text-muted-foreground/30 uppercase tracking-[0.3em] italic">
+                    <div className="col-span-5">Identity_Node</div>
                     <div className="col-span-2">Sector</div>
-                    <div className="col-span-2">Economics</div>
-                    <div className="col-span-2 text-center">Stock Level</div>
+                    <div className="col-span-2">Valuation</div>
                     <div className="col-span-1 text-center">Protocol</div>
-                    <div className="col-span-1 text-right">Actions</div>
+                    <div className="col-span-2 text-right">Overrides</div>
                 </div>
 
                 {products.length === 0 ? (
-                    <div className="bg-card backdrop-blur-xl border border-border shadow-2xl rounded-[2rem] p-16 text-center">
-                        <Package className="w-16 h-16 text-muted-foreground/30 mx-auto mb-6" />
-                        <h2 className="text-2xl font-black text-foreground mb-3 uppercase italic">No Assets Identified</h2>
-                        <p className="text-muted-foreground text-sm mb-8 max-w-md mx-auto leading-relaxed">
-                            Your global inventory is currently empty. Initialize your trade presence by deploying your first product listing.
-                        </p>
-                        <Link
-                            href="/dashboard/exporter/inventory/new"
-                            className="inline-flex items-center gap-2 bg-primary hover:bg-[#0f49bd] text-white font-black text-[10px] uppercase tracking-widest py-4 px-8 rounded-2xl shadow-2xl shadow-primary/20 transition-all active:scale-95"
-                        >
-                            Deploy First Listing
-                        </Link>
+                    <div className="bg-card/40 dark:bg-white/5 backdrop-blur-3xl border border-border dark:border-white/5 shadow-xl dark:shadow-2xl rounded-[3rem] p-24 text-center">
+                        <div className="flex flex-col items-center gap-8 opacity-40">
+                            <div className="p-10 rounded-[2.5rem] bg-black/5 dark:bg-white/10 border border-border dark:border-white/10">
+                                <Package className="w-16 h-16 text-foreground dark:text-white" />
+                            </div>
+                            <div className="space-y-4">
+                                <h2 className="text-2xl font-black text-foreground dark:text-white uppercase italic tracking-tighter">Null_Registry_Record</h2>
+                                <p className="text-[10px] text-foreground dark:text-white font-black uppercase tracking-[0.2em] max-w-sm mx-auto leading-relaxed italic">
+                                    Primary asset registry empty. Initialize first node cluster to define market presence.
+                                </p>
+                            </div>
+                            <Link
+                                href="/dashboard/exporter/inventory/add"
+                                className="inline-flex items-center gap-3 bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] uppercase tracking-[0.2em] py-4 px-10 rounded-2xl shadow-2xl shadow-white/5 transition-all active:scale-95 italic"
+                            >
+                                Deploy Initial Alpha
+                            </Link>
+                        </div>
                     </div>
                 ) : (
-                    products.map((product) => (
-                        <div
-                            key={product.id}
-                            className={`bg-card backdrop-blur-xl border border-border hover:border-primary/40 transition-all duration-500 shadow-xl dark:shadow-2xl rounded-[2rem] p-5 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4 items-center group ${isDeletingId === product.id ? "opacity-30 pointer-events-none scale-95" : "hover:scale-[1.01]"
-                                }`}
-                        >
-                            <div className="lg:col-span-4 flex items-center gap-5">
-                                <div className="size-16 rounded-2xl bg-muted border border-border flex-shrink-0 overflow-hidden flex items-center justify-center shadow-lg group-hover:border-primary/20 transition-colors">
-                                    {product.images?.[0] ? (
-                                        <img src={product.images[0]} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                                    ) : (
-                                        <Package className="w-6 h-6 text-muted-foreground" />
-                                    )}
-                                </div>
-                                <div className="min-w-0">
-                                    <div className="text-base font-black text-foreground truncate group-hover:text-primary transition-colors">{product.name}</div>
-                                    <div className="text-[10px] text-muted-foreground mt-1 line-clamp-1 font-medium italic group-hover:text-foreground">
-                                        {product.description || "NO MARKET DESCRIPTION PROVIDED"}
+                    <div className="space-y-4">
+                        {products.map((product) => (
+                            <div
+                                key={product.id}
+                                className={`bg-card/40 dark:bg-white/5 backdrop-blur-3xl border border-border dark:border-white/5 hover:border-border dark:border-white/20 transition-all duration-700 shadow-xl dark:shadow-2xl rounded-[2.5rem] p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center group ${isDeletingId === product.id ? "opacity-20 pointer-events-none scale-95" : "hover:-translate-y-1"
+                                    }`}
+                            >
+                                <div className="lg:col-span-5 flex items-center gap-8">
+                                    <div className="size-20 rounded-[2rem] bg-black/5 dark:bg-white/10 border border-border dark:border-white/5 flex-shrink-0 overflow-hidden flex items-center justify-center group-hover:border-border dark:border-white/20 transition-all duration-700 p-2 shadow-inner">
+                                        {product.images?.[0] ? (
+                                            <img src={product.images[0]} alt="" className="w-full h-full object-cover group-hover:scale-125 transition-transform duration-1000 grayscale group-hover:grayscale-0 opacity-80 group-hover:opacity-100" />
+                                        ) : (
+                                            <Package className="w-8 h-8 text-muted-foreground/20 group-hover:text-foreground dark:text-white transition-colors duration-700" />
+                                        )}
+                                    </div>
+                                    <div className="min-w-0">
+                                        <div className="text-xl font-black text-foreground dark:text-white truncate italic tracking-tighter uppercase group-hover:translate-x-1 transition-transform">{product.name}</div>
+                                        <div className="text-[9px] text-muted-foreground/30 mt-2 line-clamp-1 font-black uppercase tracking-widest italic group-hover:text-muted-foreground/60 transition-colors">
+                                            {product.description || "NO_DATA_DESCRIPTION"}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div className="lg:col-span-2">
-                                <span className="inline-flex items-center px-3 py-1 rounded-xl bg-muted/50 border border-border text-[9px] text-muted-foreground font-black uppercase tracking-[0.15em]">
-                                    {product.category}
-                                </span>
-                            </div>
+                                <div className="lg:col-span-2">
+                                    <span className="inline-flex items-center px-5 py-2 rounded-2xl bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 text-[9px] text-foreground dark:text-white font-black uppercase tracking-[0.2em] italic group-hover:bg-primary group-hover:text-primary-foreground transition-all">
+                                        {product.category}
+                                    </span>
+                                </div>
 
-                            <div className="lg:col-span-2">
-                                <div className="text-foreground font-black text-lg tracking-tight">{formatCurrency(product.price)}</div>
-                                <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider mt-0.5">per {product.unit}</div>
-                            </div>
+                                <div className="lg:col-span-2">
+                                    <div className="text-foreground dark:text-white font-black text-2xl italic tracking-tighter group-hover:scale-105 transition-transform origin-left">{formatCurrency(product.price)}</div>
+                                    <div className="text-[8px] text-muted-foreground/20 font-black uppercase tracking-[0.3em] mt-2 italic group-hover:text-muted-foreground/40 transition-colors">INDEX_VAL / {product.unit}</div>
+                                </div>
 
-                            <div className="lg:col-span-2 flex flex-col items-center">
-                                <div className="flex items-center gap-2 bg-muted border border-border rounded-xl p-1 shadow-inner">
+                                <div className="lg:col-span-1 flex justify-start lg:justify-center">
                                     <button
-                                        onClick={() => updateQuantity(product.id, product.quantity - 1)}
-                                        className="size-7 flex items-center justify-center rounded-lg hover:bg-background/50 text-muted-foreground hover:text-foreground transition-colors text-lg font-bold"
+                                        onClick={() => updateQuantity(product.id, product.quantity, !product.available)}
+                                        className={
+                                            "inline-flex items-center gap-3 px-6 py-2.5 rounded-full border text-[9px] font-black uppercase tracking-[0.2em] italic shadow-xl dark:shadow-2xl transition-all hover:scale-105 active:scale-95 " +
+                                            (product.available
+                                                ? "text-primary-foreground bg-primary border-transparent shadow-white/10"
+                                                : "text-muted-foreground/20 bg-black/5 dark:bg-white/10 border-border dark:border-white/5")
+                                        }
                                     >
-                                        -
-                                    </button>
-                                    <div className="min-w-[40px] text-center text-sm font-black text-foreground">
-                                        {product.quantity}
-                                    </div>
-                                    <button
-                                        onClick={() => updateQuantity(product.id, product.quantity + 1)}
-                                        className="size-7 flex items-center justify-center rounded-lg hover:bg-background/50 text-muted-foreground hover:text-foreground transition-colors text-lg font-bold"
-                                    >
-                                        +
+                                        <span className={`size-2 rounded-full ${product.available ? "bg-card dark:bg-[#0a0a0a] animate-pulse" : "bg-muted-foreground/20"}`} />
+                                        {product.available ? "Active" : "Halted"}
                                     </button>
                                 </div>
-                                <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest mt-2 italic">Unit: {product.unit}</div>
-                            </div>
 
-                            <div className="lg:col-span-1 flex justify-start lg:justify-center">
-                                <button
-                                    onClick={() => updateQuantity(product.id, product.quantity, !product.available)}
-                                    className={
-                                        "inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-[9px] font-black uppercase tracking-[0.2em] shadow-sm transition-all hover:scale-105 active:scale-95 " +
-                                        (product.available
-                                            ? "text-emerald-400 bg-emerald-400/5 border-emerald-400/20 shadow-emerald-400/5 hover:bg-emerald-400/10"
-                                            : "text-red-400 bg-red-400/5 border-red-400/20 shadow-red-400/5 hover:bg-red-400/10")
-                                    }
-                                >
-                                    <span className={`size-1.5 rounded-full bg-current ${product.available ? "animate-pulse" : ""}`} />
-                                    {product.available ? "Active" : "Halted"}
-                                </button>
+                                <div className="lg:col-span-2 flex justify-end gap-3 mt-4 lg:mt-0">
+                                    <Link
+                                        href={`/dashboard/exporter/inventory/${product.id}/edit`}
+                                        className="size-14 bg-black/5 dark:bg-white/10 border border-border dark:border-white/5 text-muted-foreground/20 hover:text-foreground dark:text-white hover:bg-black/10 dark:bg-white/15 hover:border-border dark:border-white/20 rounded-[1.5rem] flex items-center justify-center transition-all duration-500 active:scale-90 shadow-xl dark:shadow-2xl"
+                                        title="Modify Protocol"
+                                    >
+                                        <Edit2 className="w-5 h-5" />
+                                    </Link>
+                                    <button
+                                        onClick={() => deleteProduct(product.id, product.name)}
+                                        disabled={isDeletingId === product.id}
+                                        className="size-14 bg-black/5 dark:bg-white/10 border border-border dark:border-white/5 text-muted-foreground/20 hover:text-foreground dark:text-white hover:bg-neutral-800 hover:border-border dark:border-white/20 rounded-[1.5rem] flex items-center justify-center transition-all duration-500 active:scale-90 shadow-xl dark:shadow-2xl"
+                                        title="Purge Node"
+                                    >
+                                        {isDeletingId === product.id ? (
+                                            <div className="w-5 h-5 border-2 border-border dark:border-white border-t-transparent rounded-full animate-spin" />
+                                        ) : (
+                                            <Trash2 className="w-5 h-5" />
+                                        )}
+                                    </button>
+                                </div>
                             </div>
-
-                            <div className="lg:col-span-1 flex justify-end gap-3 mt-4 lg:mt-0">
-                                <Link
-                                    href={`/dashboard/exporter/inventory/${product.id}/edit`}
-                                    className="p-3 bg-muted border border-border text-muted-foreground hover:text-foreground hover:bg-accent rounded-2xl transition-all active:scale-90"
-                                    title="Edit Protocol"
-                                >
-                                    <Edit2 className="w-4 h-4" />
-                                </Link>
-                                <button
-                                    onClick={() => deleteProduct(product.id, product.name)}
-                                    disabled={isDeletingId === product.id}
-                                    className="p-3 bg-muted border border-border text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-2xl transition-all active:scale-90"
-                                    title="Purge Asset"
-                                >
-                                    {isDeletingId === product.id ? (
-                                        <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
-                                    ) : (
-                                        <Trash2 className="w-4 h-4" />
-                                    )}
-                                </button>
-                            </div>
-                        </div>
-                    ))
+                        ))}
+                    </div>
                 )}
             </div>
         </div>

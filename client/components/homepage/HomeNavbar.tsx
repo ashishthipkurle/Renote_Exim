@@ -5,13 +5,19 @@ import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { useTheme } from "next-themes";
+import LogoLight from "@/assests/LOGO_TEXT.png";
+import LogoDark from "@/assests/Logo-2-without-circle.png";
 
 export default function HomeNavbar() {
   const { user, loading, logout } = useAuth();
+  const { theme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    setMounted(true);
     const handleClickOutside = (event: MouseEvent) => {
       if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
         setIsProfileMenuOpen(false);
@@ -21,19 +27,17 @@ export default function HomeNavbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const isDark = mounted && (resolvedTheme === "dark" || theme === "dark");
+  const LogoImg = isDark ? LogoDark : LogoLight;
+
   return (
     <nav className="sticky top-0 w-full z-50 bg-background/90 backdrop-blur-xl border-b border-border transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-white font-bold primary-glow-hover">
-            <span className="material-icons text-sm">public</span>
-          </div>
-          <span className="text-xl font-bold tracking-wide text-foreground">
-            RANOTE<span className="text-primary">EXIM</span>
-          </span>
-        </div>
+      <div className="relative w-full px-2 md:px-4 h-14 flex justify-between items-center">
+        <Link href="/" className="flex items-center flex-shrink-0">
+          <Image src={LogoImg} alt="Ranote Exim Logo" className={isDark ? "h-14 md:h-[75px] w-auto object-contain transition-all" : "h-8 md:h-10 w-auto object-contain transition-all"} unoptimized />
+        </Link>
 
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
+        <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-8 text-sm font-medium text-muted-foreground">
           <Link className="hover:text-primary dark:hover:text-white transition-colors" href="/products">
             Marketplace
           </Link>

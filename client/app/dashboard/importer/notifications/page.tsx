@@ -107,44 +107,44 @@ export default function ImporterNotificationsPage() {
   const getTypeColor = (type: string) => {
     switch (type) {
       case "ORDER_UPDATE": return "text-primary bg-primary/10";
-      case "SHIPMENT_UPDATE": return "text-cyan-600 dark:text-cyan-400 bg-cyan-600/10 dark:bg-cyan-400/10";
-      case "PAYMENT_RECEIVED": return "text-emerald-600 dark:text-emerald-400 bg-emerald-600/10 dark:bg-emerald-400/10";
-      case "MESSAGE": return "text-pink-600 dark:text-pink-400 bg-pink-600/10 dark:bg-pink-400/10";
-      default: return "text-slate-500 dark:text-slate-400 bg-slate-500/10 dark:bg-slate-400/10";
+      case "SHIPMENT_UPDATE": return "text-neutral-300 bg-neutral-300/10";
+      case "PAYMENT_RECEIVED": return "text-muted-foreground bg-neutral-400/10";
+      case "MESSAGE": return "text-muted-foreground bg-neutral-500/10";
+      default: return "text-muted-foreground bg-muted/20";
     }
   };
 
   return (
-    <div className="h-dvh overflow-hidden flex flex-col bg-slate-50 dark:bg-[#0a0c12] transition-colors duration-300">
-      <header className="flex-shrink-0 p-6 lg:p-8 border-b border-slate-200 dark:border-white/5 bg-white dark:bg-transparent transition-colors duration-300">
+    <div className="h-dvh overflow-hidden flex flex-col bg-background transition-colors duration-300">
+      <header className="flex-shrink-0 p-6 lg:p-8 border-b border-border bg-header backdrop-blur-xl z-20">
         <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-3">
+            <h1 className="text-3xl font-black tracking-tight text-foreground flex items-center gap-3 uppercase italic">
               Notification Center
               {data?.unreadCount && data.unreadCount > 0 ? (
-                <span className="px-2.5 py-1 rounded-full bg-primary text-white text-[10px] font-black animate-pulse shadow-md dark:shadow-none">
+                <span className="px-2.5 py-1 rounded-full bg-primary text-primary-foreground border-transparent text-[10px] font-black animate-pulse shadow-[0_0_15px_rgba(255,255,255,0.4)]">
                   {data.unreadCount} NEW
                 </span>
               ) : null}
             </h1>
-            <p className="text-slate-500 dark:text-slate-400 mt-1">Real-time situational awareness for your entire import pipeline.</p>
+            <p className="text-muted-foreground font-black text-[10px] uppercase tracking-widest mt-1.5 opacity-60">Real-time situational awareness for your entire import pipeline.</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
             <button
               onClick={() => setShowUnreadOnly(!showUnreadOnly)}
-              className={`px-5 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border ${showUnreadOnly
-                  ? "bg-primary/10 dark:bg-primary/20 border-primary text-primary shadow-sm dark:shadow-lg dark:shadow-primary/10"
-                  : "bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/5 text-slate-500 hover:text-slate-900 dark:hover:text-white"
+              className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border ${showUnreadOnly
+                  ? "bg-primary text-primary-foreground border-transparent border-white shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+                  : "bg-muted/40 border-border text-muted-foreground hover:text-foreground hover:bg-muted/20"
                 }`}
             >
               Unread Focused
             </button>
             <button
               onClick={handleMarkAllRead}
-              className="px-5 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-white border border-slate-200 dark:border-white/10 transition-all flex items-center gap-2"
+              className="px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest bg-muted/40 hover:bg-muted/60 text-foreground border border-border transition-all flex items-center gap-3 shadow-xl active:scale-95"
             >
-              <CheckCircle2 className="w-4 h-4" />
+              <CheckCircle2 className="w-3.5 h-3.5" />
               Catch Up All
             </button>
           </div>
@@ -153,24 +153,24 @@ export default function ImporterNotificationsPage() {
 
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar Filters */}
-        <aside className="w-72 border-r border-slate-200 dark:border-white/5 bg-white dark:bg-transparent p-6 space-y-2 overflow-y-auto hidden lg:block transition-colors duration-300">
-          <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-4 mb-4">Traffic Type</div>
+        <aside className="w-72 border-r border-border bg-header backdrop-blur-xl p-6 space-y-3 overflow-y-auto hidden lg:block transition-all">
+          <div className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-4 mb-4 opacity-40">Traffic Type</div>
           {NOTIF_TYPES.map((t) => {
             const Icon = t.icon;
             return (
               <button
                 key={t.id}
                 onClick={() => setActiveType(t.id)}
-                className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all group ${activeType === t.id
-                    ? "bg-primary text-white shadow-xl shadow-primary/20"
-                    : "text-slate-500 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-slate-200"
+                className={`w-full flex items-center justify-between p-5 rounded-2xl transition-all group scale-95 hover:scale-100 ${activeType === t.id
+                    ? "bg-primary text-primary-foreground border-transparent shadow-[0_0_20px_rgba(255,255,255,0.1)] scale-100 z-10"
+                    : "text-muted-foreground hover:bg-muted/20 hover:text-foreground"
                   }`}
               >
-                <div className="flex items-center gap-3">
-                  <Icon className="w-4 h-4" />
-                  <span className="text-xs font-black uppercase tracking-widest">{t.label}</span>
+                <div className="flex items-center gap-4">
+                  <Icon className={`w-4 h-4 ${activeType === t.id ? "animate-pulse" : "opacity-30 group-hover:opacity-100 transition-opacity"}`} />
+                  <span className="text-[10px] font-black uppercase tracking-widest">{t.label}</span>
                 </div>
-                <ChevronRight className={`w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity ${activeType === t.id ? "opacity-100" : ""}`} />
+                <ChevronRight className={`w-3.5 h-3.5 transition-all ${activeType === t.id ? "translate-x-0 opacity-100" : "-translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"}`} />
               </button>
             );
           })}
@@ -181,22 +181,22 @@ export default function ImporterNotificationsPage() {
           <div className="max-w-[1000px] mx-auto space-y-4">
             {loading && !data ? (
               Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="h-28 bg-white dark:bg-white/5 rounded-3xl animate-pulse border border-slate-200 dark:border-white/5" />
+                <div key={i} className="h-28 bg-muted/20 rounded-[2rem] animate-pulse border border-border/50" />
               ))
             ) : !data?.notifications?.length ? (
               <div className="py-32 text-center opacity-40 select-none">
-                <Bell className="w-20 h-20 mx-auto mb-6 text-slate-400 dark:text-slate-500" />
-                <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-widest italic">Signal is Clear</h2>
-                <p className="text-slate-500 text-sm mt-2">No incoming notifications for this filter set.</p>
+                <Bell className="w-20 h-20 mx-auto mb-8 text-muted-foreground/20" />
+                <h2 className="text-xl font-black text-foreground uppercase tracking-widest italic">Signal is Clear</h2>
+                <p className="text-muted-foreground text-[10px] font-black uppercase tracking-widest leading-none mt-2">No incoming notifications for this filter set.</p>
               </div>
             ) : (
               data.notifications.map((n) => (
                 <div
                   key={n.id}
                   onClick={() => !n.read && handleMarkRead(n.id)}
-                  className={`group relative bg-white dark:bg-[#151c2a]/60 backdrop-blur-xl border transition-all rounded-[2rem] p-6 lg:p-8 flex items-start gap-6 cursor-pointer shadow-sm dark:shadow-none ${n.read
-                      ? "border-slate-200 dark:border-white/5 opacity-80 hover:opacity-100 dark:opacity-60 dark:hover:opacity-80"
-                      : "border-primary/30 dark:border-primary/20 shadow-lg shadow-primary/5 hover:border-primary/50 dark:hover:border-primary/40"
+                  className={`group relative bg-muted/40 backdrop-blur-xl border transition-all rounded-[2rem] p-7 lg:p-10 flex items-start gap-8 cursor-pointer shadow-2xl ${n.read
+                      ? "border-border opacity-40 hover:opacity-80"
+                      : "border-border shadow-[0_0_30px_rgba(255,255,255,0.05)] hover:border-white/30"
                     }`}
                 >
                   <div className={`flex-shrink-0 size-14 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 ${getTypeColor(n.type)}`}>
@@ -204,26 +204,26 @@ export default function ImporterNotificationsPage() {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-3">
-                        <h3 className={`text-lg font-black tracking-tight truncate ${n.read ? "text-slate-500 dark:text-slate-300" : "text-slate-900 dark:text-white"}`}>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-4">
+                        <h3 className={`text-xl font-black tracking-tight uppercase italic truncate ${n.read ? "text-muted-foreground" : "text-foreground"}`}>
                           {n.title}
                         </h3>
                         {!n.read && (
-                          <div className="size-2 rounded-full bg-primary shadow-[0_0_10px_rgba(37,99,235,0.4)] dark:shadow-[0_0_10px_rgba(37,99,235,0.8)]" />
+                          <div className="size-2 rounded-full bg-white shadow-[0_0_12px_rgba(255,255,255,0.8)] animate-pulse" />
                         )}
                       </div>
-                      <time className="text-[10px] font-black text-slate-500 uppercase tracking-widest whitespace-nowrap">
+                      <time className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] whitespace-nowrap opacity-40">
                         {timeAgo(n.createdAt)}
                       </time>
                     </div>
-                    <p className={`text-sm leading-relaxed ${n.read ? "text-slate-400 dark:text-slate-500" : "text-slate-600 dark:text-slate-400"}`}>
-                      {n.message}
+                    <p className={`text-[11px] font-black uppercase tracking-widest leading-relaxed line-clamp-2 ${n.read ? "text-muted-foreground/40" : "text-muted-foreground"}`}>
+                      &ldquo;{n.message}&rdquo;
                     </p>
                   </div>
 
                   <div className="flex-shrink-0 self-center">
-                    <button className="p-2 text-slate-400 hover:text-slate-700 dark:text-slate-700 dark:hover:text-white transition-colors">
+                    <button className="p-3 text-muted-foreground/30 hover:text-foreground transition-all hover:scale-110 active:scale-90">
                       <MoreVertical className="w-5 h-5" />
                     </button>
                   </div>
@@ -233,8 +233,8 @@ export default function ImporterNotificationsPage() {
 
             {/* Pagination Placeholder */}
             {data && data.pagination.totalPages > 1 && (
-              <div className="text-center py-6">
-                <button className="text-[10px] font-black text-primary uppercase tracking-[0.2em] hover:underline">
+              <div className="text-center py-10">
+                <button className="text-[10px] font-black text-foreground hover:text-muted-foreground uppercase tracking-[0.3em] transition-all border-b border-border pb-1">
                   Load Older Transmission Trace
                 </button>
               </div>

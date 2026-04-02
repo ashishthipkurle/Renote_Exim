@@ -58,14 +58,14 @@ export default function AdminLogsPage() {
     );
 
     return (
-        <div className="h-dvh flex flex-col bg-[#0b1019] relative overflow-hidden">
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f2937_1px,transparent_1px),linear-gradient(to_bottom,#1f2937_1px,transparent_1px)] bg-[length:40px_40px] opacity-[0.03] pointer-events-none" />
+        <div className="h-dvh flex flex-col bg-background relative overflow-hidden">
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#333_1px,transparent_1px),linear-gradient(to_bottom,#333_1px,transparent_1px)] bg-[length:40px_40px] opacity-[0.03] pointer-events-none" />
 
             <header className="flex-shrink-0 h-20 px-8 flex items-center justify-between border-b border-white/5 bg-[#0b1019]/30 backdrop-blur-md z-30">
                 <div>
                     <h1 className="text-xl font-black text-white uppercase tracking-widest flex items-center gap-2">
                         System Audit Logs
-                        <span className="text-[10px] bg-primary/20 text-primary border border-primary/30 px-2 py-0.5 rounded">
+                        <span className="text-[10px] bg-white/20 text-white border border-white/30 px-2 py-0.5 rounded">
                             LIVE FEED
                         </span>
                     </h1>
@@ -74,11 +74,11 @@ export default function AdminLogsPage() {
 
                 <div className="flex items-center gap-4">
                     <div className="relative group">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-primary transition-colors" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-white transition-colors" />
                         <input
                             type="text"
                             placeholder="Search IP, Entity, Email..."
-                            className="bg-[#151c2a]/50 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-sm text-white focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none w-64 transition-all"
+                            className="bg-muted/50 border border-border rounded-xl pl-10 pr-4 py-2 text-sm text-white focus:ring-2 focus:ring-white/20 focus:border-white/50 outline-none w-64 transition-all"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />
@@ -87,7 +87,7 @@ export default function AdminLogsPage() {
             </header>
 
             <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
-                <div className="bg-[#151c2a]/40 backdrop-blur-xl border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
+                <div className="bg-muted/40 backdrop-blur-xl border border-border rounded-2xl overflow-hidden shadow-2xl">
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="border-b border-white/5 bg-white/5">
@@ -120,7 +120,7 @@ export default function AdminLogsPage() {
                                     <tr key={log.id} className="group hover:bg-white/[0.02] transition-colors">
                                         <td className="px-6 py-5">
                                             <div className="flex items-center gap-3">
-                                                <Clock className="w-3.5 h-3.5 text-slate-500 group-hover:text-primary transition-colors" />
+                                                <Clock className="w-3.5 h-3.5 text-slate-500 group-hover:text-white transition-colors" />
                                                 <div className="flex flex-col">
                                                     <span className="text-xs font-black text-slate-300 font-mono italic">
                                                         {format(new Date(log.createdAt), "HH:mm:ss")}
@@ -137,7 +137,7 @@ export default function AdminLogsPage() {
                                                     {log.user.name.charAt(0)}
                                                 </div>
                                                 <div>
-                                                    <div className="text-xs font-bold text-white group-hover:text-primary transition-colors">{log.user.name}</div>
+                                                    <div className="text-xs font-bold text-white group-hover:text-white transition-colors">{log.user.name}</div>
                                                     <div className="text-[9px] text-slate-500 font-medium font-mono">{log.user.email}</div>
                                                 </div>
                                             </div>
@@ -151,7 +151,7 @@ export default function AdminLogsPage() {
                                         <td className="px-6 py-5">
                                             <div className={clsx(
                                                 "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[9px] font-black uppercase tracking-widest",
-                                                log.success ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-red-500/10 text-red-400 border-red-500/20"
+                                                log.success ? "bg-white/10 text-white border-white/20" : "bg-neutral-800 text-neutral-400 border-white/10"
                                             )}>
                                                 {log.success ? <ShieldCheck className="w-3 h-3" /> : <ShieldAlert className="w-3 h-3" />}
                                                 {log.success ? "VALIDATED" : "BREACH / FAIL"}
@@ -176,8 +176,8 @@ export default function AdminLogsPage() {
 
                 <div className="mt-8 flex items-center justify-between">
                     <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest italic">
-                        <Terminal className="w-3.5 h-3.5 text-primary" />
-                        Platform Entropy: <span className="text-emerald-400">Stable</span>
+                        <Terminal className="w-3.5 h-3.5 text-white" />
+                        Platform Entropy: <span className="text-white">Stable</span>
                     </div>
                 </div>
             </div>

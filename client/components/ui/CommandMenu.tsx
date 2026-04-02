@@ -39,101 +39,103 @@ export default function CommandMenu() {
 
   return (
     <div 
-      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm transition-opacity"
+      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xl transition-opacity animate-in fade-in duration-300"
       onClick={() => setOpen(false)}
     >
       <div className="flex h-full w-full items-center justify-center p-4">
         <Command 
           onClick={(e) => e.stopPropagation()}
-          className="w-full max-w-[640px] overflow-hidden rounded-2xl bg-slate-900 border border-slate-800 shadow-2xl ring-1 ring-white/10"
+          className="w-full max-w-[640px] overflow-hidden rounded-3xl bg-black border border-white/10 shadow-2xl ring-1 ring-white/5 animate-in zoom-in-95 duration-300"
         >
-          <div className="flex items-center border-b border-slate-800 px-4">
-            <Search className="mr-3 h-5 w-5 text-slate-400" />
+          <div className="flex items-center border-b border-white/5 px-6">
+            <Search className="mr-4 h-5 w-5 text-muted-foreground/40" />
             <Command.Input
-              placeholder="Type a command or search..."
-              className="flex h-14 w-full bg-transparent py-4 text-sm outline-none placeholder:text-slate-500 text-white"
+              placeholder="Search data nodes or execute protocol..."
+              className="flex h-20 w-full bg-transparent py-4 text-sm outline-none placeholder:text-muted-foreground/20 text-white font-medium italic"
             />
           </div>
 
-          <Command.List className="max-h-[400px] overflow-y-auto p-2 scrollbar-thin scrollbar-thumb-slate-800">
-            <Command.Empty className="py-6 text-center text-sm text-slate-500">
-              No results found.
+          <Command.List className="max-h-[400px] overflow-y-auto p-4 scrollbar-none">
+            <Command.Empty className="py-12 text-center text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] opacity-40">
+              No telemetry matches found.
             </Command.Empty>
 
-            <Command.Group heading="Navigation" className="px-2 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <Command.Group heading="Navigation" className="px-3 py-4 text-[10px] font-black text-white/20 uppercase tracking-[0.2em] italic">
               <Command.Item 
                 onSelect={() => runCommand(() => router.push('/dashboard'))}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white cursor-pointer transition-colors"
+                className="flex items-center gap-4 px-4 py-4 rounded-2xl text-muted-foreground hover:bg-white/5 hover:text-white cursor-pointer transition-all group"
               >
-                <LayoutDashboard className="h-4 w-4" />
-                <span>Dashboard Home</span>
+                <LayoutDashboard className="h-4 w-4 opacity-40 group-hover:opacity-100 transition-opacity" />
+                <span className="text-[10px] font-black uppercase tracking-widest">Dashboard Home</span>
               </Command.Item>
               <Command.Item 
                 onSelect={() => runCommand(() => router.push('/marketplace'))}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white cursor-pointer transition-colors"
+                className="flex items-center gap-4 px-4 py-4 rounded-2xl text-muted-foreground hover:bg-white/5 hover:text-white cursor-pointer transition-all group"
               >
-                <Box className="h-4 w-4" />
-                <span>Marketplace</span>
+                <Box className="h-4 w-4 opacity-40 group-hover:opacity-100 transition-opacity" />
+                <span className="text-[10px] font-black uppercase tracking-widest">Marketplace Hub</span>
               </Command.Item>
               <Command.Item 
                 onSelect={() => runCommand(() => router.push('/dashboard/orders'))}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white cursor-pointer transition-colors"
+                className="flex items-center gap-4 px-4 py-4 rounded-2xl text-muted-foreground hover:bg-white/5 hover:text-white cursor-pointer transition-all group"
               >
-                <ShoppingCart className="h-4 w-4" />
-                <span>My Orders</span>
+                <ShoppingCart className="h-4 w-4 opacity-40 group-hover:opacity-100 transition-opacity" />
+                <span className="text-[10px] font-black uppercase tracking-widest">Transmission Logs</span>
               </Command.Item>
             </Command.Group>
 
-            <Command.Separator className="h-px bg-slate-800 my-2" />
+            <div className="h-px bg-white/5 mx-4 my-2" />
 
-            <Command.Group heading="Actions" className="px-2 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <Command.Group heading="Procurement" className="px-3 py-4 text-[10px] font-black text-white/20 uppercase tracking-[0.2em] italic">
               <Command.Item 
                 onSelect={() => runCommand(() => router.push('/dashboard/products/new'))}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white cursor-pointer transition-colors"
+                className="flex items-center gap-4 px-4 py-4 rounded-2xl text-muted-foreground hover:bg-white/5 hover:text-white cursor-pointer transition-all group"
               >
-                <Plus className="h-4 w-4" />
-                <span>List New Product</span>
+                <Plus className="h-4 w-4 opacity-40 group-hover:opacity-100 transition-opacity" />
+                <span className="text-[10px] font-black uppercase tracking-widest">Initialize Asset</span>
               </Command.Item>
               <Command.Item 
                 onSelect={() => runCommand(() => router.push('/inbox'))}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white cursor-pointer transition-colors"
+                className="flex items-center gap-4 px-4 py-4 rounded-2xl text-muted-foreground hover:bg-white/5 hover:text-white cursor-pointer transition-all group"
               >
-                <MessageSquare className="h-4 w-4" />
-                <span>Messenger</span>
+                <MessageSquare className="h-4 w-4 opacity-40 group-hover:opacity-100 transition-opacity" />
+                <span className="text-[10px] font-black uppercase tracking-widest">Comms Interface</span>
               </Command.Item>
             </Command.Group>
 
-            <Command.Separator className="h-px bg-slate-800 my-2" />
+            <div className="h-px bg-white/5 mx-4 my-2" />
 
-            <Command.Group heading="Account" className="px-2 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <Command.Group heading="System" className="px-3 py-4 text-[10px] font-black text-white/20 uppercase tracking-[0.2em] italic">
               <Command.Item 
                 onSelect={() => runCommand(() => router.push('/dashboard/settings'))}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white cursor-pointer transition-colors"
+                className="flex items-center gap-4 px-4 py-4 rounded-2xl text-muted-foreground hover:bg-white/5 hover:text-white cursor-pointer transition-all group"
               >
-                <Settings className="h-4 w-4" />
-                <span>Settings</span>
+                <Settings className="h-4 w-4 opacity-40 group-hover:opacity-100 transition-opacity" />
+                <span className="text-[10px] font-black uppercase tracking-widest">Configurations</span>
               </Command.Item>
               <Command.Item 
                 onSelect={() => runCommand(() => router.push('/dashboard/profile'))}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white cursor-pointer transition-colors"
+                className="flex items-center gap-4 px-4 py-4 rounded-2xl text-muted-foreground hover:bg-white/5 hover:text-white cursor-pointer transition-all group"
               >
-                <User className="h-4 w-4" />
-                <span>Profile</span>
+                <User className="h-4 w-4 opacity-40 group-hover:opacity-100 transition-opacity" />
+                <span className="text-[10px] font-black uppercase tracking-widest">Node Profile</span>
               </Command.Item>
             </Command.Group>
           </Command.List>
 
-          <div className="flex items-center border-t border-slate-800 px-4 py-3 bg-slate-950/50">
-            <kbd className="mr-2 inline-flex h-5 w-5 items-center justify-center rounded border border-slate-700 bg-slate-800 text-[10px] text-slate-400 font-medium">
-              ESC
-            </kbd>
-            <span className="text-[10px] text-slate-500">to close</span>
-            <div className="ml-auto flex items-center gap-4">
-              <div className="flex items-center gap-1.5">
-                 <kbd className="inline-flex h-5 w-8 items-center justify-center rounded border border-slate-700 bg-slate-800 text-[10px] text-slate-400 font-medium whitespace-nowrap">
+          <div className="flex items-center border-t border-white/5 px-6 py-4 bg-muted/10">
+            <div className="flex items-center gap-3">
+              <kbd className="inline-flex h-6 w-10 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-[9px] font-black text-white uppercase tracking-widest">
+                ESC
+              </kbd>
+              <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest opacity-40">Abort</span>
+            </div>
+            <div className="ml-auto flex items-center gap-6">
+              <div className="flex items-center gap-3">
+                 <kbd className="inline-flex h-6 w-14 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-[9px] font-black text-white uppercase tracking-widest">
                   ENTER
                 </kbd>
-                <span className="text-[10px] text-slate-500">to select</span>
+                <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest opacity-40">Execute</span>
               </div>
             </div>
           </div>

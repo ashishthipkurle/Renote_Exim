@@ -15,12 +15,13 @@ import {
   BarChart3,
   Settings,
   LogOut,
-  Globe2,
   Menu,
   X,
 } from "lucide-react";
 import { useState } from "react";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import Image from "next/image";
+import LogoImg from "@/assests/LOGO_TEXT.png";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -88,12 +89,7 @@ export default function DashboardLayout({ children, role }: DashboardLayoutProps
             </button>
 
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <Globe2 className="text-white" size={20} />
-              </div>
-              <span className="font-bold text-lg hidden sm:inline">
-                Renote <span className="text-blue-600">Exim</span>
-              </span>
+              <Image src={LogoImg} alt="Ranote Exim Logo" className="h-8 md:h-10 w-auto object-contain" unoptimized />
             </Link>
           </div>
 
@@ -102,7 +98,7 @@ export default function DashboardLayout({ children, role }: DashboardLayoutProps
             <ThemeToggle />
             <button className="relative p-2 hover:bg-accent rounded-lg">
               <Bell size={20} />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              <span className="absolute top-1 right-1 w-2 h-2 bg-white rounded-full"></span>
             </button>
             <Link href="/dashboard/settings">
               <button className="p-2 hover:bg-accent rounded-lg">
