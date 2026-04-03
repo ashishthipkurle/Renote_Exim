@@ -126,12 +126,12 @@ function normalizeCategory(value: string | null): string {
     if (!value) return "OTHER";
     const upper = value.trim().toUpperCase();
     if (VALID_CATEGORIES.has(upper)) return upper;
-    
+
     // Explicit mapping for common mismatches
     if (upper === "MACHINERY" || upper === "MACHINES & EQUIPMENT" || upper === "MACHINE") {
         return "MACHINES";
     }
-    
+
     // Check if it's one of the display labels
     const found = CATEGORIES.find(c => c.label.toUpperCase() === upper || c.value === upper);
     if (found) return found.value;
@@ -498,20 +498,20 @@ export default function ProductForm({
                         <h2 className="text-[11px] font-black text-foreground tracking-[0.25em] uppercase opacity-50 italic">Asset Gallery</h2>
 
                         {/* Previews */}
-                        <ImageUploader 
-                            images={form.images} 
+                        <ImageUploader
+                            images={form.images}
                             onChange={(urls) => {
                                 setForm(prev => ({ ...prev, images: urls }));
                                 setErrors(prev => ({ ...prev, images: "" }));
-                            }} 
+                            }}
                             maxFiles={4}
                         />
                         {/* Make sure we can still remove completed images from the main form state */}
                         {form.images.length > 0 && (
                             <div className="grid grid-cols-2 gap-3 mt-4">
                                 {form.images.map((url, i) => (
-                                    <div 
-                                        key={i} 
+                                    <div
+                                        key={i}
                                         className="relative group rounded-xl overflow-hidden border border-border aspect-square bg-muted shadow-xl cursor-zoom-in"
                                         onClick={() => setPreviewImage(url)}
                                     >
@@ -611,22 +611,22 @@ export default function ProductForm({
 
             {/* Image Preview Modal */}
             {previewImage && (
-                <div 
+                <div
                     className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 animate-in fade-in zoom-in-95 duration-200"
                     onClick={() => setPreviewImage(null)}
                 >
-                    <button 
-                        type="button" 
+                    <button
+                        type="button"
                         onClick={() => setPreviewImage(null)}
                         className="absolute top-4 right-4 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors shadow-2xl"
                     >
                         <X className="w-6 h-6" />
                     </button>
-                    <img 
-                        src={previewImage} 
-                        alt="Expanded Preview" 
+                    <img
+                        src={previewImage}
+                        alt="Expanded Preview"
                         className="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl"
-                        onClick={(e) => e.stopPropagation()} 
+                        onClick={(e) => e.stopPropagation()}
                     />
                 </div>
             )}

@@ -370,3 +370,19 @@
   "certifications": [],
   "quantity": 3
 }
+[2026-04-03T14:07:35.805Z] [POST /api/products] Body: {
+  "name": "rice",
+  "category": "FOOD",
+  "description": "In marketing, a product is an object or a system that is made available for consumer use through the process of marketing. Product widely means literally anything that can be offered in a market keeping its demand in close connection. This ‘Product’",
+  "price": 8,
+  "regularPrice": 12,
+  "minOrderQty": 1,
+  "unit": "kg",
+  "originCountry": "india",
+  "hsCode": "852",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775225246/renote-exim/products/xsqfrrtdetcgbwqnzxvt.jpg"
+  ],
+  "certifications": [],
+  "quantity": 4
+}
