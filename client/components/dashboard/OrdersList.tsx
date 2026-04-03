@@ -11,11 +11,11 @@ import ShipmentTrackingPanel from "@/components/dashboard/ShipmentTrackingPanel"
 import { toast } from "sonner";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
-    PENDING: { label: "Pending", color: "text-neutral-400 bg-neutral-400/10 border-neutral-400/20", icon: Clock },
-    CONFIRMED: { label: "Confirmed", color: "text-white bg-white/10 border-white/20", icon: CheckCircle2 },
-    PROCESSING: { label: "Processing", color: "text-neutral-300 bg-neutral-300/10 border-neutral-300/20", icon: Package },
-    SHIPPED: { label: "Shipped", color: "text-white bg-white/5 border-white/10", icon: Truck },
-    DELIVERED: { label: "Delivered", color: "text-neutral-400 bg-neutral-400/10 border-neutral-400/20", icon: CheckCircle2 },
+    PENDING: { label: "Pending", color: "text-neutral-500 bg-neutral-500/10 border-neutral-500/20", icon: Clock },
+    CONFIRMED: { label: "Confirmed", color: "text-primary bg-primary/10 border-primary/20", icon: CheckCircle2 },
+    PROCESSING: { label: "Processing", color: "text-neutral-600 dark:text-neutral-300 bg-neutral-300/10 border-neutral-300/20", icon: Package },
+    SHIPPED: { label: "Shipped", color: "text-primary bg-primary/5 border-primary/10", icon: Truck },
+    DELIVERED: { label: "Delivered", color: "text-neutral-500 bg-neutral-500/10 border-neutral-500/20", icon: CheckCircle2 },
     CANCELLED: { label: "Cancelled", color: "text-neutral-500 bg-neutral-500/10 border-neutral-500/20", icon: XCircle },
 };
 
@@ -188,9 +188,9 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
                                     )}
                                 </div>
                                 <div>
-                                    <div className="text-sm font-black text-white group-hover:text-muted-foreground transition-colors uppercase italic tracking-tighter">{order.product?.name ?? "Unknown Asset"}</div>
+                                    <div className="text-sm font-black text-foreground group-hover:text-primary transition-colors uppercase italic tracking-tighter">{order.product?.name ?? "Unknown Asset"}</div>
                                     <div className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-0.5">VIA: {order.product?.exporter?.companyName || order.product?.exporter?.name || "EXPORTER"}</div>
-                                    <div className="text-[11px] text-white mt-1 font-black tracking-tighter">{formatCurrency(order.totalPrice)}</div>
+                                    <div className="text-[11px] text-foreground mt-1 font-black tracking-tighter">{formatCurrency(order.totalPrice)}</div>
                                 </div>
                             </div>
 
@@ -215,7 +215,7 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
                                     <Link
                                         href={`/products/${order.product.id}`}
                                         onClick={(e) => e.stopPropagation()}
-                                        className="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-colors border border-white/10"
+                                        className="px-3 py-2 rounded-lg bg-muted border border-border hover:bg-muted/80 text-foreground text-xs font-bold transition-colors"
                                         title="View Product"
                                     >
                                         View Product
@@ -234,7 +234,7 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
                                 </button>
                                 <button
                                     onClick={(e) => { e.stopPropagation(); openDetails(order); }}
-                                    className="p-2 rounded-lg bg-card hover:bg-white/5 text-muted-foreground hover:text-white transition-all border border-border"
+                                    className="p-2 rounded-lg bg-card hover:bg-muted text-muted-foreground hover:text-foreground transition-all border border-border"
                                     title="Order Details"
                                 >
                                     <Info className="w-4 h-4" />
@@ -244,7 +244,7 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
                                         e.stopPropagation();
                                         setExpandedOrderId(isExpanded ? null : order.id);
                                     }}
-                                    className="p-2 rounded-lg bg-muted/50 hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors"
+                                    className="p-2 rounded-lg bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors border border-border"
                                     title="Expand"
                                 >
                                     <ChevronDown className={`w-4 h-4 transition-transform ${isExpanded ? "rotate-180" : ""}`} />
@@ -311,10 +311,10 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
                                         <ShipmentTrackingPanel shipment={order.shipment} />
                                     )}
 
-                                    <div className="rounded-xl border border-border bg-white/5 p-4 space-y-3 shadow-inner">
+                                    <div className="rounded-xl border border-border bg-muted/10 p-4 space-y-3 shadow-inner">
                                         <div className="flex items-center justify-between gap-3">
-                                            <h4 className="text-[10px] font-black text-white uppercase tracking-[0.2em] italic">Procurement Intelligence Feedback</h4>
-                                            {review && <span className="text-[9px] font-black text-white px-2 py-0.5 rounded-full border border-white/20 bg-white/5 uppercase tracking-widest">Logged</span>}
+                                            <h4 className="text-[10px] font-black text-foreground uppercase tracking-[0.2em] italic">Procurement Intelligence Feedback</h4>
+                                            {review && <span className="text-[9px] font-black text-foreground px-2 py-0.5 rounded-full border border-border bg-muted/20 uppercase tracking-widest">Logged</span>}
                                         </div>
 
                                         {!isReviewEligible ? (
@@ -327,10 +327,10 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
                                                             key={star}
                                                             type="button"
                                                             onClick={() => setRatingDraftByOrder((prev) => ({ ...prev, [order.id]: star }))}
-                                                            className="text-white hover:scale-125 transition-transform"
+                                                            className="text-foreground hover:scale-125 transition-transform"
                                                             title={`${star} star metadata`}
                                                         >
-                                                            <Star className={`w-5 h-5 ${star <= currentRating ? "fill-white" : ""}`} />
+                                                            <Star className={`w-5 h-5 ${star <= currentRating ? "fill-foreground" : ""}`} />
                                                         </button>
                                                     ))}
                                                     <span className="text-[10px] font-black text-muted-foreground ml-2 tracking-widest">{currentRating || 0} / 5.0 CNS</span>
@@ -339,7 +339,7 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
                                                 <textarea
                                                     value={currentComment}
                                                     onChange={(e) => setCommentDraftByOrder((prev) => ({ ...prev, [order.id]: e.target.value }))}
-                                                    className="w-full min-h-24 rounded-lg bg-background border border-border px-3 py-2 text-sm text-white placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-white/20 transition-all font-medium leading-relaxed italic"
+                                                    className="w-full min-h-24 rounded-lg bg-background border border-border px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-primary/20 transition-all font-medium leading-relaxed italic"
                                                     placeholder="Report asset quality, logistics protocol efficiency, and node synchronization..."
                                                 />
 
@@ -347,7 +347,7 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
                                                     <button
                                                         type="button"
                                                         onClick={() => submitReview(order)}
-                                                        className="px-6 py-2.5 rounded-xl bg-white text-black text-[10px] font-black uppercase tracking-[0.2em] hover:bg-primary/90 transition-all shadow-xl shadow-white/10 active:scale-95"
+                                                        className="px-6 py-2.5 rounded-xl bg-foreground text-background text-[10px] font-black uppercase tracking-[0.2em] hover:bg-foreground/90 transition-all shadow-xl active:scale-95"
                                                     >
                                                         {review ? "Patch Intelligence" : "Broadcast Feedback"}
                                                     </button>

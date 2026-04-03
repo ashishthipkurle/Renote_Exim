@@ -17,6 +17,11 @@ import LogoImg from "@/assests/LOGO.png";
 const TOTAL_FRAMES = 150;
 const SCROLL_DISTANCE = 3000; // px of scroll for full video playback
 
+// Global cache to persist frames across navigation within the same session (SPA navigation)
+let globalFramesCache: ImageBitmap[] = [];
+let globalProgressCache = 0;
+let isExtractionRunning = false;
+
 /* --- Scrollytelling text data ---
  * Each entry defines a text block that fades in/out at specific scroll progress ranges.
  * `animation` controls the entrance/exit style for each block.
@@ -65,11 +70,11 @@ export default function ScrollVideoSection() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
   const textRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const framesRef = useRef<ImageBitmap[]>([]);
+  const framesRef = useRef<ImageBitmap[]>(globalFramesCache);
   const currentFrameRef = useRef(-1);
-  const [progress, setProgress] = useState(0);
+  const [progress, setProgress] = useState(globalProgressCache);
   const [failed, setFailed] = useState(false);
-  const [loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded] = useState(globalFramesCache.length >= 2);
 
   // Cover-draw: scale + center-crop bitmap to fill the canvas
   const drawCover = useCallback(
@@ -123,17 +128,20 @@ export default function ScrollVideoSection() {
     };
   }, [loaded, failed]);
 
-  // Lock scroll while buffering frames
+  // Lock scroll while buffering frames (only if not seen before in this session)
   useEffect(() => {
-    if (progress >= 100 || failed) return;
+    const hasSeenIntro = sessionStorage.getItem("ranote-video-intro-seen") === "true";
+    if (progress >= 100 || failed || hasSeenIntro) return;
 
     const preventScroll = (e: Event) => {
+      // Allow scroll if progress is significantly along, or if failed
+      if (progress >= 100) return;
       e.preventDefault();
     };
 
     const preventKeys = (e: KeyboardEvent) => {
       if (['ArrowDown', 'ArrowUp', 'Space', 'PageDown', 'PageUp', 'Home', 'End', ' '].includes(e.key)) {
-        e.preventDefault();
+        if (progress < 100) e.preventDefault();
       }
     };
 
@@ -288,6 +296,17 @@ export default function ScrollVideoSection() {
 
     // ---------- 2. Extract frames in background ----------
     const extractFrames = async () => {
+      if (globalFramesCache.length >= TOTAL_FRAMES) {
+        setLoaded(true);
+        setProgress(100);
+        resizeCanvas();
+        drawFrame(0);
+        return;
+      }
+
+      if (isExtractionRunning) return;
+      isExtractionRunning = true;
+
       const video = document.createElement("video");
       video.style.position = "absolute";
       video.style.opacity = "0";
@@ -320,23 +339,52 @@ export default function ScrollVideoSection() {
       const interval = duration / (TOTAL_FRAMES - 1);
 
       for (let i = 0; i < TOTAL_FRAMES; i++) {
+        // If navigation occurred and cleared framesRef, stop extraction
+        if (!framesRef.current) break;
+
         await new Promise<void>((resolve) => {
           const onSeeked = async () => {
             try {
-              const bitmap = await createImageBitmap(video);
-              frames[i] = bitmap;
-            } catch {
+              // Resize frames to 1080p maximum to save memory (prevents browser crashes/reclaims)
+              const vw = video.videoWidth || 1920;
+              const vh = video.videoHeight || 1080;
+              const targetW = Math.min(1920, vw);
+              const targetH = Math.round((targetW / vw) * vh);
+
+              const bitmap = await createImageBitmap(video, {
+                resizeWidth: targetW,
+                resizeHeight: targetH,
+                resizeQuality: "medium"
+              });
+              
+              if (framesRef.current) framesRef.current[i] = bitmap;
+              globalFramesCache[i] = bitmap;
+            } catch (e) {
+              console.error("[ScrollVideo] createImageBitmap failed, falling back to canvas", e);
               const tmpCanvas = document.createElement("canvas");
-              tmpCanvas.width = video.videoWidth || 1920;
-              tmpCanvas.height = video.videoHeight || 1080;
+              const vw = video.videoWidth || 1920;
+              const vh = video.videoHeight || 1080;
+              const targetW = Math.min(1920, vw);
+              const targetH = Math.round((targetW / vw) * vh);
+              
+              tmpCanvas.width = targetW;
+              tmpCanvas.height = targetH;
               const tmpCtx = tmpCanvas.getContext("2d");
               if (tmpCtx) {
-                tmpCtx.drawImage(video, 0, 0);
-                const bitmap = await createImageBitmap(tmpCanvas);
-                frames[i] = bitmap;
+                tmpCtx.drawImage(video, 0, 0, targetW, targetH);
+                try {
+                  const bitmap = await createImageBitmap(tmpCanvas);
+                  if (framesRef.current) framesRef.current[i] = bitmap;
+                  globalFramesCache[i] = bitmap;
+                } catch (b) {
+                  console.error("[ScrollVideo] Canvas bitmap capture failed", b);
+                }
               }
             }
-            setProgress(Math.round(((i + 1) / TOTAL_FRAMES) * 100));
+            
+            const p = Math.round(((i + 1) / TOTAL_FRAMES) * 100);
+            setProgress(p);
+            globalProgressCache = p;
 
             if (i === 0) {
               resizeCanvas();
@@ -344,10 +392,14 @@ export default function ScrollVideoSection() {
             }
 
             if (i === 2 || (i === 0 && TOTAL_FRAMES <= 2)) {
-              if (i === 2) drawFrame(2);
               setLoaded(true);
               (window as any).homeVideoReady = true;
               window.dispatchEvent(new Event('home-video-ready'));
+            }
+
+            if (i === TOTAL_FRAMES - 1) {
+              sessionStorage.setItem("ranote-video-intro-seen", "true");
+              isExtractionRunning = false;
             }
 
             video.removeEventListener("seeked", onSeeked);
@@ -370,14 +422,15 @@ export default function ScrollVideoSection() {
 
     extractFrames().catch(() => {
       setFailed(true);
+      isExtractionRunning = false;
     });
 
     return () => {
       window.removeEventListener("resize", resizeCanvas);
       tl.kill();
       ScrollTrigger.getAll().forEach((t) => t.kill());
-      frames.forEach((bmp) => bmp?.close());
-      framesRef.current = [];
+      // We no longer close frames on unmount because we want to cache them
+      // framesRef.current = []; // Keep it for the global cache
     };
   }, [failed, drawCover]);
 

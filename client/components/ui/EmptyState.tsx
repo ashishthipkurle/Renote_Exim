@@ -47,7 +47,7 @@ export default function EmptyState({
   const ActionButton = () => (
     <button 
       onClick={onAction}
-      className="bg-white hover:bg-neutral-200 text-black px-10 h-14 rounded-2xl transition-all shadow-2xl shadow-white/10 font-black uppercase tracking-[0.2em] active:scale-[0.98] text-[10px]"
+      className="bg-primary hover:bg-primary/90 text-primary-foreground px-10 h-14 rounded-2xl transition-all shadow-xl font-black uppercase tracking-[0.2em] active:scale-[0.98] text-[10px]"
     >
       {actionLabel}
     </button>
@@ -55,12 +55,12 @@ export default function EmptyState({
 
   return (
     <div className="flex flex-col items-center justify-center py-20 px-4 text-center animate-in fade-in zoom-in-95 duration-500">
-      <div className="w-24 h-24 bg-muted/20 backdrop-blur-3xl border border-border rounded-[2.5rem] flex items-center justify-center mb-10 text-white shadow-2xl relative group">
-        <div className="absolute inset-0 bg-white/5 rounded-[2.5rem] animate-pulse group-hover:bg-white/10 transition-colors" />
+      <div className="w-24 h-24 bg-muted/20 backdrop-blur-3xl border border-border rounded-[2.5rem] flex items-center justify-center mb-10 text-foreground shadow-2xl relative group">
+        <div className="absolute inset-0 bg-foreground/5 rounded-[2.5rem] animate-pulse group-hover:bg-foreground/10 transition-colors" />
         <Icon className="w-10 h-10 relative z-10" />
       </div>
-      <h3 className="text-3xl font-black text-white mb-4 tracking-tighter uppercase italic shadow-[0_0_20px_rgba(255,255,255,0.1)]">{title}</h3>
-      <p className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.2em] max-w-sm mx-auto mb-12 leading-relaxed opacity-60">
+      <h3 className="text-3xl font-black text-foreground mb-4 tracking-tighter uppercase italic">{title}</h3>
+      <p className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.2em] max-w-sm mx-auto mb-12 leading-relaxed">
         {description}
       </p>
       {actionLabel && (
