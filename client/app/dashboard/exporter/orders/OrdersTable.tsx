@@ -21,7 +21,7 @@ import {
   Circle
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
+import ShipmentTrackingPanel from "@/components/dashboard/ShipmentTrackingPanel";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
     PENDING: { label: "PENDING_NODE", color: "text-muted-foreground/40 bg-black/5 dark:bg-white/10 border-border dark:border-white/5", icon: Clock },
@@ -64,6 +64,7 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
     const searchParams = useSearchParams();
     const [isPending, startTransition] = useTransition();
     const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
+    const [shipmentExpandedOrderId, setShipmentExpandedOrderId] = useState<string | null>(null);
     const [localOrders, setLocalOrders] = useState<any[]>([]);
     const [reviewsByOrder, setReviewsByOrder] = useState<Record<string, ProductReview>>({});
 
@@ -305,6 +306,35 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
                                                     <ChevronDown className={`w-5 h-5 transition-transform duration-500 ${isExpanded ? "rotate-180" : ""}`} />
                                                 </button>
                                             </div>
+                                    <div className="lg:col-span-2 flex justify-end gap-2">
+                                        {order.product?.id ? (
+                                            <Link
+                                                href={`/products/${order.product.id}`}
+                                                className="inline-flex items-center gap-1 bg-primary text-white text-xs font-bold px-3 py-2 rounded-lg transition-all hover:brightness-110 hover:-translate-y-0.5"
+                                            >
+                                                View Product <ArrowRight className="w-3 h-3" />
+                                            </Link>
+                                        ) : null}
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setExpandedOrderId(order.id);
+                                                setShipmentExpandedOrderId((prev) => (prev === order.id ? null : order.id));
+                                            }}
+                                            className="inline-flex items-center gap-1 bg-primary text-white text-xs font-bold px-3 py-2 rounded-lg transition-all hover:brightness-110 hover:-translate-y-0.5"
+                                            title="Shipment Details"
+                                        >
+                                            Shipment Details
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setExpandedOrderId(isExpanded ? null : order.id)}
+                                            className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+                                            title="Expand"
+                                        >
+                                            <ChevronDown className={`w-4 h-4 transition-transform ${isExpanded ? "rotate-180" : ""}`} />
+                                        </button>
+                                    </div>
 
                                             {/* ── Expanded Content ── */}
                                             <AnimatePresence>
@@ -327,31 +357,47 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
                                                                     </div>
                                                                 </div>
 
-                                                                <div className="xl:col-span-9 grid grid-cols-1 md:grid-cols-3 gap-6">
-                                                                    {[
-                                                                        { l: 'Buyer Entity', v: order.importer?.companyName || order.importer?.name || "ANON_NODE", i: Globe },
-                                                                        { l: 'Node Origin', v: order.importer?.country ?? "GLOBAL", i: ShieldCheck },
-                                                                        { l: 'Protocol Value', v: formatCurrency(order.totalPrice), i: TrendingUp },
-                                                                        { l: 'Signal Quantity', v: order.quantity ?? 0, i: Layers },
-                                                                        { l: 'Reference Key', v: order.orderNumber || order.id?.slice(0,8).toUpperCase(), i: Package },
-                                                                        { l: 'Settlement Status', v: (order.paymentStatus || "PENDING").toUpperCase(), i: Clock },
-                                                                    ].map(detail => (
-                                                                        <div key={detail.l} className="p-6 rounded-[1.5rem] bg-white/[0.02] border border-border dark:border-white/5 group/detail hover:border-border dark:border-white/20 transition-all">
-                                                                            <div className="flex items-center gap-4 mb-3">
-                                                                                <detail.i className="w-4 h-4 text-muted-foreground/20 group-hover/detail:text-foreground dark:text-white transition-colors" />
-                                                                                <span className="text-[9px] font-black text-muted-foreground/20 uppercase tracking-widest italic">{detail.l}</span>
-                                                                            </div>
-                                                                            <div className="text-foreground dark:text-white font-black text-sm italic uppercase tracking-tighter truncate">{detail.v}</div>
-                                                                        </div>
-                                                                    ))}
-                                                                </div>
-                                                            </div>
+                                                <div className="flex-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 text-sm">
+                                                    <div className="rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-3">
+                                                        <div className="text-slate-400 text-xs uppercase tracking-widest">Order Number</div>
+                                                        <div className="text-slate-900 dark:text-white font-semibold mt-1 break-all">{order.orderNumber ?? order.id}</div>
+                                                    </div>
+                                                    <div className="rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-3">
+                                                        <div className="text-slate-400 text-xs uppercase tracking-widest">Created</div>
+                                                        <div className="text-slate-900 dark:text-white font-semibold mt-1">{formatDate(order.createdAt)}</div>
+                                                    </div>
+                                                    <div className="rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-3">
+                                                        <div className="text-slate-400 text-xs uppercase tracking-widest">Buyer</div>
+                                                        <div className="text-slate-900 dark:text-white font-semibold mt-1">{order.importer?.companyName || order.importer?.name || "Importer"}</div>
+                                                    </div>
+                                                    <div className="rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-3">
+                                                        <div className="text-slate-400 text-xs uppercase tracking-widest">Country</div>
+                                                        <div className="text-slate-900 dark:text-white font-semibold mt-1">{order.importer?.country ?? "N/A"}</div>
+                                                    </div>
+                                                    <div className="rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-3 md:col-span-2">
+                                                        <div className="text-slate-400 text-xs uppercase tracking-widest">Product</div>
+                                                        <div className="text-slate-900 dark:text-white font-semibold mt-1">{order.product?.name ?? "Unknown Product"}</div>
+                                                    </div>
+                                                    <div className="rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-3">
+                                                        <div className="text-slate-400 text-xs uppercase tracking-widest">Price</div>
+                                                        <div className="text-slate-900 dark:text-white font-semibold mt-1">{formatCurrency(order.totalPrice)}</div>
+                                                    </div>
+                                                    <div className="rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-3">
+                                                        <div className="text-slate-400 text-xs uppercase tracking-widest">Quantity</div>
+                                                        <div className="text-slate-900 dark:text-white font-semibold mt-1">{order.quantity ?? 0}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {shipmentExpandedOrderId === order.id && (
+                                                <ShipmentTrackingPanel shipment={order.shipment} />
+                                            )}
 
                                                             <div className="p-8 rounded-[2rem] border border-border dark:border-white/10 bg-black/5 dark:bg-white/10 relative overflow-hidden group/intel">
                                                                 <div className="absolute top-0 right-0 p-8 opacity-5">
                                                                     <ShieldCheck className="w-20 h-20 text-foreground dark:text-white" />
                                                                 </div>
-                                                                <h4 className="text-[10px] font-black text-foreground dark:text-white uppercase tracking-[0.3em] mb-6 italic flex items-center gap-3">
+                                                                <h4 className="text-[10px] font-black text-foreground dark:text-slate-900 dark:text-white uppercase tracking-[0.3em] mb-6 italic flex items-center gap-3">
                                                                     <div className="size-2 rounded-full bg-primary animate-pulse" />
                                                                     Intelligence Feedback Loop
                                                                 </h4>

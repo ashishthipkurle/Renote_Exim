@@ -10,15 +10,16 @@ import OrdersTable from "./OrdersTable";
 export default async function ExporterOrdersPage({
   searchParams,
 }: {
-  searchParams: { status?: string; search?: string; page?: string };
+  searchParams?: { status?: string; search?: string; page?: string } | Promise<{ status?: string; search?: string; page?: string }>;
 }) {
+  const resolvedSearchParams = (await searchParams) ?? {};
   const auth = await getServerAuth();
   if (!auth) redirect("/login");
   if (auth.role !== "EXPORTER" && auth.role !== "ADMIN") {
     redirect(`/dashboard/${auth.role.toLowerCase()}`);
   }
 
-  const page = parseInt(searchParams.page || "1");
+  const page = parseInt(resolvedSearchParams.page || "1");
   const limit = 10;
   const skip = (page - 1) * limit;
 
@@ -27,16 +28,16 @@ export default async function ExporterOrdersPage({
     product: { exporterId: auth.userId },
   };
 
-  if (searchParams.status && searchParams.status !== "ALL") {
-    where.status = searchParams.status as any;
+  if (resolvedSearchParams.status && resolvedSearchParams.status !== "ALL") {
+    where.status = resolvedSearchParams.status as any;
   }
 
-  if (searchParams.search) {
+  if (resolvedSearchParams.search) {
     where.OR = [
-      { id: { contains: searchParams.search, mode: "insensitive" } },
-      { product: { name: { contains: searchParams.search, mode: "insensitive" } } },
-      { importer: { name: { contains: searchParams.search, mode: "insensitive" } } },
-      { importer: { companyName: { contains: searchParams.search, mode: "insensitive" } } },
+      { id: { contains: resolvedSearchParams.search, mode: "insensitive" } },
+      { product: { name: { contains: resolvedSearchParams.search, mode: "insensitive" } } },
+      { importer: { name: { contains: resolvedSearchParams.search, mode: "insensitive" } } },
+      { importer: { companyName: { contains: resolvedSearchParams.search, mode: "insensitive" } } },
     ];
   }
 
@@ -58,6 +59,7 @@ export default async function ExporterOrdersPage({
         include: {
           product: { select: { name: true, category: true, images: true } },
           importer: { select: { name: true, companyName: true, country: true } },
+          shipment: true,
         },
         orderBy: { createdAt: "desc" },
         skip,
@@ -125,7 +127,7 @@ export default async function ExporterOrdersPage({
           {totalPages > 1 && (
             <div className="flex items-center justify-center gap-4 mt-20 mb-20">
               <Link
-                href={`?${new URLSearchParams({ ...searchParams, page: (page - 1).toString() })}`}
+                href={`?${new URLSearchParams({ ...resolvedSearchParams, page: (page - 1).toString() })}`}
                 className={`px-8 py-4 rounded-2xl bg-card/40 dark:bg-white/5 border border-border dark:border-white/5 text-[10px] uppercase font-black tracking-widest italic transition-all backdrop-blur-3xl ${page <= 1 ? "opacity-20 pointer-events-none" : "hover:bg-black/10 dark:bg-white/15 hover:border-border dark:border-white/20 text-foreground dark:text-white"
                   }`}
               >
@@ -138,7 +140,7 @@ export default async function ExporterOrdersPage({
                     return (
                       <Link
                         key={p}
-                        href={`?${new URLSearchParams({ ...searchParams, page: p.toString() })}`}
+                        href={`?${new URLSearchParams({ ...resolvedSearchParams, page: p.toString() })}`}
                         className={`w-14 h-14 flex items-center justify-center rounded-2xl border text-[10px] font-black transition-all backdrop-blur-3xl ${page === p 
                           ? "bg-primary border-transparent text-primary-foreground shadow-2xl shadow-white/10 scale-110" 
                           : "bg-card/40 dark:bg-white/5 border-border dark:border-white/5 text-muted-foreground hover:bg-black/10 dark:bg-white/15 hover:border-border dark:border-white/20 hover:text-foreground dark:text-white"
@@ -155,7 +157,7 @@ export default async function ExporterOrdersPage({
                 })}
               </div>
               <Link
-                href={`?${new URLSearchParams({ ...searchParams, page: (page + 1).toString() })}`}
+                href={`?${new URLSearchParams({ ...resolvedSearchParams, page: (page + 1).toString() })}`}
                 className={`px-8 py-4 rounded-2xl bg-card/40 dark:bg-white/5 border border-border dark:border-white/5 text-[10px] uppercase font-black tracking-widest italic transition-all backdrop-blur-3xl ${page >= totalPages ? "opacity-20 pointer-events-none" : "hover:bg-black/10 dark:bg-white/15 hover:border-border dark:border-white/20 text-foreground dark:text-white"
                   }`}
               >

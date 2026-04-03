@@ -32,6 +32,13 @@ export default function DashboardHeader() {
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
+    const notificationsHref =
+        user?.role === "IMPORTER"
+            ? "/dashboard/importer/notifications"
+            : user?.role === "ADMIN"
+                ? "/dashboard/admin/notifications"
+                : "/dashboard/exporter/notifications";
+
     React.useEffect(() => {
         setMounted(true);
 
@@ -108,7 +115,7 @@ export default function DashboardHeader() {
 
                             {/* Notifications */}
                             <Link
-                                href="/dashboard/exporter/notifications"
+                                href={notificationsHref}
                                 className="relative size-9 rounded-full flex items-center justify-center hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all active:scale-95 border border-transparent hover:border-primary/20 group"
                             >
                                 <Bell className="w-4 h-4 group-hover:animate-bounce" />

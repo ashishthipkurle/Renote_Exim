@@ -18,18 +18,26 @@ function formatDate(d: Date | string) {
     return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(new Date(d));
 }
 
-export default function ShipmentsTable({ shipments }: { shipments: any[] }) {
+export default function ShipmentsTable({
+    shipments,
+    searchParamKey = "search",
+    pageParamKey = "page",
+}: {
+    shipments: any[];
+    searchParamKey?: string;
+    pageParamKey?: string;
+}) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [isPending, startTransition] = useTransition();
-    const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
+    const [searchQuery, setSearchQuery] = useState(searchParams.get(searchParamKey) || "");
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         const params = new URLSearchParams(searchParams);
-        if (searchQuery) params.set("search", searchQuery);
-        else params.delete("search");
-        params.delete("page");
+        if (searchQuery) params.set(searchParamKey, searchQuery);
+        else params.delete(searchParamKey);
+        params.delete(pageParamKey);
 
         startTransition(() => {
             router.push(`?${params.toString()}`);

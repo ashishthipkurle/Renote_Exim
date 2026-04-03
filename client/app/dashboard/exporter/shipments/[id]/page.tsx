@@ -73,15 +73,11 @@ export default function ShipmentDetailPage({ params }: { params: Promise<{ id: s
   const currentStepIndex = STEPS.findIndex(s => s.id === shipment.status);
 
   return (
-    <div className="max-w-[1400px] mx-auto px-10 py-12 space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-      {/* ── Header ── */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-10">
-        <div className="flex items-center gap-8">
-          <Link
-            href="/dashboard/exporter/shipments"
-            className="size-16 rounded-[2rem] bg-card/40 dark:bg-white/5 border border-border dark:border-white/5 flex items-center justify-center text-muted-foreground hover:text-foreground dark:text-white hover:border-border dark:border-white/20 transition-all hover:-translate-x-2 group shadow-xl dark:shadow-2xl backdrop-blur-3xl"
-          >
-            <ArrowLeft className="w-6 h-6 transition-transform group-hover:scale-110" />
+    <div className="max-w-6xl mx-auto space-y-8 pb-20 animate-in fade-in duration-700">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="flex items-center gap-4">
+               <Link href="/dashboard/exporter/orders" className="size-12 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white transition-all hover:scale-105">
+            <ArrowLeft className="w-6 h-6" />
           </Link>
           <div>
             <h1 className="text-5xl font-black text-foreground dark:text-white tracking-tighter uppercase italic">Signal Tracking</h1>

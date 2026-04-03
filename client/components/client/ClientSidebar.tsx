@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import {
   Home,
   LayoutGrid,
-  Package,
   Truck,
   LineChart,
   Wallet,
@@ -14,6 +13,9 @@ import {
   FileText,
   LogOut,
   User,
+  Users,
+  MessageSquare,
+  PhoneCall,
 } from "lucide-react";
 import {
   Sidebar,
@@ -38,9 +40,11 @@ export default function ClientSidebar({ basePath }: { basePath: string }) {
 
   const nav: NavItem[] = [
     { href: basePath, label: "Dashboard", icon: Home },
+    { href: `${basePath}/directory`, label: "Directory", icon: Users },
     { href: `${basePath}/orders`, label: "Orders", icon: Truck },
     { href: `${basePath}/rfqs`, label: "RFQs", icon: FileText },
-    { href: `${basePath}/shipments`, label: "Shipments", icon: Package },
+    { href: `${basePath}/messages`, label: "Messages", icon: MessageSquare },
+    { href: `${basePath}/calls`, label: "Calls", icon: PhoneCall },
     { href: `${basePath}/inventory`, label: "Inventory", icon: LayoutGrid },
     { href: `${basePath}/analytics`, label: "Analytics", icon: LineChart },
     { href: `${basePath}/finance`, label: "Finance", icon: Wallet },

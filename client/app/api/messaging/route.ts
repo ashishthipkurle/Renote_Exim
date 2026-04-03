@@ -18,9 +18,13 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const otherUserId = searchParams.get("otherUserId");
     const orderId = searchParams.get("orderId");
+    const limit = Math.min(100, Math.max(1, Number(searchParams.get("limit") || "50")));
+    const before = searchParams.get("before");
 
     // If otherUserId is provided, fetch messages for that specific conversation
     if (otherUserId) {
+      const beforeDate = before ? new Date(before) : null;
+
       const messages = await prisma.message.findMany({
         where: {
           OR: [
@@ -28,72 +32,101 @@ export async function GET(req: NextRequest) {
             { senderId: otherUserId, receiverId: user.id },
           ],
           ...(orderId ? { orderId } : {}),
-        },
-        orderBy: { createdAt: "asc" },
-      });
-      return NextResponse.json(messages);
-    }
-
-    // Otherwise, fetch the inbox (list of conversations)
-    // This is a complex query: find distinct users the current user has chatted with
-    const sentMessages = await prisma.message.findMany({
-      where: { senderId: user.id },
-      distinct: ["receiverId"],
-      select: { receiverId: true },
-    });
-
-    const receivedMessages = await prisma.message.findMany({
-      where: { receiverId: user.id },
-      distinct: ["senderId"],
-      select: { senderId: true },
-    });
-
-    const contactIds = Array.from(new Set([
-      ...sentMessages.map(m => m.receiverId),
-      ...receivedMessages.map(m => m.senderId)
-    ]));
-
-    const conversations = await Promise.all(contactIds.map(async (contactId) => {
-      const lastMessage = await prisma.message.findFirst({
-        where: {
-          OR: [
-            { senderId: user.id, receiverId: contactId },
-            { senderId: contactId, receiverId: user.id },
-          ],
+          ...(beforeDate && !Number.isNaN(beforeDate.getTime()) ? { createdAt: { lt: beforeDate } } : {}),
         },
         orderBy: { createdAt: "desc" },
-        include: {
-          sender: { select: { name: true, avatar: true } },
-          receiver: { select: { name: true, avatar: true } },
-        },
+        take: limit,
       });
 
-      const unreadCount = await prisma.message.count({
-        where: {
-          senderId: contactId,
-          receiverId: user.id,
-          read: false,
-        }
-      });
+      // Frontend expects chronological order.
+      return NextResponse.json(messages.reverse());
+    }
 
-      const otherUser = await prisma.user.findUnique({
-        where: { id: contactId },
-        select: { id: true, name: true, avatar: true, role: true }
-      });
+    // Otherwise, fetch inbox list with a single aggregate query.
+    const rows = await prisma.$queryRaw<
+      Array<{
+        otherUserId: string;
+        messageId: string;
+        content: string;
+        createdAt: Date;
+        senderId: string;
+        unreadCount: bigint | number;
+      }>
+    >`
+      WITH conversation_messages AS (
+        SELECT
+          CASE
+            WHEN m."senderId" = ${user.id} THEN m."receiverId"
+            ELSE m."senderId"
+          END AS "otherUserId",
+          m.id,
+          m.content,
+          m."createdAt",
+          m."senderId"
+        FROM messages m
+        WHERE m."senderId" = ${user.id} OR m."receiverId" = ${user.id}
+      ),
+      latest_messages AS (
+        SELECT DISTINCT ON ("otherUserId")
+          "otherUserId",
+          id,
+          content,
+          "createdAt",
+          "senderId"
+        FROM conversation_messages
+        ORDER BY "otherUserId", "createdAt" DESC
+      ),
+      unread_counts AS (
+        SELECT
+          m."senderId" AS "otherUserId",
+          COUNT(*)::int AS "unreadCount"
+        FROM messages m
+        WHERE m."receiverId" = ${user.id} AND m.read = false
+        GROUP BY m."senderId"
+      )
+      SELECT
+        l."otherUserId",
+        l.id AS "messageId",
+        l.content,
+        l."createdAt",
+        l."senderId",
+        COALESCE(u."unreadCount", 0) AS "unreadCount"
+      FROM latest_messages l
+      LEFT JOIN unread_counts u
+        ON u."otherUserId" = l."otherUserId"
+      ORDER BY l."createdAt" DESC
+      LIMIT ${limit}
+    `;
 
-      return {
-        otherUser,
-        lastMessage,
-        unreadCount,
-      };
-    }));
+    const userIds = rows.map((row) => row.otherUserId);
+    if (!userIds.length) {
+      return NextResponse.json([]);
+    }
 
-    // Sort by last message date
-    conversations.sort((a, b) => {
-      const dateA = a.lastMessage?.createdAt ? new Date(a.lastMessage.createdAt).getTime() : 0;
-      const dateB = b.lastMessage?.createdAt ? new Date(b.lastMessage.createdAt).getTime() : 0;
-      return dateB - dateA;
+    const otherUsers = await prisma.user.findMany({
+      where: { id: { in: userIds } },
+      select: { id: true, name: true, avatar: true, role: true },
     });
+
+    const userMap = new Map(otherUsers.map((entry) => [entry.id, entry]));
+
+    const conversations = rows
+      .map((row) => {
+        const otherUser = userMap.get(row.otherUserId);
+        if (!otherUser) return null;
+
+        return {
+          otherUser,
+          lastMessage: {
+            id: row.messageId,
+            content: row.content,
+            createdAt: row.createdAt,
+            senderId: row.senderId,
+          },
+          unreadCount: Number(row.unreadCount),
+        };
+      })
+      .filter(Boolean);
 
     return NextResponse.json(conversations);
 
@@ -117,19 +150,48 @@ export async function POST(req: NextRequest) {
     }
 
     const { receiverId, content, orderId, subject } = await req.json();
+    const messageText = typeof content === "string" ? content.trim() : "";
 
-    if (!receiverId || !content) {
+    if (!receiverId || !messageText) {
       return NextResponse.json({ error: "Receiver and content are required" }, { status: 400 });
+    }
+
+    if (messageText.length > 4000) {
+      return NextResponse.json({ error: "Message is too long" }, { status: 400 });
     }
 
     const newMessage = await prisma.message.create({
       data: {
         senderId: user.id,
         receiverId,
-        content,
+        content: messageText,
         orderId,
         subject,
       },
+    });
+
+    const receiverUser = await prisma.user.findUnique({
+      where: { id: receiverId },
+      select: { role: true },
+    });
+
+    const notificationLink =
+      receiverUser?.role === "IMPORTER"
+        ? "/dashboard/importer/messages"
+        : receiverUser?.role === "ADMIN"
+          ? "/dashboard/admin/notifications"
+          : "/dashboard/exporter/messages";
+
+    await prisma.notification.create({
+      data: {
+        userId: receiverId,
+        type: "MESSAGE_RECEIVED",
+        title: "New message",
+        message: "You have received a new trade message.",
+        link: notificationLink,
+      },
+    }).catch(() => {
+      // Notification should not block message delivery.
     });
 
     return NextResponse.json(newMessage);

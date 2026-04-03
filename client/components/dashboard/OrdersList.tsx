@@ -7,6 +7,7 @@ import { formatCurrency, formatDate } from "@/lib/api-utils";
 import OrderDetailsModal from "./OrderDetailsModal";
 import DisputeModal from "./DisputeModal";
 import EmptyState from "@/components/ui/EmptyState";
+import ShipmentTrackingPanel from "@/components/dashboard/ShipmentTrackingPanel";
 import { toast } from "sonner";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
@@ -36,6 +37,7 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
     const [detailsOpen, setDetailsOpen] = useState(false);
     const [disputeOpen, setDisputeOpen] = useState(false);
     const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
+    const [shipmentExpandedOrderId, setShipmentExpandedOrderId] = useState<string | null>(null);
     const [reviewsByOrder, setReviewsByOrder] = useState<Record<string, ProductReview>>({});
     const [ratingDraftByOrder, setRatingDraftByOrder] = useState<Record<string, number>>({});
     const [commentDraftByOrder, setCommentDraftByOrder] = useState<Record<string, string>>({});
@@ -214,11 +216,22 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
                                         href={`/products/${order.product.id}`}
                                         onClick={(e) => e.stopPropagation()}
                                         className="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-colors border border-white/10"
-                                        title="Vire Product"
+                                        title="View Product"
                                     >
-                                        Vire Product
+                                        View Product
                                     </Link>
                                 ) : null}
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setExpandedOrderId(order.id);
+                                        setShipmentExpandedOrderId((prev) => (prev === order.id ? null : order.id));
+                                    }}
+                                    className="px-3 py-2 rounded-lg bg-primary text-white text-xs font-bold transition-all hover:brightness-110 hover:-translate-y-0.5"
+                                    title="Shipment Details"
+                                >
+                                    Shipment Details
+                                </button>
                                 <button
                                     onClick={(e) => { e.stopPropagation(); openDetails(order); }}
                                     className="p-2 rounded-lg bg-card hover:bg-white/5 text-muted-foreground hover:text-white transition-all border border-border"
@@ -247,7 +260,7 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
                                 )}
                             </div>
 
-                            <div className={`lg:col-span-12 overflow-hidden transition-all duration-300 ease-out ${isExpanded ? "max-h-[1200px] opacity-100 mt-2" : "max-h-0 opacity-0"}`}>
+                            <div className={`lg:col-span-12 overflow-hidden transition-all duration-300 ease-out ${isExpanded ? "max-h-[2000px] opacity-100 mt-2" : "max-h-0 opacity-0"}`}>
                                 <div className="rounded-xl border border-border bg-card p-4 lg:p-5 space-y-4 shadow-2xl">
                                     <div className="flex flex-col lg:flex-row gap-4">
                                         <div className="lg:w-48 w-full">
@@ -293,6 +306,10 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
                                             </div>
                                         </div>
                                     </div>
+
+                                    {shipmentExpandedOrderId === order.id && (
+                                        <ShipmentTrackingPanel shipment={order.shipment} />
+                                    )}
 
                                     <div className="rounded-xl border border-border bg-white/5 p-4 space-y-3 shadow-inner">
                                         <div className="flex items-center justify-between gap-3">

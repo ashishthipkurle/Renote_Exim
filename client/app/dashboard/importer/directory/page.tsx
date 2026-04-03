@@ -1,15 +1,24 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { authFetch } from "@/lib/api-utils";
 import {
     Search,
+    CalendarClock,
     Star,
+    Phone,
+    Video,
+    Verified,
+    Globe,
+    Users,
     MessageSquare,
     ShieldCheck,
-    ChevronRight,
     TrendingUp
 } from "lucide-react";
+
+import ScheduleCallModal from "@/components/calls/ScheduleCallModal";
+import { useRealtimeCall } from "@/hooks/useRealtimeCall";
 import { toast } from "sonner";
 
 interface Exporter {
@@ -22,14 +31,19 @@ interface Exporter {
     tradeVolume: number;
     categories: string[];
     joinedAt: string;
-    _count: { products: number };
+    _count: { products?: number; exportedProducts?: number };
 }
 
 export default function ImporterDirectoryPage() {
+    const router = useRouter();
+    const callController = useRealtimeCall();
+
     const [exporters, setExporters] = useState<Exporter[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
     const [category, setCategory] = useState("all");
+    const [scheduleOpen, setScheduleOpen] = useState(false);
+    const [scheduleTarget, setScheduleTarget] = useState<{ id: string; name?: string | null; companyName?: string | null } | null>(null);
 
     const fetchExporters = async () => {
         setLoading(true);
@@ -49,6 +63,50 @@ export default function ImporterDirectoryPage() {
         }, 500);
         return () => clearTimeout(timer);
     }, [search, category]);
+
+    const openScheduleModal = (exporter: Exporter) => {
+        setScheduleTarget({
+            id: exporter.id,
+            name: exporter.name,
+            companyName: exporter.companyName,
+        });
+        setScheduleOpen(true);
+    };
+
+    const incomingCallBanner =
+        callController.incomingCall ? (
+            <div className="mb-6 rounded-2xl border border-primary/30 bg-primary/10 p-4">
+                <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+                    <div className="flex items-center gap-3">
+                        <div className="relative flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/20 text-primary">
+                            <Phone className="h-5 w-5" />
+                            <span className="absolute inset-0 animate-ping rounded-2xl border border-primary/40" />
+                        </div>
+                        <div>
+                            <p className="text-xs font-black uppercase tracking-widest text-primary">Incoming call</p>
+                            <p className="text-sm text-foreground">
+                                {callController.incomingCall.fromName || "Exporter"} is calling you now.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => void callController.declineCall()}
+                            className="rounded-xl border border-red-400/40 bg-red-500/10 px-4 py-2 text-xs font-black uppercase tracking-wider text-red-300 transition-colors hover:bg-red-500/20"
+                        >
+                            Decline
+                        </button>
+                        <button
+                            onClick={() => void callController.acceptCall()}
+                            className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-black uppercase tracking-wider text-white transition-colors hover:bg-emerald-500"
+                        >
+                            Accept
+                        </button>
+                    </div>
+                </div>
+            </div>
+        ) : null;
 
     return (
         <div className="h-dvh overflow-hidden flex flex-col bg-background transition-colors duration-300">
@@ -92,6 +150,8 @@ export default function ImporterDirectoryPage() {
 
             <div className="flex-1 overflow-y-auto p-6 lg:p-8">
                 <div className="max-w-[1600px] mx-auto">
+                    {incomingCallBanner}
+
                     {loading && exporters.length === 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8">
                             {Array.from({ length: 8 }).map((_, i) => (
@@ -107,17 +167,55 @@ export default function ImporterDirectoryPage() {
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8">
                             {exporters.map((exporter) => (
-                                <ExporterCard key={exporter.id} exporter={exporter} />
+                                <ExporterCard
+                                    key={exporter.id}
+                                    exporter={exporter}
+                                    onMessage={() => router.push(`/dashboard/importer/messages?user=${exporter.id}`)}
+                                    onVoiceCall={() =>
+                                        void callController.startCall({
+                                            target: { id: exporter.id, name: exporter.companyName || exporter.name },
+                                            callType: "AUDIO",
+                                        })
+                                    }
+                                    onVideoCall={() =>
+                                        void callController.startCall({
+                                            target: { id: exporter.id, name: exporter.companyName || exporter.name },
+                                            callType: "VIDEO",
+                                        })
+                                    }
+                                    onSchedule={() => openScheduleModal(exporter)}
+                                />
                             ))}
                         </div>
                     )}
                 </div>
             </div>
+
+            <ScheduleCallModal
+                open={scheduleOpen}
+                onOpenChange={setScheduleOpen}
+                receiver={scheduleTarget}
+                onScheduled={() => toast.success("Call request sent to exporter")}
+            />
         </div>
     );
 }
 
-function ExporterCard({ exporter }: { exporter: Exporter }) {
+function ExporterCard({
+    exporter,
+    onMessage,
+    onVoiceCall,
+    onVideoCall,
+    onSchedule,
+}: {
+    exporter: Exporter;
+    onMessage: () => void;
+    onVoiceCall: () => void;
+    onVideoCall: () => void;
+    onSchedule: () => void;
+}) {
+    const productCount = exporter._count?.products ?? exporter._count?.exportedProducts ?? 0;
+
     return (
         <div className="group relative bg-muted/20 backdrop-blur-xl border border-border shadow-2xl rounded-[2.5rem] overflow-hidden transition-all hover:scale-[1.02] hover:border-border hover:shadow-primary/5">
             {/* Visual Header */}
@@ -182,13 +280,31 @@ function ExporterCard({ exporter }: { exporter: Exporter }) {
                         <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest leading-none mb-1">Assets</span>
                         <span className="text-sm font-black text-foreground">{exporter._count.products} Registered</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <button className="p-3 rounded-2xl bg-muted border border-border text-muted-foreground hover:text-foreground hover:bg-muted/20 transition-all shadow-xl">
+                    <div className="grid grid-cols-2 gap-2">
+                        <button
+                            onClick={onMessage}
+                            className="p-3 rounded-2xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all shadow-sm dark:shadow-none"
+                        >
                             <MessageSquare className="w-5 h-5" />
                         </button>
-                        <button className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground border-transparent font-black text-[10px] uppercase tracking-widest shadow-xl shadow-primary/5 active:scale-95 transition-all">
-                            Profile
-                            <ChevronRight className="w-4 h-4" />
+                        <button
+                            onClick={onVoiceCall}
+                            className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 hover:bg-emerald-500/20 transition-all shadow-sm"
+                        >
+                            <Phone className="w-5 h-5" />
+                        </button>
+                        <button
+                            onClick={onVideoCall}
+                            className="p-3 rounded-2xl bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 transition-all shadow-sm"
+                        >
+                            <Video className="w-5 h-5" />
+                        </button>
+                        <button
+                            onClick={onSchedule}
+                            className="flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-primary hover:bg-[#0f49bd] text-white font-black text-xs shadow-xl shadow-primary/20 transition-all active:scale-95"
+                        >
+                            <CalendarClock className="w-4 h-4" />
+                            Schedule
                         </button>
                     </div>
                 </div>

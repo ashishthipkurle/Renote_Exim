@@ -181,14 +181,14 @@ export default function ExporterDashboard() {
       trendUp: true as boolean | null, trend: "Active",
     },
     {
-      label: "Total Shipments", value: loading ? "—" : String(data?.totalShipments ?? 0),
-      sub: PERIOD_LABELS[period],
-      icon: <Truck className="w-5 h-5" />, href: "/dashboard/exporter/shipments",
-      gradFrom: "from-neutral-300", gradTo: "to-neutral-600",
-      bgTint: "bg-black/5 dark:bg-white/10", textTint: "text-foreground dark:text-white",
-      borderTint: "border-border dark:border-white/10", glowColor: "rgba(255,255,255,0.2)",
-      shadow: "dark:shadow-md shadow-none",
-      bar: 30, trendUp: null as boolean | null, trend: "All time",
+      label:"Total Shipments", value:loading?"—":String(data?.totalShipments??0),
+      sub:PERIOD_LABELS[period],
+      icon:<Truck className="w-5 h-5"/>, href:"/dashboard/exporter/orders",
+      gradFrom:"from-orange-600", gradTo:"to-orange-400",
+      bgTint:"bg-orange-500/10", textTint:"text-orange-500",
+      borderTint:"border-orange-500/20", glowColor:"rgba(249,115,22,0.4)",
+      shadow:"shadow-[0_0_20px_rgba(249,115,22,0.3)]",
+      bar:30, trendUp:null as boolean|null, trend:"All time",
     },
   ];
 
@@ -380,10 +380,89 @@ export default function ExporterDashboard() {
           </div>
 
           {/* ── Map + Transactions ── */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 h-[600px]">
-            <div className="xl:col-span-2 h-full rounded-[2.5rem] overflow-hidden border border-border dark:border-white/5 bg-card dark:bg-[#0a0a0a] shadow-xl dark:shadow-2xl relative group">
-              <div className="absolute inset-0 bg-black/5 dark:bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-              <ShipTrackingMap />
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-5" style={{height:"520px"}}>
+
+            {/* Map */}
+            <div className="xl:col-span-2 bg-[#0d1117]/80 backdrop-blur-xl border border-white/5 shadow-xl rounded-2xl flex flex-col h-full overflow-hidden">
+              {/* Map header */}
+              <div className="flex-shrink-0 flex items-center justify-between px-5 py-3 z-20 relative" style={{borderBottom:"1px solid rgba(255,255,255,0.05)"}}>
+                <div className="min-w-0 flex items-center gap-3">
+                  <Globe className="w-4 h-4 text-primary flex-shrink-0"/>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-[14px] font-bold text-white tracking-tight">India Global Trade Network</h2>
+                      <span className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase border ${mapIsDemo?"bg-amber-500/12 border-amber-500/30 text-amber-400":"bg-green-500/12 border-green-500/30 text-green-400"}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full inline-block animate-pulse ${mapIsDemo?"bg-amber-400":"bg-green-400"}`}/>
+                        {mapIsDemo?"Demo":"Live"}
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-slate-500 mt-0.5">{activeCount} active routes{lastUpdate&&<span> · {lastUpdate.toLocaleTimeString()}</span>}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5 flex-wrap justify-end">
+                  {(Object.entries(FILTER_CFG) as [FilterMode,typeof FILTER_CFG[FilterMode]][]).map(([mode,cfg])=>{
+                    const count=mode==="all"?activeCount:(regionCounts[mode]??0);
+                    const isActive=mapFilter===mode;
+                    return(
+                      <button key={mode} onClick={()=>setMapFilter(mode)}
+                        className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-semibold border transition-all duration-200"
+                        style={{background:isActive?`${cfg.color}15`:"transparent",borderColor:isActive?`${cfg.color}45`:"rgba(255,255,255,0.07)",color:isActive?cfg.color:"#475569",boxShadow:isActive?`0 0 12px ${cfg.color}22`:"none"}}>
+                        <span>{cfg.icon}</span>
+                        <span className="hidden lg:inline">{mode==="all"?"All":cfg.label}</span>
+                        {count>0&&<span className="opacity-60 text-[9px]">{count}</span>}
+                      </button>
+                    );
+                  })}
+                  <button onClick={()=>setMapRefresh(n=>n+1)}
+                    className="w-7 h-7 flex items-center justify-center rounded-lg border border-white/8 text-slate-500 hover:text-white hover:border-white/20 transition-all duration-200">
+                    <RefreshCw className={`w-3.5 h-3.5 ${mapLoading?"animate-spin":""}`}/>
+                  </button>
+                </div>
+              </div>
+
+              {/* Map area */}
+              <div className="flex-1 relative overflow-hidden">
+                <EmbeddedMap filter={mapFilter} apiRoutes={apiRoutes} isDemo={mapIsDemo}/>
+                {mapLoading&&(
+                  <div className="absolute inset-0 flex items-center justify-center z-30" style={{background:"rgba(3,8,16,0.55)",backdropFilter:"blur(4px)"}}>
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="w-7 h-7 rounded-full border-2 border-yellow-400/30 border-t-yellow-400 animate-spin"/>
+                      <p className="text-[10px] text-slate-400 font-mono">Loading trade routes…</p>
+                    </div>
+                  </div>
+                )}
+                {/* Legend */}
+                <div className="absolute bottom-3 left-3 flex flex-col gap-1.5 z-20">
+                  {[{clr:"#fbbf24",label:"India Hubs",dot:false},{clr:"#818cf8",label:"Air Freight",dot:true,dashed:false},{clr:"#67e8f9",label:"Ocean Cargo",dot:true,dashed:true}].map(({clr,label,dot,dashed})=>(
+                    <div key={label} className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg backdrop-blur-md" style={{background:"rgba(3,8,15,0.85)",border:`1px solid ${clr}22`}}>
+                      {dot?(<svg width="18" height="6"><line x1="0" y1="3" x2="18" y2="3" stroke={clr} strokeWidth="1.5" strokeDasharray={dashed?"5,3":"none"}/><circle cx="13" cy="3" r="1.8" fill={clr}/></svg>):(<span className="w-2 h-2 rounded-full flex-shrink-0" style={{background:clr,boxShadow:`0 0 8px ${clr}`}}/>)}
+                      <span className="text-[9px] font-mono" style={{color:clr}}>{label}</span>
+                    </div>
+                  ))}
+                </div>
+                {/* Region pills */}
+                <div className="absolute bottom-3 right-3 flex flex-col gap-1 z-20">
+                  {(["russia","europe","usa","africa","asia"] as FilterMode[]).map(m=>{
+                    const cfg=FILTER_CFG[m]; const count=regionCounts[m]??0; if(count===0) return null;
+                    const active=mapFilter===m||mapFilter==="all";
+                    return(
+                      <button key={m} className="flex items-center gap-2 px-2 py-1 rounded-lg backdrop-blur-md transition-all" style={{background:active?`${cfg.color}12`:"rgba(3,8,15,0.7)",border:`1px solid ${active?cfg.color+"28":"rgba(255,255,255,0.04)"}`,opacity:active?1:0.4}} onClick={()=>setMapFilter(mapFilter===m?"all":m)}>
+                        <span className="text-[9px]">{cfg.icon}</span>
+                        <span className="text-[9px] font-mono" style={{color:active?cfg.color:"#374151"}}>{cfg.label}</span>
+                        <span className="text-[10px] font-bold font-mono" style={{color:active?cfg.color:"#1f2937"}}>{count}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Map footer */}
+              <div className="flex-shrink-0 flex items-center gap-5 px-5 py-2.5 z-20" style={{borderTop:"1px solid rgba(255,255,255,0.04)"}}>
+                <div className="flex items-center gap-1.5"><Wind className="w-3 h-3 text-indigo-400"/><span className="text-[10px] text-slate-500">Air</span><span className="text-[10px] font-bold text-indigo-400">{(mapIsDemo?DEMO_ROUTES:apiRoutes).filter(r=>r.type==="air").length}</span></div>
+                <div className="flex items-center gap-1.5"><Anchor className="w-3 h-3 text-cyan-400"/><span className="text-[10px] text-slate-500">Ocean</span><span className="text-[10px] font-bold text-cyan-400">{(mapIsDemo?DEMO_ROUTES:apiRoutes).filter(r=>r.type==="ocean").length}</span></div>
+                <div className="flex items-center gap-1.5"><Layers className="w-3 h-3 text-slate-400"/><span className="text-[10px] text-slate-500">Ports</span><span className="text-[10px] font-bold text-slate-300">{new Set((mapIsDemo?DEMO_ROUTES:apiRoutes).flatMap(r=>[r.fromPort,r.toPort])).size}</span></div>
+                <div className="ml-auto"><Link href="/dashboard/exporter/orders" className="flex items-center gap-1 text-[10px] text-primary hover:text-blue-300 font-medium transition-colors">All shipments<ChevronRight className="w-3 h-3"/></Link></div>
+              </div>
             </div>
 
             <div className="bg-card/40 dark:bg-white/5 backdrop-blur-3xl border border-border dark:border-white/5 shadow-xl dark:shadow-2xl rounded-[2.5rem] p-8 flex flex-col h-full relative overflow-hidden">

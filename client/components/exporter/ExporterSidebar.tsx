@@ -7,26 +7,32 @@ import {
   Boxes,
   CreditCard,
   FolderTree,
-  Globe,
   LayoutDashboard,
   LineChart,
+  MessageSquare,
+  PhoneCall,
   Settings,
   Users,
   Handshake,
   FileText,
-  Package,
+  Globe,
 } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
+
+interface NavItem {
+  href: string;
+  label: string;
+  icon: ComponentType<{ className?: string }>;
+}
 
 export default function ExporterSidebar({ basePath }: { basePath: string }) {
   const pathname = usePathname();
@@ -39,6 +45,8 @@ export default function ExporterSidebar({ basePath }: { basePath: string }) {
     { href: `${basePath}/rfqs`, label: "RFQs", icon: FileText },
     { href: `${basePath}/directory`, label: "Buyers", icon: Users },
     { href: `${basePath}/suppliers`, label: "Dealers", icon: Handshake },
+    { href: `${basePath}/messages`, label: "Messages", icon: MessageSquare },
+    { href: `${basePath}/calls`, label: "Calls", icon: PhoneCall },
     { href: `${basePath}/analytics`, label: "Analytics", icon: LineChart },
     { href: `${basePath}/finance`, label: "Finance", icon: CreditCard },
   ];
