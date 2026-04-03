@@ -1,16 +1,16 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Package, Clock, CheckCircle2, XCircle, Truck, Globe, ArrowRight, ArrowLeft, Layers, ShieldCheck, ShoppingCart } from "lucide-react";
+import { ShoppingCart, ArrowRight, ArrowLeft } from "lucide-react";
 
 import { prisma } from "@/lib/prisma";
 import { getServerAuth } from "@/lib/supabase/server";
-import { Prisma } from "@prisma/client";
+import { OrderStatus } from "@prisma/client";
 import OrdersTable from "./OrdersTable";
 
 export default async function ExporterOrdersPage({
   searchParams,
 }: {
-  searchParams?: { status?: string; search?: string; page?: string } | Promise<{ status?: string; search?: string; page?: string }>;
+  searchParams?: { [key: string]: string | string[] | undefined } | Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const resolvedSearchParams = (await searchParams) ?? {};
   const auth = await getServerAuth();
@@ -19,25 +19,30 @@ export default async function ExporterOrdersPage({
     redirect(`/dashboard/${auth.role.toLowerCase()}`);
   }
 
-  const page = parseInt(resolvedSearchParams.page || "1");
+  const page = parseInt(typeof resolvedSearchParams.page === 'string' ? resolvedSearchParams.page : "1");
   const limit = 10;
   const skip = (page - 1) * limit;
 
   // Build where clause
-  const where: Prisma.OrderWhereInput = {
-    product: { exporterId: auth.userId },
+  const where: any = {
+    product: { is: { exporterId: auth.userId } },
   };
 
   if (resolvedSearchParams.status && resolvedSearchParams.status !== "ALL") {
-    where.status = resolvedSearchParams.status as any;
+    const s = Array.isArray(resolvedSearchParams.status) ? resolvedSearchParams.status[0] : resolvedSearchParams.status;
+    const status = (s || "").toUpperCase();
+    if (Object.values(OrderStatus).includes(status as any)) {
+      where.status = status as OrderStatus;
+    }
   }
 
-  if (resolvedSearchParams.search) {
+  if (typeof resolvedSearchParams.search === 'string' && resolvedSearchParams.search) {
+    const search = resolvedSearchParams.search;
     where.OR = [
-      { id: { contains: resolvedSearchParams.search, mode: "insensitive" } },
-      { product: { name: { contains: resolvedSearchParams.search, mode: "insensitive" } } },
-      { importer: { name: { contains: resolvedSearchParams.search, mode: "insensitive" } } },
-      { importer: { companyName: { contains: resolvedSearchParams.search, mode: "insensitive" } } },
+      { id: { contains: search, mode: "insensitive" } },
+      { product: { is: { name: { contains: search, mode: "insensitive" } } } },
+      { importer: { is: { name: { contains: search, mode: "insensitive" } } } },
+      { importer: { is: { companyName: { contains: search, mode: "insensitive" } } } },
     ];
   }
 

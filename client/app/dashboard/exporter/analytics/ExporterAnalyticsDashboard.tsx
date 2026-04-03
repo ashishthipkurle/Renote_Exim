@@ -11,7 +11,7 @@ import {
   DollarSign, Download, RefreshCw, Filter, ChevronDown,
   ArrowUpRight, ArrowDownRight, BarChart2, Activity,
   CreditCard, Truck, CheckCircle2, Clock, XCircle, AlertCircle,
-  Layers,
+  Layers, type LucideIcon,
 } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -97,7 +97,7 @@ function ChartTooltip({ active, payload, label }: any) {
 
 // ─── Empty State ──────────────────────────────────────────────────────────────
 
-function EmptyChart({ icon: Icon, message }: { icon: React.ElementType; message: string }) {
+function EmptyChart({ icon: Icon, message }: { icon: LucideIcon; message: string }) {
   return (
     <div className="flex flex-col items-center justify-center h-full gap-4 py-12 opacity-40">
       <div className="p-5 rounded-3xl bg-black/5 dark:bg-white/10 border border-border dark:border-white/10">
@@ -114,7 +114,7 @@ function KpiCard({
   label, value, sub, trend, accentColor, icon: Icon, glowColor,
 }: {
   label: string; value: string; sub: string; trend?: number;
-  accentColor: string; icon: React.ElementType; glowColor: string;
+  accentColor: string; icon: LucideIcon; glowColor: string;
 }) {
   const isPositive = (trend ?? 0) >= 0;
   return (
@@ -809,6 +809,7 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
               ) : (
                 <div className="space-y-3">
                   {[
+
                     { label: "Delivered", count: data.orderStatusBreakdown.DELIVERED, color: "#ffffff", icon: CheckCircle2 },
                     { label: "Shipped", count: data.orderStatusBreakdown.SHIPPED, color: "#e5e5e5", icon: Truck },
                     { label: "Processing", count: data.orderStatusBreakdown.PROCESSING, color: "#a3a3a3", icon: RefreshCw },
@@ -828,8 +829,9 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
                             boxShadow: s.count > 0 ? `0 0 8px ${s.color}50` : "none",
                           }}
                         />
+
                       </div>
-                      <span className="text-xs font-bold text-foreground w-6 text-right flex-shrink-0">{s.count}</span>
+                      <span className="text-xs font-black text-foreground dark:text-white w-6 text-right flex-shrink-0">{s.count}</span>
                     </div>
                   ))}
 

@@ -30,7 +30,7 @@ const ALL_INDUSTRIES = [
     "Doors", "Drilling Equipment", "Dyes", "E-commerce Packaging", "Earthmoving Machinery", "Educational Supplies",
     "Electric Motors", "Electrical Fittings", "Electronic Components", "Emergency Equipment", "Engines", "Essential Oils",
     "Excavators", "Fabricated Metals", "Fans", "Fasteners", "Feed Additives", "Fertilizers", "Fibers", "Filtering Equipment",
-    "Fire Extinguishers", "Fish Products", "Floor Coverings", "Flour", "Flowers", "Footwear", "Forestry Equipment",
+    "Fire Extinguishers", "Fish Products", "Floor Covers", "Flour", "Flowers", "Footwear", "Forestry Equipment",
     "Forging Equipment", "Frames", "Fruit", "Fungicides", "Furnaces", "Furniture Fittings", "Garden Tools", "Gaskets",
     "Gears", "General Hardware", "Generators", "Glass Products", "Glassware", "Gloves", "Grain", "Greenhouse Equipment",
     "Grinding Tools", "Hair Care", "Hand Tools", "Handling Equipment", "Hats", "Hay", "Heaters", "Herbicides", "Herbal Products",
@@ -262,3 +262,4 @@ export default function CategoryDirectory({ usedCategories = [] }: { usedCategor
         </div>
     );
 }
+

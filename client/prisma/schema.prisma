@@ -54,9 +54,13 @@ model Product {
   description      String
   category         ProductCategory
   moq              Int                      @default(1)
-  b2bPrice         Float
+  minOrderQty      Int                      @default(1)
+  b2bPrice         Float?
   b2cPrice         Float?
+  price            Float                    @default(0)
+  regularPrice     Float                    @default(0)
   currency         String                   @default("USD")
+  unit             String                   @default("")
   isDualListed     Boolean                  @default(false)
   stockQty         Int                      @default(0)
   hsCode           String?
@@ -66,7 +70,6 @@ model Product {
   images           String[]                 @default([])
   available        Boolean                  @default(true)
   trustDocumentUrl String?
-  unit             String?                  @default("")
   createdAt        DateTime                 @default(now())
   updatedAt        DateTime                 @updatedAt
   deletedAt        DateTime?

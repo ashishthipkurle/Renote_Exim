@@ -271,7 +271,7 @@ export default function ImageUploader({ images, onChange, maxFiles = 8 }: ImageU
         <div className="space-y-4">
             <div
                 className={`relative border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center transition-colors
-                    ${isDragging ? "border-primary bg-primary/10" : "border-white/10 hover:border-white/20 hover:bg-white/[0.02]"}`}
+                    ${isDragging ? "border-primary bg-primary/10" : "border-border hover:border-primary/50 hover:bg-muted/50"}`}
                 onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
                 onDragLeave={(e) => { e.preventDefault(); setIsDragging(false); }}
                 onDrop={(e) => {
@@ -288,11 +288,11 @@ export default function ImageUploader({ images, onChange, maxFiles = 8 }: ImageU
                     title=" "
                 />
 
-                <UploadCloud className="w-8 h-8 text-slate-400 mb-3" />
-                <p className="text-white text-sm font-bold">Drag & Drop visual assets here</p>
-                <p className="text-slate-500 text-xs mt-1">or click to browse your files</p>
-                <div className="mt-4 px-3 py-1 bg-slate-800 rounded-lg border border-white/5">
-                    <p className="text-[10px] text-slate-400 uppercase tracking-wider">
+                <UploadCloud className="w-8 h-8 text-muted-foreground mb-3" />
+                <p className="text-foreground text-sm font-bold">Drag & Drop visual assets here</p>
+                <p className="text-muted-foreground text-xs mt-1">or click to browse your files</p>
+                <div className="mt-4 px-3 py-1 bg-muted rounded-lg border border-border">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
                         Supported: JPG, PNG, WEBP • Max Size: 5MB
                     </p>
                 </div>

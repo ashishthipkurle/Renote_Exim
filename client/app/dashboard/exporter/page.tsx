@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import {
   TrendingUp, AlertTriangle, Search, CalendarDays,
   Plus, Package, DollarSign, ShoppingCart, Truck, Filter,
-  ChevronDown, ChevronRight, Activity, X,
+  ChevronDown, ChevronRight, Activity, X, RefreshCw, Wind, Anchor, Globe
 } from "lucide-react";
 import {
   authFetch, formatCurrency, timeAgo, getInitials, formatNumber
@@ -36,6 +36,25 @@ interface Partner {
   country: string | null; verified: boolean;
   orderCount: number; totalValue: number;
 }
+type FilterMode = "all" | "russia" | "europe" | "usa" | "africa" | "asia";
+const FILTER_CFG: Record<FilterMode, { label: string; icon: string; color: string }> = {
+  all:     { label: "India",     icon: "🇮🇳", color: "#fbbf24" },
+  russia:  { label: "Russia",    icon: "🇷🇺", color: "#818cf8" },
+  europe:  { label: "Europe",    icon: "🇪🇺", color: "#67e8f9" },
+  usa:     { label: "USA",       icon: "🇺🇸", color: "#f472b6" },
+  africa:  { label: "Africa",    icon: "🌍", color: "#fb923c" },
+  asia:    { label: "Asia",      icon: "🌏", color: "#c084fc" },
+};
+interface LiveRoute {
+  id: string; fromPort: string; toPort: string; type: "ocean" | "air" | "land";
+  status: string; vessel?: string; cargo?: string; lat?: number; lng?: number;
+  lastLocation?: string; importer?: string;
+}
+const DEMO_ROUTES: LiveRoute[] = [
+  { id: "R-1", fromPort: "MUMBAI", toPort: "ROTTERDAM", type: "ocean", status: "In Transit", cargo: "Textiles", lat: 15.2, lng: 60.5 },
+  { id: "R-2", fromPort: "DELHI", toPort: "LONDON", type: "air", status: "Scheduled", cargo: "Spices", lat: 25.1, lng: 45.2 },
+  { id: "R-3", fromPort: "CHENNAI", toPort: "SINGAPORE", type: "ocean", status: "Departed", cargo: "Tea", lat: 5.5, lng: 90.1 },
+];
 
 // Dashboard filter periods
 type PeriodFilter = "today" | "week" | "month" | "quarter" | "year" | "all";
@@ -102,6 +121,16 @@ export default function ExporterDashboard() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [calMonth, setCalMonth] = useState(new Date());
 
+  // Map state
+  const [mapFilter, setMapFilter] = useState<FilterMode>("all");
+  const [mapLoading, setMapLoading] = useState(false);
+  const [apiRoutes, setApiRoutes] = useState<LiveRoute[]>([]);
+  const [regionCounts, setRegionCounts] = useState<Record<string, number>>({});
+  const [activeCount, setActiveCount] = useState(0);
+  const [mapIsDemo, setMapIsDemo] = useState(false);
+  const [lastUpdate, setLastUpdate] = useState<Date|null>(null);
+  const [mapRefresh, setMapRefresh] = useState(0);
+
   useEffect(() => {
     setLoading(true);
     const params = period !== "all" ? `?period=${period}` : "";
@@ -115,6 +144,31 @@ export default function ExporterDashboard() {
       setPartners((d.partners || []).slice(0, 3)); setLoading(false);
     });
   }, [period]);
+
+  useEffect(() => {
+    setMapLoading(true);
+    authFetch<{ routes: LiveRoute[]; total: number }>("/api/shipments/active")
+      .then(d => {
+        if (d?.routes) {
+          setApiRoutes(d.routes);
+          setActiveCount(d.routes.length);
+          setLastUpdate(new Date());
+          const counts: Record<string, number> = {};
+          d.routes.forEach(r => {
+             const key = r.toPort.toLowerCase().includes('russia') ? 'russia' : 
+                         r.toPort.toLowerCase().includes('london') || r.toPort.toLowerCase().includes('rotterdam') ? 'europe' :
+                         r.toPort.toLowerCase().includes('new_york') ? 'usa' : 'asia';
+             counts[key] = (counts[key] || 0) + 1;
+          });
+          setRegionCounts(counts);
+          setMapIsDemo(false);
+        } else {
+          setMapIsDemo(true);
+        }
+      })
+      .catch(() => setMapIsDemo(true))
+      .finally(() => setMapLoading(false));
+  }, [mapRefresh]);
 
   const filteredOrders = useMemo(() => {
     if (!search.trim()) return allOrders.slice(0, 4);
@@ -420,9 +474,8 @@ export default function ExporterDashboard() {
                 </div>
               </div>
 
-              {/* Map area */}
               <div className="flex-1 relative overflow-hidden">
-                <EmbeddedMap filter={mapFilter} apiRoutes={apiRoutes} isDemo={mapIsDemo}/>
+                <ShipTrackingMap filter={mapFilter} routes={mapIsDemo ? DEMO_ROUTES : apiRoutes} />
                 {mapLoading&&(
                   <div className="absolute inset-0 flex items-center justify-center z-30" style={{background:"rgba(3,8,16,0.55)",backdropFilter:"blur(4px)"}}>
                     <div className="flex flex-col items-center gap-2">

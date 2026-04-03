@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { 
   Package, 
@@ -30,6 +31,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }>
     SHIPPED: { label: "IN_TRANSIT", color: "text-muted-foreground/80 bg-black/10 dark:bg-white/15 border-border dark:border-white/20", icon: Truck },
     DELIVERED: { label: "DELIVERED", color: "text-primary-foreground bg-primary border-transparent", icon: CheckCircle2 },
     CANCELLED: { label: "TERMINATED", color: "text-muted-foreground/10 bg-black/5 dark:bg-white/10 border-border dark:border-white/5", icon: XCircle },
+    DISPUTED: { label: "DISPUTE_SIGNAL", color: "text-orange-400/60 bg-orange-400/5 border-orange-400/10", icon: XCircle },
 };
 
 function formatDate(d: Date | string) {
@@ -306,35 +308,6 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
                                                     <ChevronDown className={`w-5 h-5 transition-transform duration-500 ${isExpanded ? "rotate-180" : ""}`} />
                                                 </button>
                                             </div>
-                                    <div className="lg:col-span-2 flex justify-end gap-2">
-                                        {order.product?.id ? (
-                                            <Link
-                                                href={`/products/${order.product.id}`}
-                                                className="inline-flex items-center gap-1 bg-primary text-white text-xs font-bold px-3 py-2 rounded-lg transition-all hover:brightness-110 hover:-translate-y-0.5"
-                                            >
-                                                View Product <ArrowRight className="w-3 h-3" />
-                                            </Link>
-                                        ) : null}
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                setExpandedOrderId(order.id);
-                                                setShipmentExpandedOrderId((prev) => (prev === order.id ? null : order.id));
-                                            }}
-                                            className="inline-flex items-center gap-1 bg-primary text-white text-xs font-bold px-3 py-2 rounded-lg transition-all hover:brightness-110 hover:-translate-y-0.5"
-                                            title="Shipment Details"
-                                        >
-                                            Shipment Details
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => setExpandedOrderId(isExpanded ? null : order.id)}
-                                            className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
-                                            title="Expand"
-                                        >
-                                            <ChevronDown className={`w-4 h-4 transition-transform ${isExpanded ? "rotate-180" : ""}`} />
-                                        </button>
-                                    </div>
 
                                             {/* ── Expanded Content ── */}
                                             <AnimatePresence>
@@ -357,41 +330,38 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
                                                                     </div>
                                                                 </div>
 
-                                                <div className="flex-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 text-sm">
-                                                    <div className="rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-3">
-                                                        <div className="text-slate-400 text-xs uppercase tracking-widest">Order Number</div>
-                                                        <div className="text-slate-900 dark:text-white font-semibold mt-1 break-all">{order.orderNumber ?? order.id}</div>
-                                                    </div>
-                                                    <div className="rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-3">
-                                                        <div className="text-slate-400 text-xs uppercase tracking-widest">Created</div>
-                                                        <div className="text-slate-900 dark:text-white font-semibold mt-1">{formatDate(order.createdAt)}</div>
-                                                    </div>
-                                                    <div className="rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-3">
-                                                        <div className="text-slate-400 text-xs uppercase tracking-widest">Buyer</div>
-                                                        <div className="text-slate-900 dark:text-white font-semibold mt-1">{order.importer?.companyName || order.importer?.name || "Importer"}</div>
-                                                    </div>
-                                                    <div className="rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-3">
-                                                        <div className="text-slate-400 text-xs uppercase tracking-widest">Country</div>
-                                                        <div className="text-slate-900 dark:text-white font-semibold mt-1">{order.importer?.country ?? "N/A"}</div>
-                                                    </div>
-                                                    <div className="rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-3 md:col-span-2">
-                                                        <div className="text-slate-400 text-xs uppercase tracking-widest">Product</div>
-                                                        <div className="text-slate-900 dark:text-white font-semibold mt-1">{order.product?.name ?? "Unknown Product"}</div>
-                                                    </div>
-                                                    <div className="rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-3">
-                                                        <div className="text-slate-400 text-xs uppercase tracking-widest">Price</div>
-                                                        <div className="text-slate-900 dark:text-white font-semibold mt-1">{formatCurrency(order.totalPrice)}</div>
-                                                    </div>
-                                                    <div className="rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-3">
-                                                        <div className="text-slate-400 text-xs uppercase tracking-widest">Quantity</div>
-                                                        <div className="text-slate-900 dark:text-white font-semibold mt-1">{order.quantity ?? 0}</div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                                                <div className="xl:col-span-9 space-y-10">
+                                                                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                                                        <div className="p-6 rounded-[2rem] bg-black/5 dark:bg-white/5 border border-border dark:border-white/5">
+                                                                            <div className="text-[8px] font-black text-muted-foreground/20 uppercase tracking-[0.3em] mb-2 italic">Sequence_UID</div>
+                                                                            <div className="text-sm font-black text-foreground dark:text-white tracking-tighter uppercase italic truncate">{order.orderNumber ?? order.id}</div>
+                                                                        </div>
+                                                                        <div className="p-6 rounded-[2rem] bg-black/5 dark:bg-white/5 border border-border dark:border-white/5">
+                                                                            <div className="text-[8px] font-black text-muted-foreground/20 uppercase tracking-[0.3em] mb-2 italic">Timestamp_Registry</div>
+                                                                            <div className="text-sm font-black text-foreground dark:text-white tracking-tighter uppercase italic">{formatDate(order.createdAt)}</div>
+                                                                        </div>
+                                                                        <div className="p-6 rounded-[2rem] bg-black/5 dark:bg-white/5 border border-border dark:border-white/5">
+                                                                            <div className="text-[8px] font-black text-muted-foreground/20 uppercase tracking-[0.3em] mb-2 italic">Valuation_Metric</div>
+                                                                            <div className="text-sm font-black text-foreground dark:text-white tracking-tighter uppercase italic">{formatCurrency(order.totalPrice)}</div>
+                                                                        </div>
+                                                                    </div>
 
-                                            {shipmentExpandedOrderId === order.id && (
-                                                <ShipmentTrackingPanel shipment={order.shipment} />
-                                            )}
+                                                                    <div className="flex flex-wrap gap-4">
+                                                                        <button 
+                                                                            onClick={() => setShipmentExpandedOrderId(shipmentExpandedOrderId === order.id ? null : order.id)}
+                                                                            className={`px-8 py-3 rounded-2xl border text-[10px] font-black uppercase tracking-widest italic transition-all ${shipmentExpandedOrderId === order.id 
+                                                                                ? "bg-primary text-primary-foreground border-transparent shadow-2xl shadow-white/10 scale-105" 
+                                                                                : "bg-card/40 dark:bg-white/5 text-muted-foreground/40 border-border dark:border-white/5 hover:bg-black/10 dark:bg-white/15 hover:text-foreground dark:text-white"}`}
+                                                                        >
+                                                                            Logistics_Telemetry
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            {shipmentExpandedOrderId === order.id && (
+                                                                <ShipmentTrackingPanel shipment={order.shipment} />
+                                                            )}
 
                                                             <div className="p-8 rounded-[2rem] border border-border dark:border-white/10 bg-black/5 dark:bg-white/10 relative overflow-hidden group/intel">
                                                                 <div className="absolute top-0 right-0 p-8 opacity-5">

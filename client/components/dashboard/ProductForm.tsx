@@ -91,6 +91,7 @@ type ProductData = {
     category: string;
     description: string;
     price: number;
+    regularPrice: number;
     minOrderQty: number;
     unit: string;
     originCountry: string;
@@ -106,6 +107,7 @@ const defaultProduct: ProductData = {
     category: "OTHER",
     description: "",
     price: 0,
+    regularPrice: 0,
     minOrderQty: 1,
     unit: "kg",
     originCountry: "",
@@ -203,7 +205,8 @@ export default function ProductForm({
         if (!form.name || form.name.length < 3) newErrors.name = "Name must be at least 3 characters";
         if (!form.description || form.description.length < 20)
             newErrors.description = "Description must be at least 20 characters";
-        if (!form.price || form.price <= 0) newErrors.price = "Price must be positive";
+        if (!form.price || form.price <= 0) newErrors.price = "FOB Price must be positive";
+        if (!form.regularPrice || form.regularPrice <= 0) newErrors.regularPrice = "Regular Price must be positive";
         if (!form.minOrderQty || form.minOrderQty <= 0) newErrors.minOrderQty = "MOQ must be positive";
         if (!form.unit) newErrors.unit = "Unit is required";
         if (!form.originCountry || form.originCountry.length < 2)
@@ -232,6 +235,7 @@ export default function ProductForm({
                 category: normalizeCategory(rawCategory),
                 description: form.description,
                 price: form.price,
+                regularPrice: form.regularPrice,
                 minOrderQty: form.minOrderQty,
                 unit: form.unit,
                 originCountry: form.originCountry,
@@ -270,15 +274,15 @@ export default function ProductForm({
                     <div className="flex items-center gap-6">
                         <Link
                             href="/dashboard/exporter/inventory"
-                            className="p-3 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all text-slate-400 hover:text-white group"
+                            className="p-3 bg-card border border-border rounded-2xl hover:bg-accent transition-all text-muted-foreground hover:text-foreground group"
                         >
                             <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                         </Link>
                         <div>
-                            <h1 className="text-3xl font-black text-white uppercase italic tracking-tighter">
+                            <h1 className="text-3xl font-black text-foreground uppercase italic tracking-tighter">
                                 {isEdit ? "Edit Listing" : "New Listing"}
                             </h1>
-                            <p className="text-slate-500 text-xs font-bold mt-1 uppercase tracking-widest leading-relaxed">
+                            <p className="text-muted-foreground text-xs font-bold mt-1 uppercase tracking-widest leading-relaxed">
                                 {isEdit
                                     ? "Modify your asset parameters for global trade"
                                     : "Feature your products to buyers worldwide"}
@@ -304,7 +308,7 @@ export default function ProductForm({
                     <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-2xl rounded-[2.5rem] p-10 space-y-8 relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 blur-[80px] rounded-full -mr-32 -mt-32 group-hover:bg-white/10 transition-colors pointer-events-none" />
 
-                        <h2 className="text-sm font-black text-white tracking-[0.25em] uppercase opacity-50 mb-4 italic">Core Specifications</h2>
+                        <h2 className="text-sm font-black text-foreground tracking-[0.25em] uppercase opacity-50 mb-4 italic">Core Specifications</h2>
 
                         <div className="space-y-6">
                             <div>
@@ -342,7 +346,7 @@ export default function ProductForm({
                                                     <option key={c} value={c.toUpperCase()}>{c}</option>
                                                 ))}
                                             </datalist>
-                                            <Plus className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none rotate-45" />
+                                            <Plus className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none rotate-45" />
                                         </div>
                                     </div>
 
@@ -391,14 +395,32 @@ export default function ProductForm({
                     </div>
 
                     {/* Pricing */}
-                    <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-2xl rounded-[2.5rem] p-10 space-y-8 relative overflow-hidden group">
-                        <h2 className="text-sm font-black text-white tracking-[0.25em] uppercase opacity-50 mb-4 italic">Trade Economics</h2>
+                    <div className="bg-card backdrop-blur-xl border border-border shadow-2xl rounded-[2.5rem] p-10 space-y-8 relative overflow-hidden group">
+                        <h2 className="text-sm font-black text-foreground tracking-[0.25em] uppercase opacity-50 mb-4 italic">Trade Economics</h2>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                             <div>
-                                <label htmlFor="price" className={labelClass}>FOB Price (USD) *</label>
+                                <label htmlFor="regularPrice" className={labelClass}>Regular Price (USD) *</label>
                                 <div className="relative">
-                                    <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 font-bold">$</span>
+                                    <span className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">$</span>
+                                    <input
+                                        id="regularPrice"
+                                        name="regularPrice"
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        value={form.regularPrice || ""}
+                                        onChange={handleChange}
+                                        placeholder="0.00"
+                                        className={inputClass + " pl-10"}
+                                    />
+                                </div>
+                                {errors.regularPrice && <p className={errorClass}>{errors.regularPrice}</p>}
+                            </div>
+                            <div>
+                                <label htmlFor="price" className={labelClass}>FOB Price (Bulk Purchase) *</label>
+                                <div className="relative">
+                                    <span className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">$</span>
                                     <input
                                         id="price"
                                         name="price"
@@ -464,7 +486,7 @@ export default function ProductForm({
                                 placeholder="e.g. 0910.20.00"
                                 className={inputClass}
                             />
-                            <p className="text-[9px] text-slate-500 mt-2 ml-1 italic font-medium uppercase tracking-wider">Crucial for international customs processing</p>
+                            <p className="text-[9px] text-muted-foreground mt-2 ml-1 italic font-medium uppercase tracking-wider">Crucial for international customs processing</p>
                         </div>
                     </div>
                 </div>
@@ -472,8 +494,8 @@ export default function ProductForm({
                 {/* Right Column: Visuals & Certs */}
                 <div className="lg:col-span-12 xl:col-span-4 space-y-8">
                     {/* Visual Assets */}
-                    <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-2xl rounded-[2.5rem] p-8 space-y-6">
-                        <h2 className="text-[11px] font-black text-white tracking-[0.25em] uppercase opacity-50 italic">Asset Gallery</h2>
+                    <div className="bg-card backdrop-blur-xl border border-border shadow-2xl rounded-[2.5rem] p-8 space-y-6">
+                        <h2 className="text-[11px] font-black text-foreground tracking-[0.25em] uppercase opacity-50 italic">Asset Gallery</h2>
 
                         {/* Previews */}
                         <ImageUploader 
@@ -510,8 +532,8 @@ export default function ProductForm({
                     </div>
 
                     {/* Professional Certs */}
-                    <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-2xl rounded-[2.5rem] p-8 space-y-6">
-                        <h2 className="text-[11px] font-black text-white tracking-[0.25em] uppercase opacity-50 italic">Trust Markers</h2>
+                    <div className="bg-card backdrop-blur-xl border border-border shadow-2xl rounded-[2.5rem] p-8 space-y-6">
+                        <h2 className="text-[11px] font-black text-foreground tracking-[0.25em] uppercase opacity-50 italic">Trust Markers</h2>
 
                         <div className="flex flex-wrap gap-2">
                             {form.certifications.map((cert, i) => (
@@ -556,15 +578,15 @@ export default function ProductForm({
                 </div>
 
                 {/* Final Action */}
-                <div className="lg:col-span-12 flex items-center justify-between bg-[#151c2a]/80 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-8 mt-4 shadow-2xl">
+                <div className="lg:col-span-12 flex items-center justify-between bg-card/80 backdrop-blur-2xl border border-border rounded-[2rem] p-8 mt-4 shadow-2xl">
                     <div className="hidden sm:block">
-                        <p className="text-white font-black text-xs uppercase tracking-widest">{isEdit ? "Update Existing Asset" : "Deploy New Asset"}</p>
-                        <p className="text-slate-500 text-[10px] uppercase font-bold tracking-wider mt-1 italic">Authorized Listing Procedure (ALP-1)</p>
+                        <p className="text-foreground font-black text-xs uppercase tracking-widest">{isEdit ? "Update Existing Asset" : "Deploy New Asset"}</p>
+                        <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider mt-1 italic">Authorized Listing Procedure (ALP-1)</p>
                     </div>
                     <div className="flex items-center gap-4 w-full sm:w-auto">
                         <Link
                             href="/dashboard/exporter/inventory"
-                            className="flex-1 sm:flex-none px-10 py-4 text-slate-500 border border-white/5 hover:text-white hover:bg-white/5 font-black text-[10px] uppercase tracking-widest rounded-2xl transition-all"
+                            className="flex-1 sm:flex-none px-10 py-4 text-muted-foreground border border-border hover:text-foreground hover:bg-muted font-black text-[10px] uppercase tracking-widest rounded-2xl transition-all"
                         >
                             Abort
                         </Link>

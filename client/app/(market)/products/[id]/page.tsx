@@ -21,6 +21,7 @@ import {
 
 import { prisma } from "@/lib/prisma";
 import AddToCartButton from "@/components/marketplace/AddToCartButton";
+import { getServerAuth } from "@/lib/supabase/server";
 
 type ProductReview = {
   orderId: string;
@@ -95,12 +96,19 @@ export default async function ProductDetailPage({
 
   if (!product) notFound();
 
+  const auth = await getServerAuth();
+  const role = auth?.role || "USER";
+
+  // Apply role-based price swap
+  const originalProductPrice = product.price;
+  product.price = role === "IMPORTER" ? product.price : (product.regularPrice || product.price);
+
   const heroImage = product.images?.[0] ?? null;
   const nameParts = product.name.split(" ").filter(Boolean);
   const splitIndex = Math.min(3, nameParts.length);
   const titlePrimary = nameParts.slice(0, splitIndex).join(" ");
   const titleAccent = nameParts.slice(splitIndex).join(" ");
-  const oldPrice = product.price * 1.15;
+  const oldPrice = originalProductPrice * 1.15;
 
   let productReviews: ProductReview[] = [];
   try {
