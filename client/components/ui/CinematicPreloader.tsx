@@ -274,7 +274,7 @@ export default function CinematicPreloader() {
                             {activeTexts.map((text, i) => (
                                 <div key={i} className="text-reveal-mask">
                                     <h1 className={`text-reveal-item font-['Anton'] tracking-tight opacity-0 uppercase ${i === 1 ? 'text-5xl md:text-8xl text-[#D4AF37] border-x-4 border-[#D4AF37] px-6' :
-                                        'text-4xl md:text-7xl text-white'
+                                        'text-4xl md:text-7xl text-foreground'
                                         }`}>
                                         {text}
                                     </h1>
