@@ -35,7 +35,6 @@ export async function GET(request: NextRequest) {
                 companyName: true,
                 avatar: true,
                 description: true,
-                createdAt: true,
                 _count: {
                     select: {
                         exportedProducts: true,
@@ -69,18 +68,14 @@ export async function GET(request: NextRequest) {
             });
 
             // Mock rating (since we don't have a rating system yet)
-            const rating = 4 + Math.min(0.9, totalOrders / 50);
+            const rating = 4 + Math.random();
 
             return {
                 ...exp,
                 rating: rating.toFixed(1),
                 tradeVolume: totalOrders,
                 categories: categories.map(c => c.category),
-                joinedAt: exp.createdAt.toISOString(),
-                _count: {
-                    products: exp._count.exportedProducts,
-                    exportedProducts: exp._count.exportedProducts,
-                },
+                joinedAt: new Date().toISOString(), // Fallback
             };
         }));
 
