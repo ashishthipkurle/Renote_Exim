@@ -175,5 +175,3 @@ export default async function ExporterOrdersPage({
     </div>
   );
 }
-  );
-}
