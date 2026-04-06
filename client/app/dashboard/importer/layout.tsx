@@ -1,22 +1,28 @@
 import ClientSidebar from "@/components/client/ClientSidebar";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import { SidebarProvider } from "@/lib/contexts/SidebarContext";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import PageTransition from "@/components/ui/PageTransition";
 
 export default function ImporterLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
-      <div className="bg-slate-50 dark:bg-[#0a0c12] text-slate-900 dark:text-slate-100 h-dvh flex flex-col overflow-hidden transition-colors duration-300">
+      <div className="flex flex-col h-svh w-full bg-board transition-colors duration-300 overflow-hidden">
+        {/* Master Header spans the full width at the top */}
         <DashboardHeader />
-        <div className="flex flex-1 overflow-hidden">
+
+        <div className="flex flex-1 overflow-hidden relative">
           <ClientSidebar basePath="/dashboard/importer" />
-          <main className="flex-1 min-w-0 h-full overflow-y-auto p-4 lg:p-8 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-800">
-            <Breadcrumbs />
-            <PageTransition>
-              {children}
-            </PageTransition>
-          </main>
+          <SidebarInset>
+            <div className="flex-1 overflow-auto custom-scrollbar">
+              <div className="px-8 py-6">
+                <Breadcrumbs />
+              </div>
+              <PageTransition>
+                {children}
+              </PageTransition>
+            </div>
+          </SidebarInset>
         </div>
       </div>
     </SidebarProvider>

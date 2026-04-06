@@ -45,19 +45,19 @@ interface AnalyticsData {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-const TIMEFRAMES = ["1M","3M","6M","1Y","ALL"] as const;
+const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const TIMEFRAMES = ["1M", "3M", "6M", "1Y", "ALL"] as const;
 type Timeframe = typeof TIMEFRAMES[number];
 
 const PALETTE = [
-  "#135bec","#34d399","#d4af37","#22d3ee","#a78bfa","#fb7185","#f97316","#84cc16","#e879f9",
+  "#ffffff", "#f5f5f5", "#e5e5e5", "#d4d4d4", "#a3a3a3", "#737373", "#525252", "#404040", "#262626",
 ];
 
 const CATEGORY_LABELS: Record<string, string> = {
-  CHEMICALS: "Chemicals", MACHINES: "Machines", TEXTILES: "Textiles",
-  MEDICAL: "Medical", HANDICRAFTS: "Handicrafts", FOOD: "Food",
-  ELECTRONICS: "Electronics", AUTOMOTIVE: "Automotive",
-  CONSTRUCTION: "Construction", AGRICULTURE: "Agriculture", OTHER: "Other",
+  CHEMICALS: "CHEMICALS", MACHINES: "MACHINES", TEXTILES: "TEXTILES",
+  MEDICAL: "MEDICAL", HANDICRAFTS: "HANDICRAFTS", FOOD: "FOOD",
+  ELECTRONICS: "ELECTRONICS", AUTOMOTIVE: "AUTOMOTIVE",
+  CONSTRUCTION: "CONSTRUCTION", AGRICULTURE: "AGRICULTURE", OTHER: "OTHER",
 };
 
 // ─── Formatters ───────────────────────────────────────────────────────────────
@@ -70,7 +70,7 @@ function fCurrency(n: number) {
 function fNum(n: number) { return new Intl.NumberFormat("en-US").format(n); }
 function fMonth(iso: string) {
   const d = new Date(iso + "-01");
-  return `${MONTH_NAMES[d.getMonth()]} '${String(d.getFullYear()).slice(2)}`;
+  return `${MONTH_NAMES[d.getMonth()]} '${String(d.getFullYear()).slice(2)}`.toUpperCase();
 }
 
 // ─── Shared Tooltip ───────────────────────────────────────────────────────────
@@ -78,13 +78,13 @@ function fMonth(iso: string) {
 function ChartTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-card border border-border rounded-xl px-4 py-3 shadow-2xl dark:shadow-black/60 backdrop-blur-xl">
-      <p className="text-[11px] text-muted-foreground mb-2 font-medium">{label}</p>
+    <div className="bg-black/90 border border-border dark:border-white/10 rounded-2xl px-5 py-4 shadow-xl dark:shadow-2xl backdrop-blur-xl">
+      <p className="text-[10px] text-muted-foreground mb-3 font-black uppercase tracking-widest italic">{label}</p>
       {payload.map((p: any, i: number) => (
-        <div key={i} className="flex items-center gap-2 text-xs font-bold">
-          <span className="size-2 rounded-full" style={{ background: p.color }} />
-          <span className="text-muted-foreground capitalize">{p.name}:</span>
-          <span style={{ color: p.color }}>
+        <div key={i} className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest">
+          <span className="w-2 h-2 rounded-full" style={{ background: p.color }} />
+          <span className="text-muted-foreground/60">{p.name}:</span>
+          <span style={{ color: p.color }} className="italic">
             {p.name === "revenue" || p.name === "Revenue" || p.name === "paidRevenue"
               ? fCurrency(p.value)
               : fNum(p.value)}
@@ -99,11 +99,11 @@ function ChartTooltip({ active, payload, label }: any) {
 
 function EmptyChart({ icon: Icon, message }: { icon: LucideIcon; message: string }) {
   return (
-    <div className="flex flex-col items-center justify-center h-full gap-3 py-8">
-      <div className="p-4 rounded-2xl bg-muted border border-border">
-        <Icon className="w-8 h-8 text-muted-foreground" />
+    <div className="flex flex-col items-center justify-center h-full gap-4 py-12 opacity-40">
+      <div className="p-5 rounded-3xl bg-black/5 dark:bg-white/10 border border-border dark:border-white/10">
+        <Icon className="w-10 h-10 text-foreground dark:text-white" />
       </div>
-      <p className="text-muted-foreground text-sm text-center max-w-[200px]">{message}</p>
+      <p className="text-foreground dark:text-white text-[10px] font-black uppercase tracking-[0.2em] text-center max-w-[250px] italic">{message}</p>
     </div>
   );
 }
@@ -119,49 +119,37 @@ function KpiCard({
   const isPositive = (trend ?? 0) >= 0;
   return (
     <div
-      className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:scale-[1.02] hover:border-primary/20 group cursor-default shadow-sm dark:shadow-none"
-      style={{ boxShadow: `0 0 0 0 ${glowColor}`, transition: "box-shadow 0.3s" }}
-      onMouseEnter={e => (e.currentTarget.style.boxShadow = `0 8px 40px -8px ${glowColor}25`)}
-      onMouseLeave={e => (e.currentTarget.style.boxShadow = "none")}
+      className="relative overflow-hidden rounded-[2rem] border border-border dark:border-white/5 bg-card/40 dark:bg-white/5 p-8 transition-all duration-500 hover:-translate-y-1 group cursor-default shadow-xl dark:shadow-2xl backdrop-blur-3xl"
     >
-      {/* Background glow blob */}
       <div
-        className="absolute -top-6 -right-6 w-24 h-24 rounded-full opacity-10 blur-2xl pointer-events-none"
-        style={{ background: glowColor }}
+        className="absolute -top-12 -right-12 w-32 h-32 rounded-full opacity-0 group-hover:opacity-20 blur-3xl transition-opacity duration-700 pointer-events-none"
+        style={{ background: '#ffffff' }}
       />
-      {/* Top row */}
-      <div className="flex items-start justify-between relative">
-        <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">{label}</p>
-        <div
-          className="p-2.5 rounded-xl border transition-colors"
-          style={{ background: `${glowColor}10`, borderColor: `${glowColor}20` }}
-        >
-          <Icon className="w-4 h-4" style={{ color: glowColor }} />
+      <div className="flex items-start justify-between relative mb-6">
+        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] opacity-40 italic">{label}</p>
+        <div className="p-3 rounded-2xl bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 text-foreground dark:text-white transition-all group-hover:scale-110">
+          <Icon className="w-5 h-5" />
         </div>
       </div>
-      {/* Value */}
-      <p className="text-3xl font-black mt-3 tracking-tight" style={{ color: accentColor }}>
+      <p className="text-4xl font-black tracking-tighter text-foreground dark:text-white uppercase italic group-hover:scale-[1.02] transition-transform duration-300 origin-left">
         {value}
       </p>
-      <p className="text-xs text-muted-foreground mt-1">{sub}</p>
-      {/* Trend badge */}
+      <p className="text-[9px] font-black text-muted-foreground/40 mt-2 uppercase tracking-widest">{sub}</p>
       {trend !== undefined && (
         <div
-          className={`mt-3 inline-flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-lg ${
-            isPositive
-              ? "text-emerald-400 bg-emerald-400/10 border border-emerald-400/20"
-              : "text-red-400 bg-red-400/10 border border-red-400/20"
-          }`}
+          className={`mt-6 inline-flex items-center gap-2 text-[9px] font-black px-3 py-1.5 rounded-full border uppercase tracking-widest italic transition-all ${isPositive
+            ? "text-foreground dark:text-white bg-black/10 dark:bg-white/15 border-border dark:border-white/20"
+            : "text-muted-foreground/60 bg-black/5 dark:bg-white/10 border-border dark:border-white/5"
+            }`}
         >
-          {isPositive ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
-          {Math.abs(trend)}% vs last 30 days
+          {isPositive ? <TrendingUp className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
+          {Math.abs(trend)}% Delta
         </div>
       )}
-      {/* Bottom bar */}
-      <div className="mt-4 h-[2px] w-full bg-muted rounded-full overflow-hidden">
+      <div className="mt-8 h-1.5 w-full bg-black/5 dark:bg-white/10 rounded-full overflow-hidden">
         <div
-          className="h-full rounded-full w-3/4"
-          style={{ background: `linear-gradient(90deg, ${glowColor}, ${glowColor}60)` }}
+          className="h-full rounded-full bg-primary transition-all duration-1000 delay-300"
+          style={{ width: '75%', boxShadow: '0 0 15px rgba(255,255,255,0.3)' }}
         />
       </div>
     </div>
@@ -173,7 +161,7 @@ function KpiCard({
 function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
     <div
-      className={`rounded-2xl border border-border bg-card p-6 transition-all duration-200 hover:border-primary/10 shadow-sm dark:shadow-none ${className}`}
+      className={`rounded-[2.5rem] border border-border dark:border-white/5 bg-card/40 dark:bg-white/5 p-8 shadow-xl dark:shadow-2xl backdrop-blur-3xl transition-all duration-300 hover:border-border dark:border-white/10 ${className}`}
     >
       {children}
     </div>
@@ -182,9 +170,9 @@ function Card({ children, className = "" }: { children: React.ReactNode; classNa
 
 function CardHeader({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
-    <div className="mb-5">
-      <p className="text-foreground font-bold tracking-tight">{title}</p>
-      {subtitle && <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>}
+    <div className="mb-8">
+      <p className="text-xl font-black text-foreground dark:text-white uppercase italic tracking-tighter">{title}</p>
+      {subtitle && <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-1 opacity-40 italic">{subtitle}</p>}
     </div>
   );
 }
@@ -223,10 +211,10 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
   // ── Payment donut data ────────────────────────────────────────────────────
   const paymentDonutData = useMemo(
     () => [
-      { name: "Paid", value: data.paymentBreakdown.PAID, color: "#34d399" },
-      { name: "Pending", value: data.paymentBreakdown.PENDING, color: "#d4af37" },
-      { name: "Failed", value: data.paymentBreakdown.FAILED, color: "#fb7185" },
-      { name: "Refunded", value: data.paymentBreakdown.REFUNDED, color: "#a78bfa" },
+      { name: "Paid", value: data.paymentBreakdown.PAID, color: "#ffffff" },
+      { name: "Pending", value: data.paymentBreakdown.PENDING, color: "#a3a3a3" },
+      { name: "Failed", value: data.paymentBreakdown.FAILED, color: "#525252" },
+      { name: "Refunded", value: data.paymentBreakdown.REFUNDED, color: "#262626" },
     ].filter((d) => d.value > 0),
     [data.paymentBreakdown]
   );
@@ -234,12 +222,12 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
   // ── Order status radial data ──────────────────────────────────────────────
   const orderStatusData = useMemo(
     () => [
-      { name: "Delivered", value: data.orderStatusBreakdown.DELIVERED, fill: "#34d399" },
-      { name: "Shipped", value: data.orderStatusBreakdown.SHIPPED, fill: "#22d3ee" },
-      { name: "Processing", value: data.orderStatusBreakdown.PROCESSING, fill: "#a78bfa" },
-      { name: "Confirmed", value: data.orderStatusBreakdown.CONFIRMED, fill: "#135bec" },
-      { name: "Pending", value: data.orderStatusBreakdown.PENDING, fill: "#d4af37" },
-      { name: "Cancelled", value: data.orderStatusBreakdown.CANCELLED, fill: "#fb7185" },
+      { name: "Delivered", value: data.orderStatusBreakdown.DELIVERED, fill: "#ffffff" },
+      { name: "Shipped", value: data.orderStatusBreakdown.SHIPPED, fill: "#e5e5e5" },
+      { name: "Processing", value: data.orderStatusBreakdown.PROCESSING, fill: "#a3a3a3" },
+      { name: "Confirmed", value: data.orderStatusBreakdown.CONFIRMED, fill: "#737373" },
+      { name: "Pending", value: data.orderStatusBreakdown.PENDING, fill: "#525252" },
+      { name: "Cancelled", value: data.orderStatusBreakdown.CANCELLED, fill: "#262626" },
     ].filter((d) => d.value > 0),
     [data.orderStatusBreakdown]
   );
@@ -256,18 +244,17 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
         .page-title { font-size: 28px; font-weight: 900; margin-bottom: 8px; }
         .page-sub { font-size: 14px; color: #64748b; margin-bottom: 32px; }
         .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
-        .kpi-card { background: #151c2a; border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 20px; }
+        .kpi-card { background: #111; border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 20px; }
         .kpi-label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em; }
         .kpi-value { font-size: 28px; font-weight: 900; margin-top: 8px; }
         .kpi-sub { font-size: 12px; color: #64748b; margin-top: 4px; }
-        .section { background: #151c2a; border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 24px; margin-bottom: 24px; }
+        .section { background: #111; border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 24px; margin-bottom: 24px; }
         .section-title { font-size: 15px; font-weight: 700; margin-bottom: 16px; }
         table { width: 100%; border-collapse: collapse; }
         th { text-align: left; font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; padding: 8px 12px; }
         td { padding: 10px 12px; font-size: 13px; border-top: 1px solid rgba(255,255,255,0.05); color: #cbd5e1; }
         .pill { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
-        .pill-green { background: rgba(52,211,153,0.1); color: #34d399; border: 1px solid rgba(52,211,153,0.2); }
-        .pill-blue { background: rgba(19,91,236,0.1); color: #135bec; border: 1px solid rgba(19,91,236,0.2); }
+        .pill-neutral { background: rgba(255,255,255,0.1); color: #ffffff; border: 1px solid rgba(255,255,255,0.2); }
       </style>
     `;
 
@@ -275,19 +262,19 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
       topProducts: data.topProducts
         .map(
           (p, i) =>
-            `<tr><td>${i + 1}. ${p.name}</td><td>${CATEGORY_LABELS[p.category] ?? p.category}</td><td>${p.orderCount}</td><td style="color:#34d399;font-weight:700">${fCurrency(p.revenue)}</td></tr>`
+            `<tr><td>${i + 1}. ${p.name}</td><td>${CATEGORY_LABELS[p.category] ?? p.category}</td><td>${p.orderCount}</td><td style="color:#ffffff;font-weight:700">${fCurrency(p.revenue)}</td></tr>`
         )
         .join(""),
       geo: data.geographicData
         .map(
           (g) =>
-            `<tr><td>${g.country}</td><td>${g.orderCount}</td><td style="color:#34d399;font-weight:700">${fCurrency(g.revenue)}</td></tr>`
+            `<tr><td>${g.country}</td><td>${g.orderCount}</td><td style="color:#ffffff;font-weight:700">${fCurrency(g.revenue)}</td></tr>`
         )
         .join(""),
       monthly: data.monthlyRevenue
         .map(
           (m) =>
-            `<tr><td>${fMonth(m.month)}</td><td>${m.orderCount}</td><td style="color:#135bec;font-weight:700">${fCurrency(m.revenue)}</td></tr>`
+            `<tr><td>${fMonth(m.month)}</td><td>${m.orderCount}</td><td style="color:#ffffff;font-weight:700">${fCurrency(m.revenue)}</td></tr>`
         )
         .join(""),
     };
@@ -301,10 +288,10 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
         <div class="page-sub">Generated on ${new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</div>
 
         <div class="kpi-grid">
-          <div class="kpi-card"><div class="kpi-label">Total Revenue</div><div class="kpi-value" style="color:#135bec">${fCurrency(data.totalRevenue)}</div><div class="kpi-sub">All-time earnings</div></div>
-          <div class="kpi-card"><div class="kpi-label">Total Orders</div><div class="kpi-value" style="color:#34d399">${fNum(data.totalOrders)}</div><div class="kpi-sub">${data.paidOrders} paid</div></div>
-          <div class="kpi-card"><div class="kpi-label">Avg. Order Value</div><div class="kpi-value" style="color:#d4af37">${fCurrency(data.avgOrderValue)}</div><div class="kpi-sub">Per transaction</div></div>
-          <div class="kpi-card"><div class="kpi-label">Products Listed</div><div class="kpi-value" style="color:#a78bfa">${fNum(data.totalProducts)}</div><div class="kpi-sub">${data.availableProducts} available</div></div>
+          <div class="kpi-card"><div class="kpi-label">Total Revenue</div><div class="kpi-value" style="color:#ffffff">${fCurrency(data.totalRevenue)}</div><div class="kpi-sub">All-time earnings</div></div>
+          <div class="kpi-card"><div class="kpi-label">Total Orders</div><div class="kpi-value" style="color:#e5e5e5">${fNum(data.totalOrders)}</div><div class="kpi-sub">${data.paidOrders} paid</div></div>
+          <div class="kpi-card"><div class="kpi-label">Avg. Order Value</div><div class="kpi-value" style="color:#a3a3a3">${fCurrency(data.avgOrderValue)}</div><div class="kpi-sub">Per transaction</div></div>
+          <div class="kpi-card"><div class="kpi-label">Products Listed</div><div class="kpi-value" style="color:#737373">${fNum(data.totalProducts)}</div><div class="kpi-sub">${data.availableProducts} available</div></div>
         </div>
 
         <div class="section">
@@ -326,7 +313,7 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
           <div class="section-title">💳 Payment Summary</div>
           <table>
             <tr><th>Status</th><th>Count</th></tr>
-            <tr><td><span class="pill pill-green">Paid</span></td><td>${data.paymentBreakdown.PAID}</td></tr>
+            <tr><td><span class="pill pill-neutral">Paid</span></td><td>${data.paymentBreakdown.PAID}</td></tr>
             <tr><td>Pending</td><td>${data.paymentBreakdown.PENDING}</td></tr>
             <tr><td>Failed</td><td>${data.paymentBreakdown.FAILED}</td></tr>
             <tr><td>Refunded</td><td>${data.paymentBreakdown.REFUNDED}</td></tr>
@@ -353,29 +340,28 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
       className="h-dvh overflow-hidden flex flex-col bg-background"
     >
       {/* ── Header ── */}
-      <header className="flex-shrink-0 px-6 py-5 lg:px-8 border-b border-border bg-header backdrop-blur-xl">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <header className="flex-shrink-0 px-10 py-8 border-b border-border dark:border-white/5 bg-background/40 backdrop-blur-3xl z-40">
+        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-8">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-foreground">Performance Analytics</h1>
-            <p className="text-muted-foreground mt-1 text-sm">
+            <h1 className="text-4xl font-black tracking-tighter text-foreground dark:text-white uppercase italic">Intelligence Analytics</h1>
+            <p className="text-muted-foreground mt-2 text-[10px] font-black uppercase tracking-[0.2em] opacity-40">
               {hasOrders
-                ? `Real-time insights across ${fNum(data.totalOrders)} orders & ${fNum(data.totalProducts)} products`
-                : "No orders yet — analytics will appear as orders come in"}
+                ? `Active Node: ${fNum(data.totalOrders)} signals processing / ${fNum(data.totalProducts)} assets indexed`
+                : "Awaiting primary transmissions — metrics dormant"}
             </p>
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-4 flex-wrap">
             {/* Timeframe */}
-            <div className="flex items-center bg-muted border border-border rounded-xl p-1 gap-0.5">
+            <div className="flex items-center bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 rounded-2xl p-1.5 backdrop-blur-md">
               {TIMEFRAMES.map((tf) => (
                 <button
                   key={tf}
                   onClick={() => setTimeframe(tf)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 ${
-                    timeframe === tf
-                      ? "bg-primary text-white shadow-lg shadow-primary/30"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                  }`}
+                  className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${timeframe === tf
+                    ? "bg-primary text-primary-foreground dark:shadow-md shadow-none"
+                    : "text-muted-foreground/60 hover:text-foreground dark:text-white hover:bg-black/5 dark:bg-white/10"
+                    }`}
                 >
                   {tf}
                 </button>
@@ -384,28 +370,28 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
 
             {/* Category */}
             <div className="relative">
-              <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+              <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/40 pointer-events-none" />
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="pl-9 pr-8 py-2.5 bg-muted border border-border rounded-xl text-xs text-foreground font-bold focus:outline-none focus:border-primary/40 appearance-none cursor-pointer"
+                className="pl-12 pr-10 py-3 bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 rounded-2xl text-[10px] text-foreground dark:text-white font-black uppercase tracking-widest focus:outline-none focus:border-white/40 appearance-none cursor-pointer hover:bg-black/10 dark:bg-white/15 transition-colors"
               >
                 {availableCategories.map((c) => (
-                  <option key={c} value={c}>
-                    {c === "ALL" ? "All Categories" : (CATEGORY_LABELS[c] ?? c)}
+                  <option key={c} value={c} className="bg-card dark:bg-[#0a0a0a] text-foreground dark:text-white">
+                    {c === "ALL" ? "Global Grid" : (CATEGORY_LABELS[c] ?? c)}
                   </option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground pointer-events-none" />
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground/40 pointer-events-none" />
             </div>
 
             {/* Export PDF */}
             <button
               onClick={handleExport}
-              className="inline-flex items-center gap-2 bg-primary hover:bg-[#0f49bd] active:scale-95 text-white font-bold py-2.5 px-5 rounded-xl shadow-lg shadow-primary/20 transition-all text-sm"
+              className="inline-flex items-center gap-3 bg-primary hover:bg-primary/90 active:scale-95 text-primary-foreground font-black py-3 px-6 rounded-2xl shadow-2xl shadow-white/5 transition-all text-[10px] uppercase tracking-[0.2em] italic"
             >
-              <Download className="w-3.5 h-3.5" />
-              Export PDF
+              <Download className="w-4 h-4" />
+              Generate Signal Report
             </button>
           </div>
         </div>
@@ -416,116 +402,115 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
         <div className="max-w-[1600px] mx-auto space-y-6">
 
           {/* ── KPI Cards ── */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
             <KpiCard
-              label="Total Revenue" icon={DollarSign} accentColor="#135bec" glowColor="#135bec"
-              value={fCurrency(data.totalRevenue)} sub="All-time earnings" trend={data.revenueGrowth}
+              label="Total Revenue" icon={DollarSign} accentColor="#ffffff" glowColor="#ffffff"
+              value={fCurrency(data.totalRevenue)} sub="Gross Signal Capital" trend={data.revenueGrowth}
             />
             <KpiCard
-              label="Total Orders" icon={ShoppingCart} accentColor="#34d399" glowColor="#34d399"
-              value={fNum(data.totalOrders)} sub={`${data.paidOrders} paid orders`} trend={data.orderGrowth}
+              label="Total Orders" icon={ShoppingCart} accentColor="#e5e5e5" glowColor="#e5e5e5"
+              value={fNum(data.totalOrders)} sub={`${data.paidOrders} confirmed transmissions`} trend={data.orderGrowth}
             />
             <KpiCard
-              label="Avg. Order Value" icon={TrendingUp} accentColor="#d4af37" glowColor="#d4af37"
-              value={fCurrency(data.avgOrderValue)} sub="Per transaction"
+              label="Avg. Order Value" icon={TrendingUp} accentColor="#a3a3a3" glowColor="#a3a3a3"
+              value={fCurrency(data.avgOrderValue)} sub="Unit Telemetry Val"
             />
             <KpiCard
-              label="Products Listed" icon={Package} accentColor="#a78bfa" glowColor="#a78bfa"
-              value={fNum(data.totalProducts)} sub={`${data.availableProducts} available · ${data.conversionRate} conv.`}
+              label="Assets Indexed" icon={Package} accentColor="#d4d4d4" glowColor="#d4d4d4"
+              value={fNum(data.totalProducts)} sub={`${data.availableProducts} active · ${data.conversionRate} yield`}
             />
           </div>
 
           {/* ── Revenue Trend Chart ── */}
           <Card>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-8 mb-10">
               <div>
-                <p className="text-foreground font-bold tracking-tight">
-                  {activeMetric === "revenue" ? "Revenue Trend" : "Order Volume Trend"}
+                <p className="text-xl font-black text-foreground dark:text-white uppercase italic tracking-tighter">
+                  {activeMetric === "revenue" ? "Capital Flux" : "Signal Density"}
                 </p>
-                <p className="text-xs text-muted-foreground mt-0.5">
+                <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-1 opacity-40 italic">
                   {filteredMonthly.length > 0
-                    ? `${filteredMonthly[0].label} → ${filteredMonthly[filteredMonthly.length - 1].label}`
-                    : "No data for selected period"}
+                    ? `Temporal Index: ${filteredMonthly[0].label} — ${filteredMonthly[filteredMonthly.length - 1].label}`
+                    : "Telemetry data unavailable"}
                 </p>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="flex bg-muted border border-border rounded-xl p-1 gap-0.5">
+              <div className="flex items-center gap-4">
+                <div className="flex bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 rounded-2xl p-1.5 backdrop-blur-md">
                   {(["revenue", "orderCount"] as const).map((m) => (
                     <button
                       key={m}
                       onClick={() => setActiveMetric(m)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-all ${
-                        activeMetric === m ? "bg-primary text-white" : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                      }`}
+                      className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${activeMetric === m ? "bg-primary text-primary-foreground dark:shadow-md shadow-none" : "text-muted-foreground/60 hover:text-foreground dark:text-white hover:bg-black/5 dark:bg-white/10"
+                        }`}
                     >
-                      {m === "revenue" ? "Revenue" : "Orders"}
+                      {m === "revenue" ? "Revenue" : "Signals"}
                     </button>
                   ))}
                 </div>
-                <div className="flex bg-muted border border-border rounded-xl p-1 gap-0.5">
+                <div className="flex bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 rounded-2xl p-1.5 backdrop-blur-md">
                   <button
                     onClick={() => setChartMode("area")}
-                    className={`p-2 rounded-lg transition-all ${chartMode === "area" ? "bg-primary text-white" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}
+                    className={`p-2.5 rounded-xl transition-all duration-300 ${chartMode === "area" ? "bg-primary text-primary-foreground dark:shadow-md shadow-none" : "text-muted-foreground/60 hover:text-foreground dark:text-white hover:bg-black/5 dark:bg-white/10"}`}
                   >
-                    <Activity className="w-3.5 h-3.5" />
+                    <Activity className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => setChartMode("bar")}
-                    className={`p-2 rounded-lg transition-all ${chartMode === "bar" ? "bg-primary text-white" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}
+                    className={`p-2.5 rounded-xl transition-all duration-300 ${chartMode === "bar" ? "bg-primary text-primary-foreground dark:shadow-md shadow-none" : "text-muted-foreground/60 hover:text-foreground dark:text-white hover:bg-black/5 dark:bg-white/10"}`}
                   >
-                    <BarChart2 className="w-3.5 h-3.5" />
+                    <BarChart2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>
             </div>
 
-            <div className="h-64">
+            <div className="h-80">
               {filteredMonthly.length === 0 ? (
-                <EmptyChart icon={Activity} message="No data for selected timeframe" />
+                <EmptyChart icon={Activity} message="Sensor data unavailable for selected index" />
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
                   {chartMode === "area" ? (
                     <AreaChart data={filteredMonthly} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                       <defs>
                         <linearGradient id="grad1" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor={activeMetric === "revenue" ? "#135bec" : "#34d399"} stopOpacity={0.25} />
-                          <stop offset="100%" stopColor={activeMetric === "revenue" ? "#135bec" : "#34d399"} stopOpacity={0} />
+                          <stop offset="0%" stopColor="#ffffff" stopOpacity={0.15} />
+                          <stop offset="100%" stopColor="#ffffff" stopOpacity={0} />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-border" opacity={0.4} vertical={false} />
-                       <XAxis dataKey="label" tick={{ fill: "currentColor", fontSize: 11 }} className="text-muted-foreground" axisLine={false} tickLine={false} />
-                       <YAxis
-                         tick={{ fill: "currentColor", fontSize: 11 }} className="text-muted-foreground" axisLine={false} tickLine={false} width={70}
-                         tickFormatter={(v) => activeMetric === "revenue" ? fCurrency(v) : fNum(v)}
-                       />
-                      <Tooltip content={<ChartTooltip />} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#ffffff" opacity={0.05} vertical={false} />
+                      <XAxis dataKey="label" tick={{ fill: "#ffffff", fontSize: 10, fontWeight: 900 }} axisLine={false} tickLine={false} dy={10} />
+                      <YAxis
+                        tick={{ fill: "#ffffff", fontSize: 10, fontWeight: 900 }} axisLine={false} tickLine={false} width={80}
+                        tickFormatter={(v) => activeMetric === "revenue" ? fCurrency(v) : fNum(v)}
+                      />
+                      <Tooltip content={<ChartTooltip />} cursor={{ stroke: '#ffffff', strokeWidth: 1, strokeDasharray: '4 4' }} />
                       <Area
                         type="monotone" dataKey={activeMetric}
-                        name={activeMetric === "revenue" ? "Revenue" : "Orders"}
-                        stroke={activeMetric === "revenue" ? "#135bec" : "#34d399"}
-                        strokeWidth={2.5} fill="url(#grad1)"
+                        name={activeMetric === "revenue" ? "revenue" : "signals"}
+                        stroke="#ffffff"
+                        strokeWidth={3} fill="url(#grad1)"
                         dot={false}
-                        activeDot={{ r: 5, strokeWidth: 2, stroke: "#fff", fill: activeMetric === "revenue" ? "#135bec" : "#34d399" }}
+                        activeDot={{ r: 6, strokeWidth: 0, fill: "#ffffff" }}
                       />
                     </AreaChart>
                   ) : (
-                    <BarChart data={filteredMonthly} margin={{ top: 10, right: 10, left: 0, bottom: 0 }} barSize={28}>
+                    <BarChart data={filteredMonthly} margin={{ top: 10, right: 10, left: 0, bottom: 0 }} barSize={32}>
                       <defs>
                         <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor={activeMetric === "revenue" ? "#135bec" : "#34d399"} stopOpacity={1} />
-                          <stop offset="100%" stopColor={activeMetric === "revenue" ? "#135bec" : "#34d399"} stopOpacity={0.6} />
+                          <stop offset="0%" stopColor="#ffffff" stopOpacity={1} />
+                          <stop offset="100%" stopColor="#ffffff" stopOpacity={0.4} />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-border" opacity={0.4} vertical={false} />
-                      <XAxis dataKey="label" tick={{ fill: "currentColor", fontSize: 11 }} className="text-muted-foreground" axisLine={false} tickLine={false} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#ffffff" opacity={0.05} vertical={false} />
+                      <XAxis dataKey="label" tick={{ fill: "#ffffff", fontSize: 10, fontWeight: 900 }} axisLine={false} tickLine={false} dy={10} />
                       <YAxis
-                        tick={{ fill: "currentColor", fontSize: 11 }} className="text-muted-foreground" axisLine={false} tickLine={false} width={70}
+                        tick={{ fill: "#ffffff", fontSize: 10, fontWeight: 900 }} axisLine={false} tickLine={false} width={80}
                         tickFormatter={(v) => activeMetric === "revenue" ? fCurrency(v) : fNum(v)}
                       />
-                      <Tooltip content={<ChartTooltip />} cursor={{ fill: "currentColor", opacity: 0.05, radius: 8 } as any} />
+                      <Tooltip content={<ChartTooltip />} cursor={{ fill: "rgba(255,255,255,0.03)", radius: 12 } as any} />
                       <Bar
-                        dataKey={activeMetric} name={activeMetric === "revenue" ? "Revenue" : "Orders"}
-                        fill="url(#barGrad)" radius={[8, 8, 0, 0]}
+                        dataKey={activeMetric} name={activeMetric === "revenue" ? "revenue" : "signals"}
+                        fill="url(#barGrad)" radius={[10, 10, 0, 0]}
                       />
                     </BarChart>
                   )}
@@ -535,63 +520,63 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
           </Card>
 
           {/* ── Row: Category + Top Products ── */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
             {/* Category donut */}
             <Card className="lg:col-span-5">
-              <CardHeader title="Revenue by Category" subtitle="Distribution across product segments" />
+              <CardHeader title="Sector Distribution" subtitle="System-wide asset categorization" />
               {filteredCategories.length === 0 ? (
-                <EmptyChart icon={Layers} message="No category data available" />
+                <EmptyChart icon={Layers} message="Telemetry data dormant" />
               ) : (
                 <>
-                  <div className="h-52">
+                  <div className="h-64">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <defs>
                           {filteredCategories.map((_, i) => (
                             <radialGradient key={i} id={`catGrad${i}`} cx="50%" cy="50%" r="50%">
                               <stop offset="0%" stopColor={PALETTE[i % PALETTE.length]} stopOpacity={1} />
-                              <stop offset="100%" stopColor={PALETTE[i % PALETTE.length]} stopOpacity={0.6} />
+                              <stop offset="100%" stopColor={PALETTE[i % PALETTE.length]} stopOpacity={0.4} />
                             </radialGradient>
                           ))}
                         </defs>
                         <Pie
                           data={filteredCategories} cx="50%" cy="50%"
-                          innerRadius={60} outerRadius={90} paddingAngle={3}
+                          innerRadius={70} outerRadius={100} paddingAngle={4}
                           dataKey="revenue" nameKey="category"
                           stroke="none"
                         >
                           {filteredCategories.map((_, i) => (
-                            <Cell key={i} fill={`url(#catGrad${i})`} style={{ filter: `drop-shadow(0 0 6px ${PALETTE[i % PALETTE.length]}60)` }} />
+                            <Cell key={i} fill={`url(#catGrad${i})`} style={{ filter: `drop-shadow(0 0 10px ${PALETTE[i % PALETTE.length]}40)` }} />
                           ))}
                         </Pie>
                         <Tooltip content={({ active, payload }) => {
                           if (!active || !payload?.length) return null;
                           const p = payload[0];
-                            return (
-                              <div className="bg-card border border-border rounded-xl px-4 py-3 shadow-2xl">
-                                <p className="text-xs text-muted-foreground">
-                                  {p.name ? (CATEGORY_LABELS[p.name as string] ?? p.name) : "Unknown"}
-                                </p>
-                                <p className="text-sm font-black text-foreground mt-1">{fCurrency(p.value as number)}</p>
-                                <p className="text-xs text-muted-foreground/60">{p.payload.orderCount} orders</p>
-                              </div>
-                            );
+                          return (
+                            <div className="bg-black/90 border border-border dark:border-white/10 rounded-2xl px-5 py-4 shadow-xl dark:shadow-2xl backdrop-blur-xl">
+                              <p className="text-[10px] text-muted-foreground mb-2 font-black uppercase tracking-widest italic">
+                                {p.name ? (CATEGORY_LABELS[p.name as string] ?? p.name) : "NULL_ENTITY"}
+                              </p>
+                              <p className="text-sm font-black text-foreground dark:text-white italic">{fCurrency(p.value as number)}</p>
+                              <p className="text-[9px] text-muted-foreground/40 font-black uppercase tracking-widest mt-1">Signals: {p.payload.orderCount}</p>
+                            </div>
+                          );
                         }} />
                       </PieChart>
                     </ResponsiveContainer>
                   </div>
 
-                  <div className="mt-3 space-y-2">
+                  <div className="mt-8 space-y-3">
                     {filteredCategories.map((c, i) => {
                       const total = filteredCategories.reduce((a, x) => a + x.revenue, 0);
                       const pct = total > 0 ? ((c.revenue / total) * 100).toFixed(1) : "0";
                       return (
-                        <div key={c.category} className="flex items-center gap-3 group">
-                          <span className="size-2 rounded-full flex-shrink-0 shadow-lg" style={{ background: PALETTE[i % PALETTE.length], boxShadow: `0 0 8px ${PALETTE[i % PALETTE.length]}80` }} />
-                          <span className="text-xs text-muted-foreground flex-1">{CATEGORY_LABELS[c.category] ?? c.category}</span>
-                          <span className="text-[10px] text-muted-foreground/60">{c.orderCount} orders</span>
-                          <span className="text-xs font-bold text-foreground w-10 text-right">{pct}%</span>
+                        <div key={c.category} className="flex items-center gap-4 group">
+                          <span className="w-2.5 h-2.5 rounded-full flex-shrink-0 dark:shadow-md shadow-none" style={{ background: PALETTE[i % PALETTE.length] }} />
+                          <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex-1 group-hover:text-foreground dark:text-white transition-colors italic">{CATEGORY_LABELS[c.category] ?? c.category}</span>
+                          <span className="text-[9px] text-muted-foreground/20 font-black uppercase tracking-tighter">[{c.orderCount} SIG]</span>
+                          <span className="text-[10px] font-black text-foreground dark:text-white w-12 text-right italic">{pct}%</span>
                         </div>
                       );
                     })}
@@ -602,41 +587,41 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
 
             {/* Top 5 Products */}
             <Card className="lg:col-span-7">
-              <CardHeader title="Top 5 Products" subtitle="Ranked by revenue generated" />
+              <CardHeader title="Strategic Assets" subtitle="High-yield telemetry ranking" />
               {data.topProducts.length === 0 ? (
-                <EmptyChart icon={Package} message="No product sales data yet" />
+                <EmptyChart icon={Package} message="No archival data available" />
               ) : (
-                <div className="space-y-5">
+                <div className="space-y-8">
                   {data.topProducts.map((p, i) => {
                     const maxRev = Math.max(...data.topProducts.map((x) => x.revenue), 1);
                     const pct = (p.revenue / maxRev) * 100;
                     const color = PALETTE[i % PALETTE.length];
                     return (
-                      <div key={p.id}>
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-3">
+                      <div key={p.id} className="group">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-5">
                             <div
-                              className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black flex-shrink-0"
-                              style={{ background: `${color}20`, color, border: `1px solid ${color}40` }}
+                              className="w-10 h-10 rounded-xl flex items-center justify-center text-[10px] font-black flex-shrink-0 border transition-all group-hover:scale-110"
+                              style={{ background: `${color}10`, color, borderColor: `${color}20` }}
                             >
-                              {i + 1}
+                              0{i + 1}
                             </div>
                             <div>
-                              <p className="text-sm text-foreground font-semibold leading-tight">{p.name}</p>
-                              <p className="text-[10px] text-muted-foreground">
-                                {CATEGORY_LABELS[p.category] ?? p.category} · {p.orderCount} orders
+                              <p className="text-sm text-foreground dark:text-white font-black uppercase italic tracking-tighter group-hover:translate-x-1 transition-transform">{p.name}</p>
+                              <p className="text-[9px] text-muted-foreground font-black uppercase tracking-[0.2em] mt-1 opacity-40">
+                                {CATEGORY_LABELS[p.category] ?? p.category} · {p.orderCount} transmissions
                               </p>
                             </div>
                           </div>
-                          <p className="text-sm font-black" style={{ color }}>{fCurrency(p.revenue)}</p>
+                          <p className="text-lg font-black italic uppercase" style={{ color }}>{fCurrency(p.revenue)}</p>
                         </div>
-                        <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+                        <div className="h-1.5 w-full bg-black/5 dark:bg-white/10 rounded-full overflow-hidden p-[1px] border border-border dark:border-white/5">
                           <div
-                            className="h-full rounded-full transition-all duration-700"
+                            className="h-full rounded-full transition-all duration-1000 delay-300"
                             style={{
                               width: `${pct}%`,
-                              background: `linear-gradient(90deg, ${color}, ${color}70)`,
-                              boxShadow: `0 0 8px ${color}60`,
+                              background: `linear-gradient(90deg, ${color}, ${color}40)`,
+                              boxShadow: `0 0 15px ${color}30`,
                             }}
                           />
                         </div>
@@ -650,40 +635,42 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
 
           {/* ── Geographic Breakdown ── */}
           <Card>
-            <div className="flex items-center gap-2 mb-5">
-              <Globe className="w-4 h-4 text-primary" />
-              <p className="text-foreground font-bold tracking-tight">Geographic Breakdown</p>
-              <span className="ml-auto text-xs text-muted-foreground">{data.geographicData.length} countries</span>
+            <div className="flex items-center gap-4 mb-10">
+              <Globe className="w-5 h-5 text-foreground dark:text-white animate-pulse" />
+              <div>
+                <p className="text-xl font-black text-foreground dark:text-white uppercase italic tracking-tighter">Geographic Distribution</p>
+                <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-1 opacity-40 italic">Global Grid Coverage: {data.geographicData.length} active nodes</p>
+              </div>
             </div>
 
             {data.geographicData.length === 0 ? (
-              <EmptyChart icon={Globe} message="No geographic data yet" />
+              <EmptyChart icon={Globe} message="Global telemetry data dormant" />
             ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                 {/* Full-height bar chart */}
-                <div style={{ height: Math.max(data.geographicData.length * 52, 200) }}>
+                <div style={{ height: Math.max(data.geographicData.length * 60, 300) }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                       data={data.geographicData} layout="vertical"
-                      margin={{ top: 4, right: 24, left: 4, bottom: 4 }} barSize={22}
+                      margin={{ top: 4, right: 32, left: 4, bottom: 4 }} barSize={28}
                     >
                       <defs>
                         {data.geographicData.map((_, i) => (
                           <linearGradient key={i} id={`geoGrad${i}`} x1="0" y1="0" x2="1" y2="0">
                             <stop offset="0%" stopColor={PALETTE[i % PALETTE.length]} stopOpacity={1} />
-                            <stop offset="100%" stopColor={PALETTE[i % PALETTE.length]} stopOpacity={0.4} />
+                            <stop offset="100%" stopColor={PALETTE[i % PALETTE.length]} stopOpacity={0.2} />
                           </linearGradient>
                         ))}
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-border" opacity={0.4} horizontal={false} />
-                      <XAxis type="number" tick={{ fill: "currentColor", fontSize: 10 }} className="text-muted-foreground" axisLine={false} tickLine={false} tickFormatter={fCurrency} />
-                      <YAxis type="category" dataKey="country" tick={{ fill: "currentColor", fontSize: 12 }} className="text-foreground" axisLine={false} tickLine={false} width={110} />
-                      <Tooltip content={<ChartTooltip />} cursor={{ fill: "currentColor", opacity: 0.05 }} />
-                      <Bar dataKey="revenue" name="Revenue" radius={[0, 8, 8, 0]}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#ffffff" opacity={0.05} horizontal={false} />
+                      <XAxis type="number" tick={{ fill: "#ffffff", fontSize: 10, fontWeight: 900 }} axisLine={false} tickLine={false} tickFormatter={fCurrency} />
+                      <YAxis type="category" dataKey="country" tick={{ fill: "#ffffff", fontSize: 11, fontWeight: 900 }} axisLine={false} tickLine={false} width={120} />
+                      <Tooltip content={<ChartTooltip />} cursor={{ fill: "rgba(255,255,255,0.03)", radius: 8 }} />
+                      <Bar dataKey="revenue" name="revenue" radius={[0, 10, 10, 0]}>
                         {data.geographicData.map((_, i) => (
                           <Cell
                             key={i} fill={`url(#geoGrad${i})`}
-                            style={{ filter: `drop-shadow(2px 0 6px ${PALETTE[i % PALETTE.length]}40)` }}
+                            style={{ filter: `drop-shadow(4px 0 10px ${PALETTE[i % PALETTE.length]}30)` }}
                           />
                         ))}
                       </Bar>
@@ -692,25 +679,25 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
                 </div>
 
                 {/* Country list */}
-                <div className="space-y-2 overflow-y-auto max-h-96 pr-1">
+                <div className="space-y-3 overflow-y-auto max-h-[500px] pr-2 custom-scrollbar">
                   {data.geographicData.map((g, i) => (
                     <div
                       key={g.country}
-                      className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border hover:border-primary/20 hover:bg-muted/50 transition-all group"
+                      className="flex items-center gap-4 p-5 rounded-2xl bg-white/[0.02] border border-border dark:border-white/5 hover:border-border dark:border-white/10 hover:bg-white/[0.05] transition-all group"
                     >
                       <div
-                        className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black flex-shrink-0"
-                        style={{ background: `${PALETTE[i % PALETTE.length]}20`, color: PALETTE[i % PALETTE.length] }}
+                        className="w-10 h-10 rounded-xl flex items-center justify-center text-[10px] font-black flex-shrink-0 border transition-all"
+                        style={{ background: `${PALETTE[i % PALETTE.length]}10`, color: PALETTE[i % PALETTE.length], borderColor: `${PALETTE[i % PALETTE.length]}20` }}
                       >
-                        #{i + 1}
+                        {i < 9 ? `0${i + 1}` : i + 1}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-foreground truncate">{g.country}</p>
-                        <p className="text-[10px] text-muted-foreground">{g.orderCount} orders</p>
+                        <p className="text-xs font-black text-foreground dark:text-white uppercase italic tracking-wider truncate">{g.country}</p>
+                        <p className="text-[9px] text-muted-foreground font-black uppercase tracking-[0.2em] mt-1 opacity-40">{g.orderCount} transmissions</p>
                       </div>
                       <div className="text-right flex-shrink-0">
-                        <p className="text-sm font-black" style={{ color: PALETTE[i % PALETTE.length] }}>{fCurrency(g.revenue)}</p>
-                        <p className="text-[10px] text-muted-foreground/60">{((g.revenue / maxGeo) * 100).toFixed(1)}% share</p>
+                        <p className="text-sm font-black italic uppercase" style={{ color: PALETTE[i % PALETTE.length] }}>{fCurrency(g.revenue)}</p>
+                        <p className="text-[9px] text-muted-foreground/20 font-black uppercase tracking-tighter mt-1">{((g.revenue / maxGeo) * 100).toFixed(1)}% Share</p>
                       </div>
                     </div>
                   ))}
@@ -720,40 +707,43 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
           </Card>
 
           {/* ── Payment Status (detailed) + Order Status ── */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
             {/* Payment detailed */}
             <Card className="lg:col-span-7">
-              <div className="flex items-center gap-2 mb-5">
-                <CreditCard className="w-4 h-4 text-emerald-400" />
-                <p className="text-foreground font-bold tracking-tight">Payment Status</p>
+              <div className="flex items-center gap-4 mb-10">
+                <CreditCard className="w-5 h-5 text-foreground dark:text-white" />
+                <div>
+                  <p className="text-xl font-black text-foreground dark:text-white uppercase italic tracking-tighter">Capital Settlement</p>
+                  <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-1 opacity-40 italic">Signal Liquidity Status</p>
+                </div>
               </div>
 
               {data.totalOrders === 0 ? (
-                <EmptyChart icon={CreditCard} message="No payment data yet" />
+                <EmptyChart icon={CreditCard} message="Payment telemetry dormant" />
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-10">
                   {/* Donut */}
-                  <div className="h-52 relative">
+                  <div className="h-64 relative">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <defs>
                           {paymentDonutData.map((d, i) => (
                             <radialGradient key={i} id={`payGrad${i}`} cx="50%" cy="50%" r="50%">
                               <stop offset="0%" stopColor={d.color} stopOpacity={1} />
-                              <stop offset="100%" stopColor={d.color} stopOpacity={0.5} />
+                              <stop offset="100%" stopColor={d.color} stopOpacity={0.4} />
                             </radialGradient>
                           ))}
                         </defs>
                         <Pie
                           data={paymentDonutData} cx="50%" cy="50%"
-                          innerRadius={55} outerRadius={80} paddingAngle={4}
+                          innerRadius={70} outerRadius={100} paddingAngle={6}
                           dataKey="value" stroke="none"
                         >
                           {paymentDonutData.map((d, i) => (
                             <Cell
                               key={i} fill={`url(#payGrad${i})`}
-                              style={{ filter: `drop-shadow(0 0 8px ${d.color}50)` }}
+                              style={{ filter: `drop-shadow(0 0 15px ${d.color}30)` }}
                             />
                           ))}
                         </Pie>
@@ -761,9 +751,9 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
                           if (!active || !payload?.length) return null;
                           const p = payload[0];
                           return (
-                            <div className="bg-card border border-border rounded-xl px-4 py-3 shadow-2xl">
-                              <p className="text-xs font-bold" style={{ color: p.payload.color }}>{p.name}</p>
-                              <p className="text-sm font-black text-foreground">{fNum(p.value as number)} orders</p>
+                            <div className="bg-black/90 border border-border dark:border-white/10 rounded-2xl px-5 py-4 shadow-xl dark:shadow-2xl backdrop-blur-xl">
+                              <p className="text-[10px] font-black uppercase tracking-[0.2em] italic mb-1" style={{ color: p.payload.color }}>{p.name}</p>
+                              <p className="text-sm font-black text-foreground dark:text-white italic">{fNum(p.value as number)} transmissions</p>
                             </div>
                           );
                         }} />
@@ -771,40 +761,37 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
                     </ResponsiveContainer>
                     {/* Centre label */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                      <p className="text-2xl font-black text-emerald-400">{data.paymentBreakdown.PAID}</p>
-                      <p className="text-[10px] text-muted-foreground font-medium">Paid</p>
+                      <p className="text-4xl font-black text-foreground dark:text-white italic">{data.paymentBreakdown.PAID}</p>
+                      <p className="text-[9px] text-muted-foreground font-black uppercase tracking-[0.3em] mt-1 opacity-40">Confirmed</p>
                     </div>
                   </div>
 
                   {/* Breakdown cards */}
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {[
-                      { label: "Paid", count: data.paymentBreakdown.PAID, rev: data.paidRevenue, color: "#34d399", icon: CheckCircle2 },
-                      { label: "Pending", count: data.paymentBreakdown.PENDING, rev: data.pendingRevenue, color: "#d4af37", icon: Clock },
-                      { label: "Failed", count: data.paymentBreakdown.FAILED, rev: 0, color: "#fb7185", icon: XCircle },
-                      { label: "Refunded", count: data.paymentBreakdown.REFUNDED, rev: 0, color: "#a78bfa", icon: AlertCircle },
-                    ].filter((s) => s.count > 0 || s.label === "Paid").map((s) => {
-                      const Icon = s.icon;
-                      return (
-                        <div
-                          key={s.label}
-                          className="flex items-center gap-3 p-3 rounded-xl border transition-all hover:scale-[1.01]"
-                          style={{ background: `${s.color}08`, borderColor: `${s.color}25` }}
-                        >
-                          <Icon className="w-4 h-4 flex-shrink-0" style={{ color: s.color }} />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs font-bold" style={{ color: s.color }}>{s.label}</p>
-                            {s.rev > 0 && <p className="text-[10px] text-muted-foreground">{fCurrency(s.rev)}</p>}
-                          </div>
-                          <div className="text-right">
-                            <p className="text-sm font-black text-foreground">{fNum(s.count)}</p>
-                            <p className="text-[10px] text-muted-foreground">
-                              {data.totalOrders > 0 ? ((s.count / data.totalOrders) * 100).toFixed(1) : 0}%
-                            </p>
-                          </div>
+                      { label: "Confirmed", count: data.paymentBreakdown.PAID, rev: data.paidRevenue, color: "#ffffff", icon: CheckCircle2 },
+                      { label: "Pending", count: data.paymentBreakdown.PENDING, rev: data.pendingRevenue, color: "#a3a3a3", icon: Clock },
+                      { label: "Failed", count: data.paymentBreakdown.FAILED, rev: 0, color: "#737373", icon: XCircle },
+                      { label: "Refunded", count: data.paymentBreakdown.REFUNDED, rev: 0, color: "#525252", icon: AlertCircle },
+                    ].filter((s) => s.count > 0 || s.label === "Confirmed").map((s) => (
+                      <div
+                        key={s.label}
+                        className="flex items-center gap-4 p-4 rounded-2xl border transition-all hover:bg-white/[0.02]"
+                        style={{ background: `${s.color}05`, borderColor: `${s.color}15` }}
+                      >
+                        <s.icon className="w-5 h-5 flex-shrink-0" style={{ color: s.color }} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[10px] font-black uppercase tracking-widest italic" style={{ color: s.color }}>{s.label}</p>
+                          {s.rev > 0 && <p className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-tighter mt-1">{fCurrency(s.rev)}</p>}
                         </div>
-                      );
-                    })}
+                        <div className="text-right">
+                          <p className="text-lg font-black text-foreground dark:text-white italic">{fNum(s.count)}</p>
+                          <p className="text-[9px] font-black text-muted-foreground/20 uppercase tracking-tighter">
+                            {data.totalOrders > 0 ? ((s.count / data.totalOrders) * 100).toFixed(1) : 0}% Yield
+                          </p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
@@ -813,7 +800,7 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
             {/* Order Status */}
             <Card className="lg:col-span-5">
               <div className="flex items-center gap-2 mb-5">
-                <Truck className="w-4 h-4 text-cyan-400" />
+                <Truck className="w-4 h-4 text-foreground dark:text-white" />
                 <p className="text-foreground font-bold tracking-tight">Order Pipeline</p>
               </div>
 
@@ -822,43 +809,42 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
               ) : (
                 <div className="space-y-3">
                   {[
-                    { label: "Delivered", count: data.orderStatusBreakdown.DELIVERED, color: "#34d399", icon: CheckCircle2 },
-                    { label: "Shipped", count: data.orderStatusBreakdown.SHIPPED, color: "#22d3ee", icon: Truck },
-                    { label: "Processing", count: data.orderStatusBreakdown.PROCESSING, color: "#a78bfa", icon: RefreshCw },
-                    { label: "Confirmed", count: data.orderStatusBreakdown.CONFIRMED, color: "#135bec", icon: CheckCircle2 },
-                    { label: "Pending", count: data.orderStatusBreakdown.PENDING, color: "#d4af37", icon: Clock },
-                    { label: "Cancelled", count: data.orderStatusBreakdown.CANCELLED, color: "#fb7185", icon: XCircle },
-                  ].map((s) => {
-                    const Icon = s.icon;
-                    return (
-                      <div key={s.label} className="flex items-center gap-3">
-                        <Icon className="w-3.5 h-3.5 flex-shrink-0" style={{ color: s.color }} />
-                        <span className="text-xs text-muted-foreground w-20 flex-shrink-0">{s.label}</span>
-                        <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-                          <div
-                            className="h-full rounded-full transition-all duration-700"
-                            style={{
-                              width: `${data.totalOrders > 0 ? (s.count / data.totalOrders) * 100 : 0}%`,
-                              background: `linear-gradient(90deg, ${s.color}, ${s.color}60)`,
-                              boxShadow: s.count > 0 ? `0 0 8px ${s.color}50` : "none",
-                            }}
-                          />
-                        </div>
-                        <span className="text-xs font-bold text-foreground w-6 text-right flex-shrink-0">{s.count}</span>
+
+                    { label: "Delivered", count: data.orderStatusBreakdown.DELIVERED, color: "#ffffff", icon: CheckCircle2 },
+                    { label: "Shipped", count: data.orderStatusBreakdown.SHIPPED, color: "#e5e5e5", icon: Truck },
+                    { label: "Processing", count: data.orderStatusBreakdown.PROCESSING, color: "#a3a3a3", icon: RefreshCw },
+                    { label: "Confirmed", count: data.orderStatusBreakdown.CONFIRMED, color: "#737373", icon: CheckCircle2 },
+                    { label: "Pending", count: data.orderStatusBreakdown.PENDING, color: "#525252", icon: Clock },
+                    { label: "Cancelled", count: data.orderStatusBreakdown.CANCELLED, color: "#262626", icon: XCircle },
+                  ].map((s) => (
+                    <div key={s.label} className="flex items-center gap-3">
+                      <s.icon className="w-3.5 h-3.5 flex-shrink-0" style={{ color: s.color }} />
+                      <span className="text-xs text-muted-foreground w-20 flex-shrink-0">{s.label}</span>
+                      <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all duration-700"
+                          style={{
+                            width: `${data.totalOrders > 0 ? (s.count / data.totalOrders) * 100 : 0}%`,
+                            background: `linear-gradient(90deg, ${s.color}, ${s.color}60)`,
+                            boxShadow: s.count > 0 ? `0 0 8px ${s.color}50` : "none",
+                          }}
+                        />
+
                       </div>
-                    );
-                  })}
+                      <span className="text-xs font-black text-foreground dark:text-white w-6 text-right flex-shrink-0">{s.count}</span>
+                    </div>
+                  ))}
 
                   {/* Shipment mini summary */}
                   {Object.values(data.shipmentBreakdown).some((v) => v > 0) && (
-                    <div className="mt-4 pt-4 border-t border-white/5">
+                    <div className="mt-4 pt-4 border-t border-border dark:border-white/5">
                       <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-3">Shipments</p>
                       <div className="grid grid-cols-2 gap-2">
                         {[
-                          { label: "In Transit", count: data.shipmentBreakdown.IN_TRANSIT, color: "#22d3ee" },
-                          { label: "Delivered", count: data.shipmentBreakdown.DELIVERED, color: "#34d399" },
-                          { label: "Customs", count: data.shipmentBreakdown.CUSTOMS, color: "#a78bfa" },
-                          { label: "Returned", count: data.shipmentBreakdown.RETURNED, color: "#fb7185" },
+                          { label: "In Transit", count: data.shipmentBreakdown.IN_TRANSIT, color: "#ffffff" },
+                          { label: "Delivered", count: data.shipmentBreakdown.DELIVERED, color: "#e5e5e5" },
+                          { label: "Customs", count: data.shipmentBreakdown.CUSTOMS, color: "#a3a3a3" },
+                          { label: "Returned", count: data.shipmentBreakdown.RETURNED, color: "#525252" },
                         ].filter((s) => s.count > 0).map((s) => (
                           <div key={s.label} className="flex items-center gap-2 p-2 rounded-lg bg-muted/30 border border-border">
                             <span className="size-1.5 rounded-full" style={{ background: s.color }} />
@@ -879,3 +865,5 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
     </div>
   );
 }
+
+

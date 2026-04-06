@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
 import { getApiAuthContext } from "@/lib/supabase/auth";
+import { validateFileUpload } from "@/lib/upload-validation";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -16,7 +17,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (auth.role !== "EXPORTER") {
+    if (auth.role !== "EXPORTER" && auth.role !== "ADMIN") {
       return NextResponse.json({ error: "Access denied. Exporters only." }, { status: 403 });
     }
 
@@ -27,16 +28,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    // Validate file type
-    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
-    if (!allowedTypes.includes(file.type)) {
-      return NextResponse.json({ error: "Invalid file format. Only JPG, PNG, and WEBP are allowed." }, { status: 400 });
-    }
-
-    // Validate file size (e.g., 5MB limit)
-    const maxSize = 5 * 1024 * 1024;
-    if (file.size > maxSize) {
-      return NextResponse.json({ error: "Image size must be less than 5MB" }, { status: 400 });
+    const validation = validateFileUpload(file, "productImage");
+    if (!validation.isValid) {
+      return NextResponse.json({ error: validation.error }, { status: 400 });
     }
 
     const bytes = await file.arrayBuffer();
@@ -57,7 +51,7 @@ export async function POST(req: NextRequest) {
   } catch (error: any) {
     console.error("Upload error:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to upload file to Cloudinary" },
+      { error: error.message || "Failed to upload file" },
       { status: 500 }
     );
   }

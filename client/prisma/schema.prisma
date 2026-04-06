@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
 }
 
 datasource db {
@@ -9,175 +10,309 @@ datasource db {
 }
 
 model User {
-  id                  String         @id @default(uuid())
+  id                  String             @id @default(uuid())
+  email               String             @unique
+  role                Role               @default(USER)
+  verificationStatus  VerificationStatus @default(PENDING)
+  businessName        String?
+  b2bActive           Boolean            @default(false)
+  b2cActive           Boolean            @default(false)
+  preferredCurrency   String             @default("USD")
+  budgetLimit         Float?
+  contactInfo         Json?
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
   name                String?
-  email               String         @unique
   password            String?
-  role                Role           @default(IMPORTER)
-  companyName         String?
+  avatar              String?
   country             String?
   phone               String?
-  website             String?
-  businessType        String?
-  taxId               String?
-  address             String?
-  verified            Boolean        @default(false)
-  avatar              String?
-  createdAt           DateTime       @default(now())
-  updatedAt           DateTime       @updatedAt
-  businessHours       Json?          @default("{}")
-  description         String?
-  monthlyBudget       Float          @default(0)
-  preferredCategories String[]       @default([])
-  socialLinks         Json?          @default("{}")
   deletedAt           DateTime?
+  address             String?
+  cart                Cart?
   documents           Document[]
-  receivedMessages    Message[]      @relation("Receiver")
-  sentMessages        Message[]      @relation("Sender")
+  requestedCalls      CallSchedule[]     @relation("CallRequester")
+  receivedCalls       CallSchedule[]     @relation("CallReceiver")
+  outgoingSessions    CallSession[]      @relation("CallCaller")
+  incomingSessions    CallSession[]      @relation("CallCallee")
+  messagesReceived    Message[]          @relation("MessagesReceived")
+  messagesSent        Message[]          @relation("MessagesSent")
   notifications       Notification[]
-  orders              Order[]        @relation("ImporterOrders")
-  exportedProducts    Product[]      @relation("ExporterProducts")
-  shipments           Shipment[]
-  suppliers           Supplier[]
-  wishlist            Wishlist[]
+  ordersAsBuyer       Order[]            @relation("BuyerOrders")
+  ordersAsSeller      Order[]            @relation("SellerOrders")
+  products            Product[]          @relation("ExporterProducts")
+  suppliersAsExporter Supplier[]         @relation("ExporterSuppliers")
+  suppliersAsImporter Supplier[]         @relation("ImporterSuppliers")
 
   @@map("users")
 }
 
 model Product {
-  id               String         @id @default(uuid())
+  id               String                   @id @default(uuid())
   exporterId       String
   name             String
   description      String
-  price            Float
-  regularPrice     Float          @default(0)
-  minOrderQty      Int
-  unit             String
-  originCountry    String
-  hsCode           String?
-  images           String[]
-  certifications   String[]
-  available        Boolean        @default(true)
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
-  quantity         Int            @default(0)
-  trustDocumentUrl String?
   category         ProductCategory
+  moq              Int                      @default(1)
+  minOrderQty      Int                      @default(1)
+  b2bPrice         Float?
+  b2cPrice         Float?
+  price            Float                    @default(0)
+  regularPrice     Float                    @default(0)
+  currency         String                   @default("USD")
+  unit             String                   @default("")
+  isDualListed     Boolean                  @default(false)
+  stockQty         Int                      @default(0)
+  hsCode           String?
+  originCountry    String
+  searchVector     Unsupported("tsvector")?
+  certifications   String[]                 @default([])
+  images           String[]                 @default([])
+  available        Boolean                  @default(true)
+  trustDocumentUrl String?
+  createdAt        DateTime                 @default(now())
+  updatedAt        DateTime                 @updatedAt
   deletedAt        DateTime?
-  orders           Order[]        @relation("ProductToOrder")
+  cartItems        CartItem[]
+  orders           Order[]                  @relation("ProductOrders")
   priceHistory     PriceHistory[]
-  exporter         User           @relation("ExporterProducts", fields: [exporterId], references: [id], onDelete: Cascade)
-  wishlistedBy     Wishlist[]
+  exporter         User                     @relation("ExporterProducts", fields: [exporterId], references: [id])
 
+  @@index([searchVector], type: Gin)
   @@map("products")
 }
 
-model Order {
-  id            String        @id @default(uuid())
-  orderNumber   String        @unique
-  importerId    String
-  totalPrice    Float
-  currency      String        @default("USD")
-  status        OrderStatus   @default(PENDING)
-  paymentStatus PaymentStatus @default(PENDING)
-  notes         String?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+model PriceHistory {
+  id         String   @id @default(uuid())
+  productId  String
+  price      Float
+  currency   String
+  recordedAt DateTime @default(now())
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("price_history")
+}
+
+model Cart {
+  id         String     @id @default(uuid())
+  consumerId String     @unique
+  createdAt  DateTime   @default(now())
+  cartItems  CartItem[]
+  consumer   User       @relation(fields: [consumerId], references: [id], onDelete: Cascade)
+
+  @@map("carts")
+}
+
+model CartItem {
+  id            String  @id @default(uuid())
+  cartId        String
   productId     String
   quantity      Int
-  messages      Message[]
-  importer      User          @relation("ImporterOrders", fields: [importerId], references: [id])
-  product       Product       @relation("ProductToOrder", fields: [productId], references: [id])
-  shipment      Shipment?
+  priceSnapshot Float
+  currency      String
+  cart          Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product       Product @relation(fields: [productId], references: [id])
+
+  @@map("cart_items")
+}
+
+model Order {
+  id                     String        @id @default(uuid())
+  orderType              OrderType
+  orderNumber            String        @unique
+  buyerId                String
+  sellerId               String
+  productId              String
+  quantity               Int
+  unitPrice              Float
+  totalPrice             Float
+  currency               String
+  exchangeRateAtPurchase Float?
+  totalPriceUSD          Float?
+  orderStatus            OrderStatus   @default(QUOTE_REQUESTED)
+  paymentStatus          PaymentStatus @default(PENDING)
+  stripePaymentIntentId  String?
+  stripeInvoiceId        String?
+  notes                  String?
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @updatedAt
+  documents              Document[]
+  messages               Message[]     @relation("OrderMessages")
+  buyer                  User          @relation("BuyerOrders", fields: [buyerId], references: [id])
+  product                Product       @relation("ProductOrders", fields: [productId], references: [id])
+  seller                 User          @relation("SellerOrders", fields: [sellerId], references: [id])
+  shipment               Shipment?
 
   @@map("orders")
 }
 
 model Shipment {
-  id                String         @id @default(uuid())
-  orderId           String         @unique
-  userId            String
-  trackingNumber    String         @unique
-  carrier           String
-  origin            String
-  destination       String
-  estimatedDelivery DateTime
-  actualDelivery    DateTime?
-  status            ShipmentStatus @default(PREPARING)
-  currentLocation   String?
-  statusHistory     Json[]
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
-  order             Order          @relation(fields: [orderId], references: [id])
-  user              User           @relation(fields: [userId], references: [id])
+  id                    String          @id @default(uuid())
+  orderId               String          @unique
+  courierId             String?
+  trackingNumber        String?         @unique
+  estimatedDelivery     DateTime?
+  currentStatus         ShipmentStatus  @default(PREPARING)
+  declaredValue         Float?
+  declaredValueCurrency String?
+  origin                String?
+  destination           String?
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+  statusHistory         ShipmentEvent[]
+  order                 Order           @relation(fields: [orderId], references: [id])
 
   @@map("shipments")
 }
 
-model Message {
-  id         String   @id @default(uuid())
-  senderId   String
-  receiverId String
-  orderId    String?
-  subject    String?
-  content    String
-  read       Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  order      Order?   @relation(fields: [orderId], references: [id])
-  receiver   User     @relation("Receiver", fields: [receiverId], references: [id])
-  sender     User     @relation("Sender", fields: [senderId], references: [id])
+model ShipmentEvent {
+  id         String         @id @default(uuid())
+  shipmentId String
+  status     ShipmentStatus
+  location   String?
+  note       String?
+  createdAt  DateTime       @default(now())
+  latitude   Float?
+  longitude  Float?
+  shipment   Shipment       @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
 
-  @@map("messages")
+  @@map("shipment_events")
+}
+
+model CallSchedule {
+  id              String           @id @default(uuid())
+  requesterId     String
+  receiverId      String
+  title           String?
+  agenda          String?
+  callType        CallType         @default(VIDEO)
+  scheduledFor    DateTime
+  durationMinutes Int              @default(30)
+  timezone        String           @default("UTC")
+  status          CallScheduleStatus @default(PENDING)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  requester       User             @relation("CallRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  receiver        User             @relation("CallReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  sessions        CallSession[]
+
+  @@index([requesterId, status, scheduledFor])
+  @@index([receiverId, status, scheduledFor])
+  @@map("call_schedules")
+}
+
+model CallSession {
+  id            String            @id @default(uuid())
+  scheduleId    String?
+  callerId      String
+  calleeId      String
+  callType      CallType          @default(VIDEO)
+  status        CallSessionStatus @default(RINGING)
+  startedAt     DateTime          @default(now())
+  connectedAt   DateTime?
+  endedAt       DateTime?
+  durationSec   Int?
+  endedReason   String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  schedule      CallSchedule?     @relation(fields: [scheduleId], references: [id], onDelete: SetNull)
+  caller        User              @relation("CallCaller", fields: [callerId], references: [id], onDelete: Cascade)
+  callee        User              @relation("CallCallee", fields: [calleeId], references: [id], onDelete: Cascade)
+
+  @@index([callerId, createdAt])
+  @@index([calleeId, createdAt])
+  @@index([status, createdAt])
+  @@map("call_sessions")
 }
 
 model Document {
-  id          String       @id @default(uuid())
-  ownerId     String
-  type        DocumentType
-  fileName    String
-  fileUrl     String
-  fileSize    Int
-  mimeType    String
-  verified    Boolean      @default(false)
-  verifiedAt  DateTime?
-  verifiedBy  String?
-  description String?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  owner       User         @relation(fields: [ownerId], references: [id])
+  id                 String                @id @default(uuid())
+  userId             String
+  orderId            String?
+  docType            DocumentType
+  fileUrl            String
+  mimeType           String
+  fileSizeBytes      Int
+  verificationStatus DocVerificationStatus @default(PENDING)
+  reviewedBy         String?
+  reviewedAt         DateTime?
+  virusScanStatus    ScanStatus            @default(PENDING)
+  description        String?
+  fileName           String?
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+  order              Order?                @relation(fields: [orderId], references: [id])
+  user               User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("documents")
 }
 
+model Message {
+  id          String              @id @default(uuid())
+  senderId    String
+  receiverId  String
+  orderId     String?
+  productId   String?
+  subject     String?
+  body        String
+  isRead      Boolean             @default(false)
+  createdAt   DateTime            @default(now())
+  attachments MessageAttachment[]
+  order       Order?              @relation("OrderMessages", fields: [orderId], references: [id])
+  receiver    User                @relation("MessagesReceived", fields: [receiverId], references: [id], onDelete: Cascade)
+  sender      User                @relation("MessagesSent", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+model MessageAttachment {
+  id            String  @id @default(uuid())
+  messageId     String
+  fileUrl       String
+  fileName      String
+  mimeType      String
+  fileSizeBytes Int
+  message       Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@map("message_attachments")
+}
+
 model Notification {
-  id        String           @id @default(uuid())
-  userId    String
-  type      NotificationType
-  title     String
-  message   String
-  link      String?
-  read      Boolean          @default(false)
-  readAt    DateTime?
-  createdAt DateTime         @default(now())
-  user      User             @relation(fields: [userId], references: [id])
+  id             String           @id @default(uuid())
+  userId         String
+  type           NotificationType
+  message        String
+  isRead         Boolean          @default(false)
+  linkedEntityId String?
+  title          String?
+  link           String?
+  createdAt      DateTime         @default(now())
+  readAt         DateTime?
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("notifications")
 }
 
 model Supplier {
-  id            String   @id @default(uuid())
-  userId        String
-  name          String
-  contactPerson String?
-  email         String?
-  phone         String?
-  address       String?
-  country       String?
-  category      String?
-  notes         String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String   @id @default(uuid())
+  importerId        String
+  exporterId        String
+  tags              String[] @default([])
+  rating            Int?
+  contractNotes     String?
+  preferredCurrency String?
+  name              String?
+  email             String?
+  address           String?
+  country           String?
+  notes             String?
+  category          String?
+  contactPerson     String?
+  phone             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  exporter          User     @relation("ExporterSuppliers", fields: [exporterId], references: [id], onDelete: Cascade)
+  importer          User     @relation("ImporterSuppliers", fields: [importerId], references: [id], onDelete: Cascade)
 
   @@map("suppliers")
 }
@@ -187,52 +322,63 @@ model Wishlist {
   userId    String
   productId String
   createdAt DateTime @default(now())
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, productId])
   @@map("wishlists")
 }
 
-model PriceHistory {
-  id        String   @id @default(uuid())
-  productId String
-  price     Float
-  createdAt DateTime @default(now())
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+model StripeEvent {
+  id            String   @id @default(uuid())
+  stripeEventId String   @unique
+  eventType     String
+  processedAt   DateTime @default(now())
 
-  @@map("price_history")
+  @@map("stripe_events")
 }
 
 enum Role {
   USER
-  EXPORTER
+  CONSUMER
   IMPORTER
+  EXPORTER
   ADMIN
 }
 
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+  SUSPENDED
+}
+
 enum ProductCategory {
-  CHEMICALS
-  MACHINES
-  TEXTILES
-  MEDICAL
-  HANDICRAFTS
-  FOOD
-  ELECTRONICS
-  AUTOMOTIVE
-  CONSTRUCTION
-  AGRICULTURE
-  OTHER
+  Chemicals
+  Machines
+  Textiles
+  Medical
+  Electronics
+  Agri
+  RawMaterials
+  ConsumerGoods
+}
+
+enum OrderType {
+  B2B
+  B2C
 }
 
 enum OrderStatus {
-  PENDING
-  CONFIRMED
+  QUOTE_REQUESTED
+  QUOTE_CONFIRMED
+  PO_RAISED
+  CART
+  CHECKOUT
+  PAYMENT_CONFIRMED
+  PAYMENT_FAILED
   PROCESSING
   SHIPPED
   DELIVERED
+  COMPLETED
   CANCELLED
-  DISPUTED
 }
 
 enum PaymentStatus {
@@ -240,6 +386,7 @@ enum PaymentStatus {
   PARTIAL
   PAID
   REFUNDED
+  FAILED
 }
 
 enum ShipmentStatus {
@@ -248,31 +395,68 @@ enum ShipmentStatus {
   CUSTOMS
   OUT_FOR_DELIVERY
   DELIVERED
-  DELAYED
-  RETURNED
 }
 
 enum DocumentType {
   BUSINESS_LICENSE
-  TAX_CERTIFICATE
-  IMPORT_EXPORT_LICENSE
-  CERTIFICATE_OF_ORIGIN
-  QUALITY_CERTIFICATE
-  INSURANCE_DOCUMENT
-  INVOICE
-  PACKING_LIST
+  IMPORT_LICENSE
+  EXPORT_LICENSE
+  TAX_ID
+  KYC_IDENTITY
+  PRODUCT_CERTIFICATION
   BILL_OF_LADING
-  OTHER
+  CERTIFICATE_OF_ORIGIN
+  COMMERCIAL_INVOICE
+  PACKING_LIST
+}
+
+enum DocVerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ScanStatus {
+  PENDING
+  CLEAN
+  INFECTED
+  ERROR
 }
 
 enum NotificationType {
-  ORDER_PLACED
-  ORDER_CONFIRMED
-  ORDER_SHIPPED
-  ORDER_DELIVERED
+  ORDER_UPDATE
+  SHIPMENT_UPDATE
   MESSAGE_RECEIVED
+  VERIFICATION_OUTCOME
+  CALL_SCHEDULED
+  CALL_ACCEPTED
+  CALL_REJECTED
+  CALL_REMINDER
+  MISSED_CALL
   PAYMENT_RECEIVED
-  DOCUMENT_VERIFIED
-  ACCOUNT_VERIFIED
-  GENERAL
+  PAYMENT_FAILED
+  ADMIN_BROADCAST
+}
+
+enum CallType {
+  AUDIO
+  VIDEO
+}
+
+enum CallScheduleStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+  COMPLETED
+  EXPIRED
+}
+
+enum CallSessionStatus {
+  RINGING
+  ACTIVE
+  ENDED
+  MISSED
+  DECLINED
+  FAILED
 }

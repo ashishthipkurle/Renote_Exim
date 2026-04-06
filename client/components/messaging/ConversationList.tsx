@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { Search, User } from "lucide-react";
 import Image from "next/image";
 import { formatDistanceToNow } from "date-fns";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { getSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 type Conversation = {
   otherUser: {
@@ -27,23 +29,50 @@ interface ConversationListProps {
 }
 
 export default function ConversationList({ selectedUserId, onSelect }: ConversationListProps) {
+  const { user } = useAuth();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const supabase = getSupabaseBrowserClient();
+
+  const fetchConversations = useCallback(async () => {
+    try {
+      const res = await axios.get("/api/messaging?limit=50");
+      setConversations(res.data);
+    } catch (err) {
+      console.error("Failed to fetch conversations", err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchConversations = async () => {
-      try {
-        const res = await axios.get("/api/messaging");
-        setConversations(res.data);
-      } catch (err) {
-        console.error("Failed to fetch conversations", err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchConversations();
-  }, []);
+  }, [fetchConversations]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const channel = supabase
+      .channel(`conversations:incoming:${user.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+          filter: `receiverId=eq.${user.id}`,
+        },
+        () => {
+          fetchConversations();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [fetchConversations, supabase, user?.id]);
 
   const filtered = conversations.filter(c => 
     c.otherUser.name?.toLowerCase().includes(search.toLowerCase()) ||

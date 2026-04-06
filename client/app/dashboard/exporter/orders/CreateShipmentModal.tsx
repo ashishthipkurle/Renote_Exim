@@ -61,10 +61,10 @@ export function CreateShipmentModal({
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
-            <div className="bg-card border border-border w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
-                <div className="p-6 border-b border-border flex items-center justify-between bg-gradient-to-r from-primary/10 to-transparent">
+            <div className="bg-card border border-border w-full max-w-lg rounded-3xl shadow-xl dark:shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+                <div className="p-6 border-b border-border flex items-center justify-between bg-gradient-to-r from-white/10 to-transparent">
                     <div className="flex items-center gap-3">
-                        <div className="p-2 bg-primary/20 rounded-xl text-primary">
+                        <div className="p-2 bg-black/10 dark:bg-white/15 rounded-xl text-foreground dark:text-white">
                             <Truck className="w-5 h-5" />
                         </div>
                         <div>
@@ -87,7 +87,7 @@ export function CreateShipmentModal({
                             required
                             type="text"
                             placeholder="e.g. FedEx, DHL, Maersk"
-                            className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-sm focus:border-primary/50 outline-none transition-all text-foreground placeholder:text-muted-foreground/50"
+                            className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-sm focus:border-white/50 outline-none transition-all text-foreground placeholder:text-muted-foreground/50"
                             value={formData.carrier}
                             onChange={(e) => setFormData({ ...formData, carrier: e.target.value })}
                         />
@@ -103,7 +103,7 @@ export function CreateShipmentModal({
                                 required
                                 type="text"
                                 placeholder="City, Country"
-                                className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-sm focus:border-primary/50 outline-none transition-all text-foreground placeholder:text-muted-foreground/50"
+                                className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-sm focus:border-white/50 outline-none transition-all text-foreground placeholder:text-muted-foreground/50"
                                 value={formData.origin}
                                 onChange={(e) => setFormData({ ...formData, origin: e.target.value })}
                             />
@@ -117,7 +117,7 @@ export function CreateShipmentModal({
                                 required
                                 type="text"
                                 placeholder="City, Country"
-                                className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-sm focus:border-primary/50 outline-none transition-all text-foreground placeholder:text-muted-foreground/50"
+                                className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-sm focus:border-white/50 outline-none transition-all text-foreground placeholder:text-muted-foreground/50"
                                 value={formData.destination}
                                 onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
                             />
@@ -132,7 +132,7 @@ export function CreateShipmentModal({
                         <input
                             required
                             type="date"
-                            className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 text-sm focus:border-primary/50 outline-none transition-all text-foreground dark:[color-scheme:dark]"
+                            className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 text-sm focus:border-white/50 outline-none transition-all text-foreground dark:[color-scheme:dark]"
                             value={formData.estimatedDelivery}
                             onChange={(e) => setFormData({ ...formData, estimatedDelivery: e.target.value })}
                         />
@@ -149,7 +149,7 @@ export function CreateShipmentModal({
                         <button
                             type="submit"
                             disabled={loading}
-                            className="flex-2 px-8 py-3 bg-primary hover:bg-primary-hover text-white rounded-xl text-sm font-bold shadow-lg shadow-primary/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                            className="flex-2 px-8 py-3 bg-primary hover:bg-neutral-100 text-primary-foreground rounded-xl text-sm font-bold shadow-lg shadow-white/5 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                         >
                             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Truck className="w-4 h-4" />}
                             Create Shipment
@@ -160,3 +160,4 @@ export function CreateShipmentModal({
         </div>
     );
 }
+

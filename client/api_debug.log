@@ -370,6 +370,7 @@
   "certifications": [],
   "quantity": 3
 }
+<<<<<<< HEAD
 [2026-04-03T14:07:35.805Z] [POST /api/products] Body: {
   "name": "rice",
   "category": "FOOD",
@@ -385,4 +386,410 @@
   ],
   "certifications": [],
   "quantity": 4
+=======
+[2026-04-03T08:04:14.920Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled TV",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled TV this is a nice TV",
+  "price": 1000,
+  "regularPrice": 1299,
+  "minOrderQty": 12,
+  "unit": "pcs",
+  "originCountry": "india",
+  "images": [],
+  "certifications": [],
+  "quantity": 0
+}
+[2026-04-03T08:04:16.033Z] [POST /api/products] Supabase REST insert failed: {
+  "code": "23503",
+  "details": "Key (exporterId)=(6af345eb-d8e0-4871-9eee-6ed78542a977) is not present in table \"users\".",
+  "hint": null,
+  "message": "insert or update on table \"products\" violates foreign key constraint \"products_exporterId_fkey\""
+}
+[2026-04-03T08:04:22.489Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled TV",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled TV this is a nice TV",
+  "price": 1000,
+  "regularPrice": 1299,
+  "minOrderQty": 12,
+  "unit": "pcs",
+  "originCountry": "india",
+  "images": [],
+  "certifications": [],
+  "quantity": 0
+}
+[2026-04-03T08:04:22.798Z] [POST /api/products] Supabase REST insert failed: {
+  "code": "23503",
+  "details": "Key (exporterId)=(6af345eb-d8e0-4871-9eee-6ed78542a977) is not present in table \"users\".",
+  "hint": null,
+  "message": "insert or update on table \"products\" violates foreign key constraint \"products_exporterId_fkey\""
+}
+[2026-04-03T08:04:29.155Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled TV",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled TV this is a nice TV",
+  "price": 1000,
+  "regularPrice": 1299,
+  "minOrderQty": 12,
+  "unit": "pcs",
+  "originCountry": "india",
+  "images": [],
+  "certifications": [],
+  "quantity": 0
+}
+[2026-04-03T08:04:29.564Z] [POST /api/products] Supabase REST insert failed: {
+  "code": "23503",
+  "details": "Key (exporterId)=(6af345eb-d8e0-4871-9eee-6ed78542a977) is not present in table \"users\".",
+  "hint": null,
+  "message": "insert or update on table \"products\" violates foreign key constraint \"products_exporterId_fkey\""
+}
+[2026-04-03T08:04:40.341Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled TV",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled TV this is a nice TV",
+  "price": 1000,
+  "regularPrice": 1299,
+  "minOrderQty": 12,
+  "unit": "pcs",
+  "originCountry": "india",
+  "images": [],
+  "certifications": [],
+  "quantity": 12
+}
+[2026-04-03T08:04:40.800Z] [POST /api/products] Supabase REST insert failed: {
+  "code": "23503",
+  "details": "Key (exporterId)=(6af345eb-d8e0-4871-9eee-6ed78542a977) is not present in table \"users\".",
+  "hint": null,
+  "message": "insert or update on table \"products\" violates foreign key constraint \"products_exporterId_fkey\""
+}
+[2026-04-03T08:04:46.748Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled TV",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled TV this is a nice TV",
+  "price": 1000,
+  "regularPrice": 1299,
+  "minOrderQty": 12,
+  "unit": "pcs",
+  "originCountry": "india",
+  "images": [],
+  "certifications": [],
+  "quantity": 12
+}
+[2026-04-03T08:04:47.190Z] [POST /api/products] Supabase REST insert failed: {
+  "code": "23503",
+  "details": "Key (exporterId)=(6af345eb-d8e0-4871-9eee-6ed78542a977) is not present in table \"users\".",
+  "hint": null,
+  "message": "insert or update on table \"products\" violates foreign key constraint \"products_exporterId_fkey\""
+}
+[2026-04-03T08:04:53.597Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled TV",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled TV this is a nice TV",
+  "price": 1000,
+  "regularPrice": 1299,
+  "minOrderQty": 12,
+  "unit": "pcs",
+  "originCountry": "india",
+  "images": [],
+  "certifications": [],
+  "quantity": 12
+}
+[2026-04-03T08:04:53.858Z] [POST /api/products] Supabase REST insert failed: {
+  "code": "23503",
+  "details": "Key (exporterId)=(6af345eb-d8e0-4871-9eee-6ed78542a977) is not present in table \"users\".",
+  "hint": null,
+  "message": "insert or update on table \"products\" violates foreign key constraint \"products_exporterId_fkey\""
+}
+[2026-04-03T08:10:14.930Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled TV",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled TV this is a nice TV",
+  "price": 1000,
+  "regularPrice": 1299,
+  "minOrderQty": 12,
+  "unit": "pcs",
+  "originCountry": "india",
+  "images": [],
+  "certifications": [],
+  "quantity": 12
+}
+[2026-04-03T08:10:15.540Z] [POST /api/products] Supabase REST insert failed: {
+  "code": "42703",
+  "details": null,
+  "hint": "Perhaps you meant to reference the column \"users_1.businessType\".",
+  "message": "column users_1.businessName does not exist"
+}
+[2026-04-03T08:10:17.001Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled TV",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled TV this is a nice TV",
+  "price": 1000,
+  "regularPrice": 1299,
+  "minOrderQty": 12,
+  "unit": "pcs",
+  "originCountry": "india",
+  "images": [],
+  "certifications": [],
+  "quantity": 12
+}
+[2026-04-03T08:10:17.463Z] [POST /api/products] Supabase REST insert failed: {
+  "code": "42703",
+  "details": null,
+  "hint": "Perhaps you meant to reference the column \"users_1.businessType\".",
+  "message": "column users_1.businessName does not exist"
+}
+[2026-04-03T08:10:19.131Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled TV",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled TV this is a nice TV",
+  "price": 1000,
+  "regularPrice": 1299,
+  "minOrderQty": 12,
+  "unit": "pcs",
+  "originCountry": "india",
+  "images": [],
+  "certifications": [],
+  "quantity": 12
+}
+[2026-04-03T08:10:19.411Z] [POST /api/products] Supabase REST insert failed: {
+  "code": "42703",
+  "details": null,
+  "hint": "Perhaps you meant to reference the column \"users_1.businessType\".",
+  "message": "column users_1.businessName does not exist"
+}
+[2026-04-03T08:10:48.153Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled TV",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled TV this is a nice TV",
+  "price": 1000,
+  "regularPrice": 1299,
+  "minOrderQty": 12,
+  "unit": "pcs",
+  "originCountry": "india",
+  "images": [],
+  "certifications": [],
+  "quantity": 12
+}
+[2026-04-03T08:10:48.368Z] [POST /api/products] Supabase REST insert failed: {
+  "code": "42703",
+  "details": null,
+  "hint": "Perhaps you meant to reference the column \"users_1.businessType\".",
+  "message": "column users_1.businessName does not exist"
+}
+[2026-04-03T08:10:49.540Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled TV",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled TV this is a nice TV",
+  "price": 1000,
+  "regularPrice": 1299,
+  "minOrderQty": 12,
+  "unit": "pcs",
+  "originCountry": "india",
+  "images": [],
+  "certifications": [],
+  "quantity": 12
+}
+[2026-04-03T08:10:49.783Z] [POST /api/products] Supabase REST insert failed: {
+  "code": "42703",
+  "details": null,
+  "hint": "Perhaps you meant to reference the column \"users_1.businessType\".",
+  "message": "column users_1.businessName does not exist"
+}
+[2026-04-03T08:10:51.312Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled TV",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled TV this is a nice TV",
+  "price": 1000,
+  "regularPrice": 1299,
+  "minOrderQty": 12,
+  "unit": "pcs",
+  "originCountry": "india",
+  "images": [],
+  "certifications": [],
+  "quantity": 12
+}
+[2026-04-03T08:10:51.536Z] [POST /api/products] Supabase REST insert failed: {
+  "code": "42703",
+  "details": null,
+  "hint": "Perhaps you meant to reference the column \"users_1.businessType\".",
+  "message": "column users_1.businessName does not exist"
+}
+[2026-04-03T08:10:58.511Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled TV",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled TV this is a nice TV",
+  "price": 1000,
+  "regularPrice": 1299,
+  "minOrderQty": 12,
+  "unit": "pcs",
+  "originCountry": "india",
+  "images": [],
+  "certifications": [],
+  "quantity": 12
+}
+[2026-04-03T08:10:58.892Z] [POST /api/products] Supabase REST insert failed: {
+  "code": "42703",
+  "details": null,
+  "hint": "Perhaps you meant to reference the column \"users_1.businessType\".",
+  "message": "column users_1.businessName does not exist"
+}
+[2026-04-03T08:11:01.855Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled TV",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled TV this is a nice TV",
+  "price": 1000,
+  "regularPrice": 1299,
+  "minOrderQty": 12,
+  "unit": "pcs",
+  "originCountry": "india",
+  "images": [],
+  "certifications": [],
+  "quantity": 12
+}
+[2026-04-03T08:11:02.206Z] [POST /api/products] Supabase REST insert failed: {
+  "code": "42703",
+  "details": null,
+  "hint": "Perhaps you meant to reference the column \"users_1.businessType\".",
+  "message": "column users_1.businessName does not exist"
+}
+[2026-04-03T08:11:04.308Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled TV",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled TV this is a nice TV",
+  "price": 1000,
+  "regularPrice": 1299,
+  "minOrderQty": 12,
+  "unit": "pcs",
+  "originCountry": "india",
+  "images": [],
+  "certifications": [],
+  "quantity": 12
+}
+[2026-04-03T08:11:04.669Z] [POST /api/products] Supabase REST insert failed: {
+  "code": "42703",
+  "details": null,
+  "hint": "Perhaps you meant to reference the column \"users_1.businessType\".",
+  "message": "column users_1.businessName does not exist"
+}
+[2026-04-03T08:15:37.275Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled TV",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled TV this is a nice TV",
+  "price": 1000,
+  "regularPrice": 1299,
+  "minOrderQty": 12,
+  "unit": "pcs",
+  "originCountry": "india",
+  "images": [],
+  "certifications": [],
+  "quantity": 12
+}
+[2026-04-03T08:15:37.831Z] [POST /api/products] Supabase REST insert failed: {
+  "code": "PGRST204",
+  "details": null,
+  "hint": null,
+  "message": "Could not find the 'stockQty' column of 'products' in the schema cache"
+}
+[2026-04-03T08:15:39.297Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled TV",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled TV this is a nice TV",
+  "price": 1000,
+  "regularPrice": 1299,
+  "minOrderQty": 12,
+  "unit": "pcs",
+  "originCountry": "india",
+  "images": [],
+  "certifications": [],
+  "quantity": 12
+}
+[2026-04-03T08:15:39.611Z] [POST /api/products] Supabase REST insert failed: {
+  "code": "PGRST204",
+  "details": null,
+  "hint": null,
+  "message": "Could not find the 'stockQty' column of 'products' in the schema cache"
+}
+[2026-04-03T08:15:41.192Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled TV",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled TV this is a nice TV",
+  "price": 1000,
+  "regularPrice": 1299,
+  "minOrderQty": 12,
+  "unit": "pcs",
+  "originCountry": "india",
+  "images": [],
+  "certifications": [],
+  "quantity": 12
+}
+[2026-04-03T08:15:41.511Z] [POST /api/products] Supabase REST insert failed: {
+  "code": "PGRST204",
+  "details": null,
+  "hint": null,
+  "message": "Could not find the 'stockQty' column of 'products' in the schema cache"
+}
+[2026-04-03T08:17:53.807Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled TV",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled TV",
+  "price": 1000,
+  "regularPrice": 1299,
+  "minOrderQty": 13,
+  "unit": "pcs",
+  "originCountry": "india",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775204236/renote-exim/products/rfso3iwnwvcndvrrzla7.png"
+  ],
+  "certifications": [],
+  "quantity": 11
+}
+[2026-04-03T08:17:54.049Z] [POST /api/products] Supabase REST insert failed: {
+  "code": "PGRST204",
+  "details": null,
+  "hint": null,
+  "message": "Could not find the 'stockQty' column of 'products' in the schema cache"
+}
+[2026-04-03T08:17:55.262Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled TV",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled TV",
+  "price": 1000,
+  "regularPrice": 1299,
+  "minOrderQty": 13,
+  "unit": "pcs",
+  "originCountry": "india",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775204236/renote-exim/products/rfso3iwnwvcndvrrzla7.png"
+  ],
+  "certifications": [],
+  "quantity": 11
+}
+[2026-04-03T08:17:55.484Z] [POST /api/products] Supabase REST insert failed: {
+  "code": "PGRST204",
+  "details": null,
+  "hint": null,
+  "message": "Could not find the 'stockQty' column of 'products' in the schema cache"
+}
+[2026-04-03T08:17:57.119Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled TV",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled TV",
+  "price": 1000,
+  "regularPrice": 1299,
+  "minOrderQty": 13,
+  "unit": "pcs",
+  "originCountry": "india",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775204236/renote-exim/products/rfso3iwnwvcndvrrzla7.png"
+  ],
+  "certifications": [],
+  "quantity": 11
+}
+[2026-04-03T08:17:57.436Z] [POST /api/products] Supabase REST insert failed: {
+  "code": "PGRST204",
+  "details": null,
+  "hint": null,
+  "message": "Could not find the 'stockQty' column of 'products' in the schema cache"
+>>>>>>> 305b3fb9cc3d80f2259a21c264d892a5748a1e0d
 }

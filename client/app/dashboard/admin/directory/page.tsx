@@ -56,15 +56,15 @@ export default function AdminDirectoryPage() {
   }, [search]);
 
   return (
-    <div className="h-dvh flex flex-col bg-[#0b1019] relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.05)_0%,transparent_50%)] pointer-events-none" />
+    <div className="h-dvh flex flex-col bg-background relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(255,255,255,0.05)_0%,transparent_50%)] pointer-events-none" />
 
       {/* Header */}
-      <header className="flex-shrink-0 h-20 px-8 flex items-center justify-between border-b border-white/5 bg-[#0b1019]/30 backdrop-blur-md z-30">
+      <header className="flex-shrink-0 h-20 px-8 flex items-center justify-between border-b border-border bg-background/30 backdrop-blur-md z-30">
         <div>
           <h1 className="text-xl font-black text-white uppercase tracking-widest flex items-center gap-2">
             Platform Directory
-            <span className="text-[10px] bg-primary/20 text-primary border border-primary/30 px-2 py-0.5 rounded">
+            <span className="text-[10px] bg-white/20 text-white border border-white/30 px-2 py-0.5 rounded">
               {members.length} PARTNERS
             </span>
           </h1>
@@ -73,16 +73,16 @@ export default function AdminDirectoryPage() {
 
         <div className="flex items-center gap-4">
           <div className="relative group">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-primary transition-colors" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-white transition-colors" />
             <input
               type="text"
               placeholder="Query Network..."
-              className="bg-[#151c2a]/50 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-sm text-white focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none w-64 transition-all"
+              className="bg-muted/50 border border-border rounded-xl pl-10 pr-4 py-2 text-sm text-white focus:ring-2 focus:ring-white/20 focus:border-white/50 outline-none w-64 transition-all"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <button className="flex items-center gap-2 bg-[#151c2a]/50 border border-white/10 px-4 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white transition-colors">
+          <button className="flex items-center gap-2 bg-muted/50 border border-border px-4 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white transition-colors">
             <Download className="w-4 h-4" />
             Export Census
           </button>
@@ -107,26 +107,26 @@ export default function AdminDirectoryPage() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
-                className="group bg-[#151c2a]/40 backdrop-blur-xl border border-white/5 p-6 rounded-2xl hover:border-primary/30 transition-all shadow-xl overflow-hidden relative"
+                className="group bg-muted/40 backdrop-blur-xl border border-border p-6 rounded-2xl hover:border-white/30 transition-all shadow-xl overflow-hidden relative"
               >
                 {/* Visual Identity */}
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="size-14 rounded-2xl bg-gradient-to-br from-primary/10 to-blue-600/10 border border-white/5 flex items-center justify-center text-primary font-black text-xl shadow-lg group-hover:scale-110 transition-transform">
+                  <div className="size-14 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 border border-border flex items-center justify-center text-white font-black text-xl shadow-lg group-hover:scale-110 transition-transform">
                     {m.companyName?.[0] || m.name?.[0]}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-white font-black text-sm truncate group-hover:text-primary transition-colors">
+                    <h3 className="text-white font-black text-sm truncate group-hover:text-white transition-colors">
                       {m.companyName || m.name}
                     </h3>
                     <div className="flex items-center gap-1.5 mt-1">
                       <span className={clsx(
                         "text-[8px] font-black px-1.5 py-0.5 rounded border uppercase tracking-widest",
-                        m.role === "EXPORTER" ? "bg-blue-500/10 text-blue-400 border-blue-500/20" : "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                        m.role === "EXPORTER" ? "bg-white/10 text-white border-white/20" : "bg-neutral-800 text-neutral-400 border-white/10"
                       )}>
                         {m.role}
                       </span>
                       {m.verified && (
-                        <div className="text-primary flex items-center" title="Verified Partner">
+                        <div className="text-white flex items-center" title="Verified Partner">
                           <ShieldCheck className="w-3.5 h-3.5" />
                         </div>
                       )}
@@ -149,7 +149,7 @@ export default function AdminDirectoryPage() {
                       <Globe className="w-3 h-3" />
                       {m.country || "GLOBAL"}
                     </div>
-                    <button className="text-[10px] font-black text-primary hover:text-white uppercase tracking-widest flex items-center gap-1 transition-colors">
+                    <button className="text-[10px] font-black text-white hover:opacity-70 uppercase tracking-widest flex items-center gap-1 transition-all">
                       Profile
                       <ChevronRight className="w-3 h-3" />
                     </button>

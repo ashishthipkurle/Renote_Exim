@@ -46,7 +46,7 @@ export function OrderActions({ orderId, orderNumber, currentStatus, importerCoun
                     <button
                         onClick={() => updateStatus('CONFIRMED')}
                         disabled={!!loading}
-                        className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold transition-all disabled:opacity-50"
+                        className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-neutral-100 text-primary-foreground rounded-xl font-bold transition-all disabled:opacity-50"
                     >
                         {loading === 'CONFIRMED' ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
                         Accept Order
@@ -54,7 +54,7 @@ export function OrderActions({ orderId, orderNumber, currentStatus, importerCoun
                     <button
                         onClick={() => updateStatus('CANCELLED')}
                         disabled={!!loading}
-                        className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 rounded-xl font-bold transition-all disabled:opacity-50"
+                        className="flex items-center gap-2 px-4 py-2 bg-neutral-500/10 hover:bg-neutral-500/20 text-neutral-400 border border-neutral-500/20 rounded-xl font-bold transition-all disabled:opacity-50"
                     >
                         {loading === 'CANCELLED' ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
                         Reject
@@ -66,7 +66,7 @@ export function OrderActions({ orderId, orderNumber, currentStatus, importerCoun
                 <button
                     onClick={() => setShowShipmentModal(true)}
                     disabled={!!loading}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-bold transition-all disabled:opacity-50"
+                    className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-neutral-100 text-primary-foreground rounded-xl font-bold transition-all disabled:opacity-50"
                 >
                     <Truck className="w-4 h-4" />
                     Create Shipment
@@ -77,7 +77,7 @@ export function OrderActions({ orderId, orderNumber, currentStatus, importerCoun
                 <button
                     onClick={() => updateStatus('PROCESSING')}
                     disabled={!!loading}
-                    className="flex items-center gap-2 px-4 py-2 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border border-purple-400/20 rounded-xl font-bold transition-all disabled:opacity-50"
+                    className="flex items-center gap-2 px-4 py-2 bg-black/10 dark:bg-white/15 hover:bg-black/20 dark:bg-white/20 text-foreground dark:text-white border border-border dark:border-white/20 rounded-xl font-bold transition-all disabled:opacity-50"
                 >
                     {loading === 'PROCESSING' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Package className="w-4 h-4" />}
                     Mark Processing
@@ -99,3 +99,4 @@ export function OrderActions({ orderId, orderNumber, currentStatus, importerCoun
         </div>
     );
 }
+

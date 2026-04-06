@@ -1,24 +1,30 @@
 import ExporterSidebar from "@/components/exporter/ExporterSidebar";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import { SidebarProvider } from "@/lib/contexts/SidebarContext";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import PageTransition from "@/components/ui/PageTransition";
 
 export default function ExporterLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
-      <div className="bg-background text-foreground h-dvh flex flex-col overflow-hidden transition-colors duration-300">
+      <div className="flex flex-col h-svh w-full bg-board transition-colors duration-300 overflow-hidden">
         <DashboardHeader />
-        <div className="flex flex-1 overflow-hidden">
-          <ExporterSidebar />
-          <main className="flex-1 min-w-0 h-full overflow-y-auto p-4 lg:p-8 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-800">
-            <Breadcrumbs />
-            <PageTransition>
-              {children}
-            </PageTransition>
-          </main>
+
+        <div className="flex flex-1 overflow-hidden relative">
+          <ExporterSidebar basePath="/dashboard/exporter" />
+          <SidebarInset>
+            <div className="flex-1 overflow-auto custom-scrollbar">
+              <div className="px-8 py-6">
+                <Breadcrumbs />
+              </div>
+              <PageTransition>
+                {children}
+              </PageTransition>
+            </div>
+          </SidebarInset>
         </div>
       </div>
     </SidebarProvider>
   );
 }
+

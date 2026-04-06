@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { X } from "lucide-react";
 import { createPortal } from "react-dom";
 
 interface ModalProps {
@@ -50,13 +49,13 @@ export default function Modal({
             {/* Modal Content */}
             <div
                 ref={modalRef}
-                className={`relative w-full ${maxWidth} bg-[#151c2a] border border-white/10 shadow-2xl rounded-3xl overflow-hidden animate-in zoom-in-95 fade-in duration-300`}
+                className={`relative w-full ${maxWidth} bg-black border border-white/10 shadow-2xl rounded-3xl overflow-hidden animate-in zoom-in-95 fade-in duration-300`}
             >
                 <div className="flex items-center justify-between p-6 border-b border-white/5">
                     <h3 className="text-xl font-bold text-white tracking-tight">{title}</h3>
                     <button
                         onClick={onClose}
-                        className="p-2 rounded-xl hover:bg-white/5 text-slate-400 hover:text-white transition-colors"
+                        className="p-2.5 rounded-xl hover:bg-white/5 text-muted-foreground/60 hover:text-white transition-all active:scale-90"
                     >
                         <span className="sr-only">Close</span>
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

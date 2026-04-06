@@ -19,13 +19,13 @@ import { OrderActions } from "../OrderActions";
 import OrderContact from "@/components/messaging/OrderContact";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof Package }> = {
-    PENDING: { label: "Pending", color: "text-yellow-500 bg-yellow-500/10 border-yellow-500/20", icon: Clock },
-    CONFIRMED: { label: "Confirmed", color: "text-blue-400 bg-blue-400/10 border-blue-400/20", icon: CheckCircle2 },
-    PROCESSING: { label: "Processing", color: "text-purple-400 bg-purple-400/10 border-purple-400/20", icon: Package },
-    SHIPPED: { label: "Shipped", color: "text-cyan-400 bg-cyan-400/10 border-cyan-400/20", icon: Truck },
-    DELIVERED: { label: "Delivered", color: "text-emerald-400 bg-emerald-400/10 border-emerald-400/20", icon: CheckCircle2 },
-    CANCELLED: { label: "Cancelled", color: "text-red-400 bg-red-400/10 border-red-400/20", icon: XCircle },
-    DISPUTED: { label: "Disputed", color: "text-orange-400 bg-orange-400/10 border-orange-400/20", icon: XCircle },
+    PENDING: { label: "Pending", color: "text-neutral-400 bg-neutral-400/10 border-neutral-400/20", icon: Clock },
+    CONFIRMED: { label: "Confirmed", color: "text-foreground dark:text-white bg-black/10 dark:bg-white/15 border-border dark:border-white/20", icon: CheckCircle2 },
+    PROCESSING: { label: "Processing", color: "text-neutral-300 bg-neutral-300/10 border-neutral-300/20", icon: Package },
+    SHIPPED: { label: "Shipped", color: "text-foreground dark:text-white bg-white/15 border-border dark:border-white/20", icon: Truck },
+    DELIVERED: { label: "Delivered", color: "text-foreground dark:text-white bg-black/20 dark:bg-white/20 border-white/30", icon: CheckCircle2 },
+    CANCELLED: { label: "Cancelled", color: "text-neutral-500 bg-neutral-500/10 border-neutral-500/20", icon: XCircle },
+    DISPUTED: { label: "Disputed", color: "text-neutral-600 bg-neutral-600/10 border-neutral-600/20", icon: XCircle },
 };
 
 function formatMoney(n: number) {
@@ -104,12 +104,12 @@ export default async function OrderDetailPage({ params }: { params: { id: string
                         <div className="bg-card border border-border p-4 rounded-2xl flex items-center gap-6">
                             <div className="text-right">
                                 <div className="text-[9px] text-muted-foreground uppercase font-black tracking-widest px-1">Total Amount</div>
-                                <div className="text-xl font-black text-primary">{formatMoney(order.totalPrice)}</div>
+                                <div className="text-xl font-black text-foreground dark:text-white">{formatMoney(order.totalPrice)}</div>
                             </div>
                             <div className="w-px h-10 bg-border" />
                             <div>
                                 <div className="text-[9px] text-muted-foreground uppercase font-black tracking-widest px-1">Payment Status</div>
-                                <div className="font-black text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded border border-primary/20 mt-1 uppercase tracking-widest text-center">
+                                <div className="font-black text-[10px] bg-black/10 dark:bg-white/15 text-foreground dark:text-white px-2 py-0.5 rounded border border-border dark:border-white/20 mt-1 uppercase tracking-widest text-center">
                                     {order.paymentStatus}
                                 </div>
                             </div>
@@ -123,9 +123,9 @@ export default async function OrderDetailPage({ params }: { params: { id: string
                     {/* Left Col: Product & Details */}
                     <div className="lg:col-span-2 space-y-8">
                         {/* Status Control Actions */}
-                        <section className="bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 p-6 rounded-3xl shadow-2xl shadow-primary/5">
+                        <section className="bg-gradient-to-br from-white/5 to-transparent border border-border dark:border-white/10 p-6 rounded-3xl shadow-2xl shadow-white/5">
                             <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                                <CheckCircle2 className="w-5 h-5 text-primary" />
+                                <CheckCircle2 className="w-5 h-5 text-foreground dark:text-white" />
                                 Progress Actions
                             </h3>
                             <OrderActions
@@ -197,13 +197,13 @@ export default async function OrderDetailPage({ params }: { params: { id: string
                         {/* Buyer Info */}
                         <div className="bg-card border border-border rounded-3xl p-6 shadow-xl">
                             <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-                                <User className="w-5 h-5 text-primary" />
+                                <User className="w-5 h-5 text-foreground dark:text-white" />
                                 Importer Information
                             </h3>
 
                             <div className="space-y-6">
                                 <div className="flex items-start gap-3">
-                                    <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 text-primary">
+                                    <div className="p-2.5 rounded-xl bg-black/10 dark:bg-white/15 border border-border dark:border-white/20 text-foreground dark:text-white">
                                         <Building2 className="w-5 h-5" />
                                     </div>
                                     <div>
@@ -215,7 +215,7 @@ export default async function OrderDetailPage({ params }: { params: { id: string
                                 </div>
 
                                 <div className="flex items-start gap-3">
-                                    <div className="p-2.5 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-400">
+                                    <div className="p-2.5 rounded-xl bg-black/10 dark:bg-white/15 border border-border dark:border-white/20 text-foreground dark:text-white">
                                         <Globe className="w-5 h-5" />
                                     </div>
                                     <div>
@@ -227,7 +227,7 @@ export default async function OrderDetailPage({ params }: { params: { id: string
                                 </div>
 
                                 <div className="flex items-start gap-3">
-                                    <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                                    <div className="p-2.5 rounded-xl bg-black/10 dark:bg-white/15 border border-border dark:border-white/20 text-foreground dark:text-white">
                                         <User className="w-5 h-5" />
                                     </div>
                                     <div>
@@ -248,12 +248,12 @@ export default async function OrderDetailPage({ params }: { params: { id: string
                         </div>
 
                         {/* Timeline / Meta */}
-                        <div className="bg-muted/20 border border-border rounded-3xl p-6">
+                        <div className="bg-muted/50 dark:bg-white/5 border border-border rounded-3xl p-6">
                             <h3 className="text-sm font-bold text-muted-foreground mb-4 uppercase tracking-[0.2em]">Activity Log</h3>
                             <div className="space-y-4">
                                 <div className="flex gap-4">
                                     <div className="relative">
-                                        <div className="w-3 h-3 rounded-full bg-primary shadow-[0_0_8px_rgba(19,91,236,0.6)]" />
+                                        <div className="w-3 h-3 rounded-full bg-primary dark:shadow-md shadow-none" />
                                         <div className="absolute top-3 left-1.5 w-[2px] h-8 bg-border" />
                                     </div>
                                     <div>

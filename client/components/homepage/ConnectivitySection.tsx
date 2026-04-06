@@ -31,7 +31,7 @@ export default function ConnectivitySection() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-24 bg-slate-50 dark:bg-background-dark relative z-20 reveal-on-scroll overflow-hidden">
+    <section ref={sectionRef} className="py-24 bg-slate-50 dark:bg-background relative z-20 reveal-on-scroll overflow-hidden">
       {/* Animated Airplane */}
       <div className="absolute inset-0 pointer-events-none z-50 flex items-center justify-start overflow-visible">
         <Image ref={airplaneRef} src="/assets/airplane.png" alt="Airplane" width={1400} height={400} className="w-[1400px] max-w-none h-auto object-contain drop-shadow-[0_45px_65px_rgba(0,0,0,0.5)] -ml-[300px]" unoptimized />
@@ -57,7 +57,7 @@ export default function ConnectivitySection() {
         </div>
 
         <div className="w-full h-[600px] bg-slate-200 dark:bg-[#080b12] rounded-2xl border border-slate-300 dark:border-white/10 relative overflow-hidden shadow-2xl">
-          <div className="absolute inset-0 opacity-20 dark:opacity-30 bg-[url('https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg')] bg-cover bg-no-repeat bg-center dark:invert dark:filter dark:brightness-50"></div>
+          <div className="absolute inset-0 opacity-20 dark:opacity-50 bg-[url('https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg')] bg-cover bg-no-repeat bg-center dark:invert dark:filter"></div>
           <div className="absolute inset-0">
             <svg className="absolute inset-0 w-full h-full pointer-events-none">
               <path className="stroke-primary/40 stroke-2 fill-none animate-[pathMove_3s_linear_infinite]" d="M 800 250 Q 500 200 200 250" strokeDasharray="10 10"></path>

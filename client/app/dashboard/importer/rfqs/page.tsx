@@ -37,22 +37,22 @@ export default function ImporterRFQs() {
   }, []);
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-8 animate-in fade-in duration-500 bg-background min-h-full">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">Your Custom RFQs</h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">Manage your active sourcing requirements and exporter quotes.</p>
+          <h1 className="text-3xl font-black text-foreground tracking-tight uppercase italic">Sourcing Protocols</h1>
+          <p className="text-muted-foreground mt-1 font-black text-[10px] uppercase tracking-widest leading-none">Manage your active sourcing requirements and exporter intelligence feed.</p>
         </div>
-        
+
         <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-blue-600 hover:bg-blue-500 text-white h-12 px-6 rounded-xl gap-2 font-bold shadow-lg shadow-blue-500/10">
-              <Plus className="w-4 h-4" /> New Sourcing RFQ
+            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground border-transparent h-12 px-8 rounded-xl gap-3 font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-primary/5 border border-border transition-all active:scale-95">
+              <Plus className="w-4 h-4" /> Initialize Sourcing RFQ
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-900 max-w-2xl text-slate-900 dark:text-white">
+          <DialogContent className="bg-card border-border max-w-2xl text-foreground shadow-2xl">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-bold">Post a Sourcing Requirement</DialogTitle>
+              <DialogTitle className="text-2xl font-black uppercase italic tracking-tighter">Broadcast Sourcing Protocol</DialogTitle>
             </DialogHeader>
             <RFQForm onSubmitSuccess={() => {
               setIsFormOpen(false);
@@ -67,62 +67,51 @@ export default function ImporterRFQs() {
           {loading ? (
             <div className="space-y-4">
               {[1, 2, 3].map(i => (
-                <div key={i} className="h-32 bg-slate-100 dark:bg-slate-900/50 rounded-2xl animate-pulse border border-slate-200 dark:border-slate-800" />
+                <div key={i} className="h-32 bg-muted/20 rounded-2xl animate-pulse border border-border" />
               ))}
             </div>
           ) : rfqs.length === 0 ? (
-            <div className="text-center py-20 bg-slate-50 dark:bg-slate-900/30 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl">
-              <div className="w-16 h-16 bg-slate-100 dark:bg-slate-900 rounded-2xl flex items-center justify-center mx-auto mb-4 text-slate-400 dark:text-slate-500">
+            <div className="text-center py-20 bg-muted/20 border-2 border-dashed border-border rounded-3xl shadow-xl">
+              <div className="w-16 h-16 bg-muted/20 rounded-2xl flex items-center justify-center mx-auto mb-6 text-muted-foreground border border-border">
                 <FileText className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white">No active RFQs</h3>
-              <p className="text-slate-500 dark:text-slate-400 max-w-xs mx-auto mt-2 mb-8">
-                Request custom quotes from verified international exporters.
+              <h3 className="text-xl font-black text-foreground uppercase italic tracking-tighter">Transmission Node Vacant</h3>
+              <p className="text-muted-foreground text-[10px] font-black uppercase tracking-widest max-w-xs mx-auto mt-3 mb-10">
+                Request custom intelligence from verified international resource nodes.
               </p>
-              <Button onClick={() => setIsFormOpen(true)} variant="outline" className="border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-300">
-                Create First RFQ
+              <Button onClick={() => setIsFormOpen(true)} className="bg-primary text-primary-foreground border-transparent hover:bg-primary/90 font-black text-[10px] uppercase tracking-[0.2em] h-11 px-8 rounded-xl shadow-xl">
+                Create First Protocol
               </Button>
             </div>
           ) : (
             <div className="space-y-4">
               {rfqs.map((rfq) => (
-                <Link 
-                  key={rfq.id} 
+                <Link
+                  key={rfq.id}
                   href={`/dashboard/importer/rfqs/${rfq.id}`}
-                  className="group p-6 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl hover:border-blue-500/50 dark:hover:border-blue-500/30 shadow-sm dark:shadow-none transition-all block"
+                  className="group p-6 bg-muted/40 backdrop-blur-xl border border-border rounded-2xl hover:border-border shadow-xl transition-all block"
                 >
                   <div className="flex justify-between items-start mb-4">
                     <div>
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 dark:text-blue-500 mb-2 block">
-                        {rfq.category}
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-3 block">
+                        PROTOCOL: {rfq.category}
                       </span>
-                      <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                      <h3 className="text-xl font-black text-foreground group-hover:text-muted-foreground transition-all uppercase italic tracking-tighter">
                         {rfq.title}
                       </h3>
                     </div>
-                    <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border ${
-                      rfq.status === 'OPEN' ? 'border-green-500/20 text-green-600 dark:text-green-500 bg-green-50 dark:bg-green-500/5' : 'border-slate-200 dark:border-slate-700 text-slate-500'
-                    }`}>
-                      {rfq.status}
-                    </div>
-                  </div>
-                  
-                  <p className="text-slate-600 dark:text-slate-300 text-sm line-clamp-2 mb-6 leading-relaxed">
-                    {rfq.description}
-                  </p>
 
-                  <div className="flex flex-wrap items-center gap-6 pt-6 border-t border-slate-100 dark:border-slate-800/50">
-                    <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
+                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-black uppercase tracking-widest">
                       <Clock className="w-3.5 h-3.5" />
-                      Expires: {rfq.deadline ? new Date(rfq.deadline).toLocaleDateString() : 'N/A'}
+                      EXPIRE: {rfq.deadline ? new Date(rfq.deadline).toLocaleDateString() : 'N/A'}
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-slate-500 font-medium font-mono">
+                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-black uppercase tracking-widest">
                       <Package className="w-3.5 h-3.5" />
                       {rfq.quantity} {rfq.unit}
                     </div>
-                    <div className="flex items-center gap-2 text-xs font-bold text-blue-600 dark:text-blue-500 ml-auto">
+                    <div className="flex items-center gap-2 text-[10px] font-black text-foreground ml-auto uppercase tracking-widest">
                       <MessageSquare className="w-3.5 h-3.5" />
-                      {rfq._count?.quotes || 0} Quotes Received
+                      {rfq._count?.quotes || 0} Intelligence Logs
                     </div>
                   </div>
                 </Link>
@@ -132,26 +121,26 @@ export default function ImporterRFQs() {
         </div>
 
         <div className="space-y-6">
-          <div className="p-6 bg-blue-50 dark:bg-blue-600/5 border border-blue-200 dark:border-blue-500/20 rounded-2xl">
-            <h4 className="text-slate-900 dark:text-white font-bold mb-3 flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-blue-600 dark:text-blue-500" />
-              Sourcing Tip
+          <div className="p-6 bg-muted/20 border border-border rounded-2xl shadow-xl">
+            <h4 className="text-foreground font-black uppercase tracking-widest text-[10px] mb-4 flex items-center gap-2 italic">
+              <AlertCircle className="w-4 h-4 text-foreground" />
+              Sourcing Intelligence
             </h4>
-            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed italic">
-              Be specific about certifications (ISO, CE, etc.) to attract higher quality exporters.
+            <p className="text-[10px] text-muted-foreground leading-relaxed italic font-black uppercase tracking-widest">
+              Be specific about certifications (ISO, CE) to attract premium resource nodes.
             </p>
           </div>
-          
-          <div className="p-6 border border-slate-200 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900/50 shadow-sm dark:shadow-none">
-            <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Active Sourcing</h4>
+
+          <div className="p-6 border border-border rounded-2xl bg-muted/40 shadow-xl">
+            <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-6 italic">Active Streams</h4>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-slate-600 dark:text-slate-300">Open Requests</span>
-                <span className="text-sm font-bold text-slate-900 dark:text-white">{rfqs.filter(r => r.status === 'OPEN').length}</span>
+                <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Open Requests</span>
+                <span className="text-sm font-black text-foreground italic">{rfqs.filter(r => r.status === 'OPEN').length}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-slate-600 dark:text-slate-300">Total Quotes</span>
-                <span className="text-sm font-bold text-slate-900 dark:text-white">
+                <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Total Logs</span>
+                <span className="text-sm font-black text-foreground italic">
                   {rfqs.reduce((acc, r) => acc + (r._count?.quotes || 0), 0)}
                 </span>
               </div>

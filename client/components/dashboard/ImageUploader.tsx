@@ -302,7 +302,7 @@ export default function ImageUploader({ images, onChange, maxFiles = 8 }: ImageU
             {uploadQueue.length > 0 && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
                     {uploadQueue.map(item => (
-                        <div key={item.id} className="relative group rounded-xl overflow-hidden border border-border aspect-square bg-muted shadow-xl">
+                        <div key={item.id} className="relative group rounded-xl overflow-hidden border border-white/10 aspect-square bg-card shadow-xl">
                             <img src={item.previewUrl} alt="preview" className={`w-full h-full object-cover transition-transform duration-700 ${item.status === 'uploading' ? 'opacity-40 brightness-50' : ''}`} />
 
                             {item.status === "uploading" && (

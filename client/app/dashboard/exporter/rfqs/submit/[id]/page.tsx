@@ -8,14 +8,13 @@ import {
   Calendar, 
   FileText, 
   Send, 
-  ShieldCheck, 
   Info,
   Package
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 export default function NewQuotePage({ params }: { params: Promise<{ id: string }> }) {
   const { id: rfqId } = use(params);
@@ -68,7 +67,7 @@ export default function NewQuotePage({ params }: { params: Promise<{ id: string 
     }
   };
 
-  if (!rfq) return <div className="p-8 text-white">Loading requirement...</div>;
+  if (!rfq) return <div className="p-8 text-foreground dark:text-white">Loading requirement...</div>;
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-20">
@@ -78,7 +77,7 @@ export default function NewQuotePage({ params }: { params: Promise<{ id: string 
         </Link>
         <div>
           <h1 className="text-3xl font-bold text-foreground tracking-tight">Submit Trade Quote</h1>
-          <p className="text-muted-foreground mt-1">Responding to: <span className="text-primary font-medium">{rfq.title}</span></p>
+          <p className="text-muted-foreground mt-1">Responding to: <span className="text-foreground dark:text-white font-medium">{rfq.title}</span></p>
         </div>
       </div>
 
@@ -93,7 +92,7 @@ export default function NewQuotePage({ params }: { params: Promise<{ id: string 
                   <input
                     required
                     type="number"
-                    className="w-full bg-muted border border-border rounded-2xl h-14 pl-12 pr-4 text-foreground focus:border-primary/50 outline-none transition-all"
+                    className="w-full bg-muted border border-border rounded-2xl h-14 pl-12 pr-4 text-foreground focus:border-white/50 outline-none transition-all"
                     placeholder="e.g. 15000"
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
@@ -107,7 +106,7 @@ export default function NewQuotePage({ params }: { params: Promise<{ id: string 
                   <input
                     required
                     type="number"
-                    className="w-full bg-muted border border-border rounded-2xl h-14 pl-12 pr-4 text-foreground focus:border-primary/50 outline-none transition-all"
+                    className="w-full bg-muted border border-border rounded-2xl h-14 pl-12 pr-4 text-foreground focus:border-white/50 outline-none transition-all"
                     placeholder="e.g. 15"
                     value={formData.leadTime}
                     onChange={(e) => setFormData({ ...formData, leadTime: e.target.value })}
@@ -124,7 +123,7 @@ export default function NewQuotePage({ params }: { params: Promise<{ id: string 
                   <input
                     required
                     type="date"
-                    className="w-full bg-muted border border-border rounded-2xl h-14 pl-12 pr-4 text-foreground focus:border-primary/50 outline-none transition-all"
+                    className="w-full bg-muted border border-border rounded-2xl h-14 pl-12 pr-4 text-foreground focus:border-white/50 outline-none transition-all"
                     value={formData.validUntil}
                     onChange={(e) => setFormData({ ...formData, validUntil: e.target.value })}
                   />
@@ -149,7 +148,7 @@ export default function NewQuotePage({ params }: { params: Promise<{ id: string 
               <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">Additional Notes</label>
               <textarea
                 rows={4}
-                className="w-full bg-muted border border-border rounded-2xl p-4 text-foreground focus:border-primary/50 outline-none transition-all resize-none"
+                className="w-full bg-muted border border-border rounded-2xl p-4 text-foreground focus:border-white/50 outline-none transition-all resize-none"
                 placeholder="Include details about packing, quality assurance, or logistics..."
                 value={formData.note}
                 onChange={(e) => setFormData({ ...formData, note: e.target.value })}
@@ -159,7 +158,7 @@ export default function NewQuotePage({ params }: { params: Promise<{ id: string 
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-500 text-white h-16 rounded-2xl font-bold text-lg gap-2 shadow-xl shadow-blue-500/20"
+              className="w-full bg-primary hover:bg-neutral-100 text-primary-foreground h-16 rounded-2xl font-black text-lg gap-2 shadow-xl shadow-white/5"
             >
               <Send className="w-5 h-5" />
               {loading ? 'Submitting Quote...' : 'Submit Formal Quote'}
@@ -172,24 +171,24 @@ export default function NewQuotePage({ params }: { params: Promise<{ id: string 
             <h3 className="text-sm font-black text-foreground uppercase tracking-widest">Requirement Summary</h3>
             <div className="space-y-4">
               <div className="flex items-start gap-3">
-                <Package className="w-4 h-4 text-blue-500 mt-1" />
+                <Package className="w-4 h-4 text-foreground dark:text-white mt-1" />
                 <div>
                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Wanted Quantity</p>
                   <p className="text-foreground font-bold">{rfq.quantity} {rfq.unit}</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <FileText className="w-4 h-4 text-primary mt-1" />
+                <FileText className="w-4 h-4 text-foreground dark:text-white mt-1" />
                 <div>
                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Target Budget</p>
-                  <p className="text-green-500 font-bold">{rfq.budget ? `$${rfq.budget.toLocaleString()}` : 'Not Specified'}</p>
+                  <p className="text-foreground dark:text-white font-bold">{rfq.budget ? `$${rfq.budget.toLocaleString()}` : 'Not Specified'}</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="p-6 bg-blue-600/5 border border-blue-500/10 rounded-3xl flex items-start gap-3">
-            <Info className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+          <div className="p-6 bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 rounded-3xl flex items-start gap-3">
+            <Info className="w-5 h-5 text-foreground dark:text-white shrink-0 mt-0.5" />
             <p className="text-xs text-muted-foreground leading-relaxed">
               Once submitted, your quote will be visible to the importer and cannot be edited. Ensure all terms are final.
             </p>

@@ -13,7 +13,6 @@ import {
   Plus,
   Wallet,
   ArrowUpRight,
-  ArrowDownRight,
   AlertCircle,
   BarChart3,
   Calendar,
@@ -83,23 +82,23 @@ export default function ImporterFinancePage() {
   const isOverBudget = budgetProgress > 100;
 
   return (
-    <div className="h-dvh overflow-hidden flex flex-col bg-slate-50 dark:bg-gradient-to-br dark:from-[#0a0c12] dark:via-[#0d1017] dark:to-[#0a0c12] transition-colors duration-300">
-      <header className="flex-shrink-0 p-6 lg:p-8 border-b border-slate-200 dark:border-white/5 bg-white dark:bg-transparent transition-colors duration-300">
+    <div className="h-dvh overflow-hidden flex flex-col bg-background transition-colors duration-300">
+      <header className="flex-shrink-0 p-6 lg:p-8 border-b border-border bg-header backdrop-blur-xl z-20">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-3">
-              Finance Hub
-              <Wallet className="w-8 h-8 text-primary" />
+            <h1 className="text-3xl font-black tracking-tight text-foreground flex items-center gap-3 uppercase italic">
+              Finance Architecture
+              <Wallet className="w-8 h-8 text-foreground" />
             </h1>
-            <p className="text-slate-500 dark:text-slate-400 mt-1">Strategic cash flow and procurement budget management.</p>
+            <p className="text-muted-foreground mt-1 font-black text-[10px] uppercase tracking-widest leading-none">Strategic cash flow and procurement budget management.</p>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={() => toast.success("Generating report...")}
-              className="bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 font-bold py-3 px-6 rounded-2xl transition-all flex items-center gap-2"
+              className="bg-muted hover:bg-muted/30 text-foreground border border-border font-black text-[10px] uppercase tracking-[0.2em] py-3.5 px-8 rounded-2xl transition-all flex items-center gap-3 active:scale-95"
             >
               <FileText className="w-4 h-4" />
-              Tax Statement
+              Tax intelligence
             </button>
           </div>
         </div>
@@ -109,56 +108,56 @@ export default function ImporterFinancePage() {
         <div className="max-w-[1600px] mx-auto space-y-8">
           {/* Top Analytics Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-            <div className="bg-white dark:bg-[#151c2a]/60 backdrop-blur-xl border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-xl rounded-3xl p-6 relative overflow-hidden group">
-              <div className="absolute -right-4 -top-4 size-24 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-all" />
-              <div className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">Total Procurement</div>
-              <div className="text-3xl font-black text-slate-900 dark:text-white">{loading ? "..." : formatCurrency(data?.totalBalance ?? 0)}</div>
-              <div className="mt-4 flex items-center gap-2 text-emerald-400 text-xs font-bold">
-                <ArrowUpRight className="w-3 h-3" />
-                +12.5% from last month
+            <div className="bg-muted/40 backdrop-blur-xl border border-border shadow-xl rounded-3xl p-6 relative overflow-hidden group">
+              <div className="absolute -right-4 -top-4 size-24 bg-muted/20 rounded-full blur-3xl group-hover:bg-muted/30 transition-all" />
+              <div className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.2em] mb-1">Total Procurement</div>
+              <div className="text-3xl font-black text-foreground italic tracking-tighter">{loading ? "..." : formatCurrency(data?.totalBalance ?? 0)}</div>
+              <div className="mt-4 flex items-center gap-2 text-foreground text-[10px] font-black uppercase tracking-widest leading-none">
+                <ArrowUpRight className="w-3.5 h-3.5" />
+                +12.5% vs previous cycle
               </div>
             </div>
 
-            <div className="bg-white dark:bg-[#151c2a]/60 backdrop-blur-xl border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-xl rounded-3xl p-6 relative overflow-hidden group">
-              <div className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">Uncleared Payouts</div>
-              <div className="text-3xl font-black text-amber-500 dark:text-amber-400">{loading ? "..." : formatCurrency(data?.pendingPayouts ?? 0)}</div>
-              <div className="mt-4 flex items-center gap-2 text-slate-500 text-xs font-bold">
-                <TrendingUp className="w-3 h-3" />
+            <div className="bg-muted/40 backdrop-blur-xl border border-border shadow-xl rounded-3xl p-6 relative overflow-hidden group">
+              <div className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.2em] mb-1">Uncleared Payouts</div>
+              <div className="text-3xl font-black text-foreground italic tracking-tighter">{loading ? "..." : formatCurrency(data?.pendingPayouts ?? 0)}</div>
+              <div className="mt-4 flex items-center gap-2 text-muted-foreground text-[10px] font-black uppercase tracking-widest leading-none">
+                <TrendingUp className="w-3.5 h-3.5" />
                 In flight payments
               </div>
             </div>
 
-            <div className="bg-white dark:bg-[#151c2a]/60 backdrop-blur-xl border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-xl rounded-3xl p-6 relative overflow-hidden group">
-              <div className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">Tax Provisioning</div>
-              <div className="text-3xl font-black text-rose-500 dark:text-rose-400">{loading ? "..." : formatCurrency(data?.estTaxLiability ?? 0)}</div>
-              <div className="mt-4 flex items-center gap-2 text-slate-500 text-xs font-bold">
-                <AlertCircle className="w-3 h-3" />
-                Based on 10% estimation
+            <div className="bg-muted/40 backdrop-blur-xl border border-border shadow-xl rounded-3xl p-6 relative overflow-hidden group">
+              <div className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.2em] mb-1">Tax Provisioning</div>
+              <div className="text-3xl font-black text-foreground italic tracking-tighter">{loading ? "..." : formatCurrency(data?.estTaxLiability ?? 0)}</div>
+              <div className="mt-4 flex items-center gap-2 text-muted-foreground text-[10px] font-black uppercase tracking-widest leading-none">
+                <AlertCircle className="w-3.5 h-3.5" />
+                Node calculation: 10%
               </div>
             </div>
 
             {/* Budget Tracker Card */}
-            <div className="bg-primary/5 dark:bg-primary/10 backdrop-blur-xl border border-primary/20 shadow-sm dark:shadow-xl rounded-3xl p-6 relative overflow-hidden group">
+            <div className="bg-muted/40 backdrop-blur-xl border border-border shadow-xl rounded-3xl p-6 relative overflow-hidden group">
               <div className="flex justify-between items-start mb-1">
-                <div className="text-primary text-[10px] font-black uppercase tracking-widest">Monthly Budget</div>
+                <div className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.2em]">Procurement Budget</div>
                 <button
                   onClick={() => setIsBudgetModalOpen(true)}
-                  className="p-1 rounded-lg bg-primary text-white hover:scale-110 transition-transform shadow-[0_0_10px_rgba(37,99,235,0.2)] dark:shadow-none"
+                  className="p-1 rounded-lg bg-primary text-primary-foreground border-transparent hover:scale-110 transition-transform shadow-xl shadow-primary/5"
                 >
-                  <Plus className="w-3 h-3" />
+                  <Plus className="w-3.5 h-3.5" />
                 </button>
               </div>
-              <div className="text-3xl font-black text-slate-900 dark:text-white">{loading ? "..." : formatCurrency(data?.monthlyBudget ?? 0)}</div>
-              <div className="mt-4 space-y-2">
-                <div className="flex justify-between text-[10px] font-bold">
-                  <span className="text-slate-500 dark:text-slate-400">Usage Progress</span>
-                  <span className={isOverBudget ? "text-rose-500 dark:text-rose-400" : "text-primary"}>
+              <div className="text-3xl font-black text-foreground italic tracking-tighter">{loading ? "..." : formatCurrency(data?.monthlyBudget ?? 0)}</div>
+              <div className="mt-6 space-y-3">
+                <div className="flex justify-between text-[9px] font-black uppercase tracking-widest">
+                  <span className="text-muted-foreground">Resource Utilization</span>
+                  <span className={isOverBudget ? "text-foreground" : "text-foreground"}>
                     {budgetProgress.toFixed(1)}%
                   </span>
                 </div>
-                <div className="h-2 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-300 dark:border-white/5">
+                <div className="h-1.5 w-full bg-muted/20 rounded-full overflow-hidden border border-white/5">
                   <div
-                    className={`h-full transition-all duration-1000 ${isOverBudget ? "bg-rose-500" : "bg-primary"}`}
+                    className={`h-full transition-all duration-1000 ${isOverBudget ? "bg-white opacity-40" : "bg-white shadow-[0_0_8px_rgba(255,255,255,0.4)]"}`}
                     style={{ width: `${Math.min(budgetProgress, 100)}%` }}
                   />
                 </div>
@@ -168,37 +167,37 @@ export default function ImporterFinancePage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* Spending Chart */}
-            <section className="lg:col-span-8 bg-white dark:bg-[#151c2a]/60 backdrop-blur-xl border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-xl rounded-3xl p-8">
+            <section className="lg:col-span-8 bg-muted/40 backdrop-blur-xl border border-border shadow-xl rounded-3xl p-8">
               <div className="flex items-center justify-between mb-10">
                 <div>
-                  <h3 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-3">
-                    Spending Trajectory
-                    <BarChart3 className="w-5 h-5 text-primary" />
+                  <h3 className="text-xl font-black text-foreground flex items-center gap-3 uppercase italic">
+                    Spend Trajectory
+                    <BarChart3 className="w-5 h-5 text-foreground" />
                   </h3>
-                  <p className="text-slate-500 text-sm mt-1">Confirmed payments across the last 6 fiscal months.</p>
+                  <p className="text-muted-foreground text-[10px] font-black uppercase tracking-widest mt-1">Validated transactions across the last 6 fiscal cycles.</p>
                 </div>
-                <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-muted/20 border border-border text-[9px] font-black text-muted-foreground uppercase tracking-widest">
                   <Calendar className="w-3.5 h-3.5" />
-                  Jan 2026 - Jun 2026
+                  JAN 2026 - JUN 2026
                 </div>
               </div>
 
-              <div className="flex items-end justify-between gap-4 h-64 px-4">
+              <div className="flex items-end justify-between gap-4 h-64 px-4 pb-4">
                 {data?.spendingHistory.map((sh, i) => {
                   const maxAmt = Math.max(...data.spendingHistory.map(h => h.amount), 1);
                   const height = (sh.amount / maxAmt) * 100;
                   return (
-                    <div key={sh.month} className="flex-1 flex flex-col items-center gap-4 group/bar">
+                    <div key={sh.month} className="flex-1 flex flex-col items-center gap-6 group/bar">
                       <div className="w-full relative">
                         <div
-                          className={`w-full rounded-t-xl transition-all duration-700 bg-gradient-to-t ${i === 5 ? "from-primary/20 to-primary shadow-[0_0_20px_rgba(37,99,235,0.2)] dark:shadow-[0_0_20px_rgba(37,99,235,0.2)]" : "from-slate-200 to-slate-300 hover:to-slate-400 dark:from-slate-800 dark:to-slate-700 dark:hover:to-slate-600"}`}
+                          className={`w-full rounded-t-xl transition-all duration-1000 ${i === 5 ? "bg-white shadow-[0_0_20px_rgba(255,255,255,0.3)]" : "bg-muted/30 hover:bg-white/30"}`}
                           style={{ height: `${height}%` }}
                         />
-                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 dark:bg-white text-white dark:text-black text-[10px] font-black px-2 py-1 rounded opacity-0 group-hover/bar:opacity-100 transition-opacity whitespace-nowrap z-10">
+                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground border-transparent text-[9px] font-black px-3 py-1.5 rounded opacity-0 group-hover/bar:opacity-100 transition-all uppercase tracking-widest z-20 shadow-2xl">
                           {formatCurrency(sh.amount)}
                         </div>
                       </div>
-                      <div className="text-[10px] font-black text-slate-500 uppercase tracking-tighter">{sh.month}</div>
+                      <div className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-tighter">{sh.month}</div>
                     </div>
                   );
                 })}
@@ -206,49 +205,49 @@ export default function ImporterFinancePage() {
             </section>
 
             {/* Invoices List */}
-            <section className="lg:col-span-4 bg-white dark:bg-[#151c2a]/60 backdrop-blur-xl border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-xl rounded-3xl p-8 flex flex-col">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-black text-slate-900 dark:text-white">Invoices</h3>
-                <button className="text-[10px] font-black text-primary uppercase tracking-widest hover:underline">View All</button>
+            <section className="lg:col-span-4 bg-muted/40 backdrop-blur-xl border border-border shadow-xl rounded-3xl p-8 flex flex-col">
+              <div className="flex items-center justify-between mb-8">
+                <h3 className="text-xl font-black text-foreground uppercase italic">Ledger</h3>
+                <button className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] hover:text-foreground transition-colors">Audit All</button>
               </div>
 
               <div className="flex-1 space-y-4 overflow-y-auto no-scrollbar">
                 {loading ? (
                   Array.from({ length: 5 }).map((_, i) => (
-                    <div key={i} className="h-16 bg-slate-100 dark:bg-slate-800/40 rounded-2xl animate-pulse" />
+                    <div key={i} className="h-16 bg-muted/20 rounded-2xl animate-pulse" />
                   ))
                 ) : !data?.recentInvoices?.length ? (
                   <div className="h-full flex flex-col items-center justify-center p-8 opacity-20">
                     <FileText className="w-12 h-12 mb-4" />
-                    <p className="text-xs font-bold uppercase tracking-widest text-center">No Data Available</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-center">Protocol Empty</p>
                   </div>
                 ) : (
                   data.recentInvoices.map((inv) => (
-                    <div key={inv.id} className="group p-4 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 hover:border-primary/20 dark:hover:border-white/10 rounded-2xl transition-all">
-                      <div className="flex items-center justify-between gap-4 mb-3">
+                    <div key={inv.id} className="group p-5 bg-muted/20 border border-border hover:border-border rounded-2xl transition-all shadow-xl">
+                      <div className="flex items-center justify-between gap-4 mb-4">
                         <div className="flex items-center gap-3">
-                          <div className="size-8 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-transparent flex items-center justify-center text-slate-400 group-hover:text-primary transition-colors shadow-sm dark:shadow-none">
+                          <div className="size-10 rounded-xl bg-card border border-border flex items-center justify-center text-muted-foreground group-hover:text-foreground transition-all shadow-xl">
                             <CreditCard className="w-4 h-4" />
                           </div>
                           <div>
-                            <div className="text-[10px] font-black text-slate-900 dark:text-white font-mono uppercase truncate max-w-[120px]">{inv.id}</div>
-                            <div className="text-[10px] text-slate-500 font-bold">{formatDate(inv.date)}</div>
+                            <div className="text-[10px] font-black text-foreground font-mono uppercase truncate max-w-[120px] italic tracking-tighter">{inv.id}</div>
+                            <div className="text-[9px] text-muted-foreground font-black uppercase tracking-widest mt-0.5">{formatDate(inv.date)}</div>
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="text-sm font-black text-slate-900 dark:text-white">{formatCurrency(inv.amount)}</div>
-                          <div className={`text-[8px] font-black uppercase tracking-widest ${inv.status === "PAID" ? "text-emerald-500 dark:text-emerald-400" : "text-amber-500 dark:text-amber-400"}`}>
+                          <div className="text-sm font-black text-foreground tracking-tighter">{formatCurrency(inv.amount)}</div>
+                          <div className={`text-[9px] font-black uppercase tracking-widest mt-1 ${inv.status === "PAID" ? "text-foreground" : "text-muted-foreground/40"}`}>
                             {inv.status}
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center justify-between border-t border-slate-200 dark:border-white/5 pt-3">
-                        <div className="text-[10px] text-slate-500 font-bold truncate max-w-[150px]">{inv.seller}</div>
+                      <div className="flex items-center justify-between border-t border-border pt-4">
+                        <div className="text-[9px] font-black text-muted-foreground uppercase tracking-widest truncate max-w-[150px]">{inv.seller}</div>
                         <button
                           onClick={() => toast.success("Invoice download started...")}
-                          className="size-6 rounded-lg bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-primary hover:text-white transition-all shadow-sm dark:shadow-none"
+                          className="size-8 rounded-xl bg-card border border-border flex items-center justify-center text-muted-foreground hover:bg-white hover:text-black transition-all shadow-xl active:scale-90"
                         >
-                          <Download className="w-3 h-3" />
+                          <Download className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </div>
@@ -264,28 +263,32 @@ export default function ImporterFinancePage() {
       <Modal
         isOpen={isBudgetModalOpen}
         onClose={() => setIsBudgetModalOpen(false)}
-        title="Set Procurement Budget"
+        title="Protocol Configuration"
       >
         <div className="space-y-6">
-          <p className="text-slate-500 dark:text-slate-400 text-sm">
-            Define your monthly expenditure limit. We'll alert you when your confirmed payments approach this threshold.
+          <h3 className="text-xl font-black text-foreground uppercase italic tracking-tighter shadow-[0_0_20px_rgba(255,255,255,0.1)]">Resource Node Integration</h3>
+          <p className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.2em] mt-2 opacity-60">
+            Initialize global payment protocols and liquidity bridges.
           </p>
-          <div className="space-y-2">
-            <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Monthly Limit (USD)</label>
+          <p className="text-muted-foreground text-sm">
+            We'll alert you when your confirmed payments approach this threshold.
+          </p>
+          <div className="space-y-4">
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Liquid Limit (USD)</label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">$</span>
+              <span className="absolute left-6 top-1/2 -translate-y-1/2 text-foreground font-black">$</span>
               <input
                 type="number"
                 value={newBudget}
                 onChange={(e) => setNewBudget(e.target.value)}
-                className="w-full bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-2xl py-4 pl-10 pr-4 text-slate-900 dark:text-white font-black focus:ring-2 focus:ring-primary/50 outline-none transition-all shadow-inner dark:shadow-none"
+                className="w-full bg-muted border border-border rounded-2xl py-5 pl-12 pr-6 text-foreground font-black text-xl italic focus:ring-1 focus:ring-white/20 outline-none transition-all shadow-2xl"
                 placeholder="0.00"
               />
             </div>
           </div>
           <button
             onClick={handleUpdateBudget}
-            className="w-full bg-primary hover:bg-[#0f49bd] text-white font-black py-4 rounded-2xl shadow-xl shadow-primary/20 transition-all active:scale-95"
+            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground border-transparent font-black py-4 rounded-2xl shadow-xl shadow-primary/5 transition-all active:scale-95 border border-border"
           >
             Update Budget Strategy
           </button>

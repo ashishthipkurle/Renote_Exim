@@ -6,10 +6,13 @@ import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { Analytics } from "@vercel/analytics/react";
 
-import CinematicPreloader from "@/components/ui/CinematicPreloader";
-import Footer from "@/components/layout/Footer";
+import dynamic from "next/dynamic";
 import CommandMenu from "@/components/ui/CommandMenu";
 import CookieConsent from "@/components/ui/CookieConsent";
+
+const CinematicPreloader = dynamic(() => import("@/components/ui/CinematicPreloader"), {
+  ssr: false,
+});
 
 const sora = Sora({
   subsets: ["latin"],
@@ -78,6 +81,14 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
           rel="stylesheet"
         />
+        <script dangerouslySetInnerHTML={{
+          __html: `
+          (function() {
+            if (window.location.pathname === '/') {
+              document.documentElement.classList.add('is-home');
+            }
+          })();
+        `}} />
       </head>
       <body className={`${sora.variable} font-sans antialiased`}>
         <ThemeProvider>
@@ -87,7 +98,6 @@ export default function RootLayout({
             <main id="main-content">
               {children}
             </main>
-            <Footer />
             <Toaster position="top-right" richColors />
             <CommandMenu />
             <CookieConsent />

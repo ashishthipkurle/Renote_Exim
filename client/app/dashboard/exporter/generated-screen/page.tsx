@@ -120,7 +120,7 @@ export default function GeneratedScreen() {
                         </div>
                         {/* EXPORTCO */}
                         <div className="text-reveal-mask">
-                            <h1 className="text-reveal-item font-['Anton'] text-5xl md:text-8xl tracking-tight text-white border-x-4 border-white px-6 opacity-0 translate-y-full">EXPORTCO</h1>
+                            <h1 className="text-reveal-item font-['Anton'] text-5xl md:text-8xl tracking-tight text-foreground dark:text-white border-x-4 border-border dark:border-white px-6 opacity-0 translate-y-full">EXPORTCO</h1>
                         </div>
                         {/* PORTAL */}
                         <div className="text-reveal-mask">
@@ -129,20 +129,20 @@ export default function GeneratedScreen() {
                     </div>
                     {/* Loading Progress Bar */}
                     <div className="mt-12 w-48 h-px bg-gray-800 mx-auto relative overflow-hidden" id="loader-bar-container">
-                        <div className="absolute inset-y-0 left-0 bg-white w-0" id="loader-progress"></div>
+                        <div className="absolute inset-y-0 left-0 bg-primary w-0" id="loader-progress"></div>
                     </div>
                 </div>
             </div>
             {/* END: Cinematic Preloader Overlay */}
 
             {/* BEGIN: Main Dashboard Content (Initially Hidden) */}
-            <main className="main-dashboard min-h-screen w-full bg-gradient-to-b from-[#050a14] to-[#0a192f] p-8 flex flex-col items-center justify-center text-center font-['Inter'] text-white" id="dashboard">
+            <main className="main-dashboard min-h-screen w-full bg-gradient-to-b from-black to-neutral-900 p-8 flex flex-col items-center justify-center text-center font-['Inter'] text-foreground dark:text-white" id="dashboard">
                 {/* Background subtle noise/glow */}
-                <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/10 via-transparent to-transparent"></div>
+                <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/5 via-transparent to-transparent"></div>
                 <section className="relative z-10 max-w-4xl w-full">
                     <nav className="mb-12 flex justify-between items-center opacity-0 dashboard-element">
                         <div className="font-['Anton'] text-2xl tracking-tighter">EXPORTCO // SYST</div>
-                        <div className="text-xs tracking-[0.3em] text-blue-400 uppercase">Secure Connection Established</div>
+                        <div className="text-xs tracking-[0.3em] text-white/50 uppercase">Secure Connection Established</div>
                     </nav>
                     <div className="space-y-6">
                         <h2 className="text-5xl md:text-7xl font-['Anton'] tracking-tighter dashboard-element opacity-0 translate-y-4">WELCOME COMMANDER</h2>
@@ -150,33 +150,34 @@ export default function GeneratedScreen() {
                             All systems are operational. Global logistics streams are synchronized. Your dashboard is ready for operation.
                         </p>
                         <div className="pt-8 flex gap-4 justify-center dashboard-element opacity-0 translate-y-4">
-                            <button className="px-8 py-3 bg-white text-black font-bold text-xs uppercase tracking-widest hover:bg-blue-500 hover:text-white transition-colors duration-300">
+                            <button className="px-8 py-3 bg-primary text-primary-foreground font-bold text-xs uppercase tracking-widest hover:bg-primary/90 transition-colors duration-300">
                                 Initialize View
                             </button>
-                            <button className="px-8 py-3 border border-gray-700 text-white font-bold text-xs uppercase tracking-widest hover:border-white transition-colors duration-300">
+                            <button className="px-8 py-3 border border-gray-700 text-foreground dark:text-white font-bold text-xs uppercase tracking-widest hover:border-border dark:border-white transition-colors duration-300">
                                 System Logs
                             </button>
                         </div>
                     </div>
                     <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-6 dashboard-element opacity-0">
-                        <div className="p-6 border border-white/5 bg-white/5 backdrop-blur-sm rounded-sm text-left">
+                        <div className="p-6 border border-border dark:border-white/5 bg-black/5 dark:bg-white/10 backdrop-blur-sm rounded-sm text-left">
                             <div className="text-blue-500 text-xs font-bold mb-2">ACTIVE FREIGHT</div>
                             <div className="text-3xl font-['Anton']">1,402</div>
                         </div>
-                        <div className="p-6 border border-white/5 bg-white/5 backdrop-blur-sm rounded-sm text-left">
+                        <div className="p-6 border border-border dark:border-white/5 bg-black/5 dark:bg-white/10 backdrop-blur-sm rounded-sm text-left">
                             <div className="text-blue-500 text-xs font-bold mb-2">NODES ONLINE</div>
                             <div className="text-3xl font-['Anton']">98.4%</div>
                         </div>
-                        <div className="p-6 border border-white/5 bg-white/5 backdrop-blur-sm rounded-sm text-left">
-                            <div className="text-blue-500 text-xs font-bold mb-2">SECURITY STATUS</div>
+                        <div className="p-6 border border-border dark:border-white/5 bg-black/5 dark:bg-white/10 backdrop-blur-sm rounded-sm text-left">
+                            <div className="text-white/50 text-xs font-bold mb-2">SECURITY STATUS</div>
                             <div className="text-3xl font-['Anton']">ENCRYPTED</div>
                         </div>
                     </div>
                 </section>
                 {/* Decorative Corner Elements */}
-                <div className="fixed top-4 left-4 w-12 h-12 border-t border-l border-white/20 dashboard-element opacity-0"></div>
-                <div className="fixed bottom-4 right-4 w-12 h-12 border-b border-r border-white/20 dashboard-element opacity-0"></div>
+                <div className="fixed top-4 left-4 w-12 h-12 border-t border-l border-border dark:border-white/20 dashboard-element opacity-0"></div>
+                <div className="fixed bottom-4 right-4 w-12 h-12 border-b border-r border-border dark:border-white/20 dashboard-element opacity-0"></div>
             </main>
         </>
     );
 }
+

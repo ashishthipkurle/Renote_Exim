@@ -1,27 +1,47 @@
-/**
- * Validates file upload metadata for security.
- */
-
-export const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-export const ALLOWED_DOC_TYPES = ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
-export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+export const UPLOAD_RULES = {
+  compliance: {
+    allowedTypes: ["application/pdf", "image/jpeg", "image/png"],
+    maxSize: 10 * 1024 * 1024, // 10MB
+  },
+  productImage: {
+    allowedTypes: ["image/jpeg", "image/png", "image/webp"],
+    maxSize: 5 * 1024 * 1024, // 5MB
+  },
+  messageAttachment: {
+    allowedTypes: [
+      "application/pdf", 
+      "image/jpeg", 
+      "image/png", 
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    ],
+    maxSize: 10 * 1024 * 1024, // 10MB
+  },
+  orderTradeDocument: {
+    allowedTypes: ["application/pdf"],
+    maxSize: 20 * 1024 * 1024, // 20MB
+  }
+};
 
 export interface FileValidationResult {
   isValid: boolean;
   error?: string;
+  bucket?: "private" | "public_images";
 }
 
-export function validateFileUpload(file: File, type: "image" | "document"): FileValidationResult {
-  // Check file size
-  if (file.size > MAX_FILE_SIZE) {
-    return { isValid: false, error: "File size exceeds 5MB limit" };
+export type UploadCategory = keyof typeof UPLOAD_RULES;
+
+export function validateFileUpload(file: File, category: UploadCategory): FileValidationResult {
+  const rules = UPLOAD_RULES[category];
+
+  if (file.size > rules.maxSize) {
+    return { isValid: false, error: `File size exceeds ${rules.maxSize / (1024 * 1024)}MB limit.` };
   }
 
-  // Check file type
-  const allowedTypes = type === "image" ? ALLOWED_IMAGE_TYPES : ALLOWED_DOC_TYPES;
-  if (!allowedTypes.includes(file.type)) {
-    return { isValid: false, error: `Invalid file type. Allowed: ${allowedTypes.join(", ")}` };
+  if (!rules.allowedTypes.includes(file.type)) {
+    return { isValid: false, error: `Invalid file type. Allowed: ${rules.allowedTypes.join(", ")}` };
   }
 
-  return { isValid: true };
+  const bucket = category === "productImage" ? "public_images" : "private";
+
+  return { isValid: true, bucket };
 }

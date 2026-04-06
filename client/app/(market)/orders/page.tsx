@@ -243,7 +243,7 @@ export default function OrdersPage() {
                     <div className="rounded-xl border border-border bg-muted/30 p-4 flex items-center justify-between gap-3">
                       <div className="text-sm text-muted-foreground">Shipment not created yet.</div>
                       <Button variant="ghost" className="text-primary" asChild>
-                        <Link href="/dashboard/importer/shipments">
+                        <Link href="/dashboard/importer/orders">
                           View shipments <ArrowRight className="h-4 w-4" />
                         </Link>
                       </Button>
