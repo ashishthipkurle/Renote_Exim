@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
                     }
                 } : {})
             },
-                select: {
+            select: {
                 id: true,
                 name: true,
                 companyName: true,
@@ -43,8 +43,19 @@ export async function GET(request: NextRequest) {
             }
         });
 
+        interface Exporter {
+            id: string;
+            name: string | null;
+            companyName: string | null;
+            avatar: string | null;
+            description: string | null;
+            _count: {
+                exportedProducts: number;
+            };
+        }
+
         // Enhance with trade history for the importer to see
-        const exportersWithStats = await Promise.all(exporters.map(async (exp) => {
+        const exportersWithStats = await Promise.all((exporters as unknown as Exporter[]).map(async (exp) => {
             // Get total orders from this exporter
             const totalOrders = await prisma.order.count({
                 where: { product: { exporterId: exp.id } }
