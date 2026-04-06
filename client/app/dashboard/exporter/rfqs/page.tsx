@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { 
-  Search, 
-  Clock, 
-  MessageSquare, 
-  AlertCircle, 
-  ArrowRight, 
+import {
+  Search,
+  Clock,
+  MessageSquare,
+  AlertCircle,
+  ArrowRight,
   ShieldCheck,
   Globe,
   Layers,
@@ -53,16 +53,16 @@ export default function ExporterRFQs() {
               Registry Node Index: ACTIVE_SOURCING_PROTOCOLS // Verified Importer Requests
             </p>
           </div>
-          
+
           <div className="flex bg-black/5 dark:bg-white/10 p-1.5 rounded-2xl border border-border dark:border-white/10 backdrop-blur-3xl">
-            <button 
+            <button
               onClick={() => setActiveTab('ALL')}
               className={`px-6 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all italic ${activeTab === 'ALL' ? 'bg-primary text-primary-foreground shadow-xl dark:shadow-2xl' : 'text-muted-foreground/40 hover:text-foreground dark:text-white'}`}
             >
               All Signals
             </button>
             {Array.from(new Set(rfqs.map(r => r.category))).map(cat => (
-              <button 
+              <button
                 key={cat}
                 onClick={() => setActiveTab(cat)}
                 className={`px-6 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all italic ${activeTab === cat ? 'bg-primary text-primary-foreground shadow-xl dark:shadow-2xl' : 'text-muted-foreground/40 hover:text-foreground dark:text-white'}`}
@@ -104,7 +104,7 @@ export default function ExporterRFQs() {
                     <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none group-hover:rotate-12 transition-transform duration-1000">
                       <Layers className="w-32 h-32 text-foreground dark:text-white" />
                     </div>
-                    
+
                     <div className="flex justify-between items-start mb-8 relative z-10">
                       <span className="px-5 py-2 rounded-full bg-black/5 dark:bg-white/10 text-foreground dark:text-white text-[9px] font-black uppercase tracking-widest border border-border dark:border-white/10 italic">
                         {rfq.category} // SEC_NODE
@@ -118,7 +118,7 @@ export default function ExporterRFQs() {
                     <h3 className="text-2xl font-black text-foreground dark:text-white mb-4 italic tracking-tighter uppercase group-hover:translate-x-1 transition-transform">
                       {rfq.title}
                     </h3>
-                    
+
                     <p className="text-muted-foreground/40 text-xs font-medium line-clamp-3 mb-10 leading-relaxed italic group-hover:text-muted-foreground/80 transition-colors uppercase tracking-tight">
                       {rfq.description}
                     </p>
@@ -145,8 +145,8 @@ export default function ExporterRFQs() {
                         <ShieldCheck className="w-4 h-4" /> NODE_VERIFIED
                       </div>
                     </div>
-                    
-                    <Link 
+
+                    <Link
                       href={`/dashboard/exporter/rfqs/submit/${rfq.id}`}
                       className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] uppercase tracking-[0.3em] h-14 rounded-2xl group/btn shadow-xl dark:shadow-2xl flex items-center justify-center gap-3 transition-all active:scale-95 italic"
                     >

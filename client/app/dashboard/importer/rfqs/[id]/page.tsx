@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useEffect, useState, use } from 'react';
-import { 
-  ArrowLeft, 
-  Clock, 
-  Package, 
-  ShieldCheck, 
-  Check, 
-  X, 
-  MessageSquare, 
+import {
+  ArrowLeft,
+  Clock,
+  Package,
+  ShieldCheck,
+  Check,
+  X,
+  MessageSquare,
   DollarSign,
   User,
   Info
@@ -32,7 +32,7 @@ export default function RFQDetailPage({ params }: { params: Promise<{ id: string
         fetch(`/api/rfq/${id}`),
         fetch(`/api/quotes?rfqId=${id}`)
       ]);
-      
+
       if (rfqRes.ok) setRfq(await rfqRes.json());
       if (quotesRes.ok) setQuotes(await quotesRes.json());
     } catch (error) {
@@ -56,7 +56,7 @@ export default function RFQDetailPage({ params }: { params: Promise<{ id: string
       });
 
       if (!res.ok) throw new Error('Action failed');
-      
+
       toast.success(status === 'ACCEPTED' ? 'Quote accepted! Check your orders.' : 'Quote rejected.');
       fetchData(); // Refresh data
       if (status === 'ACCEPTED') {
@@ -83,9 +83,8 @@ export default function RFQDetailPage({ params }: { params: Promise<{ id: string
           <h1 className="text-3xl font-black text-foreground uppercase italic tracking-tighter">{rfq.title}</h1>
           <p className="text-muted-foreground font-black text-[10px] uppercase tracking-[0.2em] mt-1.5 opacity-60">RESOURCE NODE: {rfq.id.slice(0, 12).toUpperCase()}</p>
         </div>
-        <div className={`ml-auto px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] border shadow-xl ${
-          rfq.status === 'OPEN' ? 'border-border text-foreground bg-muted/20 animate-pulse' : 'border-border text-muted-foreground bg-muted/20'
-        }`}>
+        <div className={`ml-auto px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] border shadow-xl ${rfq.status === 'OPEN' ? 'border-border text-foreground bg-muted/20 animate-pulse' : 'border-border text-muted-foreground bg-muted/20'
+          }`}>
           {rfq.status} PROTOCOL
         </div>
       </div>
@@ -121,7 +120,7 @@ export default function RFQDetailPage({ params }: { params: Promise<{ id: string
             <h2 className="text-lg font-black text-foreground flex items-center gap-3 uppercase italic tracking-tighter">
               <MessageSquare className="w-5 h-5 text-foreground/40" /> Transmission Logs ({quotes.length})
             </h2>
-            
+
             {quotes.length === 0 ? (
               <div className="py-24 bg-muted/20 border border-border border-dashed rounded-[2.5rem] text-center shadow-inner">
                 <p className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.3em] italic opacity-40">Awaiting vendor broadcast trace...</p>
@@ -129,9 +128,8 @@ export default function RFQDetailPage({ params }: { params: Promise<{ id: string
             ) : (
               <div className="space-y-6">
                 {quotes.map((quote) => (
-                  <div key={quote.id} className={`p-8 bg-muted/40 backdrop-blur-xl border rounded-[2.5rem] transition-all shadow-2xl ${
-                    quote.status === 'ACCEPTED' ? 'border-border bg-muted/20' : 'border-border'
-                  }`}>
+                  <div key={quote.id} className={`p-8 bg-muted/40 backdrop-blur-xl border rounded-[2.5rem] transition-all shadow-2xl ${quote.status === 'ACCEPTED' ? 'border-border bg-muted/20' : 'border-border'
+                    }`}>
                     <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-8">
                       <div className="flex items-center gap-5">
                         <div className="size-16 rounded-[1.5rem] bg-muted border border-border flex items-center justify-center text-muted-foreground/30 overflow-hidden shadow-xl">
@@ -161,14 +159,14 @@ export default function RFQDetailPage({ params }: { params: Promise<{ id: string
                       <div className="flex items-center gap-3">
                         {quote.status === 'PENDING' && rfq.status === 'OPEN' ? (
                           <>
-                            <Button 
+                            <Button
                               onClick={() => handleQuoteAction(quote.id, 'ACCEPTED')}
                               disabled={!!processingId}
                               className="bg-primary hover:bg-primary/90 text-primary-foreground border-transparent h-14 px-8 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-primary/5 active:scale-95 transition-all"
                             >
                               <Check className="w-4 h-4" /> Initialize
                             </Button>
-                            <Button 
+                            <Button
                               variant="outline"
                               onClick={() => handleQuoteAction(quote.id, 'REJECTED')}
                               disabled={!!processingId}
@@ -178,15 +176,14 @@ export default function RFQDetailPage({ params }: { params: Promise<{ id: string
                             </Button>
                           </>
                         ) : (
-                          <div className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] border shadow-xl ${
-                            quote.status === 'ACCEPTED' ? 'border-border text-foreground bg-muted/20' : 'border-border text-muted-foreground bg-muted/20'
-                          }`}>
+                          <div className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] border shadow-xl ${quote.status === 'ACCEPTED' ? 'border-border text-foreground bg-muted/20' : 'border-border text-muted-foreground bg-muted/20'
+                            }`}>
                             {quote.status} LOGGED
                           </div>
                         )}
                       </div>
                     </div>
-                    
+
                     {quote.note && (
                       <div className="mt-6 p-4 bg-muted/20 backdrop-blur-xl rounded-2xl border border-border text-[10px] font-black uppercase tracking-widest text-muted-foreground italic leading-relaxed">
                         &ldquo;{quote.note}&rdquo;

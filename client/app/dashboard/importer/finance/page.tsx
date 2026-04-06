@@ -181,7 +181,7 @@ export default function ImporterFinancePage() {
                   JAN 2026 - JUN 2026
                 </div>
               </div>
- 
+
               <div className="flex items-end justify-between gap-4 h-64 px-4 pb-4">
                 {data?.spendingHistory.map((sh, i) => {
                   const maxAmt = Math.max(...data.spendingHistory.map(h => h.amount), 1);
@@ -210,10 +210,10 @@ export default function ImporterFinancePage() {
                 <h3 className="text-xl font-black text-foreground uppercase italic">Ledger</h3>
                 <button className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] hover:text-foreground transition-colors">Audit All</button>
               </div>
- 
+
               <div className="flex-1 space-y-4 overflow-y-auto no-scrollbar">
                 {loading ? (
-                   Array.from({ length: 5 }).map((_, i) => (
+                  Array.from({ length: 5 }).map((_, i) => (
                     <div key={i} className="h-16 bg-muted/20 rounded-2xl animate-pulse" />
                   ))
                 ) : !data?.recentInvoices?.length ? (

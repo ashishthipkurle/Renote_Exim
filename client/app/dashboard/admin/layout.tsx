@@ -9,7 +9,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <SidebarProvider>
       <div className="flex flex-col h-svh w-full bg-board transition-colors duration-300 overflow-hidden">
         <DashboardHeader />
-        
+
         <div className="flex flex-1 overflow-hidden relative">
           <AdminSidebar basePath="/dashboard/admin" />
           <SidebarInset>

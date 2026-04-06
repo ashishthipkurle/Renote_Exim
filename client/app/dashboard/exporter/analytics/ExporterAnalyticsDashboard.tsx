@@ -138,8 +138,8 @@ function KpiCard({
       {trend !== undefined && (
         <div
           className={`mt-6 inline-flex items-center gap-2 text-[9px] font-black px-3 py-1.5 rounded-full border uppercase tracking-widest italic transition-all ${isPositive
-              ? "text-foreground dark:text-white bg-black/10 dark:bg-white/15 border-border dark:border-white/20"
-              : "text-muted-foreground/60 bg-black/5 dark:bg-white/10 border-border dark:border-white/5"
+            ? "text-foreground dark:text-white bg-black/10 dark:bg-white/15 border-border dark:border-white/20"
+            : "text-muted-foreground/60 bg-black/5 dark:bg-white/10 border-border dark:border-white/5"
             }`}
         >
           {isPositive ? <TrendingUp className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
@@ -359,8 +359,8 @@ export default function ExporterAnalyticsDashboard({ data }: { data: AnalyticsDa
                   key={tf}
                   onClick={() => setTimeframe(tf)}
                   className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${timeframe === tf
-                      ? "bg-primary text-primary-foreground dark:shadow-md shadow-none"
-                      : "text-muted-foreground/60 hover:text-foreground dark:text-white hover:bg-black/5 dark:bg-white/10"
+                    ? "bg-primary text-primary-foreground dark:shadow-md shadow-none"
+                    : "text-muted-foreground/60 hover:text-foreground dark:text-white hover:bg-black/5 dark:bg-white/10"
                     }`}
                 >
                   {tf}

@@ -3,20 +3,20 @@
 import { useEffect, useState, useRef, useCallback, useLayoutEffect } from "react";
 import { useTheme } from "next-themes";
 import { authFetch, formatCurrency } from "@/lib/api-utils";
-import { 
-  Download, 
-  History, 
-  TrendingUp, 
-  DollarSign, 
-  Clock, 
-  CheckCircle2, 
-  Package, 
-  FileText, 
-  Search, 
-  Globe, 
-  ArrowRight, 
-  ArrowLeft, 
-  ShieldCheck, 
+import {
+  Download,
+  History,
+  TrendingUp,
+  DollarSign,
+  Clock,
+  CheckCircle2,
+  Package,
+  FileText,
+  Search,
+  Globe,
+  ArrowRight,
+  ArrowLeft,
+  ShieldCheck,
   ShoppingCart,
   Layers,
   Circle
@@ -74,10 +74,10 @@ function statusCfg(status: string) {
 }
 
 function fmtUSD(amount: number): string {
-  return new Intl.NumberFormat("en-US", { 
-    style: "currency", 
-    currency: "USD", 
-    maximumFractionDigits: 0 
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0
   }).format(amount);
 }
 
@@ -101,7 +101,7 @@ function downloadAsFile(html: string, filename: string) {
 function buildStatementHTML(invoices: Invoice[], totalRevenue: number): string {
   const generatedDate = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
   const currentYear = new Date().getFullYear();
-  
+
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Financial_Report</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&display=swap');
@@ -157,14 +157,14 @@ function FinancialChart({ data, dark }: { data: MonthlyPoint[]; dark: boolean })
   const ys = (v: number) => cH - (v / maxV) * cH;
 
   const pts = data.map((d, i) => ({ x: xs(i), y: ys(d.revenue), d }));
-  
+
   const smooth = pts.map((p, i) => {
     if (i === 0) return `M${p.x},${p.y}`;
     const prev = pts[i - 1];
     const cpx = (prev.x + p.x) / 2;
     return `C${cpx},${prev.y} ${cpx},${p.y} ${p.x},${p.y}`;
   }).join(" ");
-  
+
   const linePath = smooth;
   const areaPath = `${smooth} L${pts[pts.length - 1].x},${cH} L0,${cH} Z`;
 
@@ -197,21 +197,21 @@ function FinancialChart({ data, dark }: { data: MonthlyPoint[]; dark: boolean })
             );
           })}
 
-          <motion.path 
+          <motion.path
             initial={{ opacity: 0 }}
             animate={{ opacity: drawn ? 1 : 0 }}
-            d={areaPath} 
-            fill="url(#areaGrad)" 
+            d={areaPath}
+            fill="url(#areaGrad)"
           />
 
           <motion.path
             initial={{ pathLength: 0 }}
             animate={{ pathLength: drawn ? 1 : 0 }}
             transition={{ duration: 1.5, ease: "easeInOut" }}
-            d={linePath} 
-            stroke="#ffffff" 
-            strokeWidth="3" 
-            fill="none" 
+            d={linePath}
+            stroke="#ffffff"
+            strokeWidth="3"
+            fill="none"
             filter="url(#glow)"
           />
 
@@ -224,10 +224,10 @@ function FinancialChart({ data, dark }: { data: MonthlyPoint[]; dark: boolean })
                 onMouseEnter={() => setTooltip({ x: p.x + padL, y: p.y + padT, point: p.d })}
                 onMouseLeave={() => setTooltip(null)}
               />
-              <motion.circle 
+              <motion.circle
                 initial={{ r: 0 }}
                 animate={{ r: 4 }}
-                cx={p.x} cy={p.y} fill="#ffffff" stroke="#000" strokeWidth="2" 
+                cx={p.x} cy={p.y} fill="#ffffff" stroke="#000" strokeWidth="2"
               />
             </g>
           ))}
@@ -235,12 +235,12 @@ function FinancialChart({ data, dark }: { data: MonthlyPoint[]; dark: boolean })
       </svg>
 
       {tooltip && (
-        <div 
+        <div
           className="absolute pointer-events-none bg-primary text-primary-foreground p-4 rounded-2xl shadow-xl dark:shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-200"
-          style={{ 
-            left: `${(tooltip.x / W) * 100}%`, 
-            top: `${(tooltip.y / H) * 100}%`, 
-            transform: "translate(-50%, -120%)" 
+          style={{
+            left: `${(tooltip.x / W) * 100}%`,
+            top: `${(tooltip.y / H) * 100}%`,
+            transform: "translate(-50%, -120%)"
           }}
         >
           <div className="text-[9px] font-black uppercase tracking-widest opacity-40 mb-1 italic">
@@ -316,7 +316,7 @@ export default function ExporterFinancePage() {
                   return;
                 }
                 const html = buildStatementHTML(paidInvoices, completedTotal);
-                downloadAsFile(html, `RANOTE_REPORT_${new Date().toISOString().slice(0,10)}.html`);
+                downloadAsFile(html, `RANOTE_REPORT_${new Date().toISOString().slice(0, 10)}.html`);
               } finally {
                 setTimeout(() => setDownloading(false), 1500);
               }
@@ -361,19 +361,19 @@ export default function ExporterFinancePage() {
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-10 max-w-[1700px] mx-auto items-start">
           {/* Revenue Chart Section */}
           <div className="xl:col-span-8 bg-card/40 dark:bg-white/5 backdrop-blur-3xl border border-border dark:border-white/5 rounded-[3rem] p-12 shadow-xl dark:shadow-2xl relative overflow-hidden group">
-             <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none group-hover:rotate-12 transition-transform duration-1000">
-               <TrendingUp className="w-80 h-80 text-foreground dark:text-white" />
-             </div>
-             <div className="flex items-center justify-between mb-12 relative z-10">
-               <div>
-                 <h2 className="text-[10px] font-black text-foreground dark:text-white uppercase tracking-[0.4em] italic mb-2">Revenue Telemetry</h2>
-                 <p className="text-[9px] text-muted-foreground/20 font-black uppercase tracking-widest italic">Signal Index: Alpha_Node_Growth</p>
-               </div>
-               <div className="px-6 py-2 rounded-2xl bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 text-foreground dark:text-white text-[9px] font-black uppercase tracking-widest italic shadow-xl dark:shadow-2xl">
-                 Live Feed: Stable
-               </div>
-             </div>
-             <FinancialChart data={chartData} dark={true} />
+            <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none group-hover:rotate-12 transition-transform duration-1000">
+              <TrendingUp className="w-80 h-80 text-foreground dark:text-white" />
+            </div>
+            <div className="flex items-center justify-between mb-12 relative z-10">
+              <div>
+                <h2 className="text-[10px] font-black text-foreground dark:text-white uppercase tracking-[0.4em] italic mb-2">Revenue Telemetry</h2>
+                <p className="text-[9px] text-muted-foreground/20 font-black uppercase tracking-widest italic">Signal Index: Alpha_Node_Growth</p>
+              </div>
+              <div className="px-6 py-2 rounded-2xl bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 text-foreground dark:text-white text-[9px] font-black uppercase tracking-widest italic shadow-xl dark:shadow-2xl">
+                Live Feed: Stable
+              </div>
+            </div>
+            <FinancialChart data={chartData} dark={true} />
           </div>
 
           {/* Quick Registry Summary */}
@@ -425,10 +425,10 @@ export default function ExporterFinancePage() {
                 <button
                   key={s}
                   onClick={() => setStatusFilter(s)}
-                  className={`px-6 py-2.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all italic border ${statusFilter === s 
-                    ? "bg-primary text-primary-foreground border-transparent shadow-xl dark:shadow-2xl" 
+                  className={`px-6 py-2.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all italic border ${statusFilter === s
+                    ? "bg-primary text-primary-foreground border-transparent shadow-xl dark:shadow-2xl"
                     : "bg-black/5 dark:bg-white/10 text-muted-foreground/20 border-border dark:border-white/5 hover:bg-black/10 dark:bg-white/15 hover:text-foreground dark:text-white"
-                  }`}
+                    }`}
                 >
                   {s}
                 </button>
@@ -438,10 +438,10 @@ export default function ExporterFinancePage() {
 
           {filteredInvoices.length === 0 ? (
             <div className="bg-card/40 dark:bg-white/5 backdrop-blur-3xl border border-border dark:border-white/5 shadow-xl dark:shadow-2xl rounded-[3rem] p-24 text-center">
-               <div className="flex flex-col items-center gap-8 opacity-40">
-                  <FileText className="w-16 h-16 text-foreground dark:text-white" />
-                  <p className="text-[10px] font-black uppercase tracking-[0.3em] italic">Null_Signature_Feed</p>
-               </div>
+              <div className="flex flex-col items-center gap-8 opacity-40">
+                <FileText className="w-16 h-16 text-foreground dark:text-white" />
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] italic">Null_Signature_Feed</p>
+              </div>
             </div>
           ) : (
             <div className="space-y-4">
@@ -478,17 +478,17 @@ export default function ExporterFinancePage() {
                           <cfg.icon className={`w-3.5 h-3.5 ${!IsPaid ? 'animate-pulse' : ''}`} />
                           {cfg.label}
                         </span>
-                        <button 
+                        <button
                           onClick={() => {
                             if (!IsPaid) return;
                             const html = buildStatementHTML([inv], inv.amount);
                             downloadAsFile(html, `INVOICE_${inv.orderNumber}.html`);
                           }}
                           disabled={!IsPaid}
-                          className={`size-14 rounded-2xl border flex items-center justify-center transition-all duration-500 shadow-xl dark:shadow-2xl ${IsPaid 
-                            ? "bg-black/5 dark:bg-white/10 border-border dark:border-white/10 text-muted-foreground hover:bg-primary hover:text-primary-foreground hover:border-transparent active:scale-90" 
+                          className={`size-14 rounded-2xl border flex items-center justify-center transition-all duration-500 shadow-xl dark:shadow-2xl ${IsPaid
+                            ? "bg-black/5 dark:bg-white/10 border-border dark:border-white/10 text-muted-foreground hover:bg-primary hover:text-primary-foreground hover:border-transparent active:scale-90"
                             : "bg-white/[0.02] border-border dark:border-white/5 text-muted-foreground/10 cursor-not-allowed opacity-20"
-                          }`}
+                            }`}
                         >
                           <Download className="w-6 h-6" />
                         </button>

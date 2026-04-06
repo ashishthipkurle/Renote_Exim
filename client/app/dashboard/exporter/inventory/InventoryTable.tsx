@@ -23,10 +23,10 @@ type Product = {
     images: string[];
 };
 
-export default function InventoryTable({ 
-    products, 
-    availableCategories = [] 
-}: { 
+export default function InventoryTable({
+    products,
+    availableCategories = []
+}: {
     products: Product[],
     availableCategories?: string[]
 }) {
@@ -179,7 +179,7 @@ export default function InventoryTable({
             <div className="space-y-6 relative">
                 <AnimatePresence>
                     {isPending && (
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}

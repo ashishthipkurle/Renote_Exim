@@ -2,15 +2,15 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { authFetch, timeAgo } from "@/lib/api-utils";
-import { 
-  CheckCheck, 
-  Bell, 
-  Package, 
-  DollarSign, 
-  MessageSquare, 
-  ShieldCheck, 
-  Globe, 
-  Search, 
+import {
+  CheckCheck,
+  Bell,
+  Package,
+  DollarSign,
+  MessageSquare,
+  ShieldCheck,
+  Globe,
+  Search,
   ArrowRight,
   Layers,
   Zap,
@@ -131,19 +131,19 @@ export default function ExporterNotificationsPage() {
         <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-10">
           <div className="flex items-center gap-8">
             <div className="relative">
-               <h1 className="text-5xl font-black tracking-tighter text-foreground dark:text-white uppercase italic">Signal Center</h1>
-               {data && data.unreadCount > 0 && (
+              <h1 className="text-5xl font-black tracking-tighter text-foreground dark:text-white uppercase italic">Signal Center</h1>
+              {data && data.unreadCount > 0 && (
                 <div className="absolute -top-4 -right-12 px-4 py-1 rounded-full bg-primary text-primary-foreground text-[9px] font-black uppercase tracking-widest shadow-xl dark:shadow-2xl animate-pulse">
                   {data.unreadCount} NEW_SIGS
                 </div>
-               )}
+              )}
             </div>
             <div className="h-10 w-px bg-black/5 dark:bg-white/10 mx-4 hidden xl:block" />
             <p className="text-muted-foreground/40 text-[10px] font-black uppercase tracking-[0.3em] italic max-w-xs hidden xl:block">
               Registry Node Comms: Operational Telemetry // {data?.notifications.length || 0} Packets Processed
             </p>
           </div>
-          
+
           <div className="flex items-center gap-5">
             <button
               onClick={markAllRead}
@@ -223,8 +223,8 @@ export default function ExporterNotificationsPage() {
                       <div className="absolute top-0 left-0 w-2 h-full bg-primary group-hover:w-3 transition-all duration-700" />
                     )}
 
-                    <div className={`size-16 flex-shrink-0 rounded-[1.5rem] border flex items-center justify-center transition-all duration-700 ${!n.read 
-                      ? "bg-primary text-primary-foreground border-transparent shadow-xl dark:shadow-2xl scale-105" 
+                    <div className={`size-16 flex-shrink-0 rounded-[1.5rem] border flex items-center justify-center transition-all duration-700 ${!n.read
+                      ? "bg-primary text-primary-foreground border-transparent shadow-xl dark:shadow-2xl scale-105"
                       : "bg-black/5 dark:bg-white/10 border-border dark:border-white/5 text-muted-foreground/20 group-hover:bg-black/10 dark:bg-white/15 group-hover:text-foreground dark:text-white"}`}>
                       <Icon className={`w-7 h-7 ${!n.read ? "animate-pulse" : ""}`} />
                     </div>
@@ -232,7 +232,7 @@ export default function ExporterNotificationsPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-6 mb-2">
                         <div className="text-xl font-black text-foreground dark:text-white truncate italic tracking-tighter uppercase group-hover:translate-x-1 transition-transform">
-                          {n.title} // REG_ID_{n.id.slice(0,4)}
+                          {n.title} // REG_ID_{n.id.slice(0, 4)}
                         </div>
                         <div className="text-[9px] font-black text-muted-foreground/30 uppercase tracking-[0.3em] italic whitespace-nowrap group-hover:text-muted-foreground/60 transition-colors">
                           TELEMETRY_LAG: {timeAgo(n.createdAt)}
@@ -242,7 +242,7 @@ export default function ExporterNotificationsPage() {
                         {n.message}
                       </p>
                     </div>
-                    
+
                     <div className="size-12 rounded-[1rem] bg-black/5 dark:bg-white/10 border border-border dark:border-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-700 -translate-x-4 group-hover:translate-x-0">
                       <ArrowRight className="w-5 h-5 text-foreground dark:text-white" />
                     </div>
@@ -252,24 +252,24 @@ export default function ExporterNotificationsPage() {
             </div>
           )}
         </div>
-        
+
         {/* Signal Protocol Reminder */}
         <div className="max-w-[1200px] mx-auto bg-card/60 dark:bg-white/[0.07] border border-border dark:border-white/10 rounded-[3rem] p-12 flex flex-col xl:flex-row items-center gap-10 shadow-xl dark:shadow-2xl relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none group-hover:rotate-6 transition-transform duration-1000">
-              <Zap className="w-40 h-40 text-foreground dark:text-white" />
-            </div>
-            <div className="size-20 rounded-[2rem] bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 flex items-center justify-center shrink-0 relative z-10 transition-all duration-1000 group-hover:scale-110">
-              <Info className="w-10 h-10 text-foreground dark:text-white" />
-            </div>
-            <div className="relative z-10">
-              <h3 className="text-foreground dark:text-white font-black text-2xl uppercase italic tracking-tighter mb-4">Registry Protocol Override</h3>
-              <p className="text-muted-foreground/40 text-xs font-medium leading-relaxed max-w-3xl italic uppercase tracking-tight group-hover:text-muted-foreground/80 transition-colors">
-                Alert telemetry is prioritized via AI routing nodes. Ensure high-priority order and settlement signals are processed within 24 hours to maintain registry integrity score. Historical packets are cached for 90 days.
-              </p>
-            </div>
-            <button className="xl:ml-auto border border-border dark:border-white/10 text-foreground dark:text-white hover:bg-primary hover:text-primary-foreground h-16 px-10 rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] italic transition-all active:scale-95 shadow-xl dark:shadow-2xl relative z-10">
-              Archive_Feed
-            </button>
+          <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none group-hover:rotate-6 transition-transform duration-1000">
+            <Zap className="w-40 h-40 text-foreground dark:text-white" />
+          </div>
+          <div className="size-20 rounded-[2rem] bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 flex items-center justify-center shrink-0 relative z-10 transition-all duration-1000 group-hover:scale-110">
+            <Info className="w-10 h-10 text-foreground dark:text-white" />
+          </div>
+          <div className="relative z-10">
+            <h3 className="text-foreground dark:text-white font-black text-2xl uppercase italic tracking-tighter mb-4">Registry Protocol Override</h3>
+            <p className="text-muted-foreground/40 text-xs font-medium leading-relaxed max-w-3xl italic uppercase tracking-tight group-hover:text-muted-foreground/80 transition-colors">
+              Alert telemetry is prioritized via AI routing nodes. Ensure high-priority order and settlement signals are processed within 24 hours to maintain registry integrity score. Historical packets are cached for 90 days.
+            </p>
+          </div>
+          <button className="xl:ml-auto border border-border dark:border-white/10 text-foreground dark:text-white hover:bg-primary hover:text-primary-foreground h-16 px-10 rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] italic transition-all active:scale-95 shadow-xl dark:shadow-2xl relative z-10">
+            Archive_Feed
+          </button>
         </div>
       </div>
     </div>

@@ -76,7 +76,7 @@ export default function AdminProductsPage() {
   };
 
   const toggleSelect = (id: string) => {
-    setSelectedProducts(prev => 
+    setSelectedProducts(prev =>
       prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
     );
   };

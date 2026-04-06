@@ -364,7 +364,7 @@ export default function ImporterDashboard() {
                   ))
                 )}
               </div>
-                <Link href="/dashboard/importer/orders" className="w-full mt-5 py-3 text-[10px] font-black text-muted-foreground uppercase tracking-widest hover:text-foreground hover:bg-muted rounded-xl transition-all border border-dashed border-border text-center block">
+              <Link href="/dashboard/importer/orders" className="w-full mt-5 py-3 text-[10px] font-black text-muted-foreground uppercase tracking-widest hover:text-foreground hover:bg-muted rounded-xl transition-all border border-dashed border-border text-center block">
                 Access Order Archives
               </Link>
             </div>

@@ -225,7 +225,7 @@ export default function CategoryDirectory({ usedCategories = [] }: { usedCategor
                     {/* ── Selection View ── */}
                     <AnimatePresence>
                         {isSelected && (
-                            <motion.div 
+                            <motion.div
                                 initial={{ x: 100, opacity: 0 }}
                                 animate={{ x: 0, opacity: 1 }}
                                 exit={{ x: 100, opacity: 0 }}
@@ -240,7 +240,7 @@ export default function CategoryDirectory({ usedCategories = [] }: { usedCategor
                                                     NODE: {selectedCategory}
                                                 </div>
                                                 <span className="text-muted-foreground/40 font-black uppercase text-[8px] tracking-[0.3em] flex items-center gap-2 italic">
-                                                    <span className="w-1.5 h-1.5 rounded-full bg-black/20 dark:bg-white/20" /> 
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-black/20 dark:bg-white/20" />
                                                     Primary Trade Link Verified
                                                 </span>
                                             </div>

@@ -188,13 +188,13 @@ export default function ExporterDirectoryPage() {
               {data.pagination.totalPages > 1 && (
                 <div className="flex justify-center gap-4 mt-20 pb-20">
                   {Array.from({ length: data.pagination.totalPages }, (_, i) => i + 1).map((p) => (
-                    <button 
-                      key={p} 
-                      onClick={() => setPage(p)} 
-                      className={`w-14 h-14 rounded-2xl text-[10px] font-black transition-all backdrop-blur-3xl italic ${p === page 
-                        ? "bg-primary text-primary-foreground border-transparent shadow-2xl shadow-white/10 scale-110" 
+                    <button
+                      key={p}
+                      onClick={() => setPage(p)}
+                      className={`w-14 h-14 rounded-2xl text-[10px] font-black transition-all backdrop-blur-3xl italic ${p === page
+                        ? "bg-primary text-primary-foreground border-transparent shadow-2xl shadow-white/10 scale-110"
                         : "bg-card/40 dark:bg-white/5 border border-border dark:border-white/5 text-muted-foreground/40 hover:bg-black/10 dark:bg-white/15 hover:border-border dark:border-white/20 hover:text-foreground dark:text-white"
-                      }`}
+                        }`}
                     >
                       {p < 10 ? `0${p}` : p}
                     </button>
@@ -210,15 +210,15 @@ export default function ExporterDirectoryPage() {
       <AnimatePresence>
         {selectedPartner && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/80 backdrop-blur-2xl" 
-              onClick={() => setSelectedPartner(null)} 
+              className="absolute inset-0 bg-black/80 backdrop-blur-2xl"
+              onClick={() => setSelectedPartner(null)}
             />
 
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}

@@ -10,7 +10,7 @@ export default function ImporterLayout({ children }: { children: React.ReactNode
       <div className="flex flex-col h-svh w-full bg-board transition-colors duration-300 overflow-hidden">
         {/* Master Header spans the full width at the top */}
         <DashboardHeader />
-        
+
         <div className="flex flex-1 overflow-hidden relative">
           <ClientSidebar basePath="/dashboard/importer" />
           <SidebarInset>

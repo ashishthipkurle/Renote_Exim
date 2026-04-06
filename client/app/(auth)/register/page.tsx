@@ -1,11 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState, Suspense } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
-  Building2,
-  Globe as GlobeIcon,
   Lock,
   Mail,
   MapPin,
@@ -36,7 +34,6 @@ function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { refreshUser } = useAuth();
-  const didInitRole = useRef(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -51,22 +48,9 @@ function RegisterForm() {
   });
 
   useEffect(() => {
-    if (didInitRole.current) return;
-    const roleParam = (searchParams.get("role") ?? "").toLowerCase();
-    if (roleParam === "exporter") {
-      setFormData((prev) => ({ ...prev, role: "EXPORTER" }));
-      didInitRole.current = true;
-      return;
-    }
-    if (roleParam === "importer" || roleParam === "customer") {
-      setFormData((prev) => ({ ...prev, role: "IMPORTER" }));
-      didInitRole.current = true;
-      return;
-    }
-    if (roleParam === "user") {
-      setFormData((prev) => ({ ...prev, role: "USER" }));
-      didInitRole.current = true;
-    }
+    // All new signups default to USER role. 
+    // Role selection is now handled by the Master Exporter Dashboard.
+    setFormData((prev) => ({ ...prev, role: "USER" }));
   }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -202,52 +186,12 @@ function RegisterForm() {
               <div className="space-y-2 mb-6">
                 <h1 className="text-3xl font-extrabold tracking-tight">Create Account</h1>
                 <p className="text-muted-foreground">
-                  Choose your role and set up your trade profile.
+                  Join the Renote Exim global trade network.
                 </p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Role Selection */}
-                <div>
-                  <label className="block text-sm font-semibold text-muted-foreground mb-3">
-                    I want to
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <button
-                      type="button"
-                      onClick={() => setFormData({ ...formData, role: "USER" })}
-                      className={`p-4 border rounded-xl text-left transition-colors ${formData.role === "USER"
-                        ? "border-primary bg-primary/10"
-                        : "border-border hover:bg-accent"
-                        }`}
-                    >
-                      <div className="font-semibold">Shop Products</div>
-                      <div className="text-sm text-muted-foreground mt-1">Browse & buy directly</div>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setFormData({ ...formData, role: "IMPORTER" })}
-                      className={`p-4 border rounded-xl text-left transition-colors ${formData.role === "IMPORTER"
-                        ? "border-primary bg-primary/10"
-                        : "border-border hover:bg-accent"
-                        }`}
-                    >
-                      <div className="font-semibold">Import Products</div>
-                      <div className="text-sm text-muted-foreground mt-1">Buy in bulk (B2B)</div>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setFormData({ ...formData, role: "EXPORTER" })}
-                      className={`p-4 border rounded-xl text-left transition-colors ${formData.role === "EXPORTER"
-                        ? "border-primary bg-primary/10"
-                        : "border-border hover:bg-accent"
-                        }`}
-                    >
-                      <div className="font-semibold">Export Products</div>
-                      <div className="text-sm text-muted-foreground mt-1">Sell to importers (B2B)</div>
-                    </button>
-                  </div>
-                </div>
+
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -339,38 +283,7 @@ function RegisterForm() {
                     </div>
                   </div>
 
-                  {/* B2B fields — only for Importer/Exporter */}
-                  {formData.role !== "USER" && (
-                    <>
-                      <div className="space-y-2">
-                        <label className="text-sm font-semibold text-muted-foreground ml-1">Company Name</label>
-                        <div className="relative group">
-                          <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors w-5 h-5" />
-                          <input
-                            type="text"
-                            value={formData.companyName}
-                            onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                            className="w-full pl-12 pr-4 py-4 bg-background border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-ring/20 transition-all placeholder:text-muted-foreground"
-                            placeholder="Acme Corp"
-                          />
-                        </div>
-                      </div>
 
-                      <div className="space-y-2">
-                        <label className="text-sm font-semibold text-muted-foreground ml-1">Website</label>
-                        <div className="relative group">
-                          <GlobeIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors w-5 h-5" />
-                          <input
-                            type="url"
-                            value={formData.website}
-                            onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                            className="w-full pl-12 pr-4 py-4 bg-background border border-input rounded-xl focus:outline-none focus:ring-2 focus:ring-ring/20 transition-all placeholder:text-muted-foreground"
-                            placeholder="https://company.com"
-                          />
-                        </div>
-                      </div>
-                    </>
-                  )}
                 </div>
 
                 <div className="flex items-start gap-3">

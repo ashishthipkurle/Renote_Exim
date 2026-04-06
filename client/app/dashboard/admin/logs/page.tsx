@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { 
-    Search, 
-    Globe, 
-    ShieldCheck, 
-    ShieldAlert, 
+import {
+    Search,
+    Globe,
+    ShieldCheck,
+    ShieldAlert,
     Clock,
     Terminal
 } from "lucide-react";
@@ -51,7 +51,7 @@ export default function AdminLogsPage() {
         fetchLogs();
     }, []);
 
-    const filteredLogs = logs.filter(log => 
+    const filteredLogs = logs.filter(log =>
         log.user.name.toLowerCase().includes(search.toLowerCase()) ||
         log.user.email.toLowerCase().includes(search.toLowerCase()) ||
         log.ip?.includes(search)
@@ -108,7 +108,7 @@ export default function AdminLogsPage() {
                             ) : filteredLogs.length === 0 ? (
                                 <tr>
                                     <td colSpan={5} className="py-20">
-                                        <EmptyState 
+                                        <EmptyState
                                             iconName="searchX"
                                             title="No Audit Trails"
                                             description="No activity logs detected in the current transmission cycle."

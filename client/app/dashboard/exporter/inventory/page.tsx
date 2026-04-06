@@ -15,10 +15,10 @@ function formatNumber(n: number) {
 }
 
 function formatMoney(n: number) {
-  return new Intl.NumberFormat("en-US", { 
-    style: "currency", 
-    currency: "USD", 
-    maximumFractionDigits: 0 
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0
   }).format(n);
 }
 
@@ -217,7 +217,7 @@ export default async function ExporterInventoryPage({
                       <div className={`px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest italic ${colorDef} transition-all`}>
                         {c.name}
                       </div>
-                      <div className="text-[8px] font-black text-muted-foreground/20 uppercase tracking-tighter">SIG_LINK_{c.name.slice(0,3)}</div>
+                      <div className="text-[8px] font-black text-muted-foreground/20 uppercase tracking-tighter">SIG_LINK_{c.name.slice(0, 3)}</div>
                     </div>
                     <div className="flex items-center justify-between">
                       <div>
@@ -230,9 +230,9 @@ export default async function ExporterInventoryPage({
                       </div>
                     </div>
                     <div className="mt-8 h-1 w-full bg-black/5 dark:bg-white/10 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-primary dark:shadow-md shadow-none transition-all duration-1000 delay-500" 
-                        style={{ width: `${Math.max((c.revenue / maxCategoryRev) * 100, 5)}%` }} 
+                      <div
+                        className="h-full bg-primary dark:shadow-md shadow-none transition-all duration-1000 delay-500"
+                        style={{ width: `${Math.max((c.revenue / maxCategoryRev) * 100, 5)}%` }}
                       />
                     </div>
                   </div>
@@ -274,10 +274,10 @@ export default async function ExporterInventoryPage({
                       <Link
                         key={p}
                         href={`?${new URLSearchParams({ ...searchParams, page: p.toString() })}`}
-                        className={`w-14 h-14 flex items-center justify-center rounded-2xl border text-[10px] font-black transition-all backdrop-blur-3xl ${page === p 
-                          ? "bg-primary border-transparent text-primary-foreground shadow-2xl shadow-white/10 scale-110" 
+                        className={`w-14 h-14 flex items-center justify-center rounded-2xl border text-[10px] font-black transition-all backdrop-blur-3xl ${page === p
+                          ? "bg-primary border-transparent text-primary-foreground shadow-2xl shadow-white/10 scale-110"
                           : "bg-card/40 dark:bg-white/5 border-border dark:border-white/5 text-muted-foreground hover:bg-black/10 dark:bg-white/15 hover:border-border dark:border-white/20 hover:text-foreground dark:text-white"
-                        }`}
+                          }`}
                       >
                         {p < 10 ? `0${p}` : p}
                       </Link>

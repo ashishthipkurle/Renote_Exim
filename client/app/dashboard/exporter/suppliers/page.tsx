@@ -19,11 +19,7 @@ import {
     User,
     Building2,
     FileText,
-    Globe,
     ShieldCheck,
-    Zap,
-    ArrowRight,
-    SearchX,
     MessageCircle,
     Users2,
     Video,
@@ -37,7 +33,6 @@ import MessagesWorkspace from "@/components/messaging/MessagesWorkspace";
 import { authFetch, formatCurrency, formatNumber, timeAgo } from "@/lib/api-utils";
 import { useRealtimeCall } from "@/hooks/useRealtimeCall";
 import { toast } from "sonner";
-import { motion, AnimatePresence } from "framer-motion";
 
 interface Supplier {
     id: string;
@@ -235,12 +230,12 @@ export default function ExporterSuppliersPage() {
 
     if (loading && suppliers.length === 0) return (
         <div className="h-screen flex flex-col items-center justify-center bg-card dark:bg-[#0a0a0a]">
-          <div className="flex flex-col items-center gap-6 opacity-40">
-            <div className="p-8 rounded-[2.5rem] bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 animate-pulse">
-              <Handshake className="w-12 h-12 text-foreground dark:text-white animate-spin-slow" />
+            <div className="flex flex-col items-center gap-6 opacity-40">
+                <div className="p-8 rounded-[2.5rem] bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 animate-pulse">
+                    <Handshake className="w-12 h-12 text-foreground dark:text-white animate-spin-slow" />
+                </div>
+                <p className="text-[10px] font-black text-foreground dark:text-white uppercase tracking-[0.4em] italic">Indexing Dealer Nodes...</p>
             </div>
-            <p className="text-[10px] font-black text-foreground dark:text-white uppercase tracking-[0.4em] italic">Indexing Dealer Nodes...</p>
-          </div>
         </div>
     );
 
@@ -277,11 +272,10 @@ export default function ExporterSuppliersPage() {
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`relative overflow-hidden rounded-2xl border px-4 py-3 text-left transition-all ${
-                                    active
-                                        ? "border-primary/40 bg-primary/15 text-primary shadow-lg shadow-primary/10"
-                                        : "border-border bg-muted/30 text-muted-foreground hover:border-border/70 hover:bg-muted/50 hover:text-foreground"
-                                }`}
+                                className={`relative overflow-hidden rounded-2xl border px-4 py-3 text-left transition-all ${active
+                                    ? "border-primary/40 bg-primary/15 text-primary shadow-lg shadow-primary/10"
+                                    : "border-border bg-muted/30 text-muted-foreground hover:border-border/70 hover:bg-muted/50 hover:text-foreground"
+                                    }`}
                             >
                                 <div className="relative z-10 flex items-center justify-between">
                                     <span className="text-xs font-black uppercase tracking-widest">{tab.label}</span>
@@ -562,36 +556,24 @@ export default function ExporterSuppliersPage() {
             ) : null}
 
             {/* Add Dealer Modal */}
-            {isModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-                    <div className="bg-background border border-border w-full max-w-2xl rounded-[2rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
-                        <div className="p-8 border-b border-border bg-muted/80 backdrop-blur-md flex items-center justify-between">
-                            <div>
-                                <h3 className="text-2xl font-black text-foreground">Add New Dealer</h3>
-                                <p className="text-muted-foreground text-sm mt-1">Record the details of your service provider or supplier.</p>
-                            </div>
-                            <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-muted rounded-full text-muted-foreground hover:text-foreground transition-colors">
-                                <X className="w-6 h-6" />
-                            </button>
-                        </div>
-
-                        <form onSubmit={handleCreateSupplier} className="p-8">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-muted-foreground uppercase flex items-center gap-2">
-                                        <Building2 className="w-3.5 h-3.5" />
-                                        Company Name*
-                                    </label>
-                                    <input
-                                        required
-                                        type="text"
-                                        className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:border-primary outline-none transition-all placeholder:text-muted-foreground/50"
-                                        placeholder="e.g. Acme Manufacturing"
-                                        value={formData.name}
-                                        onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                    />
+            <AnimatePresence>
+                {isModalOpen && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            className="bg-background border border-border w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-hidden"
+                        >
+                            <div className="p-12 border-b border-border bg-white/[0.02] backdrop-blur-md flex items-center justify-between">
+                                <div>
+                                    <h3 className="text-3xl font-black text-foreground italic uppercase tracking-tighter">Add New Dealer</h3>
+                                    <p className="text-muted-foreground/40 text-[10px] font-black uppercase tracking-[0.2em] mt-2 italic">Forge a new trade link in the registry node</p>
                                 </div>
-                                <button onClick={() => setIsModalOpen(false)} className="size-14 bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 rounded-2xl flex items-center justify-center text-white/20 hover:text-foreground dark:text-white transition-all active:scale-90">
+                                <button
+                                    onClick={() => setIsModalOpen(false)}
+                                    className="size-14 bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 rounded-2xl flex items-center justify-center text-white/20 hover:text-foreground dark:text-white transition-all active:scale-90"
+                                >
                                     <X className="w-7 h-7" />
                                 </button>
                             </div>

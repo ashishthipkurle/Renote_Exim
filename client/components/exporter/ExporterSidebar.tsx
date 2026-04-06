@@ -16,6 +16,7 @@ import {
   Handshake,
   FileText,
   Globe,
+  ShieldCheck,
 } from "lucide-react";
 import {
   Sidebar,
@@ -27,6 +28,7 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 interface NavItem {
   href: string;
@@ -36,6 +38,8 @@ interface NavItem {
 
 export default function ExporterSidebar({ basePath }: { basePath: string }) {
   const pathname = usePathname();
+  const { user } = useAuth();
+  const isMaster = user?.email === "exporter@gmail.com";
 
   const nav: NavItem[] = [
     { href: basePath, label: "Dashboard", icon: LayoutDashboard },
@@ -44,6 +48,7 @@ export default function ExporterSidebar({ basePath }: { basePath: string }) {
     { href: `${basePath}/shipments`, label: "Shipments", icon: Globe },
     { href: `${basePath}/rfqs`, label: "RFQs", icon: FileText },
     { href: `${basePath}/directory`, label: "Buyers", icon: Users },
+    ...(isMaster ? [{ href: `${basePath}/users`, label: "Registry", icon: ShieldCheck }] : []),
     { href: `${basePath}/suppliers`, label: "Dealers", icon: Handshake },
     { href: `${basePath}/messages`, label: "Messages", icon: MessageSquare },
     { href: `${basePath}/calls`, label: "Calls", icon: PhoneCall },

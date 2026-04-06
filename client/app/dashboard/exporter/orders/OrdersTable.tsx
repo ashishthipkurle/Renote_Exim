@@ -4,22 +4,22 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { 
-  Package, 
-  ArrowRight, 
-  Clock, 
-  CheckCircle2, 
-  XCircle, 
-  Truck, 
-  Search, 
-  ChevronDown, 
-  Star, 
-  Globe, 
-  ShieldCheck, 
-  ShoppingCart, 
-  Layers, 
-  TrendingUp,
-  Circle
+import {
+    Package,
+    ArrowRight,
+    Clock,
+    CheckCircle2,
+    XCircle,
+    Truck,
+    Search,
+    ChevronDown,
+    Star,
+    Globe,
+    ShieldCheck,
+    ShoppingCart,
+    Layers,
+    TrendingUp,
+    Circle
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import ShipmentTrackingPanel from "@/components/dashboard/ShipmentTrackingPanel";
@@ -201,7 +201,7 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
             <div className="space-y-6 relative">
                 <AnimatePresence>
                     {isPending && (
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
@@ -278,7 +278,7 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
 
                                             <div className="lg:col-span-2">
                                                 <div className="text-foreground dark:text-white font-black text-2xl italic tracking-tighter group-hover:scale-105 transition-transform origin-left">{formatCurrency(order.totalPrice)}</div>
-                                                <div className="text-[8px] text-muted-foreground/20 font-black uppercase tracking-[0.3em] mt-2 italic group-hover:text-muted-foreground/40 transition-colors">SETTLEMENT_{ (order.paymentStatus ?? "pending").toUpperCase() }</div>
+                                                <div className="text-[8px] text-muted-foreground/20 font-black uppercase tracking-[0.3em] mt-2 italic group-hover:text-muted-foreground/40 transition-colors">SETTLEMENT_{(order.paymentStatus ?? "pending").toUpperCase()}</div>
                                             </div>
 
                                             <div className="lg:col-span-2 flex justify-center">
@@ -312,7 +312,7 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
                                             {/* ── Expanded Content ── */}
                                             <AnimatePresence>
                                                 {isExpanded && (
-                                                    <motion.div 
+                                                    <motion.div
                                                         initial={{ height: 0, opacity: 0 }}
                                                         animate={{ height: "auto", opacity: 1 }}
                                                         exit={{ height: 0, opacity: 0 }}
@@ -347,10 +347,10 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
                                                                     </div>
 
                                                                     <div className="flex flex-wrap gap-4">
-                                                                        <button 
+                                                                        <button
                                                                             onClick={() => setShipmentExpandedOrderId(shipmentExpandedOrderId === order.id ? null : order.id)}
-                                                                            className={`px-8 py-3 rounded-2xl border text-[10px] font-black uppercase tracking-widest italic transition-all ${shipmentExpandedOrderId === order.id 
-                                                                                ? "bg-primary text-primary-foreground border-transparent shadow-2xl shadow-white/10 scale-105" 
+                                                                            className={`px-8 py-3 rounded-2xl border text-[10px] font-black uppercase tracking-widest italic transition-all ${shipmentExpandedOrderId === order.id
+                                                                                ? "bg-primary text-primary-foreground border-transparent shadow-2xl shadow-white/10 scale-105"
                                                                                 : "bg-card/40 dark:bg-white/5 text-muted-foreground/40 border-border dark:border-white/5 hover:bg-black/10 dark:bg-white/15 hover:text-foreground dark:text-white"}`}
                                                                         >
                                                                             Logistics_Telemetry

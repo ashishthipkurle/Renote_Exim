@@ -118,15 +118,15 @@ export default async function ExporterOrdersPage({
       <div className="flex-1 overflow-y-auto p-10 space-y-16 custom-scrollbar animate-in fade-in slide-in-from-bottom-4 duration-1000">
         <div className="max-w-[1700px] mx-auto space-y-16">
           {/* Order Grid (Table Component) */}
-           <div className="space-y-10">
-              <div className="flex items-center gap-5 border-b border-border dark:border-white/5 pb-6">
-                <ShoppingCart className="w-5 h-5 text-foreground dark:text-white" />
-                <h2 className="text-[10px] font-black text-foreground dark:text-white uppercase tracking-[0.4em] italic">
-                  Trade Sequence Feed
-                </h2>
-              </div>
-              <OrdersTable orders={orders} counts={statusCounts} />
-           </div>
+          <div className="space-y-10">
+            <div className="flex items-center gap-5 border-b border-border dark:border-white/5 pb-6">
+              <ShoppingCart className="w-5 h-5 text-foreground dark:text-white" />
+              <h2 className="text-[10px] font-black text-foreground dark:text-white uppercase tracking-[0.4em] italic">
+                Trade Sequence Feed
+              </h2>
+            </div>
+            <OrdersTable orders={orders} counts={statusCounts} />
+          </div>
 
           {/* Pagination */}
           {totalPages > 1 && (
@@ -146,10 +146,10 @@ export default async function ExporterOrdersPage({
                       <Link
                         key={p}
                         href={`?${new URLSearchParams({ ...resolvedSearchParams, page: p.toString() })}`}
-                        className={`w-14 h-14 flex items-center justify-center rounded-2xl border text-[10px] font-black transition-all backdrop-blur-3xl ${page === p 
-                          ? "bg-primary border-transparent text-primary-foreground shadow-2xl shadow-white/10 scale-110" 
+                        className={`w-14 h-14 flex items-center justify-center rounded-2xl border text-[10px] font-black transition-all backdrop-blur-3xl ${page === p
+                          ? "bg-primary border-transparent text-primary-foreground shadow-2xl shadow-white/10 scale-110"
                           : "bg-card/40 dark:bg-white/5 border-border dark:border-white/5 text-muted-foreground hover:bg-black/10 dark:bg-white/15 hover:border-border dark:border-white/20 hover:text-foreground dark:text-white"
-                        }`}
+                          }`}
                       >
                         {p < 10 ? `0${p}` : p}
                       </Link>
@@ -173,5 +173,7 @@ export default async function ExporterOrdersPage({
         </div>
       </div>
     </div>
+  );
+}
   );
 }
