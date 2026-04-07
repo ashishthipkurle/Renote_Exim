@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Plane2 from "@/assests/Plane2.png";
 
 export default function ConnectivitySection() {
   const airplaneRef = useRef<HTMLImageElement>(null);
@@ -34,7 +35,7 @@ export default function ConnectivitySection() {
     <section ref={sectionRef} className="py-24 bg-slate-50 dark:bg-background relative z-20 reveal-on-scroll overflow-hidden">
       {/* Animated Airplane */}
       <div className="absolute inset-0 pointer-events-none z-50 flex items-center justify-start overflow-visible">
-        <Image ref={airplaneRef} src="/assets/airplane.png" alt="Airplane" width={1400} height={400} className="w-[1400px] max-w-none h-auto object-contain drop-shadow-[0_45px_65px_rgba(0,0,0,0.5)] -ml-[300px]" unoptimized />
+        <Image ref={airplaneRef} src={Plane2} alt="Airplane" width={1400} height={400} className="w-[1400px] max-w-none h-auto object-contain drop-shadow-[0_45px_65px_rgba(0,0,0,0.5)] -ml-[300px]" unoptimized />
       </div>
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">

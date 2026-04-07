@@ -70,10 +70,6 @@ export default function RootLayout({
       {/* eslint-disable-next-line @next/next/no-page-custom-font */}
       <head>
         <link
-          href="https://fonts.googleapis.com/css2?family=Anton&display=swap"
-          rel="stylesheet"
-        />
-        <link
           href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap"
           rel="stylesheet"
         />

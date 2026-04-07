@@ -202,7 +202,7 @@ function Sidebar({
 
   return (
     <div
-      className="group peer text-sidebar-foreground hidden md:block"
+      className="group peer text-sidebar-foreground block"
       data-state={state}
       data-collapsible={state === "collapsed" ? collapsible : ""}
       data-variant={variant}
@@ -223,7 +223,7 @@ function Sidebar({
       <div
         data-slot="sidebar-container"
         className={cn(
-          "fixed top-16 bottom-0 z-30 hidden h-[calc(100vh-4rem)] w-[var(--sidebar-width)] transition-[left,right,width] duration-200 ease-linear md:flex border-t border-border/50 dark:border-white/5",
+          "fixed top-16 bottom-0 z-30 h-[calc(100vh-4rem)] w-[var(--sidebar-width)] transition-[left,right,width] duration-200 ease-linear flex border-t border-border/50 dark:border-white/5",
           side === "left"
             ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
             : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
@@ -237,8 +237,7 @@ function Sidebar({
         <div
           data-sidebar="sidebar"
           data-slot="sidebar-inner"
-          className="group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm"
-          style={{ background: "hsl(var(--sidebar))" }}
+          className="bg-sidebar group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm"
         >
           {children}
         </div>
@@ -287,11 +286,11 @@ function SidebarInset({ className, style, children, ...props }: React.ComponentP
       {/* Inner surface: removed hardcoded margin/padding to allow full-bleed layout */}
       <div
         style={{
-          borderRadius: noPadding ? "0px" : "8px",
+          borderRadius: noPadding ? "0" : "0.5rem",
           overflow: "hidden",
           boxSizing: "border-box",
-          margin: noPadding ? "0px" : "8px",
-          padding: noPadding ? "0px" : "32px"
+          margin: noPadding ? "0" : "0.5rem",
+          padding: noPadding ? "0" : "2rem"
         }}
         className={cn(
           "relative z-10 flex-1 flex flex-col overflow-hidden",

@@ -248,129 +248,17 @@ export default function ExporterDashboard() {
 
   return (
     <main className="flex-1 flex flex-col h-full overflow-hidden bg-background relative">
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: "linear-gradient(to right,#1f2937 1px,transparent 1px),linear-gradient(to bottom,#1f2937 1px,transparent 1px)", backgroundSize: "40px 40px" }} />
+
 
       <header className="flex-shrink-0 h-24 px-10 flex items-center justify-between border-b border-border dark:border-white/5 bg-background/40 backdrop-blur-xl z-40">
         <div>
-          <h1 className="text-3xl font-black text-foreground dark:text-white tracking-tighter flex items-center gap-4 uppercase italic">
+          <h1 className="text-3xl font-black text-foreground dark:text-white tracking-tighter uppercase">
             Intelligence Node
-            <span className="px-3 py-1 rounded-full text-[9px] font-black bg-black/5 dark:bg-white/10 text-foreground dark:text-white border border-border dark:border-white/10 uppercase tracking-[0.2em] flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse dark:shadow-md shadow-none" />Live Feed
-            </span>
           </h1>
-          <p className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.2em] mt-1.5 opacity-40">Sector: Exporter Operations / Master Interface</p>
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="hidden lg:flex items-center gap-3 px-5 py-2.5 rounded-2xl bg-muted/50 dark:bg-white/5 border border-border text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 backdrop-blur-md">
-            <Activity className="w-3.5 h-3.5" />
-            System Secure
-          </div>
-
-          <div className="relative">
-            <button
-              onClick={() => setPeriodOpen(o => !o)}
-              className={`flex items-center gap-3 px-5 py-3 rounded-2xl border text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 ${periodOpen ? "bg-primary text-primary-foreground border-border dark:border-white" : "bg-muted/50 dark:bg-white/5 border-border text-muted-foreground hover:border-border dark:border-white/20 hover:text-foreground dark:text-white"}`}>
-              <Filter className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">{PERIOD_LABELS[period]}</span>
-              <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${periodOpen ? "rotate-180" : ""}`} />
-            </button>
-            {periodOpen && (
-              <div className="absolute right-0 top-16 w-56 bg-card dark:bg-[#0a0a0a] border border-border dark:border-white/10 rounded-2xl shadow-xl dark:shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                {(Object.entries(PERIOD_LABELS) as [PeriodFilter, string][]).map(([k, v]) => (
-                  <button key={k} onClick={() => { setPeriod(k); setPeriodOpen(false); }}
-                    className={`w-full px-6 py-4 text-left text-[10px] font-black uppercase tracking-[0.2em] transition-colors ${period === k ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-black/5 dark:bg-white/10 hover:text-foreground dark:text-white"}`}>
-                    {v}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="relative">
-            <input
-              value={search} onChange={e => setSearch(e.target.value)}
-              onFocus={() => setSearchFocused(true)} onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
-              className={`pl-12 pr-10 py-3 bg-muted/50 dark:bg-white/5 border rounded-2xl text-xs text-foreground dark:text-white placeholder:text-muted-foreground/20 w-64 transition-all duration-500 outline-none font-medium italic ${searchFocused ? "border-border dark:border-white/20 bg-muted/40 w-80 dark:shadow-md shadow-none" : "border-border hover:border-border dark:border-white/10"}`}
-              placeholder="Search registry indices..."
-            />
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/20 pointer-events-none" />
-            {search && <button onClick={() => setSearch("")} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/40 hover:text-foreground dark:text-white transition-colors"><X className="w-4 h-4" /></button>}
-            {searchFocused && search.trim() && (
-              <div className="absolute top-16 left-0 w-96 bg-card dark:bg-[#0a0a0a] border border-border dark:border-white/10 rounded-2xl shadow-xl dark:shadow-2xl z-50 overflow-hidden max-h-[32rem] overflow-y-auto animate-in fade-in slide-in-from-top-2 duration-300">
-                {filteredOrders.length === 0 ? (
-                  <p className="text-center text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] py-12 opacity-40">Zero matches in primary indices.</p>
-                ) : (
-                  <div className="p-2">
-                    <p className="text-[9px] text-muted-foreground/40 uppercase tracking-[0.3em] px-4 pt-4 pb-2 font-black italic">Active Transmissions</p>
-                    {filteredOrders.slice(0, 5).map((o, idx) => (
-                      <Link key={o.id} href={`/dashboard/exporter/orders/${o.id}`}
-                        className="flex items-center gap-4 px-4 py-4 hover:bg-black/5 dark:bg-white/10 rounded-xl transition-all group">
-                        <div className={`w-10 h-10 rounded-xl ${BG_COLORS[idx % BG_COLORS.length].bg} ${BG_COLORS[idx % BG_COLORS.length].text} flex items-center justify-center font-black text-[10px] flex-shrink-0 border border-border dark:border-white/5`}>
-                          {getInitials(o.product.name)}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-xs text-foreground dark:text-white font-bold truncate group-hover:translate-x-1 transition-transform">{o.product.name}</p>
-                          <p className="text-[9px] text-muted-foreground uppercase tracking-widest mt-0.5">{o.orderNumber} · {formatCurrency(o.totalPrice)}</p>
-                        </div>
-                        <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded ml-auto flex-shrink-0 border ${STATUS_BG[o.status] || ""} ${STATUS_COLORS[o.status] || ""}`}>{o.status}</span>
-                      </Link>
-                    ))}
-                    {filteredOrders.length > 5 && <p className="text-center text-foreground dark:text-white text-[9px] font-black uppercase tracking-[0.2em] py-4 hover:bg-black/5 dark:bg-white/10 cursor-pointer transition-colors" onClick={() => router.push(`/dashboard/exporter/orders?q=${search}`)}>Full Data set ({filteredOrders.length})</p>}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          <div className="relative">
-            <button
-              onClick={() => setCalendarOpen(o => !o)}
-              className={`w-12 h-12 flex items-center justify-center rounded-2xl border transition-all duration-300 ${calendarOpen ? "bg-primary text-primary-foreground border-border dark:border-white" : "bg-muted/50 dark:bg-white/5 border-border hover:bg-black/10 dark:bg-white/15 hover:border-border dark:border-white/20 text-muted-foreground hover:text-foreground dark:text-white"}`}>
-              <CalendarDays className="w-5 h-5" />
-            </button>
-            {calendarOpen && (
-              <div className="absolute right-0 top-16 w-80 bg-card dark:bg-[#0a0a0a] border border-border dark:border-white/10 rounded-3xl shadow-xl dark:shadow-2xl z-50 p-6 animate-in fade-in zoom-in-95 duration-200">
-                <div className="flex items-center justify-between mb-6">
-                  <button onClick={() => setCalMonth(d => new Date(d.getFullYear(), d.getMonth() - 1, 1))} className="w-8 h-8 flex items-center justify-center rounded-xl bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:bg-white/15 text-foreground dark:text-white transition-all">‹</button>
-                  <span className="text-[10px] font-black text-foreground dark:text-white uppercase tracking-[0.2em] italic">{calMonth.toLocaleString("default", { month: "long", year: "numeric" })}</span>
-                  <button onClick={() => setCalMonth(d => new Date(d.getFullYear(), d.getMonth() + 1, 1))} className="w-8 h-8 flex items-center justify-center rounded-xl bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:bg-white/15 text-foreground dark:text-white transition-all">›</button>
-                </div>
-                <div className="grid grid-cols-7 mb-4">
-                  {["SU", "MO", "TU", "WE", "TH", "FR", "SA"].map(d => (
-                    <div key={d} className="text-center text-[9px] text-muted-foreground/40 font-black tracking-widest">{d}</div>
-                  ))}
-                </div>
-                <div className="grid grid-cols-7 gap-1">
-                  {calDays.map((day, i) => {
-                    if (!day) return <div key={i} className="aspect-square" />;
-                    const isSelected = day === selectedDate.getDate() && calMonth.getMonth() === selectedDate.getMonth() && calMonth.getFullYear() === selectedDate.getFullYear();
-                    const isToday = day === new Date().getDate() && calMonth.getMonth() === new Date().getMonth() && calMonth.getFullYear() === new Date().getFullYear();
-                    return (
-                      <button key={i} onClick={() => { setSelectedDate(new Date(calMonth.getFullYear(), calMonth.getMonth(), day)); setCalendarOpen(false); }}
-                        className={`w-full aspect-square flex items-center justify-center text-[10px] rounded-xl transition-all duration-200 font-black
-                          ${isSelected ? "bg-primary text-primary-foreground dark:shadow-md shadow-none" : isToday ? "bg-black/20 dark:bg-white/20 text-foreground dark:text-white border border-white/40" : "text-muted-foreground/60 hover:bg-black/5 dark:bg-white/10 hover:text-foreground dark:text-white"}`}>
-                        {day}
-                      </button>
-                    );
-                  })}
-                </div>
-                <div className="mt-6 pt-6 border-t border-border dark:border-white/5 flex items-center justify-between">
-                  <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest opacity-40">
-                    {selectedDate.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
-                  </span>
-                  <button onClick={() => { setSelectedDate(new Date()); setCalMonth(new Date()); setCalendarOpen(false); }}
-                    className="text-[9px] font-black text-foreground dark:text-white hover:underline uppercase tracking-widest">Reset</button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <Link href="/dashboard/exporter/inventory?action=add"
-            className="flex items-center gap-3 px-6 h-12 rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl shadow-white/5 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]">
-            <Plus className="w-4 h-4" />
-            <span className="hidden lg:inline">Initialize Asset</span>
-          </Link>
+          {/* Action modules removed per request */}
         </div>
       </header>
 
@@ -392,15 +280,15 @@ export default function ExporterDashboard() {
           )}
 
           {/* ── KPI Cards ── */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-4 gap-6">
             {statCards.map((s) => (
               <Link key={s.label} href={s.href}
-                className="bg-card/40 dark:bg-white/5 backdrop-blur-3xl border border-border dark:border-white/5 p-8 rounded-[2.5rem] relative overflow-hidden group transition-all duration-500 hover:-translate-y-2 cursor-pointer block shadow-xl dark:shadow-2xl"
+                className="bg-card/40 dark:bg-white/5 backdrop-blur-3xl border border-border dark:border-white/5 p-5 rounded-[2.5rem] relative overflow-hidden group transition-all duration-500 hover:-translate-y-2 cursor-pointer block shadow-xl dark:shadow-2xl"
               >
                 <div className={`absolute -right-12 -top-12 w-48 h-48 ${s.bgTint} rounded-full blur-[80px] transition-all duration-700 group-hover:scale-150 group-hover:opacity-100 opacity-40`} />
 
-                <div className="flex justify-between items-start mb-8 relative z-10">
-                  <div className="w-14 h-14 rounded-2xl bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 flex items-center justify-center text-foreground dark:text-white shadow-inner group-hover:scale-110 transition-all duration-300">
+                <div className="flex justify-between items-start mb-4 relative z-10">
+                  <div className="w-12 h-12 rounded-2xl bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 flex items-center justify-center text-foreground dark:text-white shadow-inner group-hover:scale-110 transition-all duration-300">
                     {s.icon}
                   </div>
                   <span className={`flex items-center text-[9px] font-black px-4 py-1.5 rounded-full border border-border dark:border-white/10 bg-black/5 dark:bg-white/10 text-foreground dark:text-white uppercase tracking-[0.2em] italic`}>
@@ -412,14 +300,14 @@ export default function ExporterDashboard() {
 
                 <div className="relative z-10">
                   <p className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.2em] mb-2 opacity-40 italic">{s.label}</p>
-                  <p className="text-4xl font-black text-foreground dark:text-white tracking-tighter group-hover:scale-[1.02] origin-left transition-transform duration-300 uppercase italic dark:shadow-md shadow-none">{s.value}</p>
+                  <p className="text-4xl font-black text-foreground dark:text-white tracking-tighter group-hover:scale-[1.02] origin-left transition-transform duration-300 uppercase dark:shadow-md shadow-none">{s.value}</p>
                   <p className="text-muted-foreground/40 text-[9px] font-black uppercase tracking-widest mt-4 flex items-center gap-2">
                     <span className="w-1 h-1 rounded-full bg-primary opacity-20" />
                     {s.sub}
                   </p>
                 </div>
 
-                <div className="mt-8 relative z-10">
+                <div className="mt-4 relative z-10">
                   <div className="h-1.5 w-full bg-black/5 dark:bg-white/10 rounded-full overflow-hidden">
                     <div className="h-full bg-primary rounded-full transition-all duration-1000 delay-300"
                       style={{ width: `${s.bar}%`, boxShadow: '0 0 20px rgba(255,255,255,0.4)' }} />
@@ -434,19 +322,19 @@ export default function ExporterDashboard() {
           </div>
 
           {/* ── Map + Transactions ── */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-5" style={{ height: "520px" }}>
+          <div className="grid grid-cols-3 gap-5" style={{ height: "520px" }}>
 
-            {/* Map */}
-            <div className="xl:col-span-2 bg-[#0d1117]/80 backdrop-blur-xl border border-white/5 shadow-xl rounded-2xl flex flex-col h-full overflow-hidden">
+            {/* Map Wrapper */}
+            <div className="col-span-2 bg-card dark:bg-[#050505]/40 backdrop-blur-xl border border-border dark:border-white/5 shadow-xl rounded-2xl flex flex-col h-full overflow-hidden">
               {/* Map header */}
-              <div className="flex-shrink-0 flex items-center justify-between px-5 py-3 z-20 relative" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+              <div className="flex-shrink-0 flex items-center justify-between px-5 py-3 z-20 relative border-b border-border dark:border-white/5 bg-background/50 dark:bg-transparent">
                 <div className="min-w-0 flex items-center gap-3">
                   <Globe className="w-4 h-4 text-primary flex-shrink-0" />
                   <div>
                     <div className="flex items-center gap-2">
-                      <h2 className="text-[14px] font-bold text-white tracking-tight">India Global Trade Network</h2>
-                      <span className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase border ${mapIsDemo ? "bg-amber-500/12 border-amber-500/30 text-amber-400" : "bg-green-500/12 border-green-500/30 text-green-400"}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full inline-block animate-pulse ${mapIsDemo ? "bg-amber-400" : "bg-green-400"}`} />
+                      <h2 className="text-[14px] font-black text-foreground dark:text-white tracking-tight">India Global Trade Network</h2>
+                      <span className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase border ${mapIsDemo ? "bg-amber-500/12 border-amber-500/30 text-amber-500" : "bg-primary/10 border-primary/20 text-primary"}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full inline-block animate-pulse ${mapIsDemo ? "bg-amber-500" : "bg-primary"}`} />
                         {mapIsDemo ? "Demo" : "Live"}
                       </span>
                     </div>
@@ -462,7 +350,7 @@ export default function ExporterDashboard() {
                         className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-semibold border transition-all duration-200"
                         style={{ background: isActive ? `${cfg.color}15` : "transparent", borderColor: isActive ? `${cfg.color}45` : "rgba(255,255,255,0.07)", color: isActive ? cfg.color : "#475569", boxShadow: isActive ? `0 0 12px ${cfg.color}22` : "none" }}>
                         <span>{cfg.icon}</span>
-                        <span className="hidden lg:inline">{mode === "all" ? "All" : cfg.label}</span>
+                        <span className="inline">{mode === "all" ? "All" : cfg.label}</span>
                         {count > 0 && <span className="opacity-60 text-[9px]">{count}</span>}
                       </button>
                     );
@@ -540,7 +428,7 @@ export default function ExporterDashboard() {
                     <Activity className="w-12 h-12 text-muted-foreground" />
                     <p className="text-[10px] font-black uppercase tracking-[0.2em]">{search ? "Zero telemetry hits" : "Channel dormant"}</p>
                   </div>
-                ) : filteredOrders.map((order, idx) => (
+                ) : filteredOrders.map((order) => (
                   <Link key={order.id} href={`/dashboard/exporter/orders/${order.id}`}
                     className="flex items-center justify-between p-4 rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-300 border border-border dark:border-white/5 hover:border-border dark:border-white/10 group cursor-pointer block">
                     <div className="flex items-center gap-4 min-w-0">
@@ -566,7 +454,7 @@ export default function ExporterDashboard() {
           </div>
 
           {/* ── Revenue + Top Buyers ── */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-12">
+          <div className="grid grid-cols-2 gap-6 pb-12">
             <div className="bg-card/40 dark:bg-white/5 backdrop-blur-3xl border border-border dark:border-white/5 shadow-xl dark:shadow-2xl rounded-[2.5rem] p-10 relative overflow-hidden">
               <div className="absolute -left-12 -bottom-12 w-48 h-48 bg-black/5 dark:bg-white/10 rounded-full blur-[80px]" />
               <div className="flex items-center justify-between mb-10 relative z-10">

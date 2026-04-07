@@ -73,7 +73,7 @@ export default function ExporterUsersPage() {
   if (user?.email !== "exporter@gmail.com") {
     return (
       <main className="flex-1 flex flex-col h-full items-center justify-center bg-background relative overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: "linear-gradient(to right,#1f2937 1px,transparent 1px),linear-gradient(to bottom,#1f2937 1px,transparent 1px)", backgroundSize: "40px 40px" }} />
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: "linear-gradient(to right,#1f2937 1px,transparent 1px),linear-gradient(to bottom,#1f2937 1px,transparent 1px)", backgroundSize: "2.5rem 2.5rem" }} />
         <div className="relative z-10 flex flex-col items-center text-center p-12 bg-card/40 backdrop-blur-3xl border border-border dark:border-white/5 rounded-[3rem] max-w-lg shadow-2xl">
           <div className="w-20 h-20 rounded-3xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 mb-8 animate-pulse">
             <ShieldCheck className="w-10 h-10" />
@@ -103,7 +103,7 @@ export default function ExporterUsersPage() {
 
   return (
     <main className="flex-1 flex flex-col h-full overflow-hidden bg-background relative">
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: "linear-gradient(to right,#1f2937 1px,transparent 1px),linear-gradient(to bottom,#1f2937 1px,transparent 1px)", backgroundSize: "40px 40px" }} />
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: "linear-gradient(to right,#1f2937 1px,transparent 1px),linear-gradient(to bottom,#1f2937 1px,transparent 1px)", backgroundSize: "2.5rem 2.5rem" }} />
 
       <header className="flex-shrink-0 h-24 px-10 flex items-center justify-between border-b border-border dark:border-white/5 bg-background/40 backdrop-blur-xl z-40">
         <div>
