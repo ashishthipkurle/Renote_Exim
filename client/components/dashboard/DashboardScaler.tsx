@@ -39,7 +39,7 @@ export function DashboardScaler({ children, targetWidth = 1440 }: DashboardScale
   return (
     <div 
       ref={containerRef}
-      className="w-full h-screen overflow-hidden bg-board relative"
+      className="w-full h-[100dvh] overflow-hidden bg-board relative"
       id="dashboard-scaler-root"
       style={{ 
         backgroundColor: "hsl(var(--background))",
@@ -53,9 +53,10 @@ export function DashboardScaler({ children, targetWidth = 1440 }: DashboardScale
           transform: (isMounted && scale < 1) ? `scale(${scale})` : "none",
           transformOrigin: "top left",
           transition: "transform 0.1s ease-out",
-          // V6: Using 100% height to ensure stable top-alignment
-          height: "100%",
-          minHeight: "100%",
+          // V6 fix: When scaling down, we must increase the pre-scaled height proportionally
+          // so that after transform: scale(), the visual height still fills exactly 100% of the screen.
+          height: (isMounted && scale < 1) ? `${100 / scale}%` : "100%",
+          minHeight: (isMounted && scale < 1) ? `${100 / scale}%` : "100%",
         }}
       >
         {children}

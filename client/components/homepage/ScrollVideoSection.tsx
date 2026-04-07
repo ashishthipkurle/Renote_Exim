@@ -521,12 +521,12 @@ export default function ScrollVideoSection() {
                   {/* Left Side: Navigation Links */}
                   <div className="flex items-center gap-8">
                     <Link href="/" className="flex items-center gap-2 group text-white/70 hover:text-white transition-all duration-300">
-                       <Home className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
-                       <span className="text-[10px] font-black uppercase tracking-[0.2em]">Home</span>
+                      <Home className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em]">Home</span>
                     </Link>
                     <Link href="/about" className="flex items-center gap-2 group text-white/70 hover:text-white transition-all duration-300">
-                       <Info className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
-                       <span className="text-[10px] font-black uppercase tracking-[0.2em]">About</span>
+                      <Info className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em]">About</span>
                     </Link>
                   </div>
 
@@ -542,15 +542,15 @@ export default function ScrollVideoSection() {
                   {/* Right Side: Contact & Auth */}
                   <div className="flex items-center gap-8">
                     <Link href="/contact" className="flex items-center gap-2 group text-white/70 hover:text-white transition-all duration-300">
-                       <Phone className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
-                       <span className="text-[10px] font-black uppercase tracking-[0.2em]">Contact</span>
+                      <Phone className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em]">Contact</span>
                     </Link>
 
                     <div className="flex items-center gap-4">
                       {!authLoading && (
                         user ? (
                           <div className="relative" ref={dropdownRef}>
-                            <button 
+                            <button
                               onClick={() => setIsProfileOpen(!isProfileOpen)}
                               className="flex items-center gap-2 group focus:outline-none"
                             >
@@ -580,7 +580,7 @@ export default function ScrollVideoSection() {
                                   }}
                                 >
                                   <div className="p-1.5 flex flex-col gap-1">
-                                    <Link 
+                                    <Link
                                       href={user.role === "USER" ? "/products" : `/dashboard/${user.role?.toLowerCase()}`}
                                       className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-white/10 text-white/70 hover:text-white transition-all group"
                                       onClick={() => setIsProfileOpen(false)}
@@ -620,10 +620,10 @@ export default function ScrollVideoSection() {
                           </div>
                         )
                       )}
-                      
+
                       <div className="h-4 w-[1px] bg-white/10" />
                       <div className="scale-75 -mx-2">
-                         <ThemeToggle />
+                        <ThemeToggle />
                       </div>
                     </div>
                   </div>

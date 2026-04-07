@@ -86,7 +86,7 @@ export default function ExporterSidebar({ basePath }: { basePath: string }) {
         </SidebarMenu>
       </SidebarContent>
 
-      <SidebarFooter className="p-6 space-y-4">
+      <SidebarFooter className="px-6 pt-4 pb-2 space-y-4">
         <SidebarSeparator />
         <SidebarMenu>
           <SidebarMenuItem>
