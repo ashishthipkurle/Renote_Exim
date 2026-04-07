@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerAuth } from "@/lib/supabase/server";
 import { Prisma } from "@prisma/client";
 import InventoryTable from "./InventoryTable";
+import CategoryDirectory from "./CategoryDirectory";
 
 
 function formatNumber(n: number) {
@@ -184,69 +185,9 @@ export default async function ExporterInventoryPage({
           ))}
         </div>
 
-<<<<<<< HEAD
-        {/* New Inventory Insights Section */}
-        <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Recently Listed */}
-          <div className="lg:col-span-12 xl:col-span-8 flex flex-col gap-6">
-            <h2 className="text-sm font-black text-foreground uppercase tracking-widest opacity-80 border-b border-border pb-2 inline-block self-start">
-              Recently Listed
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {products.slice(0, 4).length === 0 ? (
-                <div className="col-span-full py-12 bg-card/50 border border-border border-dashed rounded-3xl flex flex-col items-center justify-center text-muted-foreground gap-3">
-                   <Plus className="w-8 h-8 opacity-20" />
-                   <p className="text-xs font-medium italic">No products listed yet.</p>
-                </div>
-              ) : (
-                products.slice(0, 4).map((p) => {
-                  const styleDef = CATEGORY_COLORS[p.category] || CATEGORY_COLORS.OTHER;
-                  const textClass = styleDef.split(" ").pop();
-                  return (
-                    <div key={p.id} className="bg-card border border-border rounded-[1.5rem] p-5 shadow-sm hover:shadow-xl transition-all group relative overflow-hidden">
-                       <div className="absolute top-0 right-0 p-3">
-                          <div className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-tighter ${textClass} bg-muted/50 border border-border`}>
-                            {p.category}
-                          </div>
-                       </div>
-                       <h3 className="text-sm font-black text-foreground mt-2 truncate w-[80%]">{p.name}</h3>
-                       <p className="text-[10px] text-muted-foreground mt-1 line-clamp-1">{p.description}</p>
-                       <div className="mt-4 flex items-center justify-between">
-                          <div className="text-primary font-black text-sm">{formatMoney(p.price)}</div>
-                          <div className="text-[10px] font-bold text-muted-foreground">MOQ: {p.minOrderQty}</div>
-                       </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
-          </div>
-
-          {/* Quick Stats/Alerts (Optional, using as space filler) */}
-          <div className="lg:col-span-12 xl:col-span-4 flex flex-col gap-6">
-            <h2 className="text-sm font-black text-foreground uppercase tracking-widest opacity-80 border-b border-border pb-2 inline-block self-start">
-              Inventory Stats
-            </h2>
-            <div className="bg-card border border-border rounded-[2.5rem] p-6 h-full flex flex-col justify-center">
-               <div className="space-y-6">
-                  <div className="flex items-center justify-between">
-                     <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Active Listings</span>
-                     <span className="text-emerald-500 font-black">{totalAvailable} / {totalListed}</span>
-                  </div>
-                  <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-                     <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${(totalAvailable / (totalListed || 1)) * 100}%` }} />
-                  </div>
-                  <p className="text-[10px] text-muted-foreground leading-relaxed">
-                    Your inventory is <span className="text-foreground font-black">{Math.round((totalAvailable / (totalListed || 1)) * 100)}% active</span>. Keeping items available increases visibility for global importers.
-                  </p>
-               </div>
-            </div>
-          </div>
-=======
         {/* Directory Navigation */}
         <div className="max-w-[1700px] mx-auto">
           <CategoryDirectory usedCategories={categoriesData.map(c => c.name)} />
->>>>>>> 305b3fb9cc3d80f2259a21c264d892a5748a1e0d
         </div>
 
         {/* Category Performance Matrix */}

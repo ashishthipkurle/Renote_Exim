@@ -14,7 +14,8 @@ import {
   ArrowDownRight,
   Clock,
   XCircle,
-  AlertCircle
+  AlertCircle,
+  History
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';

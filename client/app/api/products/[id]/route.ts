@@ -88,7 +88,7 @@ export async function PUT(
     const body = await request.json();
     const validatedData = productSchema.partial().parse(body);
 
-    const product = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+    const product = await prisma.$transaction(async (tx) => {
       const updatedProduct = await tx.product.update({
         where: { id },
         data: validatedData as any,

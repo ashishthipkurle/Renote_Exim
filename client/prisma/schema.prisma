@@ -29,12 +29,12 @@ model User {
   phone               String?
   deletedAt           DateTime?
   address             String?
+  receivedCalls       CallSchedule[]     @relation("CallReceiver")
+  requestedCalls      CallSchedule[]     @relation("CallRequester")
+  incomingSessions    CallSession[]      @relation("CallCallee")
+  outgoingSessions    CallSession[]      @relation("CallCaller")
   cart                Cart?
   documents           Document[]
-  requestedCalls      CallSchedule[]     @relation("CallRequester")
-  receivedCalls       CallSchedule[]     @relation("CallReceiver")
-  outgoingSessions    CallSession[]      @relation("CallCaller")
-  incomingSessions    CallSession[]      @relation("CallCallee")
   messagesReceived    Message[]          @relation("MessagesReceived")
   messagesSent        Message[]          @relation("MessagesSent")
   notifications       Notification[]
@@ -180,20 +180,20 @@ model ShipmentEvent {
 }
 
 model CallSchedule {
-  id              String           @id @default(uuid())
+  id              String             @id @default(uuid())
   requesterId     String
   receiverId      String
   title           String?
   agenda          String?
-  callType        CallType         @default(VIDEO)
+  callType        CallType           @default(VIDEO)
   scheduledFor    DateTime
-  durationMinutes Int              @default(30)
-  timezone        String           @default("UTC")
+  durationMinutes Int                @default(30)
+  timezone        String             @default("UTC")
   status          CallScheduleStatus @default(PENDING)
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  requester       User             @relation("CallRequester", fields: [requesterId], references: [id], onDelete: Cascade)
-  receiver        User             @relation("CallReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  receiver        User               @relation("CallReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  requester       User               @relation("CallRequester", fields: [requesterId], references: [id], onDelete: Cascade)
   sessions        CallSession[]
 
   @@index([requesterId, status, scheduledFor])
@@ -202,22 +202,22 @@ model CallSchedule {
 }
 
 model CallSession {
-  id            String            @id @default(uuid())
-  scheduleId    String?
-  callerId      String
-  calleeId      String
-  callType      CallType          @default(VIDEO)
-  status        CallSessionStatus @default(RINGING)
-  startedAt     DateTime          @default(now())
-  connectedAt   DateTime?
-  endedAt       DateTime?
-  durationSec   Int?
-  endedReason   String?
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
-  schedule      CallSchedule?     @relation(fields: [scheduleId], references: [id], onDelete: SetNull)
-  caller        User              @relation("CallCaller", fields: [callerId], references: [id], onDelete: Cascade)
-  callee        User              @relation("CallCallee", fields: [calleeId], references: [id], onDelete: Cascade)
+  id          String            @id @default(uuid())
+  scheduleId  String?
+  callerId    String
+  calleeId    String
+  callType    CallType          @default(VIDEO)
+  status      CallSessionStatus @default(RINGING)
+  startedAt   DateTime          @default(now())
+  connectedAt DateTime?
+  endedAt     DateTime?
+  durationSec Int?
+  endedReason String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  callee      User              @relation("CallCallee", fields: [calleeId], references: [id], onDelete: Cascade)
+  caller      User              @relation("CallCaller", fields: [callerId], references: [id], onDelete: Cascade)
+  schedule    CallSchedule?     @relation(fields: [scheduleId], references: [id])
 
   @@index([callerId, createdAt])
   @@index([calleeId, createdAt])
