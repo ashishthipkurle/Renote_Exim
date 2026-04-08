@@ -12,22 +12,54 @@ const supplierSchema = z.object({
     country: z.string().optional().nullable(),
     category: z.string().optional().nullable(),
     notes: z.string().optional().nullable(),
+    importerId: z.string().optional().nullable(),
 });
 
 // GET /api/suppliers - List all suppliers for the exporter
 export async function GET(request: NextRequest) {
     try {
         const auth = await getApiAuthContext(request);
-        if (!auth || auth.role !== 'EXPORTER' && auth.role !== 'ADMIN') {
+        if (!auth) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
+        const role = auth.role as any;
+        const isExporter = role === 'EXPORTER' || role === 'ADMIN';
+        const isSupplier = role === 'SUPPLIER';
+
+        if (!isExporter && !isSupplier) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+        }
+
         const suppliers = await prisma.supplier.findMany({
-            where: { userId: auth.userId },
+            where: isExporter 
+                ? { exporterId: auth.userId }
+                : isSupplier
+                    ? { sourceId: auth.userId }
+                    : { id: 'none' }, // Fallback
             orderBy: { createdAt: 'desc' },
+            include: isSupplier ? {
+                exporter: {
+                    select: {
+                        id: true,
+                        name: true,
+                        businessName: true,
+                        email: true,
+                        phone: true,
+                    }
+                }
+            } : undefined
         });
 
-        return NextResponse.json({ suppliers });
+        // If user is a supplier, we want to map the exporter details into the response
+        const formattedSuppliers = isSupplier ? suppliers.map((s: any) => ({
+            ...s,
+            name: s.exporter?.businessName || s.exporter?.name || s.name,
+            email: s.exporter?.email || s.email,
+            phone: s.exporter?.phone || s.phone,
+        })) : suppliers;
+
+        return NextResponse.json({ suppliers: formattedSuppliers });
     } catch (error) {
         console.error('Get suppliers error:', error);
         return NextResponse.json({ error: 'Failed to fetch suppliers' }, { status: 500 });
@@ -38,7 +70,8 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const auth = await getApiAuthContext(request);
-        if (!auth || auth.role !== 'EXPORTER' && auth.role !== 'ADMIN') {
+        const role = auth?.role as any;
+        if (!auth || (role !== 'EXPORTER' && role !== 'ADMIN')) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
@@ -48,7 +81,7 @@ export async function POST(request: NextRequest) {
         const supplier = await prisma.supplier.create({
             data: {
                 ...validated,
-                userId: auth.userId,
+                exporterId: auth.userId,
             },
         });
 

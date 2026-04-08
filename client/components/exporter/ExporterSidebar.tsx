@@ -45,18 +45,15 @@ export default function ExporterSidebar({ basePath }: { basePath: string }) {
     { href: basePath, label: "Dashboard", icon: LayoutDashboard },
     { href: `${basePath}/inventory`, label: "Inventory", icon: Boxes },
     { href: `${basePath}/orders`, label: "Orders", icon: FolderTree },
-    { href: `${basePath}/shipments`, label: "Shipments", icon: Globe },
     { href: `${basePath}/rfqs`, label: "RFQs", icon: FileText },
     { href: `${basePath}/directory`, label: "Buyers", icon: Users },
     ...(isMaster ? [{ href: `${basePath}/users`, label: "Registry", icon: ShieldCheck }] : []),
     { href: `${basePath}/suppliers`, label: "Dealers", icon: Handshake },
-    { href: `${basePath}/messages`, label: "Messages", icon: MessageSquare },
-    { href: `${basePath}/calls`, label: "Calls", icon: PhoneCall },
     { href: `${basePath}/analytics`, label: "Analytics", icon: LineChart },
     { href: `${basePath}/finance`, label: "Finance", icon: CreditCard },
   ];
 
-  const isActive = (href: string) => 
+  const isActive = (href: string) =>
     pathname === href || (href !== basePath && pathname.startsWith(href + "/"));
 
   return (
@@ -71,8 +68,8 @@ export default function ExporterSidebar({ basePath }: { basePath: string }) {
                 tooltip={item.label}
                 className={cn(
                   "rounded-xl transition-all duration-300",
-                  isActive(item.href) 
-                    ? "bg-black/10 dark:bg-white/10 text-[#D4AF37] dark:text-[#D4AF37] hover:bg-black/15 dark:hover:bg-white/15" 
+                  isActive(item.href)
+                    ? "bg-black/10 dark:bg-white/10 text-[#D4AF37] dark:text-[#D4AF37] hover:bg-black/15 dark:hover:bg-white/15"
                     : "text-slate-500 dark:text-muted-foreground hover:bg-slate-100 dark:hover:bg-white/5 hover:text-[#D4AF37] dark:hover:text-[#D4AF37]"
                 )}
               >
@@ -90,14 +87,14 @@ export default function ExporterSidebar({ basePath }: { basePath: string }) {
         <SidebarSeparator />
         <SidebarMenu>
           <SidebarMenuItem>
-              <SidebarMenuButton
+            <SidebarMenuButton
               asChild
               isActive={isActive(`${basePath}/settings`)}
               tooltip="Settings"
               className={cn(
                 "rounded-xl transition-all duration-300",
-                isActive(`${basePath}/settings`) 
-                  ? "bg-black/10 dark:bg-white/10 text-[#D4AF37] dark:text-[#D4AF37] hover:bg-black/15 dark:hover:bg-white/15" 
+                isActive(`${basePath}/settings`)
+                  ? "bg-black/10 dark:bg-white/10 text-[#D4AF37] dark:text-[#D4AF37] hover:bg-black/15 dark:hover:bg-white/15"
                   : "text-slate-500 dark:text-muted-foreground hover:bg-slate-100 dark:hover:bg-white/5 hover:text-[#D4AF37] dark:hover:text-[#D4AF37]"
               )}
             >

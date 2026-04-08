@@ -11,70 +11,86 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { searchParams } = new URL(request.url);
+        const { searchParams } = request.nextUrl;
         const search = searchParams.get('q') || '';
-        const category = searchParams.get('category');
+        const category = searchParams.get('category') || 'all';
 
-        // Fetch exporters with their product counts and basic order volume
-        const exporters = await prisma.user.findMany({
+        const targetRole = (auth.role === 'IMPORTER' || auth.role === 'ADMIN') ? 'EXPORTER' : 'IMPORTER';
+
+        // Fetch partners with their basic stats
+        const users = await prisma.user.findMany({
             where: {
-                role: 'EXPORTER',
+                role: targetRole,
                 OR: [
                     { name: { contains: search, mode: 'insensitive' } },
-                    { companyName: { contains: search, mode: 'insensitive' } },
+                    { businessName: { contains: search, mode: 'insensitive' } },
+                    { country: { contains: search, mode: 'insensitive' } },
                 ],
-                ...(category && category !== 'all' ? {
-                    exportedProducts: {
+                ...(category && category !== 'all' ? (targetRole === 'EXPORTER' ? {
+                    products: {
                         some: { category: category as any }
                     }
-                } : {})
+                } : {}) : {})
             },
-                select: {
+            select: {
                 id: true,
                 name: true,
-                companyName: true,
+                businessName: true,
                 avatar: true,
-                description: true,
+                country: true,
                 createdAt: true,
                 _count: {
                     select: {
-                        exportedProducts: true,
+                        products: targetRole === 'EXPORTER',
+                        ordersAsBuyer: targetRole === 'IMPORTER',
                     }
                 },
             }
         });
 
-        // Enhance with trade history for the importer to see
-        const exportersWithStats = await Promise.all(exporters.map(async (exp) => {
-            // Get total orders from this exporter
-            const totalOrders = await prisma.order.count({
-                where: { product: { exporterId: exp.id } }
-            });
+        const partnersWithStats = await Promise.all(users.map(async (u: any) => {
+            let totalVolume = 0;
+            let categories: string[] = [];
 
-            // Get unique categories they sell in
-            const categories = await prisma.product.groupBy({
-                by: ['category'],
-                where: { exporterId: exp.id },
-            });
+            if (targetRole === 'EXPORTER') {
+                totalVolume = await prisma.order.count({
+                    where: { product: { exporterId: u.id } }
+                });
+                const cats = await prisma.product.groupBy({
+                    by: ['category'],
+                    where: { exporterId: u.id },
+                });
+                categories = cats.map((c: any) => c.category);
+            } else {
+                totalVolume = await prisma.order.count({
+                    where: { buyerId: u.id }
+                });
+                // Importers don't have product categories, but maybe we can show what they buy?
+                // For now, empty
+            }
 
-            // Mock rating (since we don't have a rating system yet)
-            const rating = 4 + Math.min(0.9, totalOrders / 50);
+            const rating = 4 + Math.min(0.9, totalVolume / 50);
 
             return {
-                ...exp,
+                id: u.id,
+                name: u.name,
+                businessName: u.businessName,
+                avatar: u.avatar,
+                country: u.country,
                 rating: rating.toFixed(1),
-                tradeVolume: totalOrders,
-                categories: categories.map(c => c.category),
-                joinedAt: exp.createdAt.toISOString(),
-                _count: {
-                    products: exp._count.exportedProducts,
-                    exportedProducts: exp._count.exportedProducts,
-                },
+                tradeVolume: totalVolume,
+                categories,
+                joinedAt: u.createdAt.toISOString(),
+                _count: u._count,
             };
         }));
 
+        const resultKey = targetRole === 'EXPORTER' ? 'exporters' : 'importers';
+
         return NextResponse.json({
-            exporters: exportersWithStats.sort((a, b) => b.tradeVolume - a.tradeVolume),
+            [resultKey]: partnersWithStats.sort((a, b) => b.tradeVolume - a.tradeVolume),
+            role: auth.role,
+            queryRole: targetRole,
         });
     } catch (error) {
         console.error('Directory error:', error);

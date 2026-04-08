@@ -7,9 +7,9 @@ export type Message = {
   id: string;
   senderId: string;
   receiverId: string;
-  content: string;
+  body: string;
   createdAt: string;
-  read: boolean;
+  isRead: boolean;
   orderId?: string | null;
   subject?: string | null;
 };
@@ -83,9 +83,9 @@ export function useChat(otherUserId?: string | null, orderId?: string | null) {
       id: optimisticId,
       senderId: currentUser.id,
       receiverId: otherUserId,
-      content: value,
+      body: value,
       createdAt: new Date().toISOString(),
-      read: false,
+      isRead: false,
       orderId: orderId || null,
       subject: subject || null,
     };

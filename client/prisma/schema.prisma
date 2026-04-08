@@ -340,6 +340,7 @@ enum Role {
   CONSUMER
   IMPORTER
   EXPORTER
+  SUPPLIER
   ADMIN
 }
 

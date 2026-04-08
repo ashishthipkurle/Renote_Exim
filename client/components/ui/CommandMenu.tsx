@@ -38,12 +38,12 @@ export default function CommandMenu() {
   if (!open) return null;
 
   return (
-    <div 
+    <div
       className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xl transition-opacity animate-in fade-in duration-300"
       onClick={() => setOpen(false)}
     >
       <div className="flex h-full w-full items-center justify-center p-4">
-        <Command 
+        <Command
           onClick={(e) => e.stopPropagation()}
           className="w-full max-w-[640px] overflow-hidden rounded-3xl bg-black border border-white/10 shadow-2xl ring-1 ring-white/5 animate-in zoom-in-95 duration-300"
         >
@@ -61,21 +61,21 @@ export default function CommandMenu() {
             </Command.Empty>
 
             <Command.Group heading="Navigation" className="px-3 py-4 text-[10px] font-black text-white/20 uppercase tracking-[0.2em] italic">
-              <Command.Item 
+              <Command.Item
                 onSelect={() => runCommand(() => router.push('/dashboard'))}
                 className="flex items-center gap-4 px-4 py-4 rounded-2xl text-muted-foreground hover:bg-white/5 hover:text-white cursor-pointer transition-all group"
               >
                 <LayoutDashboard className="h-4 w-4 opacity-40 group-hover:opacity-100 transition-opacity" />
                 <span className="text-[10px] font-black uppercase tracking-widest">Dashboard Home</span>
               </Command.Item>
-              <Command.Item 
+              <Command.Item
                 onSelect={() => runCommand(() => router.push('/marketplace'))}
                 className="flex items-center gap-4 px-4 py-4 rounded-2xl text-muted-foreground hover:bg-white/5 hover:text-white cursor-pointer transition-all group"
               >
                 <Box className="h-4 w-4 opacity-40 group-hover:opacity-100 transition-opacity" />
                 <span className="text-[10px] font-black uppercase tracking-widest">Marketplace Hub</span>
               </Command.Item>
-              <Command.Item 
+              <Command.Item
                 onSelect={() => runCommand(() => router.push('/dashboard/orders'))}
                 className="flex items-center gap-4 px-4 py-4 rounded-2xl text-muted-foreground hover:bg-white/5 hover:text-white cursor-pointer transition-all group"
               >
@@ -87,14 +87,14 @@ export default function CommandMenu() {
             <div className="h-px bg-white/5 mx-4 my-2" />
 
             <Command.Group heading="Procurement" className="px-3 py-4 text-[10px] font-black text-white/20 uppercase tracking-[0.2em] italic">
-              <Command.Item 
+              <Command.Item
                 onSelect={() => runCommand(() => router.push('/dashboard/products/new'))}
                 className="flex items-center gap-4 px-4 py-4 rounded-2xl text-muted-foreground hover:bg-white/5 hover:text-white cursor-pointer transition-all group"
               >
                 <Plus className="h-4 w-4 opacity-40 group-hover:opacity-100 transition-opacity" />
                 <span className="text-[10px] font-black uppercase tracking-widest">Initialize Asset</span>
               </Command.Item>
-              <Command.Item 
+              <Command.Item
                 onSelect={() => runCommand(() => router.push('/inbox'))}
                 className="flex items-center gap-4 px-4 py-4 rounded-2xl text-muted-foreground hover:bg-white/5 hover:text-white cursor-pointer transition-all group"
               >
@@ -106,14 +106,14 @@ export default function CommandMenu() {
             <div className="h-px bg-white/5 mx-4 my-2" />
 
             <Command.Group heading="System" className="px-3 py-4 text-[10px] font-black text-white/20 uppercase tracking-[0.2em] italic">
-              <Command.Item 
+              <Command.Item
                 onSelect={() => runCommand(() => router.push('/dashboard/settings'))}
                 className="flex items-center gap-4 px-4 py-4 rounded-2xl text-muted-foreground hover:bg-white/5 hover:text-white cursor-pointer transition-all group"
               >
                 <Settings className="h-4 w-4 opacity-40 group-hover:opacity-100 transition-opacity" />
                 <span className="text-[10px] font-black uppercase tracking-widest">Configurations</span>
               </Command.Item>
-              <Command.Item 
+              <Command.Item
                 onSelect={() => runCommand(() => router.push('/dashboard/profile'))}
                 className="flex items-center gap-4 px-4 py-4 rounded-2xl text-muted-foreground hover:bg-white/5 hover:text-white cursor-pointer transition-all group"
               >
@@ -132,7 +132,7 @@ export default function CommandMenu() {
             </div>
             <div className="ml-auto flex items-center gap-6">
               <div className="flex items-center gap-3">
-                 <kbd className="inline-flex h-6 w-14 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-[9px] font-black text-white uppercase tracking-widest">
+                <kbd className="inline-flex h-6 w-14 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-[9px] font-black text-white uppercase tracking-widest">
                   ENTER
                 </kbd>
                 <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest opacity-40">Execute</span>

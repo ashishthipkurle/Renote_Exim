@@ -1,4 +1,4 @@
-import ClientSidebar from "@/components/client/ClientSidebar";
+import ImporterSidebar from "@/components/importer/ImporterSidebar";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
@@ -14,7 +14,7 @@ export default function ImporterLayout({ children }: { children: React.ReactNode
           <DashboardHeader />
 
           <div className="flex flex-1 overflow-hidden relative border-t border-slate-200 dark:border-white/5">
-            <ClientSidebar basePath="/dashboard/importer" />
+            <ImporterSidebar basePath="/dashboard/importer" />
             <SidebarInset>
               <div className="flex-1 overflow-auto custom-scrollbar">
                 <div className="px-8 py-6">

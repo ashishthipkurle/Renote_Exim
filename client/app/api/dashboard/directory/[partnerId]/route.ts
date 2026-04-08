@@ -21,7 +21,7 @@ export async function GET(
             // Find orders where Exporter is the user and Importer is the partner
             const orders = await prisma.order.findMany({
                 where: {
-                    importerId: partnerId,
+                    buyerId: partnerId,
                     product: {
                         exporterId: auth.userId,
                     },
@@ -41,7 +41,7 @@ export async function GET(
             // Find orders where Importer is the user and Exporter is the partner
             const orders = await prisma.order.findMany({
                 where: {
-                    importerId: auth.userId,
+                    buyerId: auth.userId,
                     product: {
                         exporterId: partnerId,
                     },

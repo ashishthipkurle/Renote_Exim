@@ -11,7 +11,7 @@ export type ApiAuthContext = {
   role: Role;
 };
 
-const VALID_ROLES: Role[] = ["USER", "EXPORTER", "IMPORTER", "ADMIN"];
+const VALID_ROLES: Role[] = ["USER", "EXPORTER", "IMPORTER", "SUPPLIER", "ADMIN"];
 
 function isValidRole(value: unknown): value is Role {
   return typeof value === "string" && VALID_ROLES.includes(value as Role);

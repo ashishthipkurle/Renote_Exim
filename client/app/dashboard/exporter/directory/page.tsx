@@ -1,18 +1,50 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { authFetch, formatCurrency, formatNumber, getInitials, timeAgo } from "@/lib/api-utils";
-import { X, ExternalLink, Package, History, Search, Globe, ShieldCheck, TrendingUp, ArrowRight, ArrowLeft, Layers, ShoppingCart, UserCheck } from "lucide-react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
+import { authFetch, formatCurrency, getInitials } from "@/lib/api-utils";
+import {
+    X, 
+    Package, 
+    History, 
+    Search, 
+    Globe, 
+    ShieldCheck, 
+    ArrowRight, 
+    MessageCircle,
+    Video,
+    Waves,
+    CalendarClock,
+    ChevronLeft,
+    Send,
+    Loader2,
+    Mic,
+    MicOff,
+    VideoOff,
+    Phone,
+    PhoneOff,
+    Users2
+} from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRealtimeCall } from "@/hooks/useRealtimeCall";
+import { useChat } from "@/hooks/useChat";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { format } from "date-fns";
+
+// Session components for call overlay
+import { VideoPlayer } from "@/components/session/VideoPlayer";
+import { SessionTimer } from "@/components/session/SessionTimer";
+import ScheduleCallModal from "@/components/calls/ScheduleCallModal";
 
 interface Partner {
   id: string;
   name: string;
-  companyName: string | null;
+  businessName: string | null;
   country: string | null;
   orderCount: number;
   totalValue: number;
+  avatar?: string | null;
 }
 
 interface DirectoryResponse {
@@ -38,20 +70,33 @@ interface TradeHistoryOrder {
   };
 }
 
-export default function ExporterDirectoryPage() {
+export default function ExporterBuyersPage() {
+  // 1. Data Hooks
+  const callController = useRealtimeCall();
+  
+  // 2. Local State
   const [data, setData] = useState<DirectoryResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-
-  // Modal State
-  const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
+  
+  // Selection state
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [tradeHistory, setTradeHistory] = useState<TradeHistoryOrder[]>([]);
 
-  const fetchData = useCallback(() => {
+  // Comms state
+  const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+  const { messages, sendMessage, loading: messagesLoading } = useChat(selectedId);
+  const [msgInput, setMsgInput] = useState("");
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // 3. Data Fetching
+  const fetchPartners = useCallback(() => {
     setLoading(true);
-    const params = new URLSearchParams({ page: String(page), limit: "20" });
+    const params = new URLSearchParams({ page: String(page), limit: "50" });
     if (search) params.set("search", search);
     authFetch<DirectoryResponse>(`/api/dashboard/directory?${params}`)
       .then(setData)
@@ -60,268 +105,449 @@ export default function ExporterDirectoryPage() {
   }, [page, search]);
 
   useEffect(() => {
-    const t = setTimeout(fetchData, 300);
+    const t = setTimeout(fetchPartners, 300);
     return () => clearTimeout(t);
-  }, [fetchData]);
+  }, [fetchPartners]);
 
-  const openHistory = async (partner: Partner) => {
-    setSelectedPartner(partner);
+  // Fetch history when partner selected
+  const fetchHistory = async (partnerId: string) => {
     setHistoryLoading(true);
     try {
       const res = await authFetch<{ orders: TradeHistoryOrder[] }>(
-        `/api/dashboard/directory/${partner.id}`
+        `/api/dashboard/directory/${partnerId}`
       );
       setTradeHistory(res.orders);
     } catch (e) {
-      console.error(e);
       setTradeHistory([]);
     } finally {
       setHistoryLoading(false);
     }
   };
 
-  const statusColor = (status: string) => {
-    switch (status) {
-      case "DELIVERED": return "text-primary-foreground bg-primary border-transparent";
-      case "CONFIRMED":
-      case "PROCESSING":
-      case "SHIPPED": return "text-foreground dark:text-white bg-black/10 dark:bg-white/15 border-border dark:border-white/20";
-      case "CANCELLED": return "text-muted-foreground/20 bg-black/5 dark:bg-white/10 border-border dark:border-white/5";
-      default: return "text-muted-foreground/40 bg-black/5 dark:bg-white/10 border-border dark:border-white/5";
+  useEffect(() => {
+    if (selectedId) {
+      const partner = data?.partners.find(p => p.id === selectedId);
+      if (partner) {
+        setSelectedUser({
+          id: partner.id,
+          name: partner.name,
+          avatar: partner.avatar,
+          role: "Verified Importer",
+          address: partner.country || "Global"
+        });
+        void fetchHistory(partner.id);
+      }
+    } else {
+        setSelectedUser(null);
+        setTradeHistory([]);
+    }
+  }, [selectedId, data?.partners]);
+
+  // Auto-scroll chat
+  useEffect(() => {
+    if (scrollRef.current) {
+        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  // 4. Handlers
+  const handleSendMsg = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!msgInput.trim()) return;
+    try {
+        await sendMessage(msgInput);
+        setMsgInput("");
+    } catch (err) {
+        toast.error("Comms_Failure: Signal not transmitted.");
     }
   };
 
+  const initiateCall = (type: "AUDIO" | "VIDEO") => {
+    if (!selectedId || !selectedUser) return;
+    void callController.startCall({
+        target: { id: selectedId, name: selectedUser.name },
+        callType: type
+    });
+  };
+
+
+
   return (
-    <div className="h-full overflow-hidden flex flex-col bg-background selection:bg-primary selection:text-primary-foreground">
-      {/* ── Header ── */}
-      <header className="flex-shrink-0 px-10 py-10 border-b border-border dark:border-white/5 bg-background/40 backdrop-blur-3xl z-40">
-        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-10">
-          <div>
-            <h1 className="text-5xl font-black tracking-tighter text-foreground dark:text-white uppercase italic">Partner Directory</h1>
-            <p className="text-muted-foreground/40 mt-3 text-[10px] font-black uppercase tracking-[0.3em] italic">
-              Registry Node Index: {data?.pagination.total || 0} Unified Trade Partners Identified
-            </p>
-          </div>
-          <div className="relative group w-full xl:w-[400px]">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/40 group-focus-within:text-foreground dark:text-white transition-colors" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-              placeholder="Search partner node identity..."
-              className="w-full pl-14 pr-6 py-4 bg-card/40 dark:bg-white/5 border border-border dark:border-white/5 rounded-2xl text-[10px] text-foreground dark:text-white font-black uppercase tracking-widest placeholder:text-muted-foreground/20 focus:outline-none focus:border-border dark:border-white/20 transition-all shadow-inner italic backdrop-blur-xl"
-            />
-          </div>
+    <div className="h-full flex overflow-hidden bg-background">
+      {/* LEFT PANEL: Importer Hub */}
+      <div className={`flex flex-col border-r border-border shrink-0 transition-all duration-500 ${selectedId ? "w-0 md:w-80 lg:w-[400px]" : "w-full md:w-80 lg:w-[400px]"}`}>
+        <div className="p-10 space-y-8">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-black italic uppercase tracking-tighter flex items-center gap-3">
+                        <Users2 className="w-8 h-8 text-primary" />
+                        Buyers hub
+                    </h1>
+                    <p className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground mt-2 opacity-50">Global Importer Directory</p>
+                </div>
+            </div>
+
+            {/* Search */}
+            <div className="relative group/search">
+                <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within/search:text-primary transition-colors" />
+                <input
+                    type="text"
+                    placeholder="Identify Importer node..."
+                    className="w-full bg-muted/20 border border-border rounded-2xl pl-14 pr-6 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold shadow-inner uppercase tracking-wider"
+                    value={search}
+                    onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                />
+            </div>
         </div>
-      </header>
 
-      <div className="flex-1 overflow-y-auto p-10 space-y-16 custom-scrollbar animate-in fade-in slide-in-from-bottom-4 duration-1000">
-        <div className="max-w-[1700px] mx-auto">
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="h-64 bg-black/5 dark:bg-white/10 rounded-[2.5rem] animate-pulse border border-border dark:border-white/5" />
-              ))}
-            </div>
-          ) : !data?.partners?.length ? (
-            <div className="bg-card/40 dark:bg-white/5 border border-border dark:border-white/5 shadow-xl dark:shadow-2xl rounded-[3rem] p-24 text-center max-w-2xl mx-auto mt-20 backdrop-blur-3xl">
-              <div className="flex flex-col items-center gap-8 opacity-40">
-                <div className="p-10 rounded-[2.5rem] bg-black/5 dark:bg-white/10 border border-border dark:border-white/10">
-                  <UserCheck className="w-16 h-16 text-foreground dark:text-white" />
+        <div className="flex-1 overflow-y-auto custom-scrollbar px-4 pt-2">
+            {loading ? (
+                <div className="p-20 text-center flex flex-col items-center gap-6 opacity-30">
+                    <Loader2 className="w-8 h-8 animate-spin" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.4em]">Syncing Partner Registry...</span>
                 </div>
-                <div className="space-y-4">
-                  <h2 className="text-2xl font-black text-foreground dark:text-white uppercase italic tracking-tighter">Identity Registry Dormant</h2>
-                  <p className="text-[10px] text-foreground dark:text-white font-black uppercase tracking-[0.2em] max-w-sm mx-auto leading-relaxed italic">
-                    {search
-                      ? "Search parameters yielded null results. Adjust registry query."
-                      : "Partner nodes will auto-initialize upon primary trade execution."}
-                  </p>
+            ) : !data?.partners?.length ? (
+                <div className="p-20 text-center opacity-30 flex flex-col items-center gap-5">
+                    <Users2 className="w-12 h-12 grayscale" />
+                    <span className="text-xs font-black uppercase tracking-widest text-center italic">No Importers Found in Registry</span>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] max-w-[200px]">The global trade network is currently searching for compatible importer nodes.</p>
                 </div>
-              </div>
-            </div>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
-                {data.partners.map((p) => (
-                  <div key={p.id} className="bg-card/40 dark:bg-white/5 border border-border dark:border-white/5 shadow-xl dark:shadow-2xl rounded-[2.5rem] p-10 hover:border-border dark:border-white/20 transition-all duration-700 flex flex-col group backdrop-blur-3xl hover:-translate-y-2">
-                    <div className="flex items-start justify-between mb-10">
-                      <div className="flex items-center gap-6">
-                        <div className="size-16 rounded-[1.5rem] bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 flex items-center justify-center text-foreground dark:text-white font-black text-xl group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-700 shadow-inner">
-                          {getInitials(p.name)}
-                        </div>
-                        <div className="min-w-0">
-                          <div className="text-xl font-black text-foreground dark:text-white truncate italic tracking-tighter uppercase group-hover:translate-x-1 transition-transform">{p.name}</div>
-                          {p.companyName && <div className="text-muted-foreground/30 text-[9px] font-black uppercase tracking-[0.2em] mt-2 italic group-hover:text-muted-foreground transition-colors">{p.companyName}</div>}
-                        </div>
-                      </div>
-                      <div className="p-3 rounded-2xl bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 text-muted-foreground/20 group-hover:text-foreground dark:text-white transition-colors">
-                        <Globe className="w-5 h-5" />
-                      </div>
-                    </div>
+            ) : (
+                <div className="space-y-3 pb-20">
+                    {data.partners.map((p) => {
+                        const isSelected = selectedId === p.id;
+                        return (
+                            <button
+                                key={p.id}
+                                onClick={() => setSelectedId(p.id)}
+                                className={`w-full group relative bg-card/30 border transition-all duration-500 rounded-[2.5rem] p-6 text-left ${isSelected ? "border-primary ring-1 ring-primary/20 shadow-2xl shadow-primary/10" : "border-border hover:border-primary/40 hover:bg-muted/30"}`}
+                            >
+                                <div className="flex items-center gap-5">
+                                    <div className="size-16 rounded-[1.8rem] bg-gradient-to-br from-primary to-blue-600/10 flex shrink-0 items-center justify-center text-white font-black text-2xl shadow-lg shadow-primary/10 group-hover:scale-105 transition-transform">
+                                        {getInitials(p.name)}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex justify-between items-start mb-1">
+                                            <h3 className="font-black text-sm uppercase tracking-tight truncate group-hover:text-primary transition-colors">{p.name}</h3>
+                                            <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest opacity-40 shrink-0 ml-2 italic">{p.country || "Global"}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <div className="px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-500 text-[8px] font-black uppercase tracking-widest border border-emerald-500/10 italic">
+                                                Importer node
+                                            </div>
+                                            <span className="w-1 h-1 rounded-full bg-border" />
+                                            <span className="text-[8px] font-black text-muted-foreground uppercase tracking-[0.2em] opacity-40">{p.orderCount} Sigs</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </button>
+                        );
+                    })}
+                </div>
+            )}
+        </div>
 
-                    <div className="grid grid-cols-3 gap-8 mb-10 flex-1">
-                      <div>
-                        <div className="text-muted-foreground/20 mb-2 text-[8px] uppercase tracking-[0.3em] font-black italic">Origin</div>
-                        <div className="text-foreground dark:text-white font-black uppercase italic tracking-widest text-[10px] truncate">{p.country || "GLOBAL_NODE"}</div>
-                      </div>
-                      <div>
-                        <div className="text-muted-foreground/20 mb-2 text-[8px] uppercase tracking-[0.3em] font-black italic">Sigs</div>
-                        <div className="text-foreground dark:text-white font-black text-lg italic tracking-tighter">{formatNumber(p.orderCount)}</div>
-                      </div>
-                      <div>
-                        <div className="text-muted-foreground/20 mb-2 text-[8px] uppercase tracking-[0.3em] font-black italic">Net_Yield</div>
-                        <div className="text-foreground dark:text-white font-black text-lg italic tracking-tighter">{formatCurrency(p.totalValue)}</div>
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={() => openHistory(p)}
-                      className="w-full h-14 flex items-center justify-center gap-3 bg-black/5 dark:bg-white/10 hover:bg-primary text-muted-foreground group-hover:text-foreground dark:text-white hover:text-primary-foreground rounded-2xl border border-border dark:border-white/5 hover:border-transparent transition-all duration-700 font-black text-[9px] uppercase tracking-[0.3em] italic shadow-xl dark:shadow-2xl active:scale-95"
+        {/* Pagination minimal */}
+        {data && data.pagination.totalPages > 1 && (
+            <div className="p-6 border-t border-border bg-card/20 flex justify-center gap-3">
+                {Array.from({ length: Math.min(5, data.pagination.totalPages) }).map((_, i) => (
+                    <button 
+                        key={i}
+                        onClick={() => setPage(i + 1)}
+                        className={`size-8 rounded-xl text-[9px] font-black transition-all ${page === i + 1 ? "bg-primary text-white" : "bg-muted/50 text-muted-foreground hover:bg-muted"}`}
                     >
-                      <History className="w-5 h-5" />
-                      Neural Trade Feed
+                        {i + 1}
                     </button>
-                  </div>
                 ))}
-              </div>
-
-              {data.pagination.totalPages > 1 && (
-                <div className="flex justify-center gap-4 mt-20 pb-20">
-                  {Array.from({ length: data.pagination.totalPages }, (_, i) => i + 1).map((p) => (
-                    <button
-                      key={p}
-                      onClick={() => setPage(p)}
-                      className={`w-14 h-14 rounded-2xl text-[10px] font-black transition-all backdrop-blur-3xl italic ${p === page
-                        ? "bg-primary text-primary-foreground border-transparent shadow-2xl shadow-white/10 scale-110"
-                        : "bg-card/40 dark:bg-white/5 border border-border dark:border-white/5 text-muted-foreground/40 hover:bg-black/10 dark:bg-white/15 hover:border-border dark:border-white/20 hover:text-foreground dark:text-white"
-                        }`}
-                    >
-                      {p < 10 ? `0${p}` : p}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </>
-          )}
-        </div>
+            </div>
+        )}
       </div>
 
-      {/* ── Trade History Modal ── */}
-      <AnimatePresence>
-        {selectedPartner && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/80 backdrop-blur-2xl"
-              onClick={() => setSelectedPartner(null)}
-            />
-
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="relative w-full max-w-5xl max-h-[90vh] flex flex-col bg-card dark:bg-[#0a0a0a] border border-border dark:border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.8)] rounded-[3rem] overflow-hidden"
-            >
-              {/* Modal Header */}
-              <div className="flex-shrink-0 flex items-center justify-between p-12 border-b border-border dark:border-white/5 bg-white/[0.02] backdrop-blur-3xl">
-                <div className="flex items-center gap-8">
-                  <div className="size-20 rounded-[2rem] bg-primary border border-transparent flex items-center justify-center text-primary-foreground font-black text-2xl shadow-xl dark:shadow-2xl">
-                    {getInitials(selectedPartner.name)}
-                  </div>
-                  <div>
-                    <h2 className="text-3xl font-black text-foreground dark:text-white italic uppercase tracking-tighter">{selectedPartner.name}</h2>
-                    <p className="text-muted-foreground/40 mt-3 text-[9px] font-black uppercase tracking-[0.3em] italic flex items-center gap-3">
-                      <History className="w-3.5 h-3.5" />
-                      Sequence Feed • {formatNumber(selectedPartner.orderCount)} Nodes • {formatCurrency(selectedPartner.totalValue)} Net_Yield
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setSelectedPartner(null)}
-                  className="size-14 bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 text-muted-foreground/40 hover:text-foreground dark:text-white hover:bg-neutral-800 rounded-2xl flex items-center justify-center transition-all duration-500 shadow-xl dark:shadow-2xl hover:rotate-90"
-                  title="Close Registry"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-
-              {/* Modal Body */}
-              <div className="flex-1 overflow-y-auto p-12 custom-scrollbar">
-                {historyLoading ? (
-                  <div className="flex flex-col items-center justify-center py-32">
-                    <div className="p-8 rounded-[2.5rem] bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 animate-pulse">
-                      <Globe className="w-10 h-10 text-foreground dark:text-white animate-spin-slow" />
+      {/* RIGHT PANEL: Workspace hub */}
+      <div className={`flex-1 flex flex-col relative overflow-hidden bg-muted/5 ${!selectedId ? "hidden md:flex flex-col items-center justify-center" : "flex"}`}>
+        {selectedId && selectedUser ? (
+            <>
+                {/* Hub Header */}
+                <header className="p-8 border-b border-border bg-card/60 backdrop-blur-3xl flex items-center justify-between z-20 sticky top-0">
+                    <div className="flex items-center gap-6">
+                        <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setSelectedId(null)}>
+                            <ChevronLeft className="w-6 h-6" />
+                        </Button>
+                        <div className="flex items-center gap-5">
+                            <div className="size-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center font-black text-primary text-xl shadow-lg">
+                                {getInitials(selectedUser.name)}
+                            </div>
+                            <div>
+                                <h3 className="font-black text-xl italic uppercase tracking-tighter text-foreground">{selectedUser.name}</h3>
+                                <div className="flex items-center gap-2 mt-1">
+                                    <span className="size-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+                                    <span className="text-[11px] font-black text-primary uppercase tracking-widest">Trade Partner Active</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <p className="text-[10px] font-black text-white/40 mt-8 uppercase tracking-[0.3em] italic">Streaming Trade Telemetry...</p>
-                  </div>
-                ) : tradeHistory.length === 0 ? (
-                  <div className="text-center py-32 opacity-20">
-                    <Package className="w-16 h-16 mx-auto mb-8" />
-                    <p className="text-[10px] font-black uppercase tracking-[0.3em] italic">Null_Trade_History_Record</p>
-                  </div>
-                ) : (
-                  <div className="space-y-6">
-                    {tradeHistory.map((order) => (
-                      <div key={order.id} className="bg-white/[0.02] border border-border dark:border-white/5 rounded-[2.5rem] p-8 flex flex-col lg:flex-row gap-10 items-start lg:items-center group hover:bg-white/[0.05] hover:border-border dark:border-white/10 transition-all duration-700">
-                        <div className="flex items-center gap-8 flex-1 min-w-0">
-                          <div className="size-20 bg-black/5 dark:bg-white/10 rounded-[1.5rem] overflow-hidden flex-shrink-0 border border-border dark:border-white/5 p-2 shadow-inner group-hover:border-border dark:border-white/20 transition-all">
-                            {order.product?.images?.[0] ? (
-                              <img src={order.product.images[0]} alt="" className="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-1000" />
+
+                    <div className="flex items-center gap-4">
+                        <Button 
+                            className="rounded-2xl border-emerald-500/20 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 gap-3 h-14 px-8"
+                            onClick={() => initiateCall("AUDIO")}
+                        >
+                            <Waves className="w-5 h-5" />
+                            <span className="hidden lg:inline text-[11px] font-black uppercase tracking-[0.2em]">Voice Link</span>
+                        </Button>
+                        <Button 
+                            className="rounded-2xl border-primary/20 bg-primary/10 hover:bg-primary/20 text-primary gap-3 h-14 px-8"
+                            onClick={() => initiateCall("VIDEO")}
+                        >
+                            <Video className="w-5 h-5" />
+                            <span className="hidden lg:inline text-[11px] font-black uppercase tracking-[0.2em]">Video Signal</span>
+                        </Button>
+                        <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className={`rounded-2xl size-14 border border-border transition-all ${isHistoryOpen ? "bg-primary text-white border-primary" : ""}`}
+                            onClick={() => setIsHistoryOpen(!isHistoryOpen)}
+                        >
+                            <History className="w-6 h-6" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="rounded-2xl size-14 border border-border" onClick={() => setIsScheduleModalOpen(true)}>
+                            <CalendarClock className="w-6 h-6" />
+                        </Button>
+                    </div>
+                </header>
+
+                <div className="flex-1 flex overflow-hidden">
+                    {/* Main Chat Area */}
+                    <div className="flex-1 flex flex-col min-w-0 bg-[url('/grid.svg')] bg-fixed">
+                        <div ref={scrollRef} className="flex-1 overflow-y-auto p-12 space-y-10 flex flex-col custom-scrollbar">
+                            {messagesLoading && messages.length === 0 ? (
+                                <div className="flex-1 flex items-center justify-center opacity-30">
+                                    <Loader2 className="w-8 h-8 animate-spin" />
+                                </div>
+                            ) : messages.length === 0 ? (
+                                <div className="flex-1 flex flex-col items-center justify-center text-center max-w-sm mx-auto opacity-30 space-y-8">
+                                    <div className="p-8 rounded-[3rem] bg-primary/10 border border-primary/10 rotate-6">
+                                        <MessageCircle className="w-16 h-16 text-primary" />
+                                    </div>
+                                    <div className="space-y-3">
+                                        <p className="text-sm font-black uppercase tracking-[0.3em]">Communication Tunnel Established</p>
+                                        <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-70 italic text-center">Secure p2p signal active. Transmit trade intelligence.</p>
+                                    </div>
+                                </div>
                             ) : (
-                              <div className="w-full h-full flex items-center justify-center"><Package className="w-7 h-7 text-muted-foreground/20" /></div>
+                                messages.map((msg) => {
+                                    const isMe = msg.senderId !== selectedId;
+                                    return (
+                                        <div key={msg.id} className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}>
+                                           <div className={`max-w-[85%] lg:max-w-[70%] px-8 py-6 rounded-[2.8rem] shadow-2xl text-[13px] leading-relaxed transition-all duration-500 animate-in fade-in slide-in-from-bottom-2 ${isMe ? "bg-primary text-white rounded-tr-none shadow-primary/20" : "bg-card border border-border text-foreground rounded-tl-none shadow-black/5"}`}>
+                                              {msg.body}
+                                              <div className={`mt-4 text-[10px] font-black uppercase opacity-20 flex items-center gap-3 ${isMe ? "justify-end text-white/60" : "justify-start"}`}>
+                                                  {format(new Date(msg.createdAt), "HH:mm")}
+                                                  {isMe && <ShieldCheck className="w-3 h-3" />}
+                                              </div>
+                                           </div>
+                                        </div>
+                                    );
+                                })
                             )}
-                          </div>
-                          <div className="min-w-0">
-                            <Link href={`/dashboard/exporter/orders/${order.id}`} className="text-foreground dark:text-white font-black text-xl italic uppercase tracking-tighter hover:translate-x-1 transition-transform flex items-center gap-3">
-                              {order.product?.name || "Null_Asset"}
-                              <ExternalLink className="w-4 h-4 text-muted-foreground/20 group-hover:text-foreground dark:text-white transition-colors" />
-                            </Link>
-                            <div className="text-muted-foreground/20 text-[9px] font-black uppercase tracking-[0.2em] mt-3 flex items-center gap-4 italic">
-                              <span className="text-muted-foreground/40">#{order.orderNumber}</span>
-                              <span className="w-1 h-1 rounded-full bg-black/10 dark:bg-white/15" />
-                              <span>{timeAgo(order.createdAt)}</span>
-                            </div>
-                          </div>
                         </div>
 
-                        <div className="grid grid-cols-2 lg:flex lg:items-center gap-10 w-full lg:w-auto">
-                          <div className="text-left lg:text-right">
-                            <div className="text-muted-foreground/20 text-[8px] uppercase font-black tracking-[0.3em] mb-3 italic">Volume</div>
-                            <div className="text-foreground dark:text-white font-black text-sm italic tracking-widest uppercase">
-                              {order.quantity.toLocaleString()} {order.product?.unit || 'Units'}
-                            </div>
-                          </div>
-                          <div className="text-left lg:text-right">
-                            <div className="text-muted-foreground/20 text-[8px] uppercase font-black tracking-[0.3em] mb-3 italic">Total_Yield</div>
-                            <div className="text-foreground dark:text-white font-black text-lg italic tracking-tighter">
-                              {formatCurrency(order.totalPrice)} <span className="text-[10px] opacity-40 ml-1">{order.currency}</span>
-                            </div>
-                          </div>
-                          <div className="col-span-2 lg:col-span-1 flex justify-end">
-                            <span className={`inline-flex items-center px-6 py-2.5 rounded-full border text-[9px] font-black uppercase tracking-[0.2em] italic shadow-xl dark:shadow-2xl transition-all ${statusColor(order.status)}`}>
-                              <span className={`size-1.5 rounded-full mr-3 ${order.status === 'DELIVERED' ? 'bg-card dark:bg-[#0a0a0a]' : 'bg-current animate-pulse'}`} />
-                              {order.status}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+                        {/* Input Footer */}
+                        <footer className="p-10 border-t border-border bg-card/40 backdrop-blur-3xl">
+                            <form onSubmit={handleSendMsg} className="flex items-end gap-6 max-w-5xl mx-auto">
+                                <div className="flex-1 relative bg-background border border-border rounded-[2.5rem] overflow-hidden shadow-inner group/input focus-within:ring-4 focus-within:ring-primary/10 transition-all">
+                                    <textarea
+                                        className="w-full bg-transparent px-8 py-6 pr-20 text-[13px] focus:outline-none resize-none min-h-[72px] max-h-48 custom-scrollbar italic font-medium"
+                                        placeholder="Transmit buyer intelligence..."
+                                        rows={1}
+                                        value={msgInput}
+                                        onChange={(e) => setMsgInput(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter" && !e.shiftKey) {
+                                                e.preventDefault();
+                                                handleSendMsg();
+                                            }
+                                        }}
+                                    />
+                                    <div className="absolute right-8 bottom-6 text-[10px] font-black text-muted-foreground/30 uppercase tracking-[0.2em] hidden sm:block italic">
+                                        Signal Verified
+                                    </div>
+                                </div>
+                                <Button 
+                                    type="submit" 
+                                    className="size-20 rounded-[1.8rem] shadow-2xl shadow-primary/30 bg-primary hover:bg-primary-hover shrink-0 active:scale-90 transition-all flex items-center justify-center p-0"
+                                    disabled={!msgInput.trim()}
+                                >
+                                    <Send className="w-8 h-8 text-white group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                                </Button>
+                            </form>
+                        </footer>
+                    </div>
 
-              {/* Modal Footer */}
-              <div className="flex-shrink-0 p-10 border-t border-border dark:border-white/5 bg-white/[0.01] text-center">
-                <p className="text-[9px] font-black text-muted-foreground/20 uppercase tracking-[0.5em] italic">
-                  End of neural trade feed protocol // Registry node secured
-                </p>
-              </div>
-            </motion.div>
-          </div>
+                    {/* Right Panel: Mental Manifest (Trade History) */}
+                    <AnimatePresence>
+                        {isHistoryOpen && (
+                            <motion.div
+                                initial={{ width: 0, opacity: 0 }}
+                                animate={{ width: 400, opacity: 1 }}
+                                exit={{ width: 0, opacity: 0 }}
+                                className="border-l border-border bg-card/40 backdrop-blur-3xl flex flex-col shrink-0 overflow-hidden relative"
+                            >
+                                <div className="p-10 border-b border-border flex items-center justify-between">
+                                    <div>
+                                        <h3 className="text-xl font-black italic uppercase tracking-tighter">Trade Feed</h3>
+                                        <p className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground mt-2 opacity-50 italic">Neural Order Sequence</p>
+                                    </div>
+                                    <Button variant="ghost" size="icon" className="rounded-xl border border-border" onClick={() => setIsHistoryOpen(false)}>
+                                        <X className="w-5 h-5" />
+                                    </Button>
+                                </div>
+
+                                <div className="flex-1 overflow-y-auto p-8 space-y-6 custom-scrollbar">
+                                    {historyLoading ? (
+                                        <div className="flex flex-col items-center justify-center py-20 opacity-20 space-y-5">
+                                            <Globe className="w-10 h-10 animate-spin-slow" />
+                                            <span className="text-[9px] font-black uppercase tracking-[0.3em]">Streaming Telemetry...</span>
+                                        </div>
+                                    ) : tradeHistory.length === 0 ? (
+                                        <div className="text-center py-20 opacity-20 space-y-5">
+                                            <Package className="w-12 h-12 mx-auto" />
+                                            <p className="text-[9px] font-black uppercase tracking-[0.3em]">Null_History_Record</p>
+                                        </div>
+                                    ) : (
+                                        tradeHistory.map((order) => (
+                                            <div key={order.id} className="group relative bg-muted/20 border border-border rounded-[2rem] p-6 hover:bg-card/60 transition-all duration-500 overflow-hidden">
+                                                <div className="absolute top-0 right-0 px-4 py-1.5 rounded-bl-3xl bg-primary/10 text-primary text-[8px] font-black uppercase tracking-widest italic group-hover:bg-primary group-hover:text-white transition-all">
+                                                    {order.status}
+                                                </div>
+                                                <div className="flex items-center gap-4 mb-5">
+                                                    <div className="size-14 rounded-2xl bg-black/5 border border-border overflow-hidden p-1 group-hover:scale-105 transition-transform">
+                                                        {order.product?.images?.[0] ? (
+                                                            <img src={order.product.images[0]} alt="" className="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700" />
+                                                        ) : (
+                                                            <div className="w-full h-full flex items-center justify-center"><Package className="w-5 h-5 text-muted-foreground/20" /></div>
+                                                        )}
+                                                    </div>
+                                                    <div className="min-w-0">
+                                                        <h4 className="font-black text-xs uppercase tracking-tight truncate italic group-hover:text-primary transition-colors">{order.product?.name || "Null_Asset"}</h4>
+                                                        <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest opacity-40 mt-1 italic">#{order.orderNumber}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div>
+                                                        <span className="text-[7px] font-black uppercase tracking-[0.3em] text-muted-foreground/30 italic">Quantity</span>
+                                                        <div className="text-[11px] font-black italic">{order.quantity} {order.product?.unit || 'Units'}</div>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <span className="text-[7px] font-black uppercase tracking-[0.3em] text-muted-foreground/30 italic">Net_Yield</span>
+                                                        <div className="text-[11px] font-black italic text-primary">{formatCurrency(order.totalPrice)}</div>
+                                                    </div>
+                                                </div>
+                                                <Link 
+                                                    href={`/dashboard/exporter/orders/${order.id}`}
+                                                    className="mt-5 w-full py-3 bg-card border border-border rounded-xl text-[8px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-2 italic hover:bg-primary hover:text-white hover:border-transparent transition-all group/btn"
+                                                >
+                                                    Inspect node
+                                                    <ArrowRight className="w-3 h-3 group-hover/btn:translate-x-1 transition-transform" />
+                                                </Link>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+            </>
+        ) : (
+            /* Initial Empty State */
+            <div className="text-center max-w-md space-y-12 animate-in fade-in zoom-in duration-1000">
+                <div className="relative mx-auto">
+                    <div className="size-48 mx-auto rounded-[4rem] bg-gradient-to-br from-primary to-blue-600/[0.05] p-[1.5px] shadow-2xl shadow-primary/20 rotate-[-6deg] group">
+                        <div className="h-full w-full bg-background/90 backdrop-blur-3xl rounded-[3.9rem] flex items-center justify-center group-hover:rotate-[6deg] transition-transform duration-700">
+                            <Users2 className="w-20 h-20 text-primary" />
+                        </div>
+                    </div>
+                </div>
+                <div className="space-y-4">
+                    <h2 className="text-4xl font-black italic uppercase tracking-tighter text-foreground italic flex items-center justify-center gap-4">
+                        Buyer terminal
+                    </h2>
+                    <p className="text-[11px] font-black uppercase tracking-[0.4em] text-muted-foreground leading-loose opacity-60">
+                        Select intelligence node to view manifest.<br/>
+                        Comms sequence and history feed enabled.
+                    </p>
+                </div>
+                <div className="flex gap-4 justify-center">
+                    <div className="px-6 py-3 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500 italic">Global Partner</div>
+                    <div className="px-6 py-3 bg-muted/30 border border-border rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground italic">Comms Link Secured</div>
+                </div>
+            </div>
         )}
-      </AnimatePresence>
+
+        {/* Call Overlay */}
+        {callController.phase !== "idle" && callController.phase !== "ended" && (
+            <div className="absolute inset-0 z-[100] bg-black/95 backdrop-blur-3xl flex flex-col animate-in fade-in duration-500">
+                <header className="p-10 flex items-center justify-between">
+                    <div className="flex items-center gap-6">
+                        <div className="size-20 rounded-[2.5rem] bg-primary/20 border border-primary/30 flex items-center justify-center text-primary font-black text-3xl">
+                            {(callController.activeCall?.peerName || callController.incomingCall?.fromName || "X").charAt(0)}
+                        </div>
+                        <div>
+                            <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter">
+                                {callController.activeCall?.peerName || callController.incomingCall?.fromName || "Connecting..."}
+                            </h2>
+                            <div className="flex items-center gap-2 mt-2">
+                                <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+                                <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">{callController.phase.replace("-", " ")}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {callController.phase === "in-call" && <SessionTimer endTime={null} onTimeExpired={() => {}} />}
+                </header>
+
+                <div className="flex-1 p-10 grid grid-cols-1 md:grid-cols-2 gap-12 items-center max-w-7xl mx-auto w-full">
+                    <VideoPlayer stream={callController.remoteStream} name={callController.activeCall?.peerName || "Remote Partner"} image={null} isLocal={false} className="h-[500px] md:h-[600px] border border-white/10 rounded-[4rem] shadow-2xl" />
+                    <VideoPlayer stream={callController.localStream} name="You" image={null} isLocal={true} isMuted={callController.isMuted} isVideoOff={!callController.isCameraEnabled} className="h-[500px] md:h-[600px] border border-white/10 rounded-[4rem] shadow-2xl" />
+                </div>
+
+                <footer className="p-16 flex justify-center">
+                    <div className="flex items-center gap-10 p-6 bg-white/[0.03] border border-white/10 rounded-[3rem] backdrop-blur-3xl">
+                        <Button variant="ghost" size="icon" className={`size-20 rounded-full ${!callController.isMuted ? "bg-white/10" : "bg-red-500"}`} onClick={() => callController.toggleMute()}>
+                            {callController.isMuted ? <MicOff className="w-8 h-8 text-white" /> : <Mic className="w-8 h-8 text-white" />}
+                        </Button>
+                        {callController.phase === "ringing" ? (
+                            <>
+                                <Button className="size-24 rounded-full bg-emerald-500" onClick={() => void callController.acceptCall()}>
+                                    <Phone className="w-10 h-10 text-white" />
+                                </Button>
+                                <Button variant="destructive" className="size-20 rounded-full" onClick={() => void callController.declineCall()}>
+                                    <PhoneOff className="w-8 h-8 text-white" />
+                                </Button>
+                            </>
+                        ) : (
+                            <Button variant="destructive" className="size-24 rounded-full" onClick={() => void callController.endCall()}>
+                                <PhoneOff className="w-10 h-10 text-white" />
+                            </Button>
+                        )}
+                        <Button variant="ghost" size="icon" className={`size-20 rounded-full ${callController.isCameraEnabled ? "bg-white/10" : "bg-red-500"}`} onClick={() => callController.toggleCamera()}>
+                            {!callController.isCameraEnabled ? <VideoOff className="w-8 h-8 text-white" /> : <Video className="w-8 h-8 text-white" />}
+                        </Button>
+                    </div>
+                </footer>
+            </div>
+        )}
+      </div>
+
+      {/* MODALS */}
+      <ScheduleCallModal
+          open={isScheduleModalOpen}
+          onOpenChange={setIsScheduleModalOpen}
+          receiver={selectedUser ? { id: selectedId!, name: selectedUser.name } : null}
+          onScheduled={() => toast.success("Negotiation session requested.")}
+      />
     </div>
   );
 }
+
+

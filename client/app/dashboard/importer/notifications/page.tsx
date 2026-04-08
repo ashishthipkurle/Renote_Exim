@@ -134,8 +134,8 @@ export default function ImporterNotificationsPage() {
             <button
               onClick={() => setShowUnreadOnly(!showUnreadOnly)}
               className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border ${showUnreadOnly
-                  ? "bg-primary text-primary-foreground border-transparent border-white shadow-[0_0_15px_rgba(255,255,255,0.2)]"
-                  : "bg-muted/40 border-border text-muted-foreground hover:text-foreground hover:bg-muted/20"
+                ? "bg-primary text-primary-foreground border-transparent border-white shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+                : "bg-muted/40 border-border text-muted-foreground hover:text-foreground hover:bg-muted/20"
                 }`}
             >
               Unread Focused
@@ -162,8 +162,8 @@ export default function ImporterNotificationsPage() {
                 key={t.id}
                 onClick={() => setActiveType(t.id)}
                 className={`w-full flex items-center justify-between p-5 rounded-2xl transition-all group scale-95 hover:scale-100 ${activeType === t.id
-                    ? "bg-primary text-primary-foreground border-transparent shadow-[0_0_20px_rgba(255,255,255,0.1)] scale-100 z-10"
-                    : "text-muted-foreground hover:bg-muted/20 hover:text-foreground"
+                  ? "bg-primary text-primary-foreground border-transparent shadow-[0_0_20px_rgba(255,255,255,0.1)] scale-100 z-10"
+                  : "text-muted-foreground hover:bg-muted/20 hover:text-foreground"
                   }`}
               >
                 <div className="flex items-center gap-4">
@@ -195,8 +195,8 @@ export default function ImporterNotificationsPage() {
                   key={n.id}
                   onClick={() => !n.read && handleMarkRead(n.id)}
                   className={`group relative bg-muted/40 backdrop-blur-xl border transition-all rounded-[2rem] p-7 lg:p-10 flex items-start gap-8 cursor-pointer shadow-2xl ${n.read
-                      ? "border-border opacity-40 hover:opacity-80"
-                      : "border-border shadow-[0_0_30px_rgba(255,255,255,0.05)] hover:border-white/30"
+                    ? "border-border opacity-40 hover:opacity-80"
+                    : "border-border shadow-[0_0_30px_rgba(255,255,255,0.05)] hover:border-white/30"
                     }`}
                 >
                   <div className={`flex-shrink-0 size-14 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 ${getTypeColor(n.type)}`}>
