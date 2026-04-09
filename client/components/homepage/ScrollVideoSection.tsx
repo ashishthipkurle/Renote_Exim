@@ -9,7 +9,6 @@ import Link from "next/link";
 import { User, LogOut, ShoppingBag, Home, Info, Phone, ChevronDown, LayoutDashboard } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import LogoImg from "@/assests/LOGO.png";
 import ThumbnailImg from "@/assests/4k Video frame 2/1.png";
 
@@ -646,10 +645,6 @@ export default function ScrollVideoSection() {
                         )
                       )}
 
-                      <div className="h-4 w-[1px] bg-white/10" />
-                      <div className="scale-75 -mx-2">
-                        <ThemeToggle />
-                      </div>
                     </div>
                   </div>
                 </div>
