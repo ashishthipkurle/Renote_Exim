@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { ShoppingCart } from "lucide-react";
 
 import { prisma } from "@/lib/prisma";
-import { getServerAuth } from "@/lib/supabase/server";
+import { getServerAuthContext } from "@/lib/auth-server";
 import { formatCurrency } from "@/lib/api-utils";
 import OrdersList from "@/components/dashboard/OrdersList";
 
@@ -15,7 +15,7 @@ export default async function ImporterOrdersPage({
   searchParams?: { view?: string } | Promise<{ view?: string }>;
 }) {
   await searchParams;
-  const auth = await getServerAuth();
+  const auth = await getServerAuthContext();
   if (!auth) redirect("/login");
   if (auth.role !== "IMPORTER" && auth.role !== "ADMIN") {
     redirect(`/dashboard/${auth.role.toLowerCase()}`);

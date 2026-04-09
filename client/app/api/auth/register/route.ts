@@ -1,165 +1,175 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-
 import { registerSchema } from "@/lib/validations";
-import { createSupabaseRouteClient } from "@/lib/supabase/route";
-
-
+import { nhost } from "@/lib/nhost";
+import { AUTH_COOKIE_NAME, AUTH_COOKIE_OPTIONS } from "@/lib/auth-server";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-
-    // Validate input
     const validatedData = registerSchema.parse(body);
 
-    const { supabase, applyCookies } = createSupabaseRouteClient(request);
-
-    const host = request.headers.get("host");
-    const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`;
-
-    const { data, error } = await supabase.auth.signUp({
-      email: validatedData.email,
-      password: validatedData.password,
-      options: {
-        emailRedirectTo: `${appUrl}/api/auth/callback?next=/verify-email`,
-        data: {
-          name: validatedData.name,
-          role: validatedData.role,
-          companyName: validatedData.companyName,
-          country: validatedData.country,
-          phone: validatedData.phone,
-          website: validatedData.website,
+    // Nhost v4 SDK throws on error, so we need try-catch here
+    let result: any;
+    try {
+      result = await nhost.auth.signUpEmailPassword({
+        email: validatedData.email,
+        password: validatedData.password,
+        options: {
+          metadata: {
+            name: validatedData.name,
+            role: validatedData.role,
+            companyName: validatedData.companyName,
+            country: validatedData.country,
+            phone: validatedData.phone,
+          },
         },
-      },
-    });
+      });
+    } catch (signupError: any) {
+      // SDK threw an error - extract the message
+      const msg = signupError?.body?.message || signupError?.message || "Registration failed";
+      console.error("Nhost signup threw:", msg);
+      return NextResponse.json({ error: msg }, { status: 400 });
+    }
 
-    if (error || !data.user) {
+    const error = result.error || result.body?.error;
+    const session = result.session || result.body?.session;
+    const mfa = result.mfa || result.body?.mfa;
+
+    const userId = session?.user?.id || result?.user?.id || result?.body?.user?.id;
+    const userEmail = session?.user?.email || result?.user?.email || result?.body?.user?.email || validatedData.email;
+
+
+    if (error) {
       return NextResponse.json(
         { error: error?.message ?? "Registration failed" },
         { status: 400 }
       );
     }
 
-    // If email confirmations are enabled, session may be null. In that case, we can still
-    // return a helpful message and let the user sign in after confirming.
-    if (!data.session) {
-      const res = NextResponse.json(
+    // Create the profile and auto-verify
+    if (userId) {
+      try {
+        const fs = await import("fs");
+        const path = await import("path");
+        const logPath = path.join(process.cwd(), "debug-register.log");
+        const log = (msg: string) => fs.appendFileSync(logPath, `[${new Date().toISOString()}] ${msg}\n`);
+
+        const prismaModule = await import("@/lib/prisma");
+
+        // Auto-verify the user email so they can log in immediately
+        try {
+          await prismaModule.prisma.$executeRawUnsafe(
+            `UPDATE auth.users SET email_verified = true WHERE email = $1`,
+            validatedData.email
+          );
+          log("Auto-verify successful");
+        } catch (e: any) {
+          log(`Auto-verify failed: ${e.message || String(e)}`);
+          console.warn("Auto-verify failed:", e);
+        }
+
+        // Create/update public profile
+        try {
+          await prismaModule.prisma.user.upsert({
+            where: { id: userId },
+            update: {
+              name: validatedData.name,
+              email: validatedData.email,
+              role: validatedData.role,
+              businessName: validatedData.companyName || null,
+              country: validatedData.country,
+              phone: validatedData.phone || null,
+            },
+            create: {
+              id: userId,
+              name: validatedData.name,
+              email: validatedData.email,
+              role: validatedData.role,
+              businessName: validatedData.companyName || null,
+              country: validatedData.country,
+              phone: validatedData.phone || null,
+              verificationStatus: "PENDING",
+            },
+          });
+          log("Prisma upsert successful");
+        } catch (e: any) {
+          log(`Prisma upsert failed: ${e.message || String(e)}`);
+          throw e; // throw to be caught by outer sync catch
+        }
+
+        // Welcome notification
+        try {
+          await prismaModule.prisma.notification.create({
+            data: {
+              userId: userId,
+              type: "ORDER_UPDATE",
+              title: "Welcome to Renote Exim!",
+              message: `Welcome ${validatedData.name ?? ""}! Your account has been created.`,
+            },
+          });
+          log("Notification successful");
+        } catch (e) {
+          console.warn("Welcome notification failed:", e);
+        }
+      } catch (e: any) {
+        const fs = await import("fs");
+        const path = await import("path");
+        const logPath = path.join(process.cwd(), "debug-register.log");
+        fs.appendFileSync(logPath, `[${new Date().toISOString()}] Prisma sync failed during registration: ${e.message || String(e)}\n\n`);
+        console.warn("Prisma sync failed during registration:", e);
+      }
+    }
+
+    // If we got a session directly, use it
+    if (session?.accessToken) {
+      const response = NextResponse.json(
         {
-          message:
-            "Registration successful. Please check your email to confirm your account, then log in.",
+          message: "Registration successful",
+          user: { id: userId, name: validatedData.name, email: userEmail, role: validatedData.role },
+          token: session.accessToken,
         },
         { status: 201 }
       );
-      return applyCookies(res);
+      
+      console.log("[Register] Success. Setting response cookie:", AUTH_COOKIE_NAME);
+      response.cookies.set(AUTH_COOKIE_NAME, session.accessToken, AUTH_COOKIE_OPTIONS);
+      return response;
     }
 
-    // Persist the profile (especially role) using Prisma when available. This avoids relying on
-    // Supabase RLS policies for writes to the `users` table (which would otherwise leave role at
-    // the Prisma default).
-    try {
-      const prismaModule = await import("@/lib/prisma");
-      await prismaModule.prisma.user.upsert({
-        where: { id: data.user.id },
-        update: {
-          name: validatedData.name,
+    // No session - try auto-login since we just verified the email
+    if (userId) {
+      try {
+        const loginResult = await nhost.auth.signInEmailPassword({
           email: validatedData.email,
-          role: validatedData.role,
-          companyName: validatedData.companyName,
-          country: validatedData.country,
-          phone: validatedData.phone,
-          website: validatedData.website,
-        },
-        create: {
-          id: data.user.id,
-          name: validatedData.name,
-          email: validatedData.email,
-          role: validatedData.role,
-          companyName: validatedData.companyName,
-          country: validatedData.country,
-          phone: validatedData.phone,
-          website: validatedData.website,
-          verified: false,
-        },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          role: true,
-          companyName: true,
-          country: true,
-          phone: true,
-          website: true,
-          verified: true,
-          avatar: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-      });
-    } catch (e) {
-      console.warn("Prisma upsert skipped/unavailable:", e);
+          password: validatedData.password,
+        });
+
+        if (loginResult.session?.accessToken) {
+          const response = NextResponse.json(
+            {
+              message: "Registration successful",
+              user: { id: userId, name: validatedData.name, email: userEmail, role: validatedData.role },
+              token: loginResult.session.accessToken,
+            },
+            { status: 201 }
+          );
+          
+          response.cookies.set(AUTH_COOKIE_NAME, loginResult.session.accessToken, AUTH_COOKIE_OPTIONS);
+          return response;
+        }
+      } catch (e) {
+        console.warn("Auto-login after registration failed:", e);
+      }
     }
 
-    // Best-effort update to profile row (created via DB trigger). If RLS/trigger isn't
-    // installed yet, we still want the registration flow to succeed.
-    const { error: profileUpdateError } = await supabase
-      .from("users")
-      .update({
-        name: validatedData.name,
-        role: validatedData.role,
-        companyName: validatedData.companyName,
-        country: validatedData.country,
-        phone: validatedData.phone,
-        website: validatedData.website,
-      })
-      .eq("id", data.user.id);
-
-    if (profileUpdateError) {
-      console.warn("Profile update skipped/failed:", profileUpdateError.message);
-    }
-
-    const profile = {
-      id: data.user.id,
-      name: validatedData.name ?? null,
-      email: data.user.email ?? validatedData.email,
-      role: validatedData.role,
-    };
-
-    // Optional welcome notification (best-effort; skip if Prisma isn't configured)
-    try {
-      const prismaModule = await import("@/lib/prisma");
-      await prismaModule.prisma.notification.create({
-        data: {
-          userId: profile.id,
-          type: "GENERAL",
-          title: "Welcome to Renote Exim!",
-          message: `Welcome ${profile.name ?? ""}! Your account has been created successfully. Complete your profile to start trading.`,
-        },
-      });
-    } catch (e) {
-      console.warn("Welcome notification skipped:", e);
-    }
-
-    const res = NextResponse.json(
-      {
-        message: "Registration successful",
-        user: profile,
-        token: data.session.access_token,
-      },
+    // Fallback: registration worked but no session
+    return NextResponse.json(
+      { message: "Registration successful. Please log in." },
       { status: 201 }
     );
 
-    return applyCookies(res);
-
-  } catch (error) {
-    if (error instanceof Error && error.message.includes("Missing Supabase env")) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 500 }
-      );
-    }
-
+  } catch (error: any) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
@@ -167,9 +177,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.error("Registration error:", error);
+    console.error("Registration error:", error?.message || error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: error?.message || "Internal server error" },
       { status: 500 }
     );
   }

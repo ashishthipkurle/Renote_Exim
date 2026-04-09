@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { getSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { getSocket } from "@/lib/socket";
 import { useAuth } from "@/components/auth/AuthProvider";
 import axios from "axios";
 
@@ -18,13 +18,12 @@ export function useChat(otherUserId?: string | null, orderId?: string | null) {
   const { user: currentUser } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
-  const supabase = getSupabaseBrowserClient();
 
   const fetchMessages = useCallback(async () => {
     if (!otherUserId) return;
     setLoading(true);
     try {
-      const url = `/api/messaging?otherUserId=${otherUserId}${orderId ? `&orderId=${orderId}` : ""}&limit=80`;
+      const url = "/api/messaging?otherUserId=" + otherUserId + (orderId ? "&orderId=" + orderId : "") + "&limit=80";
       const res = await axios.get(url);
       setMessages(res.data);
       await axios.patch("/api/messaging/read", { senderId: otherUserId }).catch(() => {});
@@ -40,45 +39,37 @@ export function useChat(otherUserId?: string | null, orderId?: string | null) {
 
     fetchMessages();
 
-    // Listen only to new messages addressed to the current user.
-    const channel = supabase
-      .channel(`messages:incoming:${currentUser.id}:${otherUserId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "messages",
-          filter: `receiverId=eq.${currentUser.id}`,
-        },
-        (payload: any) => {
-          const newMessage = payload.new as Message;
-          const isRelevant =
-            newMessage.senderId === otherUserId &&
-            (!orderId || newMessage.orderId === orderId);
+    const socket = getSocket();
+    socket.emit("join-user-room", currentUser.id);
 
-          if (!isRelevant) return;
+    const handleNewMessage = (payload: any) => {
+      const newMessage = payload as Message;
+      const isRelevant =
+        newMessage.senderId === otherUserId &&
+        (!orderId || newMessage.orderId === orderId);
 
-          setMessages((prev) => {
-            if (prev.some((entry) => entry.id === newMessage.id)) return prev;
-            return [...prev, newMessage];
-          });
+      if (!isRelevant) return;
 
-          axios.patch("/api/messaging/read", { senderId: otherUserId }).catch(() => {});
-        }
-      )
-      .subscribe();
+      setMessages((prev) => {
+        if (prev.some((entry) => entry.id === newMessage.id)) return prev;
+        return [...prev, newMessage];
+      });
+
+      axios.patch("/api/messaging/read", { senderId: otherUserId }).catch(() => {});
+    };
+
+    socket.on("new-message", handleNewMessage);
 
     return () => {
-      supabase.removeChannel(channel);
+      socket.off("new-message", handleNewMessage);
     };
-  }, [currentUser?.id, otherUserId, orderId, fetchMessages, supabase]);
+  }, [currentUser?.id, otherUserId, orderId, fetchMessages]);
 
   const sendMessage = async (content: string, subject?: string) => {
     const value = content.trim();
     if (!otherUserId || !currentUser?.id || !value) return;
 
-    const optimisticId = `optimistic-${Date.now()}`;
+    const optimisticId = "optimistic-" + Date.now();
     const optimisticMessage: Message = {
       id: optimisticId,
       senderId: currentUser.id,
@@ -100,11 +91,20 @@ export function useChat(otherUserId?: string | null, orderId?: string | null) {
         subject,
       });
 
+      const confirmedMessage = res.data;
+
       setMessages((prev) =>
-        prev.map((message) => (message.id === optimisticId ? res.data : message))
+        prev.map((message) => (message.id === optimisticId ? confirmedMessage : message))
       );
 
-      return res.data;
+      // Notify the receiver via WebSocket
+      const socket = getSocket();
+      socket.emit("send-message", confirmedMessage);
+
+      // Also notify sender if they have multiple tabs open (optional)
+      socket.emit("send-message", { ...confirmedMessage, receiverId: currentUser.id });
+
+      return confirmedMessage;
     } catch (err) {
       setMessages((prev) => prev.filter((message) => message.id !== optimisticId));
       console.error("Failed to send message", err);

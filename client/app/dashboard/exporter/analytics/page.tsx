@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { getServerAuth } from "@/lib/supabase/server";
+import { getServerAuthContext } from "@/lib/auth-server";
 import ExporterAnalyticsDashboard from "./ExporterAnalyticsDashboard";
 
 // ─── Server-side data fetching ────────────────────────────────────────────────
@@ -8,7 +8,7 @@ import ExporterAnalyticsDashboard from "./ExporterAnalyticsDashboard";
 // No mock/dummy data anywhere in this file.
 
 export default async function ExporterAnalyticsPage() {
-  const auth = await getServerAuth();
+  const auth = await getServerAuthContext();
   if (!auth) redirect("/login");
   if (auth.role !== "EXPORTER" && auth.role !== "ADMIN") {
     redirect(`/dashboard/${auth.role.toLowerCase()}`);

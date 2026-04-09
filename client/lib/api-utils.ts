@@ -1,10 +1,22 @@
-import { getSupabaseBrowserClient } from "@/lib/supabase/browser";
-
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 /**
+ * Read the sb_access_token cookie value (client-side only).
+ */
+function getAccessTokenFromCookie(): string | null {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(/(?:^|;\s*)sb_access_token=([^;]*)/);
+  if (!match) return null;
+  try {
+    return decodeURIComponent(match[1]) || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Makes an authenticated fetch request to an API endpoint.
- * Automatically includes the Supabase access token as a Bearer token.
+ * Automatically includes the Nhost access token as a Bearer token.
  * Includes basic retry logic for 5xx errors or network failures.
  */
 export async function authFetch<T = unknown>(
@@ -13,10 +25,7 @@ export async function authFetch<T = unknown>(
   retries = 3,
   backoffMs = 500
 ): Promise<T> {
-  const supabase = getSupabaseBrowserClient();
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  const token = getAccessTokenFromCookie();
 
   const headers: Record<string, string> = {
     ...(options.headers as Record<string, string>),
@@ -26,8 +35,8 @@ export async function authFetch<T = unknown>(
     headers["Content-Type"] = "application/json";
   }
 
-  if (session?.access_token) {
-    headers["Authorization"] = `Bearer ${session.access_token}`;
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
   }
 
   let lastError: Error | unknown;

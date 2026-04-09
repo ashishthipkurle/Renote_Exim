@@ -1,25 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-
 import { forgotPasswordSchema } from "@/lib/validations";
-import { createSupabaseRouteClient } from "@/lib/supabase/route";
+import { nhost } from "@/lib/nhost";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-
-    // Validate input
     const validatedData = forgotPasswordSchema.parse(body);
 
-    const { supabase } = createSupabaseRouteClient(request);
-    
-    // Get the app URL for the reset link redirect
     const host = request.headers.get("host");
     const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`;
 
-    const { error } = await supabase.auth.resetPasswordForEmail(validatedData.email, {
-      redirectTo: `${appUrl}/reset-password`,
+    // v4 SDK: sendPasswordResetEmail (not resetPassword)
+    const { error } = await nhost.auth.sendPasswordResetEmail({
+      email: validatedData.email,
+      options: {
+        redirectTo: `${appUrl}/reset-password`,
+      }
     });
 
     if (error) {

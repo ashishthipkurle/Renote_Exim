@@ -11,6 +11,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import LogoImg from "@/assests/LOGO.png";
+import ThumbnailImg from "@/assests/4k Video frame 2/1.png";
+
 
 /**
  * ScrollVideoSection — Apple-style scroll-linked video with scrollytelling text.
@@ -84,6 +86,8 @@ export default function ScrollVideoSection() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { user, loading: authLoading, logout } = useAuth();
   const [loaded, setLoaded] = useState(globalFramesCache.length >= 2);
+  const [hasScrolled, setHasScrolled] = useState(false);
+
 
   // Cover-draw: scale + center-crop bitmap to fill the canvas
   const drawCover = useCallback(
@@ -302,6 +306,10 @@ export default function ScrollVideoSection() {
         start: "top top",
         end: `+=${SCROLL_DISTANCE}`,
         scrub: 0.8,
+        onUpdate: (self) => {
+          if (self.progress > 0.001) setHasScrolled(true);
+          else if (self.progress <= 0) setHasScrolled(false);
+        },
       },
     });
 
@@ -491,15 +499,31 @@ export default function ScrollVideoSection() {
             style={{ display: "block", width: "100%", height: "100%" }}
           />
 
+          {/* Thumbnail Image - Visible before scroll */}
+          <AnimatePresence>
+            {!hasScrolled && (
+              <motion.div
+                initial={{ opacity: 1 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0 }}
+                className="absolute inset-0 z-[5] pointer-events-none"
+              >
+                <Image
+                  src={ThumbnailImg}
+                  alt="Ranote Exim"
+                  fill
+                  priority
+                  className="object-cover"
+                  unoptimized
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Intro Overlays */}
           {loaded && (
             <>
-              {/* Header Gradient */}
-              <div className="absolute top-0 w-full h-32 z-0 bg-gradient-to-b from-black/80 via-black/30 to-transparent pointer-events-none" />
-
-              {/* Bottom Gradient for text readability */}
-              <div className="absolute bottom-0 w-full h-48 z-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
-
               {/* ─── Immersive Glassmorphism Navigation Bar ─── */}
               <nav
                 className="absolute top-6 left-1/2 -translate-x-1/2 z-[60] pointer-events-auto cursor-auto"
@@ -509,14 +533,14 @@ export default function ScrollVideoSection() {
                 <div
                   className="flex items-center gap-2 px-10 py-1.5"
                   style={{
-                    background: "rgba(255, 255, 255, 0.2)",
-                    backdropFilter: "blur(8px)",
-                    WebkitBackdropFilter: "blur(8px)",
-                    boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.35)",
-                    borderRadius: "20px",
-                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                    background: "rgba(255, 255, 255, 0.03)",
+                    backdropFilter: "blur(24px) saturate(180%)",
+                    WebkitBackdropFilter: "blur(24px) saturate(180%)",
+                    borderRadius: "24px",
+                    border: "1px solid rgba(255, 255, 255, 0.08)",
                     minWidth: "850px",
-                    justifyContent: "space-between"
+                    justifyContent: "space-between",
+                    boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
                   }}
                 >
                   {/* Left Side: Navigation Links */}

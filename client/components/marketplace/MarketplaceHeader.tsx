@@ -46,7 +46,7 @@ function NavLink({
 }
 
 export default function MarketplaceHeader() {
-  const { user, logout } = useAuth();
+  const { user, loading, logout } = useAuth();
   const dashboardPath = user?.role === "USER"
     ? "/products"
     : user?.role
@@ -111,13 +111,17 @@ export default function MarketplaceHeader() {
             <ShoppingCart className="h-4 w-4" />
           </Link>
 
-          <ThemeToggle />
-
-          {user ? (
+          {loading ? (
+            <div className="h-10 w-24 animate-pulse rounded-xl bg-muted" />
+          ) : user ? (
             <div className="relative group">
               <button className="flex items-center gap-2 rounded-xl border border-border bg-background/60 px-3 py-2 text-sm font-semibold transition-colors hover:bg-accent hover:text-foreground">
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/20 text-primary">
-                  <User className="h-4 w-4" />
+                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/20 text-primary overflow-hidden">
+                  {user.avatar ? (
+                    <img src={user.avatar} alt={user.name || "User"} className="h-full w-full object-cover" />
+                  ) : (
+                    <User className="h-4 w-4" />
+                  )}
                 </div>
                 <span className="hidden sm:inline-block max-w-[100px] truncate">{user.name || "Profile"}</span>
                 <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 group-hover:rotate-180" />

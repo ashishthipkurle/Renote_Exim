@@ -1,0 +1,60 @@
+[2026-04-09T15:43:25.345Z] Login request started
+[2026-04-09T15:43:25.350Z] Email provided: importer4@gmail.com
+[2026-04-09T15:43:25.354Z] Validation passed
+[2026-04-09T15:43:25.355Z] Calling nhost.auth.signInEmailPassword
+[2026-04-09T15:43:26.069Z] Nhost result: SUCCESS
+[2026-04-09T15:43:26.070Z] Login failed: Unauthorized
+[2026-04-09T15:44:21.250Z] Login request started
+[2026-04-09T15:44:21.252Z] Email provided: importer4@gmail.com
+[2026-04-09T15:44:21.253Z] Validation passed
+[2026-04-09T15:44:21.253Z] Calling nhost.auth.signInEmailPassword
+[2026-04-09T15:44:21.550Z] Nhost result: SUCCESS
+[2026-04-09T15:44:21.551Z] Login failed: Unauthorized
+[2026-04-09T15:44:33.107Z] Login request started
+[2026-04-09T15:44:33.108Z] Email provided: importer4@gmail.com
+[2026-04-09T15:44:33.110Z] Validation passed
+[2026-04-09T15:44:33.110Z] Calling nhost.auth.signInEmailPassword
+[2026-04-09T15:44:33.511Z] Nhost result: SUCCESS
+[2026-04-09T15:44:33.511Z] Login failed: Unauthorized
+[2026-04-09T15:44:53.449Z] Login request started
+[2026-04-09T15:44:53.451Z] Email provided: importer4@gmail.com
+[2026-04-09T15:44:53.451Z] Validation passed
+[2026-04-09T15:44:53.452Z] Calling nhost.auth.signInEmailPassword
+[2026-04-09T15:44:53.969Z] Nhost result: SUCCESS
+[2026-04-09T15:44:53.969Z] Login failed: Unauthorized
+[2026-04-09T15:51:46.793Z] Login request started
+[2026-04-09T15:51:46.795Z] Email provided: importer5@gmail.com
+[2026-04-09T15:51:46.796Z] Validation passed
+[2026-04-09T15:51:46.797Z] Calling nhost.auth.signInEmailPassword
+[2026-04-09T15:51:47.146Z] Nhost result: SUCCESS
+[2026-04-09T15:51:47.146Z] Login failed: Unauthorized
+[2026-04-09T15:52:09.666Z] Login request started
+[2026-04-09T15:52:09.667Z] Email provided: importer5@gmail.com
+[2026-04-09T15:52:09.668Z] Validation passed
+[2026-04-09T15:52:09.668Z] Calling nhost.auth.signInEmailPassword
+[2026-04-09T15:52:10.098Z] Nhost result: SUCCESS
+[2026-04-09T15:52:10.099Z] Login failed: Unauthorized
+[2026-04-09T15:52:20.754Z] Login request started
+[2026-04-09T15:52:20.755Z] Email provided: importer5@gmail.com
+[2026-04-09T15:52:20.756Z] Validation passed
+[2026-04-09T15:52:20.756Z] Calling nhost.auth.signInEmailPassword
+[2026-04-09T15:52:21.388Z] Nhost result: SUCCESS
+[2026-04-09T15:52:21.388Z] Login failed: Unauthorized
+[2026-04-09T15:52:33.207Z] Login request started
+[2026-04-09T15:52:33.211Z] Email provided: importer5@gmail.com
+[2026-04-09T15:52:33.211Z] Validation passed
+[2026-04-09T15:52:33.212Z] Calling nhost.auth.signInEmailPassword
+[2026-04-09T15:52:33.594Z] Nhost result: SUCCESS
+[2026-04-09T15:52:33.595Z] Login failed: Unauthorized
+[2026-04-09T16:35:47.886Z] Login request started
+[2026-04-09T16:35:47.962Z] Email provided: importer5@gmail.com
+[2026-04-09T16:35:47.965Z] Validation passed
+[2026-04-09T16:35:47.965Z] Calling nhost.auth.signInEmailPassword
+[2026-04-09T16:35:48.619Z] Nhost result: SUCCESS
+[2026-04-09T16:35:48.620Z] Login failed: Unauthorized
+[2026-04-09T16:36:01.951Z] Login request started
+[2026-04-09T16:36:01.952Z] Email provided: importer5@gmail.com
+[2026-04-09T16:36:01.953Z] Validation passed
+[2026-04-09T16:36:01.954Z] Calling nhost.auth.signInEmailPassword
+[2026-04-09T16:36:02.523Z] Nhost result: SUCCESS
+[2026-04-09T16:36:02.523Z] Login failed: Unauthorized

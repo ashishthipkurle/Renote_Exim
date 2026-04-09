@@ -21,7 +21,7 @@ import {
 
 import { prisma } from "@/lib/prisma";
 import AddToCartButton from "@/components/marketplace/AddToCartButton";
-import { getServerAuth } from "@/lib/supabase/server";
+import { getServerAuthContext } from "@/lib/auth-server";
 
 type ProductReview = {
   orderId: string;
@@ -64,39 +64,13 @@ export default async function ProductDetailPage({
       },
     });
   } catch (error) {
-    console.error("Prisma fallback triggered for product detail:", error);
-    try {
-      const env = require("@/lib/supabase/shared").tryGetSupabaseEnv();
-      if (env) {
-        const { createClient } = require("@supabase/supabase-js");
-        const supabase = createClient(env.url, env.anonKey);
-        const { data: supaProduct, error: supaError } = await supabase
-          .from('products')
-          .select('*, exporter:users!exporterId(id, name, companyName, country, website)')
-          .eq('id', id)
-          .maybeSingle();
-
-        if (!supaError && supaProduct) {
-          product = {
-            ...supaProduct,
-            exporter: Array.isArray(supaProduct.exporter) ? supaProduct.exporter[0] : supaProduct.exporter
-          } as any;
-        } else {
-          console.error("Supabase fallback failed:", supaError);
-          product = null;
-        }
-      } else {
-        product = null;
-      }
-    } catch (fallbackError) {
-      console.error("Supabase fallback setup failed:", fallbackError);
-      product = null;
-    }
+    console.error("Prisma failed for product detail:", error);
+    product = null;
   }
 
   if (!product) notFound();
 
-  const auth = await getServerAuth();
+  const auth = await getServerAuthContext();
   const role = auth?.role || "USER";
 
   // Apply role-based price swap

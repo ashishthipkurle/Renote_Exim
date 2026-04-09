@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getApiAuthContext } from '@/lib/supabase/auth';
+import { getApiAuthContext } from '@/lib/auth-server';
 import { productSchema } from '@/lib/validations';
 import { Prisma } from '@prisma/client';
 import * as fs from 'fs';

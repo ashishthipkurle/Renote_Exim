@@ -1,9 +1,7 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import axios from "axios";
-import { getSupabaseBrowserClient } from "@/lib/supabase/browser";
-import type { Session } from "@supabase/supabase-js";
 import type { StoredUser } from "@/lib/auth-client";
 
 type AuthContextType = {
@@ -20,6 +18,20 @@ const AuthContext = createContext<AuthContextType>({
   logout: async () => {},
 });
 
+/**
+ * Helper: read the sb_access_token cookie value from document.cookie.
+ */
+function getAccessTokenFromCookie(): string | null {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(/(?:^|;\s*)sb_access_token=([^;]*)/);
+  if (!match) return null;
+  try {
+    return decodeURIComponent(match[1]) || null;
+  } catch {
+    return null;
+  }
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<StoredUser | null>(null);
   const [loading, setLoading] = useState(true);
@@ -29,63 +41,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     document.cookie = "sb_access_token=; Path=/; Max-Age=0; SameSite=Lax";
   };
 
-  const syncMiddlewareTokenCookie = (session: Session | null) => {
-    if (typeof document === "undefined") return;
-
-    if (!session?.access_token) {
-      clearMiddlewareTokenCookie();
-      return;
-    }
-
-    const now = Math.floor(Date.now() / 1000);
-    const maxAge = Math.max(0, (session.expires_at ?? now + 3600) - now);
-    const secure = window.location.protocol === "https:" ? "; Secure" : "";
-    document.cookie = `sb_access_token=${encodeURIComponent(session.access_token)}; Path=/; Max-Age=${maxAge}; SameSite=Lax${secure}`;
-  };
-
-  const fetchUser = async (token?: string) => {
+  const fetchUser = useCallback(async (token?: string) => {
     try {
+      console.log("[Auth Trace] Attempting session discovery...");
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
       const res = await axios.get("/api/auth/me", { headers });
-      setUser(res.data.user);
+      
+      if (res.data.user) {
+        console.log("[Auth Trace] Session found:", res.data.user.email, "(Role:", res.data.user.role, ")");
+        setUser(res.data.user);
+      } else {
+        console.log("[Auth Trace] No active session found.");
+        setUser(null);
+      }
     } catch (error) {
-      console.error("Failed to fetch user profile", error);
+      console.warn("[Auth Trace] Session fetch failed or unauthorized.");
       setUser(null);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const refreshUser = async () => {
+  const refreshUser = useCallback(async () => {
+    console.log("[Auth Trace] Force refreshing session state...");
     setLoading(true);
-    const supabase = getSupabaseBrowserClient();
-    const { data } = await supabase.auth.getSession();
-    if (data.session?.access_token) {
-      syncMiddlewareTokenCookie(data.session);
-      await fetchUser(data.session.access_token);
-    } else {
-      clearMiddlewareTokenCookie();
-      setUser(null);
-      setLoading(false);
-    }
-  };
+    await fetchUser();
+  }, [fetchUser]);
 
   const logout = async () => {
     try {
       setLoading(true);
-      const supabase = getSupabaseBrowserClient();
-      await supabase.auth.signOut();
-      
-      // Attempt to hit logout route to clear HTTP-only cookies if present
       await axios.post("/api/auth/logout").catch(() => {});
-      
-      // Clean up legacy localStorage if it exists
+
       if (typeof window !== "undefined") {
         window.localStorage.removeItem("user");
       }
 
       clearMiddlewareTokenCookie();
-      
       setUser(null);
     } catch (error) {
       console.error("Logout failed", error);
@@ -95,37 +87,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    const supabase = getSupabaseBrowserClient();
-    
-    // Initial fetch
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session?.access_token) {
-        syncMiddlewareTokenCookie(data.session);
-        fetchUser(data.session.access_token);
-      } else {
-        clearMiddlewareTokenCookie();
-        setLoading(false);
-      }
-    });
-
-    // Listen for auth changes (login, logout, token refresh)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (event === "SIGNED_OUT") {
-          clearMiddlewareTokenCookie();
-          setUser(null);
-          setLoading(false);
-        } else if (session?.access_token) {
-          syncMiddlewareTokenCookie(session);
-          fetchUser(session.access_token);
-        }
-      }
-    );
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
+    // On mount, check if there's an existing session.
+    // Since we use HTTP-Only cookies, we attempt a blind fetch.
+    fetchUser();
+  }, [fetchUser]);
 
   return (
     <AuthContext.Provider value={{ user, loading, refreshUser, logout }}>

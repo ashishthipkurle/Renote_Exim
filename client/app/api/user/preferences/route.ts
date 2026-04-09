@@ -1,18 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { createSupabaseRouteClient } from '@/lib/supabase/route';
+import { getApiAuthContext } from '@/lib/auth-server';
 
 export async function GET(req: NextRequest) {
   try {
-    const { supabase } = createSupabaseRouteClient(req);
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const { auth, error } = await getApiAuthContext(req);
+    if (error || !auth) return error || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const dbUser = await prisma.user.findUnique({
-      where: { id: user.id },
+      where: { id: auth.userId },
       select: { emailPreferences: true },
     });
 
@@ -24,17 +20,13 @@ export async function GET(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
-    const { supabase } = createSupabaseRouteClient(req);
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const { auth, error } = await getApiAuthContext(req);
+    if (error || !auth) return error || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const { preferences } = await req.json();
 
     const updatedUser = await prisma.user.update({
-      where: { id: user.id },
+      where: { id: auth.userId },
       data: { emailPreferences: preferences },
     });
 

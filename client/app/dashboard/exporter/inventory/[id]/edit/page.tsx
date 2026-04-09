@@ -1,6 +1,6 @@
 import { redirect, notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { getServerAuth } from "@/lib/supabase/server";
+import { getServerAuthContext } from "@/lib/auth-server";
 import ProductForm from "@/components/dashboard/ProductForm";
 
 export default async function EditProductPage({
@@ -8,7 +8,7 @@ export default async function EditProductPage({
 }: {
     params: { id: string };
 }) {
-    const auth = await getServerAuth();
+    const auth = await getServerAuthContext();
     if (!auth) redirect("/login");
     if (auth.role !== "EXPORTER" && auth.role !== "ADMIN") {
         redirect(`/dashboard/${auth.role.toLowerCase()}`);

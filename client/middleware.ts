@@ -46,8 +46,8 @@ export async function middleware(request: NextRequest) {
     // Fail open if Redis is down
   }
 
-  // Future expansion: Supabase SSR JWT decoding for strict role routing
-  const hasAuthToken = request.cookies.getAll().some(c => c.name.includes('supabase') || c.name.includes('token'));
+  // Future expansion: Nhost SSR JWT decoding for strict role routing
+  const hasAuthToken = request.cookies.getAll().some(c => c.name.includes('nhost') || c.name.includes('sb_access_token') || c.name.includes('token'));
   
   if (path.startsWith('/dashboard/') && !hasAuthToken) {
     return NextResponse.redirect(new URL('/login', request.url));
