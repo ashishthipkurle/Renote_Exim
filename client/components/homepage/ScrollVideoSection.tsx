@@ -1,9 +1,6 @@
-<<<<<<< HEAD
-=======
 "use client";
 
 
->>>>>>> origin/Ashish-new-modification-branch-3
 import { useEffect, useRef, useState, useCallback } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -13,12 +10,8 @@ import { User, LogOut, ShoppingBag, Home, Info, Phone, ChevronDown, LayoutDashbo
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/components/auth/AuthProvider";
 import LogoImg from "@/assests/LOGO.png";
-<<<<<<< HEAD
-import { useTranslation } from "@/lib/i18n/client";
-=======
 import ThumbnailImg from "@/assests/4k Video frame 2/1.png";
 
->>>>>>> origin/Ashish-new-modification-branch-3
 
 /**
  * ScrollVideoSection — Apple-style scroll-linked video with scrollytelling text.
@@ -40,15 +33,28 @@ let isExtractionRunning = false;
  * Each entry defines a text block that fades in/out at specific scroll progress ranges.
  * `animation` controls the entrance/exit style for each block.
  */
-const SCROLL_TEXTS = [
+type AnimationType = "zoom-blur" | "flip-up" | "reveal-mask" | "grand-scale";
+type PositionType = "bottom-left" | "top-right" | "bottom-right" | "bottom-center";
+
+interface ScrollText {
+  id: string;
+  headline: string;
+  sub: string;
+  start: number;
+  end: number;
+  animation: AnimationType;
+  position: PositionType;
+}
+
+const SCROLL_TEXTS: ScrollText[] = [
   {
     id: "text-1",
     headline: "Exporting Excellence",
     sub: "Connecting Indian manufacturers to the world's largest markets.",
     start: 0.02,
     end: 0.22,
-    animation: "zoom-blur" as const,
-    position: "bottom-left" as const,
+    animation: "zoom-blur",
+    position: "bottom-left",
   },
   {
     id: "text-2",
@@ -56,8 +62,8 @@ const SCROLL_TEXTS = [
     sub: "Verified suppliers · Transparent pricing · Real-time tracking.",
     start: 0.25,
     end: 0.45,
-    animation: "flip-up" as const,
-    position: "top-right" as const,
+    animation: "flip-up",
+    position: "top-right",
   },
   {
     id: "text-3",
@@ -65,8 +71,17 @@ const SCROLL_TEXTS = [
     sub: "Seamless freight, customs clearance, and door-to-door delivery — all automated.",
     start: 0.48,
     end: 0.68,
-    animation: "reveal-mask" as const,
-    position: "bottom-right" as const,
+    animation: "reveal-mask",
+    position: "bottom-right",
+  },
+  {
+    id: "text-4",
+    headline: "The Future of Trade",
+    sub: "Experience the next generation of global commerce with Renote Exim.",
+    start: 0.72,
+    end: 0.92,
+    animation: "grand-scale",
+    position: "bottom-center",
   },
 ];
 
@@ -79,7 +94,6 @@ const POS_CLASSES: Record<string, { wrapper: string; align: string }> = {
 };
 
 export default function ScrollVideoSection() {
-  const { t } = useTranslation();
   const wrapperRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -213,7 +227,7 @@ export default function ScrollVideoSection() {
       });
 
       // Each text block gets a unique cinematic animation
-      switch (item.animation as string) {
+      switch (item.animation) {
         case "zoom-blur":
           // Zoom in from far + blur to sharp focus
           textTl.fromTo(el,
@@ -525,10 +539,11 @@ export default function ScrollVideoSection() {
         className="fixed top-0 w-full h-screen bg-black overflow-hidden m-0 p-0 cursor-none"
       >
         <div className="w-full h-full relative overflow-hidden pointer-events-none">
-          {(!loaded || progress < 100) && (
+
+          {loaded && progress < 100 && (
             <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-3 w-48 transition-opacity duration-300">
               <span className="text-white/40 text-[10px] uppercase tracking-[0.2em] font-medium">
-                {t("video.buffering", "Buffering")}...
+                Buffering...
               </span>
               <div className="w-full h-[2px] bg-white/10 rounded-full overflow-hidden">
                 <div
@@ -721,7 +736,7 @@ export default function ScrollVideoSection() {
                           textShadow: "0 4px 60px rgba(0,0,0,0.9), 0 0px 120px rgba(0,0,0,0.6)",
                         }}
                       >
-                        {t(`video.${item.id.replace('text-', 'text')}_headline`, item.headline)}
+                        {item.headline}
                       </h2>
                       <p
                         className="text-base md:text-xl lg:text-2xl text-white/70 font-light leading-relaxed max-w-lg"
@@ -729,7 +744,7 @@ export default function ScrollVideoSection() {
                           textShadow: "0 2px 30px rgba(0,0,0,0.8)",
                         }}
                       >
-                        {t(`video.${item.id.replace('text-', 'text')}_sub`, item.sub)}
+                        {item.sub}
                       </p>
                       {/* Bottom accent line */}
                       <div className="w-14 h-[2px] bg-gradient-to-r from-amber-400/90 to-amber-600/30 mt-4" />
@@ -738,24 +753,18 @@ export default function ScrollVideoSection() {
                 );
               })}
 
-<<<<<<< HEAD
-  {/* Custom Follow Cursor */ }
-  <div
-=======
               {/* Custom Follow Cursor (No Border) */}
               <div
->>>>>>> origin/Ashish-new-modification-branch-3
-    ref={cursorRef}
-    className="fixed top-0 left-0 z-[100] flex items-center justify-center w-24 h-24 rounded-full bg-white/10 backdrop-blur-md text-white text-xs font-black tracking-[0.2em] uppercase shadow-[0_0_30px_rgba(255,255,255,0.1)] pointer-events-none transition-colors duration-300"
-    style={{ opacity: 0, transform: "scale(0)", willChange: "transform, opacity" }}
-  >
-    {progress < 100 ? `${progress}%` : t("video.scroll", "Scroll")}
-  </div>
+                ref={cursorRef}
+                className="fixed top-0 left-0 z-[100] flex items-center justify-center w-24 h-24 rounded-full bg-white/10 backdrop-blur-md text-white text-xs font-black tracking-[0.2em] uppercase shadow-[0_0_30px_rgba(255,255,255,0.1)] pointer-events-none transition-colors duration-300"
+                style={{ opacity: 0, transform: "scale(0)", willChange: "transform, opacity" }}
+              >
+                {progress < 100 ? `${progress}%` : "Scroll"}
+              </div>
             </>
-          )
-}
-        </div >
-      </section >
-    </div >
+          )}
+        </div>
+      </section>
+    </div>
   );
 }
