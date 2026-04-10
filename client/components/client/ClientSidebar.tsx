@@ -28,17 +28,14 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { useTranslation } from "@/lib/i18n/client";
 
 type NavItem = {
   href: string;
-  labelKey: string;
-  defaultLabel: string;
+  label: string;
   icon: ComponentType<{ className?: string }>;
 };
 
 export default function ClientSidebar({ basePath }: { basePath: string }) {
-  const { t } = useTranslation();
   const pathname = usePathname();
 
   const nav: NavItem[] = [
@@ -46,8 +43,6 @@ export default function ClientSidebar({ basePath }: { basePath: string }) {
     { href: `${basePath}/directory`, label: "Directory", icon: Users },
     { href: `${basePath}/orders`, label: "Orders", icon: Truck },
     { href: `${basePath}/rfqs`, label: "RFQs", icon: FileText },
-    { href: `${basePath}/messages`, label: "Messages", icon: MessageSquare },
-    { href: `${basePath}/calls`, label: "Calls", icon: PhoneCall },
     { href: `${basePath}/inventory`, label: "Inventory", icon: LayoutGrid },
     { href: `${basePath}/analytics`, label: "Analytics", icon: LineChart },
     { href: `${basePath}/finance`, label: "Finance", icon: Wallet },
@@ -65,7 +60,7 @@ export default function ClientSidebar({ basePath }: { basePath: string }) {
               <SidebarMenuButton
                 asChild
                 isActive={isActive(item.href)}
-                tooltip={t(item.labelKey, item.defaultLabel)}
+                tooltip={item.label}
                 className={cn(
                   "rounded-xl transition-all duration-300",
                   isActive(item.href)
@@ -75,7 +70,7 @@ export default function ClientSidebar({ basePath }: { basePath: string }) {
               >
                 <Link href={item.href} className="flex items-center gap-3 w-full">
                   <item.icon className={cn("size-5 transition-colors", isActive(item.href) ? "text-primary" : "group-hover:text-primary")} />
-                  <span className="font-semibold text-sm">{t(item.labelKey, item.defaultLabel)}</span>
+                  <span className="font-semibold text-sm">{item.label}</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -90,7 +85,7 @@ export default function ClientSidebar({ basePath }: { basePath: string }) {
             <SidebarMenuButton
               asChild
               isActive={isActive(`${basePath}/settings`)}
-              tooltip={t("sidebar.settings", "Settings")}
+              tooltip="Settings"
               className={cn(
                 "rounded-xl transition-all duration-300",
                 isActive(`${basePath}/settings`)
@@ -100,7 +95,7 @@ export default function ClientSidebar({ basePath }: { basePath: string }) {
             >
               <Link href={`${basePath}/settings`} className="flex items-center gap-3 w-full">
                 <Settings className={cn("size-5 transition-colors", isActive(`${basePath}/settings`) ? "text-primary" : "group-hover:text-primary")} />
-                <span className="font-semibold text-sm">{t("sidebar.settings", "Settings")}</span>
+                <span className="font-semibold text-sm">Settings</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

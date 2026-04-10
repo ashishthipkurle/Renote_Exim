@@ -37,10 +37,12 @@ export async function GET(request: NextRequest) {
                 name: true,
                 businessName: true,
                 avatar: true,
+<<<<<<< HEAD
                 description: true,
+=======
                 country: true,
                 createdAt: true,
-
+>>>>>>> origin/Ashish-new-modification-branch-3
                 _count: {
                     select: {
                         products: targetRole === 'EXPORTER',
@@ -50,10 +52,29 @@ export async function GET(request: NextRequest) {
             }
         });
 
+<<<<<<< HEAD
+        interface Exporter {
+            id: string;
+            name: string | null;
+            companyName: string | null;
+            avatar: string | null;
+            description: string | null;
+            _count: {
+                exportedProducts: number;
+            };
+        }
+
+        // Enhance with trade history for the importer to see
+        const exportersWithStats = await Promise.all((exporters as unknown as Exporter[]).map(async (exp) => {
+            // Get total orders from this exporter
+            const totalOrders = await prisma.order.count({
+                where: { product: { exporterId: exp.id } }
+            });
+=======
         const partnersWithStats = await Promise.all(users.map(async (u: any) => {
             let totalVolume = 0;
             let categories: string[] = [];
-
+>>>>>>> origin/Ashish-new-modification-branch-3
 
             if (targetRole === 'EXPORTER') {
                 totalVolume = await prisma.order.count({
@@ -72,8 +93,12 @@ export async function GET(request: NextRequest) {
                 // For now, empty
             }
 
+<<<<<<< HEAD
+            // Mock rating (since we don't have a rating system yet)
+            const rating = 4 + Math.random();
+=======
             const rating = 4 + Math.min(0.9, totalVolume / 50);
-
+>>>>>>> origin/Ashish-new-modification-branch-3
 
             return {
                 id: u.id,
@@ -82,12 +107,16 @@ export async function GET(request: NextRequest) {
                 avatar: u.avatar,
                 country: u.country,
                 rating: rating.toFixed(1),
+<<<<<<< HEAD
+                tradeVolume: totalOrders,
+                categories: categories.map(c => c.category),
+                joinedAt: new Date().toISOString(), // Fallback
+=======
                 tradeVolume: totalVolume,
                 categories,
                 joinedAt: u.createdAt.toISOString(),
-                description: u.description,
                 _count: u._count,
-
+>>>>>>> origin/Ashish-new-modification-branch-3
             };
         }));
 

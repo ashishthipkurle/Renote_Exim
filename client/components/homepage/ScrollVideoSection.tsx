@@ -1,5 +1,9 @@
+<<<<<<< HEAD
+=======
 "use client";
 
+
+>>>>>>> origin/Ashish-new-modification-branch-3
 import { useEffect, useRef, useState, useCallback } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -9,9 +13,12 @@ import { User, LogOut, ShoppingBag, Home, Info, Phone, ChevronDown, LayoutDashbo
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/components/auth/AuthProvider";
 import LogoImg from "@/assests/LOGO.png";
+<<<<<<< HEAD
 import { useTranslation } from "@/lib/i18n/client";
+=======
 import ThumbnailImg from "@/assests/4k Video frame 2/1.png";
 
+>>>>>>> origin/Ashish-new-modification-branch-3
 
 /**
  * ScrollVideoSection — Apple-style scroll-linked video with scrollytelling text.
@@ -464,23 +471,23 @@ export default function ScrollVideoSection() {
         pin: section,
         pinSpacing: false,
         onUpdate: (self) => {
-           // We can add a slight scale down or blur here if desired
-           if (self.progress > SCROLL_DISTANCE / (SCROLL_DISTANCE + 1000)) {
-              const revealProgress = (self.scroll() - SCROLL_DISTANCE) / 1000;
-              gsap.set(section, { 
-                scale: 1 + (revealProgress * 0.05),
-                filter: `blur(${revealProgress * 4}px)`,
-                opacity: 1 - (revealProgress * 0.3)
-              });
-           } else {
-              gsap.set(section, { scale: 1, filter: "blur(0px)", opacity: 1 });
-           }
+          // We can add a slight scale down or blur here if desired
+          if (self.progress > SCROLL_DISTANCE / (SCROLL_DISTANCE + 1000)) {
+            const revealProgress = (self.scroll() - SCROLL_DISTANCE) / 1000;
+            gsap.set(section, {
+              scale: 1 + (revealProgress * 0.05),
+              filter: `blur(${revealProgress * 4}px)`,
+              opacity: 1 - (revealProgress * 0.3)
+            });
+          } else {
+            gsap.set(section, { scale: 1, filter: "blur(0px)", opacity: 1 });
+          }
         }
       });
 
       // Animate the marketplace content sliding over
       gsap.set("#home-content-reveal", { y: "100vh" });
-      gsap.fromTo("#home-content-reveal", 
+      gsap.fromTo("#home-content-reveal",
         { y: "100vh" },
         {
           y: 0,
@@ -708,7 +715,7 @@ export default function ScrollVideoSection() {
                     <div className={`flex flex-col ${pos.align} max-w-2xl px-6`}>
                       {/* Decorative accent line */}
                       <div className="w-14 h-[2px] bg-gradient-to-r from-amber-400/90 to-amber-600/30 mb-4" />
-                       <h2
+                      <h2
                         className="text-4xl md:text-6xl lg:text-8xl font-bold text-white mb-4 tracking-tight leading-[1.05]"
                         style={{
                           textShadow: "0 4px 60px rgba(0,0,0,0.9), 0 0px 120px rgba(0,0,0,0.6)",
@@ -716,7 +723,7 @@ export default function ScrollVideoSection() {
                       >
                         {t(`video.${item.id.replace('text-', 'text')}_headline`, item.headline)}
                       </h2>
-                       <p
+                      <p
                         className="text-base md:text-xl lg:text-2xl text-white/70 font-light leading-relaxed max-w-lg"
                         style={{
                           textShadow: "0 2px 30px rgba(0,0,0,0.8)",
@@ -731,18 +738,24 @@ export default function ScrollVideoSection() {
                 );
               })}
 
+<<<<<<< HEAD
+  {/* Custom Follow Cursor */ }
+  <div
+=======
               {/* Custom Follow Cursor (No Border) */}
               <div
-                ref={cursorRef}
-                className="fixed top-0 left-0 z-[100] flex items-center justify-center w-24 h-24 rounded-full bg-white/10 backdrop-blur-md text-white text-xs font-black tracking-[0.2em] uppercase shadow-[0_0_30px_rgba(255,255,255,0.1)] pointer-events-none transition-colors duration-300"
-                style={{ opacity: 0, transform: "scale(0)", willChange: "transform, opacity" }}
-              >
-                {progress < 100 ? `${progress}%` : t("video.scroll", "Scroll")}
-              </div>
+>>>>>>> origin/Ashish-new-modification-branch-3
+    ref={cursorRef}
+    className="fixed top-0 left-0 z-[100] flex items-center justify-center w-24 h-24 rounded-full bg-white/10 backdrop-blur-md text-white text-xs font-black tracking-[0.2em] uppercase shadow-[0_0_30px_rgba(255,255,255,0.1)] pointer-events-none transition-colors duration-300"
+    style={{ opacity: 0, transform: "scale(0)", willChange: "transform, opacity" }}
+  >
+    {progress < 100 ? `${progress}%` : t("video.scroll", "Scroll")}
+  </div>
             </>
-          )}
-        </div>
-      </section>
-    </div>
+          )
+}
+        </div >
+      </section >
+    </div >
   );
 }
