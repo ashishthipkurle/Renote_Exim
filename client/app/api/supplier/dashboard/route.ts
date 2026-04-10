@@ -6,10 +6,9 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
     try {
-        const auth = await getApiAuthContext(request);
-        const role = auth?.role as any;
-        if (!auth || role !== 'SUPPLIER') {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const { auth, error } = await getApiAuthContext(request, ['SUPPLIER']);
+        if (error || !auth) {
+            return error || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         const supplierId = auth.userId;

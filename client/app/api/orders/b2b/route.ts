@@ -4,8 +4,8 @@ import { getApiAuthContext } from '@/lib/auth-server';
 
 export async function POST(req: NextRequest) {
   try {
-    const auth = await getApiAuthContext(req);
-    if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { auth, error } = await getApiAuthContext(req);
+    if (error || !auth) return error || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     
     // Exact V3 KYC gate
     if (auth.role !== 'IMPORTER') {

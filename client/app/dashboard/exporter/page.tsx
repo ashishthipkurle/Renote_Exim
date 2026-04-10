@@ -43,6 +43,9 @@ interface LiveRoute {
   status: string; vessel?: string; cargo?: string; lat?: number; lng?: number;
   lastLocation?: string; importer?: string;
 }
+
+type FilterMode = "all" | "russia" | "europe" | "usa" | "africa" | "asia";
+type PeriodFilter = "today" | "week" | "month" | "quarter" | "year" | "all";
 const DEMO_ROUTES: LiveRoute[] = [
   { id: "R-1", fromPort: "MUMBAI", toPort: "ROTTERDAM", type: "ocean", status: "In Transit", cargo: "Textiles", lat: 15.2, lng: 60.5 },
   { id: "R-2", fromPort: "DELHI", toPort: "LONDON", type: "air", status: "Scheduled", cargo: "Spices", lat: 25.1, lng: 45.2 },

@@ -7,9 +7,9 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const auth = await getApiAuthContext(request);
-    if (!auth) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { auth, error } = await getApiAuthContext(request);
+    if (error || !auth) {
+      return error || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const shipment = await prisma.shipment.findUnique({
