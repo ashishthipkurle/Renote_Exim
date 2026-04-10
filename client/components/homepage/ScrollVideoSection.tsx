@@ -453,12 +453,52 @@ export default function ScrollVideoSection() {
       isExtractionRunning = false;
     });
 
+    // ---------- 3. Stacked Reveal Transition ----------
+    const ctx_reveal = gsap.context(() => {
+      // Pin the video section during scrub + transition
+      ScrollTrigger.create({
+        trigger: wrapper,
+        start: "top top",
+        end: `+=${SCROLL_DISTANCE + 1000}`, // SCROLL_DISTANCE for playback + 1000 for reveal
+        pin: section,
+        pinSpacing: false,
+        onUpdate: (self) => {
+           // We can add a slight scale down or blur here if desired
+           if (self.progress > SCROLL_DISTANCE / (SCROLL_DISTANCE + 1000)) {
+              const revealProgress = (self.scroll() - SCROLL_DISTANCE) / 1000;
+              gsap.set(section, { 
+                scale: 1 + (revealProgress * 0.05),
+                filter: `blur(${revealProgress * 4}px)`,
+                opacity: 1 - (revealProgress * 0.3)
+              });
+           } else {
+              gsap.set(section, { scale: 1, filter: "blur(0px)", opacity: 1 });
+           }
+        }
+      });
+
+      // Animate the marketplace content sliding over
+      gsap.set("#home-content-reveal", { y: "100vh" });
+      gsap.fromTo("#home-content-reveal", 
+        { y: "100vh" },
+        {
+          y: 0,
+          ease: "none",
+          scrollTrigger: {
+            trigger: wrapper,
+            start: `${SCROLL_DISTANCE} top`,
+            end: `${SCROLL_DISTANCE + 1000} top`,
+            scrub: true,
+          }
+        }
+      );
+    }, wrapper);
+
     return () => {
       window.removeEventListener("resize", resizeCanvas);
       tl.kill();
+      ctx_reveal.revert();
       ScrollTrigger.getAll().forEach((t) => t.kill());
-      // We no longer close frames on unmount because we want to cache them
-      // framesRef.current = []; // Keep it for the global cache
     };
   }, [failed, drawCover]);
 
@@ -469,12 +509,12 @@ export default function ScrollVideoSection() {
       ref={wrapperRef}
       className="bg-black relative z-0"
       style={{
-        height: `calc(${SCROLL_DISTANCE}px + 100vh)`,
+        height: `${SCROLL_DISTANCE + 1000}px`, // Playback distance + reveal distance
       }}
     >
       <section
         ref={sectionRef}
-        className="sticky top-0 w-full h-screen bg-black overflow-hidden m-0 p-0 cursor-none"
+        className="fixed top-0 w-full h-screen bg-black overflow-hidden m-0 p-0 cursor-none"
       >
         <div className="w-full h-full relative overflow-hidden pointer-events-none">
 

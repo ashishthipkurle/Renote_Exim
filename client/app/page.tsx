@@ -72,19 +72,26 @@ export default function HomePage() {
   return (
     <div className="bg-background text-foreground font-display selection:bg-primary selection:text-white">
       <ScrollVideoSection />
-      <HomeNavbar />
-      <HomeHero />
-      <ForwardMarquee />
-      <StatsBar />
-      <TrendingCategories />
-      <FeaturesSection />
-      <GlobalHubsSection />
-      <ReverseMarquee />
-      <BulkProcurement />
-      <ConnectivitySection />
-      <ComplianceSection />
-      <CTASection />
-      <HomeFooter />
+      
+      {/* ─── Marketplace Content Reveal Wrapper ─── */}
+      <div 
+        id="home-content-reveal" 
+        className="relative z-10 bg-background shadow-[0_-20px_50px_rgba(0,0,0,0.3)]"
+      >
+        <HomeNavbar />
+        <HomeHero />
+        <ForwardMarquee />
+        <StatsBar />
+        <TrendingCategories />
+        <FeaturesSection />
+        <GlobalHubsSection />
+        <ReverseMarquee />
+        <BulkProcurement />
+        <ConnectivitySection />
+        <ComplianceSection />
+        <CTASection />
+        <HomeFooter />
+      </div>
     </div>
   );
 }

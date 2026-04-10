@@ -32,7 +32,7 @@ export default function HomeNavbar() {
   const LogoImg = isDark ? LogoDark : LogoLight;
 
   return (
-    <nav className="sticky top-0 w-full z-50 transition-all duration-300 border-b border-white/5" 
+    <nav className="sticky top-0 w-full z-50 transition-all duration-300" 
          style={{
            background: "rgba(255, 255, 255, 0.03)", 
            backdropFilter: "blur(20px)",
