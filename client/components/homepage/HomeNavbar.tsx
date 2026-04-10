@@ -5,11 +5,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { useTranslation } from "@/lib/i18n/client";
+import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
 import { useTheme } from "next-themes";
 import LogoLight from "@/assests/LOGO_TEXT.png";
 import LogoDark from "@/assests/Logo-2-without-circle.png";
 
 export default function HomeNavbar() {
+  const { t } = useTranslation();
   const { user, loading, logout } = useAuth();
   const { theme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -39,11 +42,21 @@ export default function HomeNavbar() {
 
         <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-8 text-sm font-medium text-muted-foreground">
           <Link className="hover:text-primary dark:hover:text-white transition-colors" href="/products">
-            Marketplace
+            {t("marketplace", "Marketplace")}
           </Link>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-4">
+          {user && (
+            <Link 
+              href={user.role === "USER" ? "/products" : `/dashboard/${user.role.toLowerCase()}`}
+              className="hidden sm:flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary text-white text-xs font-black uppercase tracking-widest transition-all hover:scale-105 active:scale-95 shadow-lg shadow-primary/20"
+            >
+              <span className="material-icons text-sm">dashboard</span>
+              {t("dashboard_btn", "Dashboard")}
+            </Link>
+          )}
+          <LanguageSwitcher />
           <ThemeToggle />
           {loading ? (
             <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 animate-pulse" />
@@ -72,7 +85,7 @@ export default function HomeNavbar() {
                     onClick={() => setIsProfileMenuOpen(false)}
                   >
                     <span className="material-icons text-sm text-primary">dashboard</span>
-                    {user.role === "USER" ? "Marketplace" : "Dashboard"}
+                    {user.role === "USER" ? t("marketplace", "Marketplace") : t("dashboard", "Dashboard")}
                   </Link>
                   <Link
                     href={user.role === "USER" ? "/products" : `/dashboard/${user.role.toLowerCase()}/settings`}
@@ -80,7 +93,7 @@ export default function HomeNavbar() {
                     onClick={() => setIsProfileMenuOpen(false)}
                   >
                     <span className="material-icons text-sm text-primary">settings</span>
-                    View Profile
+                    {t("navbar.view_profile", "View Profile")}
                   </Link>
                   <button
                     onClick={() => {
@@ -90,7 +103,7 @@ export default function HomeNavbar() {
                     className="w-full flex items-center gap-3 px-4 py-2 mt-1 border-t border-slate-100 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5 text-sm text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 transition-colors text-left"
                   >
                     <span className="material-icons text-sm">logout</span>
-                    Sign Out
+                    {t("signout", "Sign Out")}
                   </button>
                 </div>
               )}
@@ -98,10 +111,10 @@ export default function HomeNavbar() {
           ) : (
             <>
               <Link className="hidden md:block text-sm font-medium text-slate-700 dark:text-white hover:text-primary dark:hover:text-primary transition-colors" href="/login">
-                Login
+                {t("login", "Login")}
               </Link>
               <Link className="bg-primary hover:bg-primary/90 text-white text-sm font-semibold py-2 px-6 rounded-lg primary-glow transition-all duration-300 transform hover:scale-105 primary-glow-hover" href="/register">
-                Get Started
+                {t("signup", "Get Started")}
               </Link>
             </>
           )}

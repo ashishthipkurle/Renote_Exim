@@ -14,6 +14,7 @@ import {
   authFetch, formatCurrency, timeAgo, getInitials, formatNumber
 } from "@/lib/api-utils";
 import dynamic from "next/dynamic";
+import { useTranslation } from "@/lib/i18n/client";
 
 const ShipTrackingMap = dynamic(() => import("@/components/dashboard/ShipTrackingMap"), { ssr: false });
 
@@ -36,15 +37,7 @@ interface Partner {
   country: string | null; verified: boolean;
   orderCount: number; totalValue: number;
 }
-type FilterMode = "all" | "russia" | "europe" | "usa" | "africa" | "asia";
-const FILTER_CFG: Record<FilterMode, { label: string; icon: string; color: string }> = {
-  all: { label: "India", icon: "🇮🇳", color: "#fbbf24" },
-  russia: { label: "Russia", icon: "🇷🇺", color: "#818cf8" },
-  europe: { label: "Europe", icon: "🇪🇺", color: "#67e8f9" },
-  usa: { label: "USA", icon: "🇺🇸", color: "#f472b6" },
-  africa: { label: "Africa", icon: "🌍", color: "#fb923c" },
-  asia: { label: "Asia", icon: "🌏", color: "#c084fc" },
-};
+// region Filter config Moved inside component for i18n
 interface LiveRoute {
   id: string; fromPort: string; toPort: string; type: "ocean" | "air" | "land";
   status: string; vessel?: string; cargo?: string; lat?: number; lng?: number;
@@ -56,12 +49,7 @@ const DEMO_ROUTES: LiveRoute[] = [
   { id: "R-3", fromPort: "CHENNAI", toPort: "SINGAPORE", type: "ocean", status: "Departed", cargo: "Tea", lat: 5.5, lng: 90.1 },
 ];
 
-// Dashboard filter periods
-type PeriodFilter = "today" | "week" | "month" | "quarter" | "year" | "all";
-const PERIOD_LABELS: Record<PeriodFilter, string> = {
-  today: "Today", week: "This Week", month: "This Month",
-  quarter: "This Quarter", year: "This Year", all: "All Time",
-};
+// period labels moved inside component for i18n
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Page constants
@@ -104,7 +92,26 @@ function fmtVal(n: number, pre = "", suf = "") {
 // Main Page
 // ─────────────────────────────────────────────────────────────────────────────
 export default function ExporterDashboard() {
+  const { t } = useTranslation();
   const router = useRouter();
+
+  const FILTER_CFG: Record<FilterMode, { label: string; icon: string; color: string }> = {
+    all: { label: t("dashboard_main.hub_regions.india", "India"), icon: "🇮🇳", color: "#fbbf24" },
+    russia: { label: t("dashboard_main.hub_regions.russia", "Russia"), icon: "🇷🇺", color: "#818cf8" },
+    europe: { label: t("dashboard_main.hub_regions.europe", "Europe"), icon: "🇪🇺", color: "#67e8f9" },
+    usa: { label: t("dashboard_main.hub_regions.usa", "USA"), icon: "🇺🇸", color: "#f472b6" },
+    africa: { label: t("dashboard_main.hub_regions.africa", "Africa"), icon: "🌍", color: "#fb923c" },
+    asia: { label: t("dashboard_main.hub_regions.asia", "Asia"), icon: "🌏", color: "#c084fc" },
+  };
+
+  const PERIOD_LABELS: Record<PeriodFilter, string> = {
+    today: t("period.today", "Today"), 
+    week: t("period.week", "This Week"), 
+    month: t("period.month", "This Month"),
+    quarter: t("period.quarter", "This Quarter"), 
+    year: t("period.year", "This Year"), 
+    all: t("period.all", "All Time"),
+  };
 
   const [data, setData] = useState<ExporterStats | null>(null);
   const [allOrders, setAllOrders] = useState<OrderItem[]>([]);
@@ -203,8 +210,8 @@ export default function ExporterDashboard() {
 
   const statCards = [
     {
-      label: "Total Products", value: loading ? "—" : String(data?.totalProducts ?? 0),
-      sub: period === "all" ? "All products" : "In period",
+      label: t("dashboard_main.total_products", "Total Products"), value: loading ? "—" : String(data?.totalProducts ?? 0),
+      sub: period === "all" ? t("dashboard_main.all_products_label", "All products") : t("dashboard_main.in_period", "In period"),
       icon: <Package className="w-5 h-5" />, href: "/dashboard/exporter/products",
       gradFrom: "from-white", gradTo: "to-neutral-300",
       bgTint: "bg-black/10 dark:bg-white/15", textTint: "text-foreground dark:text-white",
@@ -214,7 +221,7 @@ export default function ExporterDashboard() {
       trendUp: true as boolean | null, trend: "Live",
     },
     {
-      label: "Total Revenue", value: loading ? "—" : fmtVal(data?.totalRevenue ?? 0, "$"),
+      label: t("dashboard_main.total_revenue", "Total Revenue"), value: loading ? "—" : fmtVal(data?.totalRevenue ?? 0, "$"),
       sub: PERIOD_LABELS[period],
       icon: <DollarSign className="w-5 h-5" />, href: "/dashboard/exporter/analytics",
       gradFrom: "from-neutral-200", gradTo: "to-neutral-500",
@@ -224,8 +231,8 @@ export default function ExporterDashboard() {
       bar: 60, trendUp: true as boolean | null, trend: "+12.5%",
     },
     {
-      label: "Active Orders", value: loading ? "—" : String(data?.activeOrders ?? 0),
-      sub: "In progress",
+      label: t("dashboard_main.active_orders", "Active Orders"), value: loading ? "—" : String(data?.activeOrders ?? 0),
+      sub: t("dashboard_main.in_progress", "In progress"),
       icon: <ShoppingCart className="w-5 h-5" />, href: "/dashboard/exporter/orders",
       gradFrom: "from-neutral-100", gradTo: "to-neutral-400",
       bgTint: "bg-black/10 dark:bg-white/15", textTint: "text-foreground dark:text-white",
@@ -235,14 +242,14 @@ export default function ExporterDashboard() {
       trendUp: true as boolean | null, trend: "Active",
     },
     {
-      label: "Total Shipments", value: loading ? "—" : String(data?.totalShipments ?? 0),
+      label: t("dashboard_main.total_shipments", "Total Shipments"), value: loading ? "—" : String(data?.totalShipments ?? 0),
       sub: PERIOD_LABELS[period],
       icon: <Truck className="w-5 h-5" />, href: "/dashboard/exporter/orders",
       gradFrom: "from-orange-600", gradTo: "to-orange-400",
       bgTint: "bg-orange-500/10", textTint: "text-orange-500",
       borderTint: "border-orange-500/20", glowColor: "rgba(249,115,22,0.4)",
       shadow: "shadow-[0_0_20px_rgba(249,115,22,0.3)]",
-      bar: 30, trendUp: null as boolean | null, trend: "All time",
+      bar: 30, trendUp: null as boolean | null, trend: t("period.all", "All time"),
     },
   ];
 
@@ -253,18 +260,18 @@ export default function ExporterDashboard() {
       <header className="flex-shrink-0 h-24 px-10 flex items-center justify-between border-b border-border dark:border-white/5 bg-background/40 backdrop-blur-xl z-40">
         <div>
           <h1 className="text-3xl font-black text-foreground dark:text-white tracking-tighter flex items-center gap-4 uppercase italic">
-            Intelligence Node
+            {t("dashboard_main.node_title", "Intelligence Node")}
             <span className="px-3 py-1 rounded-full text-[9px] font-black bg-black/5 dark:bg-white/10 text-foreground dark:text-white border border-border dark:border-white/10 uppercase tracking-[0.2em] flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse dark:shadow-md shadow-none" />Live Feed
+              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse dark:shadow-md shadow-none" />{t("dashboard_main.live_feed", "Live Feed")}
             </span>
           </h1>
-          <p className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.2em] mt-1.5 opacity-40">Sector: Exporter Operations / Master Interface</p>
+          <p className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.2em] mt-1.5 opacity-40">{t("dashboard_main.sector_interface", "Sector: Exporter Operations / Master Interface")}</p>
         </div>
 
         <div className="flex items-center gap-4">
           <div className="hidden lg:flex items-center gap-3 px-5 py-2.5 rounded-2xl bg-muted/50 dark:bg-white/5 border border-border text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 backdrop-blur-md">
             <Activity className="w-3.5 h-3.5" />
-            System Secure
+            {t("dashboard_main.system_secure", "System Secure")}
           </div>
 
           <div className="relative">
@@ -292,7 +299,7 @@ export default function ExporterDashboard() {
               value={search} onChange={e => setSearch(e.target.value)}
               onFocus={() => setSearchFocused(true)} onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
               className={`pl-12 pr-10 py-3 bg-muted/50 dark:bg-white/5 border rounded-2xl text-xs text-foreground dark:text-white placeholder:text-muted-foreground/20 w-64 transition-all duration-500 outline-none font-medium italic ${searchFocused ? "border-border dark:border-white/20 bg-muted/40 w-80 dark:shadow-md shadow-none" : "border-border hover:border-border dark:border-white/10"}`}
-              placeholder="Search registry indices..."
+              placeholder={t("dashboard_main.search_indices", "Search registry indices...")}
             />
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/20 pointer-events-none" />
             {search && <button onClick={() => setSearch("")} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/40 hover:text-foreground dark:text-white transition-colors"><X className="w-4 h-4" /></button>}
@@ -366,10 +373,10 @@ export default function ExporterDashboard() {
             )}
           </div>
 
-          <Link href="/dashboard/exporter/inventory?action=add"
+          <Link href="/dashboard/exporter/products/new"
             className="flex items-center gap-3 px-6 h-12 rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl shadow-white/5 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]">
             <Plus className="w-4 h-4" />
-            <span className="hidden lg:inline">Initialize Asset</span>
+            <span className="hidden lg:inline">{t("dashboard_main.initialize_asset", "Initialize Asset")}</span>
           </Link>
         </div>
       </header>
@@ -386,7 +393,7 @@ export default function ExporterDashboard() {
           {period !== "all" && (
             <div className="flex items-center gap-4 px-6 py-3 bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 rounded-2xl w-fit backdrop-blur-xl animate-in slide-in-from-left-4 duration-500">
               <Filter className="w-4 h-4 text-foreground dark:text-white" />
-              <span className="text-[10px] text-foreground dark:text-white font-black uppercase tracking-[0.2em]">Temporal Filter: {PERIOD_LABELS[period]}</span>
+              <span className="text-[10px] text-foreground dark:text-white font-black uppercase tracking-[0.2em]">{t("dashboard_main.temporal_filter", "Temporal Filter")}: {PERIOD_LABELS[period]}</span>
               <button onClick={() => setPeriod("all")} className="ml-4 text-muted-foreground/40 hover:text-foreground dark:text-white transition-colors"><X className="w-4 h-4" /></button>
             </div>
           )}
@@ -444,13 +451,13 @@ export default function ExporterDashboard() {
                   <Globe className="w-4 h-4 text-primary flex-shrink-0" />
                   <div>
                     <div className="flex items-center gap-2">
-                      <h2 className="text-[14px] font-bold text-white tracking-tight">India Global Trade Network</h2>
+                      <h2 className="text-[14px] font-bold text-white tracking-tight">{t("dashboard_main.global_trade_network", "India Global Trade Network")}</h2>
                       <span className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase border ${mapIsDemo ? "bg-amber-500/12 border-amber-500/30 text-amber-400" : "bg-green-500/12 border-green-500/30 text-green-400"}`}>
                         <span className={`w-1.5 h-1.5 rounded-full inline-block animate-pulse ${mapIsDemo ? "bg-amber-400" : "bg-green-400"}`} />
                         {mapIsDemo ? "Demo" : "Live"}
                       </span>
                     </div>
-                    <p className="text-[10px] text-slate-500 mt-0.5">{activeCount} active routes{lastUpdate && <span> · {lastUpdate.toLocaleTimeString()}</span>}</p>
+                    <p className="text-[10px] text-slate-500 mt-0.5">{activeCount} {t("dashboard_main.active_routes", "active routes")}{lastUpdate && <span> · {lastUpdate.toLocaleTimeString()}</span>}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5 flex-wrap justify-end">
@@ -480,7 +487,7 @@ export default function ExporterDashboard() {
                   <div className="absolute inset-0 flex items-center justify-center z-30" style={{ background: "rgba(3,8,16,0.55)", backdropFilter: "blur(4px)" }}>
                     <div className="flex flex-col items-center gap-2">
                       <div className="w-7 h-7 rounded-full border-2 border-yellow-400/30 border-t-yellow-400 animate-spin" />
-                      <p className="text-[10px] text-slate-400 font-mono">Loading trade routes…</p>
+                      <p className="text-[10px] text-slate-400 font-mono">{t("dashboard_main.loading_routes", "Loading trade routes...")}</p>
                     </div>
                   </div>
                 )}
@@ -514,7 +521,7 @@ export default function ExporterDashboard() {
                 <div className="flex items-center gap-1.5"><Wind className="w-3 h-3 text-indigo-400" /><span className="text-[10px] text-slate-500">Air</span><span className="text-[10px] font-bold text-indigo-400">{(mapIsDemo ? DEMO_ROUTES : apiRoutes).filter(r => r.type === "air").length}</span></div>
                 <div className="flex items-center gap-1.5"><Anchor className="w-3 h-3 text-cyan-400" /><span className="text-[10px] text-slate-500">Ocean</span><span className="text-[10px] font-bold text-cyan-400">{(mapIsDemo ? DEMO_ROUTES : apiRoutes).filter(r => r.type === "ocean").length}</span></div>
                 <div className="flex items-center gap-1.5"><Layers className="w-3 h-3 text-slate-400" /><span className="text-[10px] text-slate-500">Ports</span><span className="text-[10px] font-bold text-slate-300">{new Set((mapIsDemo ? DEMO_ROUTES : apiRoutes).flatMap(r => [r.fromPort, r.toPort])).size}</span></div>
-                <div className="ml-auto"><Link href="/dashboard/exporter/orders" className="flex items-center gap-1 text-[10px] text-primary hover:text-blue-300 font-medium transition-colors">All shipments<ChevronRight className="w-3 h-3" /></Link></div>
+                <div className="ml-auto"><Link href="/dashboard/exporter/orders" className="flex items-center gap-1 text-[10px] text-primary hover:text-blue-300 font-medium transition-colors">{t("dashboard_main.all_shipments", "All shipments")}<ChevronRight className="w-3 h-3" /></Link></div>
               </div>
             </div>
 
@@ -522,11 +529,11 @@ export default function ExporterDashboard() {
               <div className="absolute top-0 right-0 w-32 h-32 bg-black/5 dark:bg-white/10 blur-[60px] rounded-full" />
               <div className="flex items-center justify-between mb-8 relative z-10">
                 <div>
-                  <h2 className="text-xl font-black text-foreground dark:text-white uppercase italic tracking-tighter">Transmissions</h2>
+                  <h2 className="text-xl font-black text-foreground dark:text-white uppercase italic tracking-tighter">{t("dashboard_main.transmissions", "Transmissions")}</h2>
                   <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-1 opacity-40 italic">{search ? `${filteredOrders.length} telemetry matches` : "Real-time stream"}</p>
                 </div>
                 <span className="flex items-center gap-2 px-3 py-1 rounded-full bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 text-[9px] text-foreground dark:text-white font-black uppercase tracking-widest">
-                  <Activity className="w-3 h-3 animate-pulse" />Live
+                  <Activity className="w-3 h-3 animate-pulse" />{t("dashboard_main.live", "Live")}
                 </span>
               </div>
 
@@ -560,7 +567,7 @@ export default function ExporterDashboard() {
               <Link href="/dashboard/exporter/analytics"
                 className="mt-8 w-full h-14 bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:bg-white/15 text-[10px] font-black text-foreground dark:text-white uppercase tracking-[0.2em] rounded-2xl transition-all duration-300 border border-border dark:border-white/5 hover:border-border dark:border-white/20 flex items-center justify-center gap-3 relative z-10 group overflow-hidden">
                 <div className="absolute inset-0 bg-primary opacity-0 group-hover:opacity-5 transition-opacity" />
-                Access Full Archives <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                {t("dashboard_main.full_archives", "Access Full Archives")} <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
           </div>
@@ -571,8 +578,8 @@ export default function ExporterDashboard() {
               <div className="absolute -left-12 -bottom-12 w-48 h-48 bg-black/5 dark:bg-white/10 rounded-full blur-[80px]" />
               <div className="flex items-center justify-between mb-10 relative z-10">
                 <div>
-                  <h2 className="text-2xl font-black text-foreground dark:text-white uppercase italic tracking-tighter">Sector Revenue</h2>
-                  <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-1 opacity-40 italic">Category Distribution / {PERIOD_LABELS[period]}</p>
+                  <h2 className="text-2xl font-black text-foreground dark:text-white uppercase italic tracking-tighter">{t("dashboard_main.sector_revenue", "Sector Revenue")}</h2>
+                  <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-1 opacity-40 italic">{t("dashboard_main.sector", "Sector")} / {PERIOD_LABELS[period]}</p>
                 </div>
                 <Link href="/dashboard/exporter/analytics" className="w-12 h-12 rounded-2xl bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 flex items-center justify-center text-foreground dark:text-white hover:bg-primary hover:text-primary-foreground transition-all group scale-90">
                   <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -612,8 +619,8 @@ export default function ExporterDashboard() {
               <div className="absolute -right-12 -bottom-12 w-48 h-48 bg-black/5 dark:bg-white/10 rounded-full blur-[80px]" />
               <div className="flex justify-between items-center mb-10 relative z-10">
                 <div>
-                  <h2 className="text-2xl font-black text-foreground dark:text-white uppercase italic tracking-tighter">Strategic Nodes</h2>
-                  <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-1 opacity-40 italic">Top Acquisitions / {PERIOD_LABELS[period]}</p>
+                  <h2 className="text-2xl font-black text-foreground dark:text-white uppercase italic tracking-tighter">{t("dashboard_main.strategic_nodes", "Strategic Nodes")}</h2>
+                  <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-1 opacity-40 italic">{t("dashboard_main.top_acquisitions", "Top Acquisitions")} / {PERIOD_LABELS[period]}</p>
                 </div>
                 <Link href="/dashboard/exporter/directory" className="w-12 h-12 rounded-2xl bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 flex items-center justify-center text-foreground dark:text-white hover:bg-primary hover:text-primary-foreground transition-all group scale-90">
                   <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -622,7 +629,7 @@ export default function ExporterDashboard() {
               <div className="overflow-x-auto relative z-10 scrollbar-none">
                 <table className="w-full text-left border-collapse">
                   <thead><tr className="text-[9px] text-muted-foreground font-black uppercase tracking-[0.3em] border-b border-border dark:border-white/5 italic">
-                    <th className="pb-5 pl-2">Node Entity</th><th className="pb-5">Sector</th><th className="pb-5">Signals</th><th className="pb-5 text-right pr-2">Valuation</th>
+                    <th className="pb-5 pl-2">{t("dashboard_main.node_entity", "Node Entity")}</th><th className="pb-5">{t("dashboard_main.sector", "Sector")}</th><th className="pb-5">{t("dashboard_main.signals", "Signals")}</th><th className="pb-5 text-right pr-2">{t("dashboard_main.valuation", "Valuation")}</th>
                   </tr></thead>
                   <tbody className="text-[10px] font-black uppercase">
                     {loading ? Array.from({ length: 3 }).map((_, i) => (

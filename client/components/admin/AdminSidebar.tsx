@@ -28,28 +28,31 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/client";
 
 type NavItem = {
   href: string;
-  label: string;
+  labelKey: string;
+  defaultLabel: string;
   icon: ComponentType<{ className?: string }>;
 };
 
 export default function AdminSidebar({ basePath = "/dashboard/admin" }: { basePath?: string }) {
+  const { t } = useTranslation();
   const pathname = usePathname();
 
   const nav: NavItem[] = [
-    { href: basePath, label: "Overview", icon: LayoutDashboard },
-    { href: `${basePath}/users`, label: "Users", icon: Users },
-    { href: `${basePath}/products`, label: "Products", icon: Package },
-    { href: `${basePath}/orders`, label: "Orders", icon: Boxes },
-    { href: `${basePath}/shipments`, label: "Shipments", icon: FolderTree },
-    { href: `${basePath}/analytics`, label: "Analytics", icon: LineChart },
-    { href: `${basePath}/categories`, label: "Categories", icon: LayoutGrid },
-    { href: `${basePath}/feed`, label: "Activity Feed", icon: Rss },
-    { href: `${basePath}/trends`, label: "Market Trends", icon: TrendingUp },
-    { href: `${basePath}/notifications`, label: "Notifications", icon: Bell },
-    { href: `${basePath}/directory`, label: "Directory", icon: Globe },
+    { href: basePath, labelKey: "sidebar.overview", defaultLabel: "Overview", icon: LayoutDashboard },
+    { href: `${basePath}/users`, labelKey: "sidebar.users", defaultLabel: "Users", icon: Users },
+    { href: `${basePath}/products`, labelKey: "sidebar.products", defaultLabel: "Products", icon: Package },
+    { href: `${basePath}/orders`, labelKey: "sidebar.orders", defaultLabel: "Orders", icon: Boxes },
+    { href: `${basePath}/shipments`, labelKey: "sidebar.shipments", defaultLabel: "Shipments", icon: FolderTree },
+    { href: `${basePath}/analytics`, labelKey: "sidebar.analytics", defaultLabel: "Analytics", icon: LineChart },
+    { href: `${basePath}/categories`, labelKey: "sidebar.categories", defaultLabel: "Categories", icon: LayoutGrid },
+    { href: `${basePath}/feed`, labelKey: "sidebar.feed", defaultLabel: "Activity Feed", icon: Rss },
+    { href: `${basePath}/trends`, labelKey: "sidebar.trends", defaultLabel: "Market Trends", icon: TrendingUp },
+    { href: `${basePath}/notifications`, labelKey: "notifications", defaultLabel: "Notifications", icon: Bell },
+    { href: `${basePath}/directory`, labelKey: "sidebar.directory", defaultLabel: "Directory", icon: Globe },
   ];
 
   const isActive = (href: string) => 
@@ -64,7 +67,7 @@ export default function AdminSidebar({ basePath = "/dashboard/admin" }: { basePa
               <SidebarMenuButton
                 asChild
                 isActive={isActive(item.href)}
-                tooltip={item.label}
+                tooltip={t(item.labelKey, item.defaultLabel)}
                 className={cn(
                   "rounded-xl transition-all duration-300",
                   isActive(item.href) 
@@ -74,7 +77,7 @@ export default function AdminSidebar({ basePath = "/dashboard/admin" }: { basePa
               >
                 <Link href={item.href} className="flex items-center gap-3 w-full">
                   <item.icon className={cn("size-5 transition-colors", isActive(item.href) ? "text-primary" : "group-hover:text-primary")} />
-                  <span className="font-semibold text-sm">{item.label}</span>
+                  <span className="font-semibold text-sm">{t(item.labelKey, item.defaultLabel)}</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -89,7 +92,7 @@ export default function AdminSidebar({ basePath = "/dashboard/admin" }: { basePa
             <SidebarMenuButton
               asChild
               isActive={isActive(`${basePath}/settings`)}
-              tooltip="Global Settings"
+              tooltip={t("sidebar.settings", "Global Settings")}
               className={cn(
                 "rounded-xl transition-all duration-300",
                 isActive(`${basePath}/settings`) 
@@ -99,7 +102,7 @@ export default function AdminSidebar({ basePath = "/dashboard/admin" }: { basePa
             >
               <Link href={`${basePath}/settings`} className="flex items-center gap-3 w-full">
                 <Settings className={cn("size-5 transition-colors", isActive(`${basePath}/settings`) ? "text-primary" : "group-hover:text-primary")} />
-                <span className="font-semibold text-sm">Settings</span>
+                <span className="font-semibold text-sm">{t("sidebar.settings", "Settings")}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

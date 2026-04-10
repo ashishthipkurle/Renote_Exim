@@ -29,31 +29,34 @@ import {
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { useTranslation } from "@/lib/i18n/client";
 
 interface NavItem {
   href: string;
-  label: string;
+  labelKey: string;
+  defaultLabel: string;
   icon: ComponentType<{ className?: string }>;
 }
 
 export default function ExporterSidebar({ basePath }: { basePath: string }) {
+  const { t } = useTranslation();
   const pathname = usePathname();
   const { user } = useAuth();
   const isMaster = user?.email === "exporter@gmail.com";
 
   const nav: NavItem[] = [
-    { href: basePath, label: "Dashboard", icon: LayoutDashboard },
-    { href: `${basePath}/inventory`, label: "Inventory", icon: Boxes },
-    { href: `${basePath}/orders`, label: "Orders", icon: FolderTree },
-    { href: `${basePath}/shipments`, label: "Shipments", icon: Globe },
-    { href: `${basePath}/rfqs`, label: "RFQs", icon: FileText },
-    { href: `${basePath}/directory`, label: "Buyers", icon: Users },
-    ...(isMaster ? [{ href: `${basePath}/users`, label: "Registry", icon: ShieldCheck }] : []),
-    { href: `${basePath}/suppliers`, label: "Dealers", icon: Handshake },
-    { href: `${basePath}/messages`, label: "Messages", icon: MessageSquare },
-    { href: `${basePath}/calls`, label: "Calls", icon: PhoneCall },
-    { href: `${basePath}/analytics`, label: "Analytics", icon: LineChart },
-    { href: `${basePath}/finance`, label: "Finance", icon: CreditCard },
+    { href: basePath, labelKey: "sidebar.dashboard", defaultLabel: "Dashboard", icon: LayoutDashboard },
+    { href: `${basePath}/inventory`, labelKey: "sidebar.inventory", defaultLabel: "Inventory", icon: Boxes },
+    { href: `${basePath}/orders`, labelKey: "sidebar.orders", defaultLabel: "Orders", icon: FolderTree },
+    { href: `${basePath}/shipments`, labelKey: "sidebar.shipments", defaultLabel: "Shipments", icon: Globe },
+    { href: `${basePath}/rfqs`, labelKey: "sidebar.rfqs", defaultLabel: "RFQs", icon: FileText },
+    { href: `${basePath}/directory`, labelKey: "sidebar.buyers", defaultLabel: "Buyers", icon: Users },
+    ...(isMaster ? [{ href: `${basePath}/users`, labelKey: "sidebar.registry", defaultLabel: "Registry", icon: ShieldCheck }] : []),
+    { href: `${basePath}/suppliers`, labelKey: "sidebar.dealers", defaultLabel: "Dealers", icon: Handshake },
+    { href: `${basePath}/messages`, labelKey: "sidebar.messages", defaultLabel: "Messages", icon: MessageSquare },
+    { href: `${basePath}/calls`, labelKey: "sidebar.calls", defaultLabel: "Calls", icon: PhoneCall },
+    { href: `${basePath}/analytics`, labelKey: "sidebar.analytics", defaultLabel: "Analytics", icon: LineChart },
+    { href: `${basePath}/finance`, labelKey: "sidebar.finance", defaultLabel: "Finance", icon: CreditCard },
   ];
 
   const isActive = (href: string) => 
@@ -68,7 +71,7 @@ export default function ExporterSidebar({ basePath }: { basePath: string }) {
               <SidebarMenuButton
                 asChild
                 isActive={isActive(item.href)}
-                tooltip={item.label}
+                tooltip={t(item.labelKey, item.defaultLabel)}
                 className={cn(
                   "rounded-xl transition-all duration-300",
                   isActive(item.href) 
@@ -78,7 +81,7 @@ export default function ExporterSidebar({ basePath }: { basePath: string }) {
               >
                 <Link href={item.href} className="flex items-center gap-3 w-full">
                   <item.icon className="size-5 transition-colors" />
-                  <span className="font-semibold text-sm">{item.label}</span>
+                  <span className="font-semibold text-sm">{t(item.labelKey, item.defaultLabel)}</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -93,7 +96,7 @@ export default function ExporterSidebar({ basePath }: { basePath: string }) {
               <SidebarMenuButton
               asChild
               isActive={isActive(`${basePath}/settings`)}
-              tooltip="Settings"
+              tooltip={t("sidebar.settings", "Settings")}
               className={cn(
                 "rounded-xl transition-all duration-300",
                 isActive(`${basePath}/settings`) 
@@ -103,7 +106,7 @@ export default function ExporterSidebar({ basePath }: { basePath: string }) {
             >
               <Link href={`${basePath}/settings`} className="flex items-center gap-3 w-full">
                 <Settings className="size-5 transition-colors" />
-                <span className="font-semibold text-sm">Settings</span>
+                <span className="font-semibold text-sm">{t("sidebar.settings", "Settings")}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

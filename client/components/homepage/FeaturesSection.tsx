@@ -1,6 +1,8 @@
 import Image from "next/image";
+import { useTranslation } from "@/lib/i18n/client";
 
 export default function FeaturesSection() {
+  const { t } = useTranslation();
   return (
     <section className="py-24 relative overflow-hidden bg-muted dark:bg-[#0A0A0A]">
       <div className="absolute top-0 right-0 w-1/3 h-full bg-primary/5 blur-[100px] pointer-events-none" />
@@ -8,13 +10,13 @@ export default function FeaturesSection() {
         <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6 reveal-trigger">
           <div className="max-w-xl">
             <h2 className="text-4xl font-bold text-foreground mb-4">
-              ENGINEERED FOR <br />
-              <span className="text-primary">MODERN LOGISTICS</span>
+              {t("features.title_part1", "ENGINEERED FOR")} <br />
+              <span className="text-primary">{t("features.title_part2", "MODERN LOGISTICS")}</span>
             </h2>
-            <p className="text-muted-foreground text-lg">Our platform combines institutional-grade financial tools with real-time supply chain visibility.</p>
+            <p className="text-muted-foreground text-lg">{t("features.subtitle", "Our platform combines institutional-grade financial tools with real-time supply chain visibility.")}</p>
           </div>
           <button className="text-primary hover:text-slate-900 dark:hover:text-white font-semibold flex items-center gap-2 transition-colors group" type="button">
-            Explore Capabilities <span className="material-icons group-hover:translate-x-1 transition-transform">arrow_forward</span>
+            {t("features.explore_btn", "Explore Capabilities")} <span className="material-icons group-hover:translate-x-1 transition-transform">arrow_forward</span>
           </button>
         </div>
 
@@ -34,8 +36,8 @@ export default function FeaturesSection() {
                   <path className="blueprint-path" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
                 </svg>
               </div>
-              <h3 className="text-2xl font-bold text-white mb-2 drop-shadow-md">Real-time Tracking</h3>
-              <p className="text-slate-200 text-sm leading-relaxed mb-6 drop-shadow-md group-hover:text-white transition-colors">Precision monitoring of your cargo via satellite and IoT sensors across air, sea, and land routes.</p>
+              <h3 className="text-2xl font-bold text-white mb-2 drop-shadow-md">{t("features.feature1_title", "Real-time Tracking")}</h3>
+              <p className="text-slate-200 text-sm leading-relaxed mb-6 drop-shadow-md group-hover:text-white transition-colors">{t("features.feature1_desc", "Precision monitoring of your cargo via satellite and IoT sensors across air, sea, and land routes.")}</p>
               <div className="h-[1px] w-full bg-gradient-to-r from-primary/50 to-transparent mb-4 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-700" />
             </div>
           </div>
@@ -55,8 +57,8 @@ export default function FeaturesSection() {
                   <path className="blueprint-path" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                 </svg>
               </div>
-              <h3 className="text-2xl font-bold text-white mb-2 drop-shadow-md">Secure Escrow</h3>
-              <p className="text-slate-200 text-sm leading-relaxed mb-6 drop-shadow-md group-hover:text-white transition-colors">Smart contracts hold funds securely until delivery conditions are met and verified by digital BOLs.</p>
+              <h3 className="text-2xl font-bold text-white mb-2 drop-shadow-md">{t("features.feature2_title", "Secure Escrow")}</h3>
+              <p className="text-slate-200 text-sm leading-relaxed mb-6 drop-shadow-md group-hover:text-white transition-colors">{t("features.feature2_desc", "Smart contracts hold funds securely until delivery conditions are met and verified by digital BOLs.")}</p>
               <div className="h-[1px] w-full bg-gradient-to-r from-primary/50 to-transparent mb-4 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-700" />
             </div>
           </div>
@@ -79,8 +81,8 @@ export default function FeaturesSection() {
                   <line className="blueprint-path" x1="3" y1="10" x2="21" y2="10" />
                 </svg>
               </div>
-              <h3 className="text-2xl font-bold text-white mb-2 drop-shadow-md">Global Compliance</h3>
-              <p className="text-slate-200 text-sm leading-relaxed mb-6 drop-shadow-md group-hover:text-white transition-colors">Automated customs documentation and regulatory checks for over 190 jurisdictions.</p>
+              <h3 className="text-2xl font-bold text-white mb-2 drop-shadow-md">{t("features.feature3_title", "Global Compliance")}</h3>
+              <p className="text-slate-200 text-sm leading-relaxed mb-6 drop-shadow-md group-hover:text-white transition-colors">{t("features.feature3_desc", "Automated customs documentation and regulatory checks for over 190 jurisdictions.")}</p>
               <div className="h-[1px] w-full bg-gradient-to-r from-primary/50 to-transparent mb-4 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-700" />
             </div>
           </div>

@@ -1,11 +1,11 @@
-"use client";
-
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useTranslation } from "@/lib/i18n/client";
 
 export default function ConnectivitySection() {
+  const { t } = useTranslation();
   const airplaneRef = useRef<HTMLImageElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
 
@@ -40,18 +40,18 @@ export default function ConnectivitySection() {
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div className="flex flex-col md:flex-row justify-between items-end mb-12">
           <div className="max-w-2xl">
-            <span className="text-primary text-sm font-bold uppercase tracking-widest mb-2 block">Live Operations</span>
-            <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">REAL-TIME <br /><span className="text-primary">CONNECTIVITY</span></h2>
-            <p className="text-slate-600 dark:text-slate-400 text-lg">Track your supply chain down to the individual vessel. Our satellite network provides 24/7 visibility on all active shipments.</p>
+            <span className="text-primary text-sm font-bold uppercase tracking-widest mb-2 block">{t("connectivity.badge", "Live Operations")}</span>
+            <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">{t("connectivity.title_part1", "REAL-TIME")} <br /><span className="text-primary">{t("connectivity.title_part2", "CONNECTIVITY")}</span></h2>
+            <p className="text-slate-600 dark:text-slate-400 text-lg">{t("connectivity.subtitle", "Track your supply chain down to the individual vessel. Our satellite network provides 24/7 visibility on all active shipments.")}</p>
           </div>
           <div className="flex items-center gap-4 mt-6 md:mt-0">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-blue-500 dark:bg-blue-400 animate-pulse"></span>
-              <span className="text-xs text-slate-600 dark:text-slate-400 uppercase font-bold">Maritime</span>
+              <span className="text-xs text-slate-600 dark:text-slate-400 uppercase font-bold">{t("connectivity.maritime", "Maritime")}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-yellow-500 dark:bg-yellow-400 animate-pulse"></span>
-              <span className="text-xs text-slate-600 dark:text-slate-400 uppercase font-bold">Aviation</span>
+              <span className="text-xs text-slate-600 dark:text-slate-400 uppercase font-bold">{t("connectivity.aviation", "Aviation")}</span>
             </div>
           </div>
         </div>
@@ -71,19 +71,19 @@ export default function ConnectivitySection() {
             <div className="map-dot bg-yellow-400 top-[25%] left-[55%] animate-[float_10s_linear_infinite]" style={{ boxShadow: "0 0 10px #facc15" }}></div>
 
             <div className="absolute top-[38%] left-[22%] glass-panel p-3 rounded-lg border border-primary/30 transform transition-all hover:scale-105 cursor-pointer bg-white/80 dark:bg-black/20">
-              <div className="text-[10px] text-primary font-bold mb-1">VESSEL: OCEAN PRIDE</div>
-              <div className="text-[10px] text-slate-800 dark:text-white">ETA: LA PORT (14h)</div>
-              <div className="text-[10px] text-slate-600 dark:text-slate-400">Cargo: Electronics</div>
+              <div className="text-[10px] text-primary font-bold mb-1">{t("connectivity.vessel_label", "VESSEL")}: OCEAN PRIDE</div>
+              <div className="text-[10px] text-slate-800 dark:text-white">{t("connectivity.eta_label", "ETA")}: LA PORT (14h)</div>
+              <div className="text-[10px] text-slate-600 dark:text-slate-400">{t("connectivity.cargo_label", "Cargo")}: Electronics</div>
             </div>
           </div>
 
           <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end pointer-events-none">
             <div className="glass-panel p-4 rounded-xl border border-slate-300 dark:border-white/5 backdrop-blur-md bg-white/60 dark:bg-black/20">
-              <p className="text-xs text-slate-600 dark:text-slate-400 uppercase mb-1">Active Vessels</p>
+              <p className="text-xs text-slate-600 dark:text-slate-400 uppercase mb-1">{t("connectivity.active_vessels", "Active Vessels")}</p>
               <p className="text-2xl font-bold text-slate-900 dark:text-white font-mono">1,492</p>
             </div>
             <div className="glass-panel p-4 rounded-xl border border-slate-300 dark:border-white/5 backdrop-blur-md bg-white/60 dark:bg-black/20">
-              <p className="text-xs text-slate-600 dark:text-slate-400 uppercase mb-1">Flights In-Air</p>
+              <p className="text-xs text-slate-600 dark:text-slate-400 uppercase mb-1">{t("connectivity.flights_in_air", "Flights In-Air")}</p>
               <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400 font-mono">418</p>
             </div>
           </div>
