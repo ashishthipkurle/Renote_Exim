@@ -18,12 +18,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSidebar } from "@/components/ui/sidebar";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { useTranslation } from "@/lib/i18n/client";
+import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
 import { useTheme } from "next-themes";
 import CartSheet from "@/components/cart/CartSheet";
 import LogoLight from "@/assests/LOGO_TEXT.png";
 import LogoDark from "@/assests/Logo-2-without-circle.png";
 
 export default function DashboardHeader() {
+    const { t } = useTranslation();
     const { open, toggleSidebar } = useSidebar();
     const { user, logout } = useAuth();
     const { theme, setTheme } = useTheme();
@@ -92,12 +95,13 @@ export default function DashboardHeader() {
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                             <input
                                 type="text"
-                                placeholder="Search shipments, assets..."
+                                placeholder={t("search_placeholder", "Search shipments, assets...")}
                                 className="w-full bg-muted/50 border border-border/50 dark:border-white/5 focus:border-white/40 rounded-full pl-10 pr-4 py-2 text-sm text-foreground outline-none transition-all focus:bg-background shadow-inner"
                             />
                         </div>
 
                         <div className="flex items-center gap-1 sm:gap-2">
+                            <LanguageSwitcher />
                             {/* Theme Toggle */}
                             {mounted && (
                                 <button
@@ -154,11 +158,11 @@ export default function DashboardHeader() {
                                     <div className="p-1 space-y-1">
                                         <Link href="/" className="flex items-center rounded-xl cursor-pointer py-2.5 px-3 hover:bg-secondary/80 transition-colors" onClick={() => setIsProfileOpen(false)}>
                                             <HomeIcon className="mr-3 h-4 w-4 text-muted-foreground" />
-                                            <span className="text-sm font-medium">Home</span>
+                                            <span className="text-sm font-medium">{t("home", "Home")}</span>
                                         </Link>
                                         <Link href="/dashboard" className="flex items-center rounded-xl cursor-pointer py-2.5 px-3 hover:bg-secondary/80 transition-colors" onClick={() => setIsProfileOpen(false)}>
                                             <LayoutDashboard className="mr-3 h-4 w-4 text-muted-foreground" />
-                                            <span className="text-sm font-medium">Dashboard</span>
+                                            <span className="text-sm font-medium">{t("dashboard", "Dashboard")}</span>
                                         </Link>
                                     </div>
 
@@ -170,7 +174,7 @@ export default function DashboardHeader() {
                                             className="w-full flex items-center rounded-xl cursor-pointer py-2.5 px-3 text-red-500 hover:bg-red-500/10 transition-colors"
                                         >
                                             <LogOut className="mr-3 h-4 w-4" />
-                                            <span className="text-sm font-bold">Log out</span>
+                                            <span className="text-sm font-bold">{t("signout", "Log out")}</span>
                                         </button>
                                     </div>
                                 </div>

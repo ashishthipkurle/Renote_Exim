@@ -10,6 +10,7 @@ import { User, LogOut, ShoppingBag, Home, Info, Phone, ChevronDown, LayoutDashbo
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/components/auth/AuthProvider";
 import LogoImg from "@/assests/LOGO.png";
+import { useTranslation } from "@/lib/i18n/client";
 import ThumbnailImg from "@/assests/4k Video frame 2/1.png";
 
 
@@ -72,6 +73,7 @@ const POS_CLASSES: Record<string, { wrapper: string; align: string }> = {
 };
 
 export default function ScrollVideoSection() {
+  const { t } = useTranslation();
   const wrapperRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -205,7 +207,7 @@ export default function ScrollVideoSection() {
       });
 
       // Each text block gets a unique cinematic animation
-      switch (item.animation) {
+      switch (item.animation as string) {
         case "zoom-blur":
           // Zoom in from far + blur to sharp focus
           textTl.fromTo(el,
@@ -517,11 +519,10 @@ export default function ScrollVideoSection() {
         className="fixed top-0 w-full h-screen bg-black overflow-hidden m-0 p-0 cursor-none"
       >
         <div className="w-full h-full relative overflow-hidden pointer-events-none">
-
-          {loaded && progress < 100 && (
+          {(!loaded || progress < 100) && (
             <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-3 w-48 transition-opacity duration-300">
               <span className="text-white/40 text-[10px] uppercase tracking-[0.2em] font-medium">
-                Buffering...
+                {t("video.buffering", "Buffering")}...
               </span>
               <div className="w-full h-[2px] bg-white/10 rounded-full overflow-hidden">
                 <div
@@ -708,21 +709,21 @@ export default function ScrollVideoSection() {
                     <div className={`flex flex-col ${pos.align} max-w-2xl px-6`}>
                       {/* Decorative accent line */}
                       <div className="w-14 h-[2px] bg-gradient-to-r from-amber-400/90 to-amber-600/30 mb-4" />
-                      <h2
+                       <h2
                         className="text-4xl md:text-6xl lg:text-8xl font-bold text-white mb-4 tracking-tight leading-[1.05]"
                         style={{
                           textShadow: "0 4px 60px rgba(0,0,0,0.9), 0 0px 120px rgba(0,0,0,0.6)",
                         }}
                       >
-                        {item.headline}
+                        {t(`video.${item.id.replace('text-', 'text')}_headline`, item.headline)}
                       </h2>
-                      <p
+                       <p
                         className="text-base md:text-xl lg:text-2xl text-white/70 font-light leading-relaxed max-w-lg"
                         style={{
                           textShadow: "0 2px 30px rgba(0,0,0,0.8)",
                         }}
                       >
-                        {item.sub}
+                        {t(`video.${item.id.replace('text-', 'text')}_sub`, item.sub)}
                       </p>
                       {/* Bottom accent line */}
                       <div className="w-14 h-[2px] bg-gradient-to-r from-amber-400/90 to-amber-600/30 mt-4" />
@@ -737,7 +738,7 @@ export default function ScrollVideoSection() {
                 className="fixed top-0 left-0 z-[100] flex items-center justify-center w-24 h-24 rounded-full bg-white/10 backdrop-blur-md text-white text-xs font-black tracking-[0.2em] uppercase shadow-[0_0_30px_rgba(255,255,255,0.1)] pointer-events-none transition-colors duration-300"
                 style={{ opacity: 0, transform: "scale(0)", willChange: "transform, opacity" }}
               >
-                {progress < 100 ? `${progress}%` : "Scroll"}
+                {progress < 100 ? `${progress}%` : t("video.scroll", "Scroll")}
               </div>
             </>
           )}

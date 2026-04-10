@@ -8,9 +8,22 @@ import {
   defaultRateLimit 
 } from '@/lib/redis';
 
+import { fallbackLng, languages, cookieName } from './lib/i18n/config';
+
 export async function middleware(request: NextRequest) {
   const ip = request.ip ?? request.headers.get('x-forwarded-for') ?? '127.0.0.1';
   const path = request.nextUrl.pathname;
+
+  // 1. i18n Language Detection (Safe)
+  let lng = request.cookies.get(cookieName)?.value;
+  if (!lng) {
+    // Detect from accept-language header
+    const acceptLanguage = request.headers.get('accept-language');
+    if (acceptLanguage) {
+      lng = languages.find(l => acceptLanguage.includes(l));
+    }
+  }
+  if (!lng) lng = fallbackLng;
 
   // Rate Limiting Logic for V3 Specifications
   try {
@@ -53,11 +66,17 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  return NextResponse.next();
+  const response = NextResponse.next();
+  // Set language cookie if not present or different
+  if (request.cookies.get(cookieName)?.value !== lng) {
+    response.cookies.set(cookieName, lng, { path: '/' });
+  }
+
+  return response;
 }
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico).*)',
+    '/((?!api|_next/static|_next/image|assets|favicon.ico|sw.js).*)',
   ],
 };

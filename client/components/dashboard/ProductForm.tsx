@@ -7,6 +7,7 @@ import { authFetch } from "@/lib/api-utils";
 import Link from "next/link";
 import { toast } from "sonner";
 import ImageUploader from "./ImageUploader";
+import { useTranslation } from "@/lib/i18n/client";
 
 
 const CATEGORIES = [
@@ -126,12 +127,12 @@ function normalizeCategory(value: string | null): string {
     if (!value) return "OTHER";
     const upper = value.trim().toUpperCase();
     if (VALID_CATEGORIES.has(upper)) return upper;
-    
+
     // Explicit mapping for common mismatches
     if (upper === "MACHINERY" || upper === "MACHINES & EQUIPMENT" || upper === "MACHINE") {
         return "MACHINES";
     }
-    
+
     // Check if it's one of the display labels
     const found = CATEGORIES.find(c => c.label.toUpperCase() === upper || c.value === upper);
     if (found) return found.value;
@@ -148,6 +149,7 @@ export default function ProductForm({
     isEdit?: boolean;
     hideHeader?: boolean;
 }) {
+    const { t } = useTranslation();
     const searchParams = useSearchParams();
     const router = useRouter();
 
@@ -280,12 +282,12 @@ export default function ProductForm({
                         </Link>
                         <div>
                             <h1 className="text-3xl font-black text-foreground uppercase italic tracking-tighter">
-                                {isEdit ? "Edit Listing" : "New Listing"}
+                                {isEdit ? t("product_form.edit_title", "Edit Listing") : t("product_form.new_title", "New Listing")}
                             </h1>
                             <p className="text-muted-foreground text-xs font-bold mt-1 uppercase tracking-widest leading-relaxed">
                                 {isEdit
-                                    ? "Modify your asset parameters for global trade"
-                                    : "Feature your products to buyers worldwide"}
+                                    ? t("product_form.edit_subtitle", "Modify your asset parameters for global trade")
+                                    : t("product_form.new_subtitle", "Feature your products to buyers worldwide")}
                             </p>
                         </div>
                     </div>
@@ -296,7 +298,7 @@ export default function ProductForm({
                         className="inline-flex items-center gap-2 bg-white hover:bg-neutral-100 text-black font-black text-xs uppercase tracking-[0.2em] py-4 px-8 rounded-2xl shadow-2xl shadow-white/10 transition-all active:scale-95 disabled:opacity-50"
                     >
                         {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                        {isEdit ? "Save Profile" : "Deploy Asset"}
+                        {isEdit ? t("product_form.save_profile", "Save Profile") : t("product_form.deploy_asset", "Deploy Asset")}
                     </button>
                 </div>
             )}
@@ -308,17 +310,17 @@ export default function ProductForm({
                     <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-2xl rounded-[2.5rem] p-10 space-y-8 relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 blur-[80px] rounded-full -mr-32 -mt-32 group-hover:bg-white/10 transition-colors pointer-events-none" />
 
-                        <h2 className="text-sm font-black text-foreground tracking-[0.25em] uppercase opacity-50 mb-4 italic">Core Specifications</h2>
+                        <h2 className="text-sm font-black text-foreground tracking-[0.25em] uppercase opacity-50 mb-4 italic">{t("product_form.core_specs", "Core Specifications")}</h2>
 
                         <div className="space-y-6">
                             <div>
-                                <label htmlFor="name" className={labelClass}>Market Identity (Product Name) *</label>
+                                <label htmlFor="name" className={labelClass}>{t("product_form.labels.product_name", "Market Identity (Product Name)")} *</label>
                                 <input
                                     id="name"
                                     name="name"
                                     value={form.name}
                                     onChange={handleChange}
-                                    placeholder="e.g. Premium Grade Organic Saffron"
+                                    placeholder={t("product_form.placeholders.product_name", "e.g. Premium Grade Organic Saffron")}
                                     className={inputClass}
                                 />
                                 {errors.name && <p className={errorClass}>{errors.name}</p>}
@@ -327,7 +329,7 @@ export default function ProductForm({
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-4">
                                     <div>
-                                        <label htmlFor="category" className={labelClass}>Industry Sector *</label>
+                                        <label htmlFor="category" className={labelClass}>{t("product_form.labels.industry_sector", "Industry Sector")} *</label>
                                         <div className="relative">
                                             <input
                                                 list="industry-categories"
@@ -335,7 +337,7 @@ export default function ProductForm({
                                                 name="category"
                                                 value={form.category}
                                                 onChange={handleChange}
-                                                placeholder="Search or select sector..."
+                                                placeholder={t("product_form.placeholders.sector", "Search or select sector...")}
                                                 className={inputClass}
                                             />
                                             <datalist id="industry-categories">
@@ -365,13 +367,13 @@ export default function ProductForm({
                                     )}
                                 </div>
                                 <div>
-                                    <label htmlFor="originCountry" className={labelClass}>Geographic Origin *</label>
+                                    <label htmlFor="originCountry" className={labelClass}>{t("product_form.labels.origin", "Geographic Origin")} *</label>
                                     <input
                                         id="originCountry"
                                         name="originCountry"
                                         value={form.originCountry}
                                         onChange={handleChange}
-                                        placeholder="e.g. Casablanca, Morocco"
+                                        placeholder={t("product_form.placeholders.origin", "e.g. Casablanca, Morocco")}
                                         className={inputClass}
                                     />
                                     {errors.originCountry && <p className={errorClass}>{errors.originCountry}</p>}
@@ -379,13 +381,13 @@ export default function ProductForm({
                             </div>
 
                             <div>
-                                <label htmlFor="description" className={labelClass}>Global Buyer Description *</label>
+                                <label htmlFor="description" className={labelClass}>{t("product_form.labels.description", "Global Buyer Description")} *</label>
                                 <textarea
                                     id="description"
                                     name="description"
                                     value={form.description}
                                     onChange={handleChange}
-                                    placeholder="Highlight key features, quality benchmarks, and usage scenarios..."
+                                    placeholder={t("product_form.placeholders.description", "Highlight key features, quality benchmarks, and usage scenarios...")}
                                     rows={6}
                                     className={inputClass + " resize-none py-5"}
                                 />
@@ -396,11 +398,11 @@ export default function ProductForm({
 
                     {/* Pricing */}
                     <div className="bg-card backdrop-blur-xl border border-border shadow-2xl rounded-[2.5rem] p-10 space-y-8 relative overflow-hidden group">
-                        <h2 className="text-sm font-black text-foreground tracking-[0.25em] uppercase opacity-50 mb-4 italic">Trade Economics</h2>
+                        <h2 className="text-sm font-black text-foreground tracking-[0.25em] uppercase opacity-50 mb-4 italic">{t("product_form.trade_economics", "Trade Economics")}</h2>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                             <div>
-                                <label htmlFor="regularPrice" className={labelClass}>Regular Price (USD) *</label>
+                                <label htmlFor="regularPrice" className={labelClass}>{t("product_form.labels.regular_price", "Regular Price (USD)")} *</label>
                                 <div className="relative">
                                     <span className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">$</span>
                                     <input
@@ -418,7 +420,7 @@ export default function ProductForm({
                                 {errors.regularPrice && <p className={errorClass}>{errors.regularPrice}</p>}
                             </div>
                             <div>
-                                <label htmlFor="price" className={labelClass}>FOB Price (Bulk Purchase) *</label>
+                                <label htmlFor="price" className={labelClass}>{t("product_form.labels.fob_price", "FOB Price (Bulk Purchase)")} *</label>
                                 <div className="relative">
                                     <span className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">$</span>
                                     <input
@@ -436,7 +438,7 @@ export default function ProductForm({
                                 {errors.price && <p className={errorClass}>{errors.price}</p>}
                             </div>
                             <div>
-                                <label htmlFor="minOrderQty" className={labelClass}>MOQ Threshold *</label>
+                                <label htmlFor="minOrderQty" className={labelClass}>{t("product_form.labels.moq", "MOQ Threshold")} *</label>
                                 <input
                                     id="minOrderQty"
                                     name="minOrderQty"
@@ -450,19 +452,19 @@ export default function ProductForm({
                                 {errors.minOrderQty && <p className={errorClass}>{errors.minOrderQty}</p>}
                             </div>
                             <div>
-                                <label htmlFor="unit" className={labelClass}>Base Unit *</label>
+                                <label htmlFor="unit" className={labelClass}>{t("product_form.labels.unit", "Base Unit")} *</label>
                                 <input
                                     id="unit"
                                     name="unit"
                                     value={form.unit}
                                     onChange={handleChange}
-                                    placeholder="e.g. MT, Kg, Lot"
+                                    placeholder={t("product_form.placeholders.unit", "e.g. MT, Kg, Lot")}
                                     className={inputClass}
                                 />
                                 {errors.unit && <p className={errorClass}>{errors.unit}</p>}
                             </div>
                             <div>
-                                <label htmlFor="quantity" className={labelClass}>Initial Stock Level *</label>
+                                <label htmlFor="quantity" className={labelClass}>{t("product_form.labels.stock", "Initial Stock Level")} *</label>
                                 <input
                                     id="quantity"
                                     name="quantity"
@@ -477,13 +479,13 @@ export default function ProductForm({
                         </div>
 
                         <div>
-                            <label htmlFor="hsCode" className={labelClass}>Harmonized (HS) Code</label>
+                            <label htmlFor="hsCode" className={labelClass}>{t("product_form.labels.hs_code", "Harmonized (HS) Code")}</label>
                             <input
                                 id="hsCode"
                                 name="hsCode"
                                 value={form.hsCode}
                                 onChange={handleChange}
-                                placeholder="e.g. 0910.20.00"
+                                placeholder={t("product_form.placeholders.hs_code", "e.g. 0910.20.00")}
                                 className={inputClass}
                             />
                             <p className="text-[9px] text-muted-foreground mt-2 ml-1 italic font-medium uppercase tracking-wider">Crucial for international customs processing</p>
@@ -495,24 +497,24 @@ export default function ProductForm({
                 <div className="lg:col-span-12 xl:col-span-4 space-y-8">
                     {/* Visual Assets */}
                     <div className="bg-card backdrop-blur-xl border border-border shadow-2xl rounded-[2.5rem] p-8 space-y-6">
-                        <h2 className="text-[11px] font-black text-foreground tracking-[0.25em] uppercase opacity-50 italic">Asset Gallery</h2>
+                        <h2 className="text-[11px] font-black text-foreground tracking-[0.25em] uppercase opacity-50 italic">{t("product_form.asset_gallery", "Asset Gallery")}</h2>
 
                         {/* Previews */}
-                        <ImageUploader 
-                            images={form.images} 
+                        <ImageUploader
+                            images={form.images}
                             onChange={(urls) => {
                                 setForm(prev => ({ ...prev, images: urls }));
                                 setErrors(prev => ({ ...prev, images: "" }));
-                            }} 
+                            }}
                             maxFiles={4}
                         />
                         {/* Make sure we can still remove completed images from the main form state */}
                         {form.images.length > 0 && (
                             <div className="grid grid-cols-2 gap-3 mt-4">
                                 {form.images.map((url, i) => (
-                                    <div 
-                                        key={i} 
-                                        className="relative group rounded-xl overflow-hidden border border-white/10 aspect-square bg-card shadow-xl cursor-zoom-in"
+                                    <div
+                                        key={i}
+                                        className="relative group rounded-xl overflow-hidden border border-border aspect-square bg-muted shadow-xl cursor-zoom-in"
                                         onClick={() => setPreviewImage(url)}
                                     >
                                         <img src={url} alt="asset" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
@@ -533,7 +535,7 @@ export default function ProductForm({
 
                     {/* Professional Certs */}
                     <div className="bg-card backdrop-blur-xl border border-border shadow-2xl rounded-[2.5rem] p-8 space-y-6">
-                        <h2 className="text-[11px] font-black text-foreground tracking-[0.25em] uppercase opacity-50 italic">Trust Markers</h2>
+                        <h2 className="text-[11px] font-black text-foreground tracking-[0.25em] uppercase opacity-50 italic">{t("product_form.trust_markers", "Trust Markers")}</h2>
 
                         <div className="flex flex-wrap gap-2">
                             {form.certifications.map((cert, i) => (
@@ -568,11 +570,11 @@ export default function ProductForm({
                     {/* Status Guard */}
                     <div className="bg-white/5 border border-white/20 rounded-[2.5rem] p-8 relative overflow-hidden group">
                         <Save className="w-10 h-10 text-white mb-4 opacity-30" />
-                        <p className="text-[10px] font-black text-white uppercase tracking-[0.2em]">Listing Protocols</p>
+                        <p className="text-[10px] font-black text-white uppercase tracking-[0.2em]">{t("product_form.listing_protocols", "Listing Protocols")}</p>
                         <ul className="text-[10px] text-slate-500 mt-4 space-y-2 italic font-medium leading-relaxed">
-                            <li>• Prices should be in USD.</li>
-                            <li>• Weights must use metric units.</li>
-                            <li>• Quality images increase buyer trust.</li>
+                            <li>• {t("product_form.protocols.price", "Prices should be in USD.")}</li>
+                            <li>• {t("product_form.protocols.metric", "Weights must use metric units.")}</li>
+                            <li>• {t("product_form.protocols.trust", "Quality images increase buyer trust.")}</li>
                         </ul>
                     </div>
                 </div>
@@ -580,7 +582,7 @@ export default function ProductForm({
                 {/* Final Action */}
                 <div className="lg:col-span-12 flex items-center justify-between bg-card/80 backdrop-blur-2xl border border-border rounded-[2rem] p-8 mt-4 shadow-2xl">
                     <div className="hidden sm:block">
-                        <p className="text-foreground font-black text-xs uppercase tracking-widest">{isEdit ? "Update Existing Asset" : "Deploy New Asset"}</p>
+                        <p className="text-foreground font-black text-xs uppercase tracking-widest">{isEdit ? t("product_form.update_asset", "Update Existing Asset") : t("product_form.deploy_new", "Deploy New Asset")}</p>
                         <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider mt-1 italic">Authorized Listing Procedure (ALP-1)</p>
                     </div>
                     <div className="flex items-center gap-4 w-full sm:w-auto">
@@ -588,7 +590,7 @@ export default function ProductForm({
                             href="/dashboard/exporter/inventory"
                             className="flex-1 sm:flex-none px-10 py-4 text-muted-foreground border border-border hover:text-foreground hover:bg-muted font-black text-[10px] uppercase tracking-widest rounded-2xl transition-all"
                         >
-                            Abort
+                            {t("product_form.abort", "Abort")}
                         </Link>
                         <button
                             type="submit"
@@ -601,7 +603,7 @@ export default function ProductForm({
                                 ) : (
                                     <Save className="w-4 h-4" />
                                 )}
-                                {isEdit ? "Commit Updates" : "Deploy Listing"}
+                                {isEdit ? t("product_form.commit_updates", "Commit Updates") : t("product_form.deploy_listing", "Deploy Listing")}
                             </span>
                             <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                         </button>
@@ -611,22 +613,22 @@ export default function ProductForm({
 
             {/* Image Preview Modal */}
             {previewImage && (
-                <div 
+                <div
                     className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 animate-in fade-in zoom-in-95 duration-200"
                     onClick={() => setPreviewImage(null)}
                 >
-                    <button 
-                        type="button" 
+                    <button
+                        type="button"
                         onClick={() => setPreviewImage(null)}
                         className="absolute top-4 right-4 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors shadow-2xl"
                     >
                         <X className="w-6 h-6" />
                     </button>
-                    <img 
-                        src={previewImage} 
-                        alt="Expanded Preview" 
+                    <img
+                        src={previewImage}
+                        alt="Expanded Preview"
                         className="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl"
-                        onClick={(e) => e.stopPropagation()} 
+                        onClick={(e) => e.stopPropagation()}
                     />
                 </div>
             )}

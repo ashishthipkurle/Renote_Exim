@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useRef } from "react";
+import { useTranslation } from "@/lib/i18n/client";
 
 export default function HomeHero() {
+  const { t } = useTranslation();
   const sectionRef = useRef<HTMLElement>(null);
 
   // Parallax Scroll Effect for the realistic globe images
@@ -74,9 +76,9 @@ export default function HomeHero() {
 
 
         <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold text-foreground mb-8 tracking-tight leading-none drop-shadow-2xl transition-colors duration-500">
-          TRADE WITHOUT <br />
+          {t("hero.title_part1", "TRADE WITHOUT")} <br />
           <span className="gradient-text-gold text-glow relative inline-block">
-            BORDERS
+            {t("hero.title_part2", "BORDERS")}
             <svg
               className="absolute -bottom-2 w-full h-3 text-[#D4AF37] opacity-60"
               fill="none"
@@ -93,7 +95,7 @@ export default function HomeHero() {
         </h1>
 
         <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-12 leading-relaxed font-light drop-shadow-lg transition-colors duration-500">
-          The next-generation B2B marketplace. Connect with verified suppliers, automate logistics, and track shipments in real-time across our immersive global network.
+          {t("hero.subtitle", "The next-generation B2B marketplace. Connect with verified suppliers, automate logistics, and track shipments in real-time across our immersive global network.")}
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 w-full max-w-lg mx-auto">
@@ -101,7 +103,7 @@ export default function HomeHero() {
             className="w-full sm:w-1/2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-5 px-8 rounded-xl primary-glow transition-all duration-300 text-lg flex items-center justify-center gap-2 group flowing-border primary-glow-hover shadow-[0_0_40px_-10px_rgba(19,91,236,0.6)] hover:shadow-[0_0_60px_-10px_rgba(19,91,236,0.8)] hover:-translate-y-1"
             href="/products"
           >
-            Start Importing
+            {t("hero.cta_start", "Start Importing")}
             <span className="material-icons group-hover:translate-x-1 transition-transform text-sm"></span>
           </Link>
           <button
@@ -109,7 +111,7 @@ export default function HomeHero() {
             type="button"
           >
             <span className="material-icons text-primary text-xl"></span>
-            Bye Products
+            {t("hero.cta_buy", "Buy Products")}
           </button>
         </div>
       </div>

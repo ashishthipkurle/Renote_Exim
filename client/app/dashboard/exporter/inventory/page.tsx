@@ -8,6 +8,7 @@ import { Prisma } from "@prisma/client";
 import InventoryTable from "./InventoryTable";
 import CategoryDirectory from "./CategoryDirectory";
 
+
 function formatNumber(n: number) {
   if (n >= 1000000) return (n / 1000000).toFixed(1) + "M";
   if (n >= 1000) return (n / 1000).toFixed(1) + "K";
