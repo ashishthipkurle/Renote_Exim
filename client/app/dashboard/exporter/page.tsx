@@ -264,10 +264,10 @@ export default function ExporterDashboard() {
       </h1>
     </div>
 
-    <div className="flex items-center gap-4">
-      {/* Action modules removed per request */}
-    </div>
-      </header >
+        <div className="flex items-center gap-4">
+          {/* Action modules removed per request */}
+        </div>
+      </header>
 
     {/* ── Click outside to close dropdowns ── */ }
   {
@@ -333,43 +333,43 @@ export default function ExporterDashboard() {
       {/* ── Map + Transactions ── */}
       <div className="grid grid-cols-3 gap-5" style={{ height: "520px" }}>
 
-        {/* Map Wrapper */}
-        <div className="col-span-2 bg-card dark:bg-[#050505]/40 backdrop-blur-xl border border-border dark:border-white/5 shadow-xl rounded-2xl flex flex-col h-full overflow-hidden">
-          {/* Map header */}
-          <div className="flex-shrink-0 flex items-center justify-between px-5 py-3 z-20 relative border-b border-border dark:border-white/5 bg-background/50 dark:bg-transparent">
-            <div className="min-w-0 flex items-center gap-3">
-              <Globe className="w-4 h-4 text-primary flex-shrink-0" />
-              <div>
-                <div className="flex items-center gap-2">
+            {/* Map Wrapper */}
+            <div className="col-span-2 bg-card dark:bg-[#050505]/40 backdrop-blur-xl border border-border dark:border-white/5 shadow-xl rounded-2xl flex flex-col h-full overflow-hidden">
+              {/* Map header */}
+              <div className="flex-shrink-0 flex items-center justify-between px-5 py-3 z-20 relative border-b border-border dark:border-white/5 bg-background/50 dark:bg-transparent">
+                <div className="min-w-0 flex items-center gap-3">
+                  <Globe className="w-4 h-4 text-primary flex-shrink-0" />
+                  <div>
+                    <div className="flex items-center gap-2">
                       <h2 className="text-[14px] font-black text-foreground dark:text-white tracking-tight">India Global Trade Network</h2>
-      <span className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase border ${mapIsDemo ? "bg-amber-500/12 border-amber-500/30 text-amber-500" : "bg-primary/10 border-primary/20 text-primary"}`}>
-        <span className={`w-1.5 h-1.5 rounded-full inline-block animate-pulse ${mapIsDemo ? "bg-amber-500" : "bg-primary"}`} />
-        {mapIsDemo ? "Demo" : "Live"}
-      </span>
-    </div>
-    <p className="text-[10px] text-slate-500 mt-0.5">{activeCount} {t("dashboard_main.active_routes", "active routes")}{lastUpdate && <span> · {lastUpdate.toLocaleTimeString()}</span>}</p>
-                  </div >
-                </div >
-    <div className="flex items-center gap-1.5 flex-wrap justify-end">
-      {(Object.entries(FILTER_CFG) as [FilterMode, typeof FILTER_CFG[FilterMode]][]).map(([mode, cfg]) => {
-        const count = mode === "all" ? activeCount : (regionCounts[mode] ?? 0);
-        const isActive = mapFilter === mode;
-        return (
-          <button key={mode} onClick={() => setMapFilter(mode)}
-            className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-semibold border transition-all duration-200"
-            style={{ background: isActive ? `${cfg.color}15` : "transparent", borderColor: isActive ? `${cfg.color}45` : "rgba(255,255,255,0.07)", color: isActive ? cfg.color : "#475569", boxShadow: isActive ? `0 0 12px ${cfg.color}22` : "none" }}>
-            <span>{cfg.icon}</span>
-            <span className="inline">{mode === "all" ? "All" : cfg.label}</span>
-            {count > 0 && <span className="opacity-60 text-[9px]">{count}</span>}
-          </button>
-        );
-      })}
-      <button onClick={() => setMapRefresh(n => n + 1)}
-        className="w-7 h-7 flex items-center justify-center rounded-lg border border-white/8 text-slate-500 hover:text-white hover:border-white/20 transition-all duration-200">
-        <RefreshCw className={`w-3.5 h-3.5 ${mapLoading ? "animate-spin" : ""}`} />
-      </button>
-    </div>
-              </div >
+                      <span className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase border ${mapIsDemo ? "bg-amber-500/12 border-amber-500/30 text-amber-500" : "bg-primary/10 border-primary/20 text-primary"}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full inline-block animate-pulse ${mapIsDemo ? "bg-amber-500" : "bg-primary"}`} />
+                        {mapIsDemo ? "Demo" : "Live"}
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-slate-500 mt-0.5">{activeCount} {t("dashboard_main.active_routes", "active routes")}{lastUpdate && <span> · {lastUpdate.toLocaleTimeString()}</span>}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5 flex-wrap justify-end">
+                  {(Object.entries(FILTER_CFG) as [FilterMode, typeof FILTER_CFG[FilterMode]][]).map(([mode, cfg]) => {
+                    const count = mode === "all" ? activeCount : (regionCounts[mode] ?? 0);
+                    const isActive = mapFilter === mode;
+                    return (
+                      <button key={mode} onClick={() => setMapFilter(mode)}
+                        className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-semibold border transition-all duration-200"
+                        style={{ background: isActive ? `${cfg.color}15` : "transparent", borderColor: isActive ? `${cfg.color}45` : "rgba(255,255,255,0.07)", color: isActive ? cfg.color : "#475569", boxShadow: isActive ? `0 0 12px ${cfg.color}22` : "none" }}>
+                        <span>{cfg.icon}</span>
+                        <span className="inline">{mode === "all" ? "All" : cfg.label}</span>
+                        {count > 0 && <span className="opacity-60 text-[9px]">{count}</span>}
+                      </button>
+                    );
+                  })}
+                  <button onClick={() => setMapRefresh(n => n + 1)}
+                    className="w-7 h-7 flex items-center justify-center rounded-lg border border-white/8 text-slate-500 hover:text-white hover:border-white/20 transition-all duration-200">
+                    <RefreshCw className={`w-3.5 h-3.5 ${mapLoading ? "animate-spin" : ""}`} />
+                  </button>
+                </div>
+              </div>
 
     <div className="flex-1 relative overflow-hidden">
       <ShipTrackingMap filter={mapFilter} routes={mapIsDemo ? DEMO_ROUTES : apiRoutes} />
