@@ -120,9 +120,8 @@ export default function DashboardLayout({ children, role }: DashboardLayoutProps
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-16 left-0 bottom-0 w-64 bg-background border-r border-border z-20 transition-transform lg:translate-x-0 ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed top-16 left-0 bottom-0 w-64 bg-background border-r border-border z-20 transition-transform lg:translate-x-0 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
       >
         <nav className="p-4 space-y-2">
           {navigation.map((item) => {
@@ -133,11 +132,10 @@ export default function DashboardLayout({ children, role }: DashboardLayoutProps
               <Link key={item.href} href={item.href}>
                 <motion.div
                   whileHover={{ x: 4 }}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                    isActive
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive
                       ? "bg-accent text-primary"
                       : "text-muted-foreground hover:bg-accent hover:text-foreground"
-                  }`}
+                    }`}
                 >
                   <Icon size={20} />
                   <span className="font-medium">{item.label}</span>

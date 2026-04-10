@@ -1,9 +1,17 @@
+"use client";
+
 import { useEffect, useRef, useState, useCallback } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Image from "next/image";
+import Link from "next/link";
+import { User, LogOut, ShoppingBag, Home, Info, Phone, ChevronDown, LayoutDashboard } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/components/auth/AuthProvider";
 import LogoImg from "@/assests/LOGO.png";
 import { useTranslation } from "@/lib/i18n/client";
+import ThumbnailImg from "@/assests/4k Video frame 2/1.png";
+
 
 /**
  * ScrollVideoSection — Apple-style scroll-linked video with scrollytelling text.
@@ -69,12 +77,17 @@ export default function ScrollVideoSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const textRefs = useRef<(HTMLDivElement | null)[]>([]);
   const framesRef = useRef<ImageBitmap[]>(globalFramesCache);
   const currentFrameRef = useRef(-1);
   const [progress, setProgress] = useState(globalProgressCache);
   const [failed, setFailed] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const { user, loading: authLoading, logout } = useAuth();
   const [loaded, setLoaded] = useState(globalFramesCache.length >= 2);
+  const [hasScrolled, setHasScrolled] = useState(false);
+
 
   // Cover-draw: scale + center-crop bitmap to fill the canvas
   const drawCover = useCallback(
@@ -127,6 +140,18 @@ export default function ScrollVideoSection() {
       section.removeEventListener("mouseleave", onMouseLeave);
     };
   }, [loaded, failed]);
+
+  // Outside click logic for profile dropdown
+  useEffect(() => {
+    if (!isProfileOpen) return;
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsProfileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isProfileOpen]);
 
   // Lock scroll while buffering frames (only if not seen before in this session)
   useEffect(() => {
@@ -281,6 +306,10 @@ export default function ScrollVideoSection() {
         start: "top top",
         end: `+=${SCROLL_DISTANCE}`,
         scrub: 0.8,
+        onUpdate: (self) => {
+          if (self.progress > 0.001) setHasScrolled(true);
+          else if (self.progress <= 0) setHasScrolled(false);
+        },
       },
     });
 
@@ -356,7 +385,7 @@ export default function ScrollVideoSection() {
                 resizeHeight: targetH,
                 resizeQuality: "medium"
               });
-              
+
               if (framesRef.current) framesRef.current[i] = bitmap;
               globalFramesCache[i] = bitmap;
             } catch (e) {
@@ -366,7 +395,7 @@ export default function ScrollVideoSection() {
               const vh = video.videoHeight || 1080;
               const targetW = Math.min(1920, vw);
               const targetH = Math.round((targetW / vw) * vh);
-              
+
               tmpCanvas.width = targetW;
               tmpCanvas.height = targetH;
               const tmpCtx = tmpCanvas.getContext("2d");
@@ -381,7 +410,7 @@ export default function ScrollVideoSection() {
                 }
               }
             }
-            
+
             const p = Math.round(((i + 1) / TOTAL_FRAMES) * 100);
             setProgress(p);
             globalProgressCache = p;
@@ -425,12 +454,52 @@ export default function ScrollVideoSection() {
       isExtractionRunning = false;
     });
 
+    // ---------- 3. Stacked Reveal Transition ----------
+    const ctx_reveal = gsap.context(() => {
+      // Pin the video section during scrub + transition
+      ScrollTrigger.create({
+        trigger: wrapper,
+        start: "top top",
+        end: `+=${SCROLL_DISTANCE + 1000}`, // SCROLL_DISTANCE for playback + 1000 for reveal
+        pin: section,
+        pinSpacing: false,
+        onUpdate: (self) => {
+           // We can add a slight scale down or blur here if desired
+           if (self.progress > SCROLL_DISTANCE / (SCROLL_DISTANCE + 1000)) {
+              const revealProgress = (self.scroll() - SCROLL_DISTANCE) / 1000;
+              gsap.set(section, { 
+                scale: 1 + (revealProgress * 0.05),
+                filter: `blur(${revealProgress * 4}px)`,
+                opacity: 1 - (revealProgress * 0.3)
+              });
+           } else {
+              gsap.set(section, { scale: 1, filter: "blur(0px)", opacity: 1 });
+           }
+        }
+      });
+
+      // Animate the marketplace content sliding over
+      gsap.set("#home-content-reveal", { y: "100vh" });
+      gsap.fromTo("#home-content-reveal", 
+        { y: "100vh" },
+        {
+          y: 0,
+          ease: "none",
+          scrollTrigger: {
+            trigger: wrapper,
+            start: `${SCROLL_DISTANCE} top`,
+            end: `${SCROLL_DISTANCE + 1000} top`,
+            scrub: true,
+          }
+        }
+      );
+    }, wrapper);
+
     return () => {
       window.removeEventListener("resize", resizeCanvas);
       tl.kill();
+      ctx_reveal.revert();
       ScrollTrigger.getAll().forEach((t) => t.kill());
-      // We no longer close frames on unmount because we want to cache them
-      // framesRef.current = []; // Keep it for the global cache
     };
   }, [failed, drawCover]);
 
@@ -441,12 +510,12 @@ export default function ScrollVideoSection() {
       ref={wrapperRef}
       className="bg-black relative z-0"
       style={{
-        height: `calc(${SCROLL_DISTANCE}px + 100vh)`,
+        height: `${SCROLL_DISTANCE + 1000}px`, // Playback distance + reveal distance
       }}
     >
       <section
         ref={sectionRef}
-        className="sticky top-0 w-full h-screen bg-black overflow-hidden m-0 p-0 cursor-none"
+        className="fixed top-0 w-full h-screen bg-black overflow-hidden m-0 p-0 cursor-none"
       >
         <div className="w-full h-full relative overflow-hidden pointer-events-none">
           {(!loaded || progress < 100) && (
@@ -469,18 +538,161 @@ export default function ScrollVideoSection() {
             style={{ display: "block", width: "100%", height: "100%" }}
           />
 
+          {/* Thumbnail Image - Visible before scroll */}
+          <AnimatePresence>
+            {!hasScrolled && (
+              <motion.div
+                initial={{ opacity: 1 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0 }}
+                className="absolute inset-0 z-[5] pointer-events-none"
+              >
+                <Image
+                  src={ThumbnailImg}
+                  alt="Ranote Exim"
+                  fill
+                  priority
+                  className="object-cover"
+                  unoptimized
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Intro Overlays */}
           {loaded && (
             <>
-              {/* Header Gradient */}
-              <div className="absolute top-0 w-full h-32 z-0 bg-gradient-to-b from-black/80 via-black/30 to-transparent pointer-events-none" />
+              {/* ─── Immersive Glassmorphism Navigation Bar ─── */}
+              <nav
+                className="absolute top-6 left-1/2 -translate-x-1/2 z-[60] pointer-events-auto cursor-auto"
+                onMouseEnter={() => gsap.to(cursorRef.current, { scale: 0, opacity: 0, duration: 0.2, ease: "power2.out" })}
+                onMouseLeave={() => gsap.to(cursorRef.current, { scale: 1, opacity: 1, duration: 0.2, ease: "back.out(1.7)" })}
+              >
+                <div
+                  className="flex items-center gap-2 px-10 py-1.5"
+                  style={{
+                    background: "rgba(255, 255, 255, 0.03)",
+                    backdropFilter: "blur(24px) saturate(180%)",
+                    WebkitBackdropFilter: "blur(24px) saturate(180%)",
+                    borderRadius: "24px",
+                    border: "1px solid rgba(255, 255, 255, 0.08)",
+                    minWidth: "850px",
+                    justifyContent: "space-between",
+                    boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
+                  }}
+                >
+                  {/* Left Side: Navigation Links */}
+                  <div className="flex items-center gap-8">
+                    <Link href="/" className="flex items-center gap-2 group text-white/70 hover:text-white transition-all duration-300">
+                      <Home className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em]">Home</span>
+                    </Link>
+                    <Link href="/about" className="flex items-center gap-2 group text-white/70 hover:text-white transition-all duration-300">
+                      <Info className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em]">About</span>
+                    </Link>
+                  </div>
 
-              {/* Bottom Gradient for text readability */}
-              <div className="absolute bottom-0 w-full h-48 z-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
+                  {/* Centerpiece: Marketplace */}
+                  <Link
+                    href="/products"
+                    className="flex items-center gap-2.5 px-8 py-2.5 rounded-xl hover:bg-white/10 text-white text-sm font-black uppercase tracking-[0.3em] transition-all duration-500 hover:scale-105 group"
+                  >
+                    <ShoppingBag className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+                    Marketplace
+                  </Link>
+
+                  {/* Right Side: Contact & Auth */}
+                  <div className="flex items-center gap-8">
+                    <Link href="/contact" className="flex items-center gap-2 group text-white/70 hover:text-white transition-all duration-300">
+                      <Phone className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em]">Contact</span>
+                    </Link>
+
+                    <div className="flex items-center gap-4">
+                      {!authLoading && (
+                        user ? (
+                          <div className="relative" ref={dropdownRef}>
+                            <button
+                              onClick={() => setIsProfileOpen(!isProfileOpen)}
+                              className="flex items-center gap-2 group focus:outline-none"
+                            >
+                              <div className="size-8 rounded-full bg-white/20 ring-1 ring-white/30 overflow-hidden flex items-center justify-center flex-shrink-0 group-hover:ring-amber-400/50 transition-all">
+                                {user.avatar ? (
+                                  <Image src={user.avatar as string} alt="" width={32} height={32} className="w-full h-full object-cover" unoptimized />
+                                ) : (
+                                  <User className="w-4 h-4 text-white" />
+                                )}
+                              </div>
+                              <ChevronDown className={`w-3 h-3 text-white/50 group-hover:text-white transition-transform duration-300 ${isProfileOpen ? 'rotate-180' : ''}`} />
+                            </button>
+
+                            {/* Profile Dropdown */}
+                            <AnimatePresence>
+                              {isProfileOpen && (
+                                <motion.div
+                                  initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                                  exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                                  className="absolute right-0 mt-4 w-48 rounded-2xl overflow-hidden"
+                                  style={{
+                                    background: "rgba(0, 0, 0, 0.8)",
+                                    backdropFilter: "blur(12px)",
+                                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                                    boxShadow: "0 10px 40px rgba(0,0,0,0.5)"
+                                  }}
+                                >
+                                  <div className="p-1.5 flex flex-col gap-1">
+                                    <Link
+                                      href={user.role === "USER" ? "/products" : `/dashboard/${user.role?.toLowerCase()}`}
+                                      className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-white/10 text-white/70 hover:text-white transition-all group"
+                                      onClick={() => setIsProfileOpen(false)}
+                                    >
+                                      <LayoutDashboard className="w-4 h-4 group-hover:text-amber-400" />
+                                      <span className="text-[10px] font-bold uppercase tracking-widest">Dashboard</span>
+                                    </Link>
+                                    <button
+                                      onClick={() => {
+                                        logout();
+                                        setIsProfileOpen(false);
+                                      }}
+                                      className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-red-500/10 text-white/70 hover:text-red-400 transition-all group w-full text-left"
+                                    >
+                                      <LogOut className="w-4 h-4" />
+                                      <span className="text-[10px] font-bold uppercase tracking-widest">Logout</span>
+                                    </button>
+                                  </div>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-4">
+                            <Link
+                              href="/login"
+                              className="text-white/60 hover:text-white text-[10px] font-black uppercase tracking-[0.2em] transition-colors"
+                            >
+                              Login
+                            </Link>
+                            <Link
+                              href="/register"
+                              className="px-6 h-8 flex items-center justify-center rounded-full bg-amber-500 hover:bg-amber-400 text-black text-[9px] font-black uppercase tracking-[0.1em] transition-all hover:scale-105 active:scale-95 shadow-[0_4px_20px_rgba(245,158,11,0.2)]"
+                            >
+                              Sign Up
+                            </Link>
+                          </div>
+                        )
+                      )}
+
+                    </div>
+                  </div>
+                </div>
+              </nav>
 
               {/* Logo Pinned to Corner */}
               <div className="absolute top-0 left-0 z-10 p-0 m-0">
-                <Image src={LogoImg} alt="Ranote Exim Logo" className="w-[220px] md:w-[320px] lg:w-[450px] h-auto object-contain origin-top-left -ml-12 -mt-12 filter drop-shadow-[0_0_15px_rgba(0,0,0,0.4)]" unoptimized />
+                <Image src={LogoImg} alt="Ranote Exim Logo" className="w-[220px] md:w-[320px] lg:w-[450px] h-auto object-contain origin-top-left -ml-9 -mt-12 filter drop-shadow-[0_0_15px_rgba(0,0,0,0.4)]" unoptimized />
               </div>
 
               {/* --- Scrollytelling Text Overlays --- */}
@@ -519,10 +731,10 @@ export default function ScrollVideoSection() {
                 );
               })}
 
-              {/* Custom Follow Cursor */}
-               <div
+              {/* Custom Follow Cursor (No Border) */}
+              <div
                 ref={cursorRef}
-                className="fixed top-0 left-0 z-[100] flex items-center justify-center w-24 h-24 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs tracking-widest uppercase font-medium shadow-[0_0_30px_rgba(255,255,255,0.1)] pointer-events-none transition-colors duration-300"
+                className="fixed top-0 left-0 z-[100] flex items-center justify-center w-24 h-24 rounded-full bg-white/10 backdrop-blur-md text-white text-xs font-black tracking-[0.2em] uppercase shadow-[0_0_30px_rgba(255,255,255,0.1)] pointer-events-none transition-colors duration-300"
                 style={{ opacity: 0, transform: "scale(0)", willChange: "transform, opacity" }}
               >
                 {progress < 100 ? `${progress}%` : t("video.scroll", "Scroll")}

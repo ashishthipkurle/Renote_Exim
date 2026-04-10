@@ -66,11 +66,11 @@ export default function DashboardHeader() {
                     <div className="flex items-center gap-4">
                         {/* Logo */}
                         <Link href="/" className="flex items-center flex-shrink-0">
-                            <Image 
-                                src={LogoImg} 
-                                alt="Ranote Exim Logo" 
-                                className={mounted && theme === "dark" ? "h-14 md:h-[75px] w-auto object-contain transition-all" : "h-8 md:h-10 w-auto object-contain transition-all"} 
-                                unoptimized 
+                            <Image
+                                src={LogoImg}
+                                alt="Ranote Exim Logo"
+                                className={mounted && theme === "dark" ? "h-14 md:h-[75px] w-auto object-contain transition-all" : "h-8 md:h-10 w-auto object-contain transition-all"}
+                                unoptimized
                             />
                         </Link>
 
@@ -91,7 +91,7 @@ export default function DashboardHeader() {
                     <div className="flex items-center gap-2 lg:gap-4">
 
                         {/* SEARCH BAR (Pushed to Right) */}
-                        <div className="hidden md:block w-64 lg:w-80 relative group mr-2">
+                        <div className="w-64 lg:w-80 relative group mr-2">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                             <input
                                 type="text"
@@ -127,7 +127,7 @@ export default function DashboardHeader() {
                             </Link>
                         </div>
 
-                        <div className="h-6 w-px bg-border dark:bg-white/10 mx-1 hidden xs:block" />
+                        <div className="h-6 w-px bg-border dark:bg-white/10 mx-1 xs:block" />
 
                         {/* PROFILE DROPDOWN */}
                         <div className="relative" ref={dropdownRef}>

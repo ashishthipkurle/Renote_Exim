@@ -1,29 +1,23 @@
 import { useEffect } from 'react';
-import { createBrowserClient } from '@supabase/ssr'; // Common for Supabase SSR
+import { getSocket } from '@/lib/socket';
 
 export function useRealtimeNotifications(userId: string | undefined, onNotification: (payload: any) => void) {
   useEffect(() => {
     if (!userId) return;
     
-    // Fallback to minimal createClient if user doesnt have a strict wrapper
-    const supabase = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
+    const socket = getSocket();
     
-    const channel = supabase.channel(`user:${userId}:notifications`)
-      .on('postgres_changes', { 
-        event: 'INSERT', 
-        schema: 'public', 
-        table: 'notifications', // Match mapped table name in schema
-        filter: `userId=eq.${userId}` 
-      }, (payload) => {
-        onNotification(payload);
-      })
-      .subscribe();
+    // Join a room specific to the user
+    socket.emit("join-user-room", userId);
+    
+    const handleNotification = (payload: any) => {
+      onNotification(payload);
+    };
+    
+    socket.on("new-notification", handleNotification);
 
     return () => {
-      supabase.removeChannel(channel);
+      socket.off("new-notification", handleNotification);
     };
   }, [userId, onNotification]);
 }

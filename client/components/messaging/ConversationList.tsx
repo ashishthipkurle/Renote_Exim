@@ -6,7 +6,7 @@ import { Search, User } from "lucide-react";
 import Image from "next/image";
 import { formatDistanceToNow } from "date-fns";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { getSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { getSocket } from "@/lib/socket";
 
 type Conversation = {
   otherUser: {
@@ -33,7 +33,6 @@ export default function ConversationList({ selectedUserId, onSelect }: Conversat
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const supabase = getSupabaseBrowserClient();
 
   const fetchConversations = useCallback(async () => {
     try {
@@ -53,26 +52,19 @@ export default function ConversationList({ selectedUserId, onSelect }: Conversat
   useEffect(() => {
     if (!user?.id) return;
 
-    const channel = supabase
-      .channel(`conversations:incoming:${user.id}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "messages",
-          filter: `receiverId=eq.${user.id}`,
-        },
-        () => {
-          fetchConversations();
-        }
-      )
-      .subscribe();
+    const socket = getSocket();
+    socket.emit("join-user-room", user.id);
+
+    const handleNewMessage = () => {
+      fetchConversations();
+    };
+
+    socket.on("new-message", handleNewMessage);
 
     return () => {
-      supabase.removeChannel(channel);
+      socket.off("new-message", handleNewMessage);
     };
-  }, [fetchConversations, supabase, user?.id]);
+  }, [fetchConversations, user?.id]);
 
   const filtered = conversations.filter(c => 
     c.otherUser.name?.toLowerCase().includes(search.toLowerCase()) ||

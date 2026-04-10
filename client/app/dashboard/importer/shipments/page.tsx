@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation";
-import { getServerAuth } from "@/lib/supabase/server";
+import { getServerAuthContext } from "@/lib/auth-server";
 
 export const dynamic = "force-dynamic";
 
 export default async function ImporterShipmentsPage() {
-  const auth = await getServerAuth();
+  const auth = await getServerAuthContext();
   if (!auth) redirect("/login");
 
   if (auth.role !== "IMPORTER" && auth.role !== "ADMIN") {

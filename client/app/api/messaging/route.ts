@@ -60,7 +60,7 @@ export async function GET(req: NextRequest) {
             ELSE m."senderId"
           END AS "otherUserId",
           m.id,
-          m.content,
+          m.body,
           m."createdAt",
           m."senderId"
         FROM messages m
@@ -70,7 +70,7 @@ export async function GET(req: NextRequest) {
         SELECT DISTINCT ON ("otherUserId")
           "otherUserId",
           id,
-          content,
+          body,
           "createdAt",
           "senderId"
         FROM conversation_messages
@@ -81,13 +81,13 @@ export async function GET(req: NextRequest) {
           m."senderId" AS "otherUserId",
           COUNT(*)::int AS "unreadCount"
         FROM messages m
-        WHERE m."receiverId" = ${user.id} AND m.read = false
+        WHERE m."receiverId" = ${user.id} AND m."isRead" = false
         GROUP BY m."senderId"
       )
       SELECT
         l."otherUserId",
         l.id AS "messageId",
-        l.content,
+        l.body,
         l."createdAt",
         l."senderId",
         COALESCE(u."unreadCount", 0) AS "unreadCount"
@@ -119,7 +119,7 @@ export async function GET(req: NextRequest) {
           otherUser,
           lastMessage: {
             id: row.messageId,
-            content: row.content,
+            body: row.body,
             createdAt: row.createdAt,
             senderId: row.senderId,
           },
@@ -164,7 +164,7 @@ export async function POST(req: NextRequest) {
       data: {
         senderId: user.id,
         receiverId,
-        content: messageText,
+        body: messageText,
         orderId,
         subject,
       },

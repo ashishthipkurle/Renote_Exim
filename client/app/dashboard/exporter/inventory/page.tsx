@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { Plus, Package, TrendingUp, BarChart2, Globe, ArrowRight, ArrowLeft, Layers, ShieldCheck, ShoppingCart } from "lucide-react";
 
 import { prisma } from "@/lib/prisma";
-import { getServerAuth } from "@/lib/supabase/server";
+import { getServerAuthContext } from "@/lib/auth-server";
 import { Prisma } from "@prisma/client";
 import InventoryTable from "./InventoryTable";
 import CategoryDirectory from "./CategoryDirectory";
@@ -42,7 +42,7 @@ export default async function ExporterInventoryPage({
 }: {
   searchParams: { search?: string; category?: string; status?: string; page?: string };
 }) {
-  const auth = await getServerAuth();
+  const auth = await getServerAuthContext();
   if (!auth) redirect("/login");
   if (auth.role !== "EXPORTER" && auth.role !== "ADMIN") {
     redirect(`/dashboard/${auth.role.toLowerCase()}`);

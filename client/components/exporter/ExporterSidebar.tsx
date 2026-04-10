@@ -45,21 +45,18 @@ export default function ExporterSidebar({ basePath }: { basePath: string }) {
   const isMaster = user?.email === "exporter@gmail.com";
 
   const nav: NavItem[] = [
-    { href: basePath, labelKey: "sidebar.dashboard", defaultLabel: "Dashboard", icon: LayoutDashboard },
-    { href: `${basePath}/inventory`, labelKey: "sidebar.inventory", defaultLabel: "Inventory", icon: Boxes },
-    { href: `${basePath}/orders`, labelKey: "sidebar.orders", defaultLabel: "Orders", icon: FolderTree },
-    { href: `${basePath}/shipments`, labelKey: "sidebar.shipments", defaultLabel: "Shipments", icon: Globe },
-    { href: `${basePath}/rfqs`, labelKey: "sidebar.rfqs", defaultLabel: "RFQs", icon: FileText },
-    { href: `${basePath}/directory`, labelKey: "sidebar.buyers", defaultLabel: "Buyers", icon: Users },
-    ...(isMaster ? [{ href: `${basePath}/users`, labelKey: "sidebar.registry", defaultLabel: "Registry", icon: ShieldCheck }] : []),
-    { href: `${basePath}/suppliers`, labelKey: "sidebar.dealers", defaultLabel: "Dealers", icon: Handshake },
-    { href: `${basePath}/messages`, labelKey: "sidebar.messages", defaultLabel: "Messages", icon: MessageSquare },
-    { href: `${basePath}/calls`, labelKey: "sidebar.calls", defaultLabel: "Calls", icon: PhoneCall },
-    { href: `${basePath}/analytics`, labelKey: "sidebar.analytics", defaultLabel: "Analytics", icon: LineChart },
-    { href: `${basePath}/finance`, labelKey: "sidebar.finance", defaultLabel: "Finance", icon: CreditCard },
+    { href: basePath, label: "Dashboard", icon: LayoutDashboard },
+    { href: `${basePath}/inventory`, label: "Inventory", icon: Boxes },
+    { href: `${basePath}/orders`, label: "Orders", icon: FolderTree },
+    { href: `${basePath}/rfqs`, label: "RFQs", icon: FileText },
+    { href: `${basePath}/directory`, label: "Buyers", icon: Users },
+    ...(isMaster ? [{ href: `${basePath}/users`, label: "Registry", icon: ShieldCheck }] : []),
+    { href: `${basePath}/suppliers`, label: "Dealers", icon: Handshake },
+    { href: `${basePath}/analytics`, label: "Analytics", icon: LineChart },
+    { href: `${basePath}/finance`, label: "Finance", icon: CreditCard },
   ];
 
-  const isActive = (href: string) => 
+  const isActive = (href: string) =>
     pathname === href || (href !== basePath && pathname.startsWith(href + "/"));
 
   return (
@@ -74,8 +71,8 @@ export default function ExporterSidebar({ basePath }: { basePath: string }) {
                 tooltip={t(item.labelKey, item.defaultLabel)}
                 className={cn(
                   "rounded-xl transition-all duration-300",
-                  isActive(item.href) 
-                    ? "bg-black/10 dark:bg-white/10 text-[#D4AF37] dark:text-[#D4AF37] hover:bg-black/15 dark:hover:bg-white/15" 
+                  isActive(item.href)
+                    ? "bg-black/10 dark:bg-white/10 text-[#D4AF37] dark:text-[#D4AF37] hover:bg-black/15 dark:hover:bg-white/15"
                     : "text-slate-500 dark:text-muted-foreground hover:bg-slate-100 dark:hover:bg-white/5 hover:text-[#D4AF37] dark:hover:text-[#D4AF37]"
                 )}
               >
@@ -89,18 +86,18 @@ export default function ExporterSidebar({ basePath }: { basePath: string }) {
         </SidebarMenu>
       </SidebarContent>
 
-      <SidebarFooter className="p-6 space-y-4">
+      <SidebarFooter className="px-6 pt-4 pb-2 space-y-4">
         <SidebarSeparator />
         <SidebarMenu>
           <SidebarMenuItem>
-              <SidebarMenuButton
+            <SidebarMenuButton
               asChild
               isActive={isActive(`${basePath}/settings`)}
               tooltip={t("sidebar.settings", "Settings")}
               className={cn(
                 "rounded-xl transition-all duration-300",
-                isActive(`${basePath}/settings`) 
-                  ? "bg-black/10 dark:bg-white/10 text-[#D4AF37] dark:text-[#D4AF37] hover:bg-black/15 dark:hover:bg-white/15" 
+                isActive(`${basePath}/settings`)
+                  ? "bg-black/10 dark:bg-white/10 text-[#D4AF37] dark:text-[#D4AF37] hover:bg-black/15 dark:hover:bg-white/15"
                   : "text-slate-500 dark:text-muted-foreground hover:bg-slate-100 dark:hover:bg-white/5 hover:text-[#D4AF37] dark:hover:text-[#D4AF37]"
               )}
             >

@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import axios from "axios";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
-import { getSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { getSupabaseBrowserClient } from "@/lib/auth-client";
 
 function getApiErrorMessage(error: unknown): string | null {
   if (!error || typeof error !== "object") return null;

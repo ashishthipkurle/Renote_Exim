@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { ShoppingCart, ArrowRight, ArrowLeft } from "lucide-react";
 
 import { prisma } from "@/lib/prisma";
-import { getServerAuth } from "@/lib/supabase/server";
+import { getServerAuthContext } from "@/lib/auth-server";
 import { OrderStatus } from "@prisma/client";
 import OrdersTable from "./OrdersTable";
 
@@ -13,7 +13,7 @@ export default async function ExporterOrdersPage({
   searchParams?: { [key: string]: string | string[] | undefined } | Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const resolvedSearchParams = (await searchParams) ?? {};
-  const auth = await getServerAuth();
+  const auth = await getServerAuthContext();
   if (!auth) redirect("/login");
   if (auth.role !== "EXPORTER" && auth.role !== "ADMIN") {
     redirect(`/dashboard/${auth.role.toLowerCase()}`);

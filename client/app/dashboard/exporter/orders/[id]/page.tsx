@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 
 import { prisma } from "@/lib/prisma";
-import { getServerAuth } from "@/lib/supabase/server";
+import { getServerAuthContext } from "@/lib/auth-server";
 import { OrderActions } from "../OrderActions";
 import OrderContact from "@/components/messaging/OrderContact";
 
@@ -43,7 +43,7 @@ function formatDate(d: Date) {
 }
 
 export default async function OrderDetailPage({ params }: { params: { id: string } }) {
-    const auth = await getServerAuth();
+    const auth = await getServerAuthContext();
     if (!auth) redirect("/login");
     if (auth.role !== "EXPORTER" && auth.role !== "ADMIN") redirect("/dashboard");
 

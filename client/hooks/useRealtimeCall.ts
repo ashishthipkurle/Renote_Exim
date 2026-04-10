@@ -2,8 +2,7 @@
 
 import { useAuth } from "@/components/auth/AuthProvider";
 import { authFetch } from "@/lib/api-utils";
-import { getSupabaseBrowserClient } from "@/lib/supabase/browser";
-import type { RealtimeChannel } from "@supabase/supabase-js";
+import { getSocket } from "@/lib/socket";
 import Peer, { type Instance as PeerInstance, type SignalData } from "simple-peer";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -75,8 +74,6 @@ type EndPayload = {
   reason?: string;
 };
 
-const SIGNAL_CHANNEL = "renote-trade-calls-v1";
-
 function getMediaConstraints(callType: CallMode): MediaStreamConstraints {
   return {
     audio: {
@@ -97,7 +94,7 @@ function getMediaConstraints(callType: CallMode): MediaStreamConstraints {
 
 export function useRealtimeCall() {
   const { user } = useAuth();
-  const supabase = getSupabaseBrowserClient();
+  const socket = getSocket();
 
   const [phase, setPhase] = useState<CallPhase>("idle");
   const [incomingCall, setIncomingCall] = useState<IncomingCallInfo | null>(null);
@@ -110,7 +107,6 @@ export function useRealtimeCall() {
 
   const phaseRef = useRef<CallPhase>("idle");
   const incomingRef = useRef<IncomingCallInfo | null>(null);
-  const channelRef = useRef<RealtimeChannel | null>(null);
   const peerRef = useRef<PeerInstance | null>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
   const activeCallRef = useRef<ActiveCallInfo | null>(null);
@@ -170,14 +166,9 @@ export function useRealtimeCall() {
 
   const sendSignalEvent = useCallback(
     async (event: "incoming-call" | "call-signal" | "call-accepted" | "call-ended", payload: Record<string, unknown>) => {
-      if (!channelRef.current) return;
-      await channelRef.current.send({
-        type: "broadcast",
-        event,
-        payload,
-      });
+      socket.emit(event, payload);
     },
-    []
+    [socket]
   );
 
   const ensureLocalStream = useCallback(async (callType: CallMode) => {
@@ -491,84 +482,83 @@ export function useRealtimeCall() {
   useEffect(() => {
     if (!user?.id) return;
 
-    const channel = supabase
-      .channel(SIGNAL_CHANNEL, { config: { broadcast: { self: true } } })
-      .on("broadcast", { event: "incoming-call" }, ({ payload }) => {
-        const incoming = payload as IncomingPayload;
-        if (!incoming?.toUserId || incoming.toUserId !== user.id) return;
-        if (!incoming.sessionId || !incoming.fromUserId) return;
+    socket.emit("join-user-room", user.id);
 
-        const hasActive =
-          phaseRef.current === "calling" ||
-          phaseRef.current === "connecting" ||
-          phaseRef.current === "in-call" ||
-          !!activeCallRef.current;
+    const onIncomingCall = (payload: IncomingPayload) => {
+      if (!payload?.toUserId || payload.toUserId !== user.id) return;
+      if (!payload.sessionId || !payload.fromUserId) return;
 
-        if (hasActive) {
-          void sendSignalEvent("call-ended", {
-            sessionId: incoming.sessionId,
-            fromUserId: user.id,
-            toUserId: incoming.fromUserId,
-            reason: "busy",
-          } satisfies EndPayload);
-          void updateSession(incoming.sessionId, "failed", "busy");
-          return;
-        }
+      const hasActive =
+        phaseRef.current === "calling" ||
+        phaseRef.current === "connecting" ||
+        phaseRef.current === "in-call" ||
+        !!activeCallRef.current;
 
-        if (incoming.signal) {
-          pendingSignalsRef.current.set(incoming.sessionId, [incoming.signal]);
-        }
+      if (hasActive) {
+        void sendSignalEvent("call-ended", {
+          sessionId: payload.sessionId,
+          fromUserId: user.id,
+          toUserId: payload.fromUserId,
+          reason: "busy",
+        } satisfies EndPayload);
+        void updateSession(payload.sessionId, "failed", "busy");
+        return;
+      }
 
-        setIncomingCall({
-          sessionId: incoming.sessionId,
-          fromUserId: incoming.fromUserId,
-          fromName: incoming.fromName,
-          callType: incoming.callType,
-          scheduleId: incoming.scheduleId,
-          startedAt: incoming.startedAt,
-        });
-        setPhase("ringing");
-      })
-      .on("broadcast", { event: "call-signal" }, ({ payload }) => {
-        const signalPayload = payload as SignalPayload;
-        if (!signalPayload?.toUserId || signalPayload.toUserId !== user.id) return;
-        if (!signalPayload.signal || !signalPayload.sessionId) return;
+      if (payload.signal) {
+        pendingSignalsRef.current.set(payload.sessionId, [payload.signal]);
+      }
 
-        queueOrApplySignal(signalPayload);
-      })
-      .on("broadcast", { event: "call-accepted" }, ({ payload }) => {
-        const acceptedPayload = payload as { sessionId: string; toUserId: string };
-        if (!acceptedPayload?.toUserId || acceptedPayload.toUserId !== user.id) return;
-        if (!activeCallRef.current) return;
-        if (activeCallRef.current.sessionId !== acceptedPayload.sessionId) return;
-
-        setPhase("connecting");
-      })
-      .on("broadcast", { event: "call-ended" }, ({ payload }) => {
-        const endPayload = payload as EndPayload;
-        if (!endPayload?.toUserId || endPayload.toUserId !== user.id) return;
-
-        if (incomingRef.current && incomingRef.current.sessionId === endPayload.sessionId) {
-          setIncomingCall(null);
-          incomingRef.current = null;
-          setPhase("idle");
-          void updateSession(endPayload.sessionId, "missed", endPayload.reason || "missed");
-          return;
-        }
-
-        if (!activeCallRef.current || activeCallRef.current.sessionId !== endPayload.sessionId) return;
-
-        void endCurrentCall(endPayload.reason || "ended", true);
+      setIncomingCall({
+        sessionId: payload.sessionId,
+        fromUserId: payload.fromUserId,
+        fromName: payload.fromName,
+        callType: payload.callType,
+        scheduleId: payload.scheduleId,
+        startedAt: payload.startedAt,
       });
+      setPhase("ringing");
+    };
 
-    channel.subscribe();
-    channelRef.current = channel;
+    const onCallSignal = (payload: SignalPayload) => {
+      if (!payload?.toUserId || payload.toUserId !== user.id) return;
+      if (!payload.signal || !payload.sessionId) return;
+      queueOrApplySignal(payload);
+    };
+
+    const onCallAccepted = (payload: { sessionId: string; toUserId: string }) => {
+      if (!payload?.toUserId || payload.toUserId !== user.id) return;
+      if (!activeCallRef.current) return;
+      if (activeCallRef.current.sessionId !== payload.sessionId) return;
+      setPhase("connecting");
+    };
+
+    const onCallEnded = (payload: EndPayload) => {
+      if (!payload?.toUserId || payload.toUserId !== user.id) return;
+
+      if (incomingRef.current && incomingRef.current.sessionId === payload.sessionId) {
+        setIncomingCall(null);
+        incomingRef.current = null;
+        setPhase("idle");
+        void updateSession(payload.sessionId, "missed", payload.reason || "missed");
+        return;
+      }
+
+      if (!activeCallRef.current || activeCallRef.current.sessionId !== payload.sessionId) return;
+
+      void endCurrentCall(payload.reason || "ended", true);
+    };
+
+    socket.on("incoming-call", onIncomingCall);
+    socket.on("call-signal", onCallSignal);
+    socket.on("call-accepted", onCallAccepted);
+    socket.on("call-ended", onCallEnded);
 
     return () => {
-      if (channelRef.current) {
-        supabase.removeChannel(channelRef.current);
-      }
-      channelRef.current = null;
+      socket.off("incoming-call", onIncomingCall);
+      socket.off("call-signal", onCallSignal);
+      socket.off("call-accepted", onCallAccepted);
+      socket.off("call-ended", onCallEnded);
 
       destroyPeer();
       stopAndClearStreams();
@@ -582,7 +572,7 @@ export function useRealtimeCall() {
     queueOrApplySignal,
     sendSignalEvent,
     stopAndClearStreams,
-    supabase,
+    socket,
     updateSession,
     user?.id,
   ]);

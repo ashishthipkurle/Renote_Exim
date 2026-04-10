@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { 
-  authRateLimit, 
-  orderRateLimit, 
-  documentRateLimit, 
-  searchRateLimit, 
-  defaultRateLimit 
+import {
+  authRateLimit,
+  orderRateLimit,
+  documentRateLimit,
+  searchRateLimit,
+  defaultRateLimit
 } from '@/lib/redis';
 
 import { fallbackLng, languages, cookieName } from './lib/i18n/config';
@@ -44,13 +44,13 @@ export async function middleware(request: NextRequest) {
     if (limitResult && !limitResult.success) {
       return NextResponse.json(
         { error: 'Too many requests. Please slow down.' },
-        { 
-          status: 429, 
-          headers: { 
+        {
+          status: 429,
+          headers: {
             'Retry-After': limitResult.reset.toString(),
             'X-RateLimit-Limit': limitResult.limit.toString(),
             'X-RateLimit-Remaining': limitResult.remaining.toString()
-          } 
+          }
         }
       );
     }
@@ -59,10 +59,9 @@ export async function middleware(request: NextRequest) {
     // Fail open if Redis is down
   }
 
-  // Future expansion: Supabase SSR JWT decoding for strict role routing
-  const cookies = request.cookies.getAll();
-  const hasAuthToken = cookies.some(c => c.name.includes('supabase') || c.name.includes('token'));
-  
+  // Future expansion: Nhost SSR JWT decoding for strict role routing
+  const hasAuthToken = request.cookies.getAll().some(c => c.name.includes('nhost') || c.name.includes('sb_access_token') || c.name.includes('token'));
+
   if (path.startsWith('/dashboard/') && !hasAuthToken) {
     return NextResponse.redirect(new URL('/login', request.url));
   }

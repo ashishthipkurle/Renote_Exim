@@ -42,18 +42,18 @@ export default function ClientSidebar({ basePath }: { basePath: string }) {
   const pathname = usePathname();
 
   const nav: NavItem[] = [
-    { href: basePath, labelKey: "sidebar.dashboard", defaultLabel: "Dashboard", icon: Home },
-    { href: `${basePath}/directory`, labelKey: "sidebar.directory", defaultLabel: "Directory", icon: Users },
-    { href: `${basePath}/orders`, labelKey: "sidebar.orders", defaultLabel: "Orders", icon: Truck },
-    { href: `${basePath}/rfqs`, labelKey: "sidebar.rfqs", defaultLabel: "RFQs", icon: FileText },
-    { href: `${basePath}/messages`, labelKey: "sidebar.messages", defaultLabel: "Messages", icon: MessageSquare },
-    { href: `${basePath}/calls`, labelKey: "sidebar.calls", defaultLabel: "Calls", icon: PhoneCall },
-    { href: `${basePath}/inventory`, labelKey: "sidebar.inventory", defaultLabel: "Inventory", icon: LayoutGrid },
-    { href: `${basePath}/analytics`, labelKey: "sidebar.analytics", defaultLabel: "Analytics", icon: LineChart },
-    { href: `${basePath}/finance`, labelKey: "sidebar.finance", defaultLabel: "Finance", icon: Wallet },
+    { href: basePath, label: "Dashboard", icon: Home },
+    { href: `${basePath}/directory`, label: "Directory", icon: Users },
+    { href: `${basePath}/orders`, label: "Orders", icon: Truck },
+    { href: `${basePath}/rfqs`, label: "RFQs", icon: FileText },
+    { href: `${basePath}/messages`, label: "Messages", icon: MessageSquare },
+    { href: `${basePath}/calls`, label: "Calls", icon: PhoneCall },
+    { href: `${basePath}/inventory`, label: "Inventory", icon: LayoutGrid },
+    { href: `${basePath}/analytics`, label: "Analytics", icon: LineChart },
+    { href: `${basePath}/finance`, label: "Finance", icon: Wallet },
   ];
 
-  const isActive = (href: string) => 
+  const isActive = (href: string) =>
     pathname === href || (href !== basePath && pathname.startsWith(href + "/"));
 
   return (
@@ -68,8 +68,8 @@ export default function ClientSidebar({ basePath }: { basePath: string }) {
                 tooltip={t(item.labelKey, item.defaultLabel)}
                 className={cn(
                   "rounded-xl transition-all duration-300",
-                  isActive(item.href) 
-                    ? "bg-primary/10 text-primary hover:bg-primary/15" 
+                  isActive(item.href)
+                    ? "bg-primary/10 text-primary hover:bg-primary/15"
                     : "text-slate-500 dark:text-muted-foreground hover:bg-slate-100 dark:hover:bg-white/5"
                 )}
               >
@@ -93,8 +93,8 @@ export default function ClientSidebar({ basePath }: { basePath: string }) {
               tooltip={t("sidebar.settings", "Settings")}
               className={cn(
                 "rounded-xl transition-all duration-300",
-                isActive(`${basePath}/settings`) 
-                  ? "bg-primary/10 text-primary hover:bg-primary/15" 
+                isActive(`${basePath}/settings`)
+                  ? "bg-primary/10 text-primary hover:bg-primary/15"
                   : "text-slate-500 dark:text-muted-foreground hover:bg-slate-100 dark:hover:bg-white/5"
               )}
             >

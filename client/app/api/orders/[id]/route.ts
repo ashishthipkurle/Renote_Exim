@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getApiAuthContext } from '@/lib/supabase/auth';
+import { getApiAuthContext } from '@/lib/auth-server';
 import { z } from 'zod';
 
 const statusUpdateSchema = z.object({

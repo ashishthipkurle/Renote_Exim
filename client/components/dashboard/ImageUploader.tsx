@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { UploadCloud, X, AlertCircle, RefreshCw, Loader2, StopCircle } from "lucide-react";
-import { getSupabaseBrowserClient } from "@/lib/supabase/browser";
 import CropModal from "./CropModal";
 
 export type UploadStatus = "pending" | "uploading" | "success" | "error";
@@ -87,10 +86,9 @@ export default function ImageUploader({ images, onChange, maxFiles = 8 }: ImageU
         updateItem(item.id, { status: "uploading", progress: 0, errorText: undefined });
 
         try {
-            // Retrieve actual Supabase JWT needed to hit API gateway successfully
-            const supabase = getSupabaseBrowserClient();
-            const { data: { session } } = await supabase.auth.getSession();
-            const token = session?.access_token;
+            // Retrieve JWT from cookie for API gateway auth
+            const cookieMatch = document.cookie.match(/(?:^|;\s*)sb_access_token=([^;]*)/);
+            const token = cookieMatch ? decodeURIComponent(cookieMatch[1]) : undefined;
 
             const xhr = new XMLHttpRequest();
             updateItem(item.id, { xhr });

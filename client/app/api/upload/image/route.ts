@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
-import { getApiAuthContext } from "@/lib/supabase/auth";
+import { getServerAuthContext } from "@/lib/auth-server";
 import { validateFileUpload } from "@/lib/upload-validation";
 
 cloudinary.config({
@@ -11,7 +11,7 @@ cloudinary.config({
 
 export async function POST(req: NextRequest) {
   try {
-    const auth = await getApiAuthContext(req);
+    const auth = await getServerAuthContext(req);
     
     if (!auth) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -5,9 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { ProductCategory } from "@/lib/types";
 import EmptyState from "@/components/ui/EmptyState";
-import { createClient } from "@supabase/supabase-js";
-import { tryGetSupabaseEnv } from "@/lib/supabase/shared";
-import { getServerAuth } from "@/lib/supabase/server";
+import { getServerAuthContext } from "@/lib/auth-server";
 
 export const dynamic = "force-dynamic";
 
@@ -48,7 +46,7 @@ export default async function ProductsPage({
   const page = typeof resolvedParams.page === "string" ? Math.max(1, parseInt(resolvedParams.page)) : 1;
   const limit = 30;
 
-  const auth = await getServerAuth();
+  const auth = await getServerAuthContext();
   const role = auth?.role || "USER";
 
   // Build Prisma where clause
@@ -124,55 +122,8 @@ export default async function ProductsPage({
       price: role === "IMPORTER" ? p.price : (p.regularPrice || p.price)
     }));
   } catch (error) {
-    console.error("Failed to fetch products from Prisma, trying Supabase fallback:", error);
-    try {
-      const env = tryGetSupabaseEnv();
-      if (env) {
-        const supabase = createClient(env.url, env.anonKey);
-
-        // Match the Prisma orderBy logic
-        let orderColumn = 'createdAt';
-        let isAscending = false;
-        if (sortParam === "price_asc") { orderColumn = 'price'; isAscending = true; }
-        else if (sortParam === "price_desc") { orderColumn = 'price'; isAscending = false; }
-        else if (sortParam === "name") { orderColumn = 'name'; isAscending = true; }
-
-        let query = supabase
-          .from('products')
-          .select('id, name, price, originCountry, category, images, quantity, exporter:users!exporterId(name, companyName, country)', { count: 'exact' })
-          .eq('available', true)
-          .order(orderColumn, { ascending: isAscending })
-          .range((page - 1) * limit, page * limit - 1);
-
-        if (categoryParam) query = query.eq('category', categoryParam);
-        if (originParam) query = query.ilike('originCountry', `%${originParam}%`);
-        if (minPriceParam) query = query.gte('price', minPriceParam);
-        if (maxPriceParam) query = query.lte('price', maxPriceParam);
-        if (searchQuery && searchQuery.trim() !== '') {
-          // the ilike syntax in Supabase for OR is separated by comma
-          const safeSearch = searchQuery.trim().replace(/%/g, '\\%'); // simple escape
-          query = query.or(`name.ilike.%${safeSearch}%,description.ilike.%${safeSearch}%`);
-        }
-
-        const { data: supaProducts, count, error: supaError } = await query;
-
-        if (!supaError && supaProducts) {
-          // Format exporter to match expected Prisma output (an object, not array, since it's a many-to-one relation)
-          products = supaProducts.map((p: any) => ({
-            ...p,
-            exporter: Array.isArray(p.exporter) ? p.exporter[0] : p.exporter,
-            price: role === "IMPORTER" ? p.price : (p.regularPrice || p.price)
-          })) as ProductWithExporter[];
-          total = count || 0;
-        } else {
-          console.error("Supabase fallback failed:", supaError);
-          products = [];
-        }
-      }
-    } catch (fallbackError) {
-      console.error("Error setting up Supabase fallback:", fallbackError);
-      products = [];
-    }
+    console.error("Failed to fetch products from Prisma:", error);
+    products = [];
   }
 
   const totalPages = Math.ceil(total / limit);

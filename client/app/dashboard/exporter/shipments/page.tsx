@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getServerAuth } from "@/lib/supabase/server";
+import { getServerAuthContext } from "@/lib/auth-server";
 
 export default async function ExporterShipmentsPage({
   searchParams,
@@ -7,7 +7,7 @@ export default async function ExporterShipmentsPage({
   searchParams?: { search?: string; page?: string } | Promise<{ search?: string; page?: string }>;
 }) {
   const resolvedSearchParams = (await searchParams) ?? {};
-  const auth = await getServerAuth();
+  const auth = await getServerAuthContext();
   if (!auth) redirect("/login");
 
   if (auth.role !== "EXPORTER" && auth.role !== "ADMIN") {

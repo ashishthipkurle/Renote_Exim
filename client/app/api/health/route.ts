@@ -1,13 +1,20 @@
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
-/**
- * GET /api/health
- * Returns the health status of the API.
- */
 export async function GET() {
-  return NextResponse.json({
-    status: "ok",
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV,
-  });
+  try {
+    const authUsers = await prisma.$queryRaw`SELECT count(*) FROM auth.users`;
+    const publicUsers = await prisma.user.count();
+    
+    // Also try an update to test write permissions
+    await prisma.$executeRaw`SELECT 1`;
+    
+    return NextResponse.json({ 
+      status: "Ok", 
+      authUsers: Number((authUsers as any)[0].count), 
+      publicUsers 
+    });
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message || String(e) }, { status: 500 });
+  }
 }

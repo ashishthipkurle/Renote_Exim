@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getApiAuthContext } from '@/lib/supabase/auth';
+import { getApiAuthContext } from '@/lib/auth-server';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,7 +21,7 @@ export async function GET(
             // Find orders where Exporter is the user and Importer is the partner
             const orders = await prisma.order.findMany({
                 where: {
-                    importerId: partnerId,
+                    buyerId: partnerId,
                     product: {
                         exporterId: auth.userId,
                     },
@@ -41,7 +41,7 @@ export async function GET(
             // Find orders where Importer is the user and Exporter is the partner
             const orders = await prisma.order.findMany({
                 where: {
-                    importerId: auth.userId,
+                    buyerId: auth.userId,
                     product: {
                         exporterId: partnerId,
                     },
