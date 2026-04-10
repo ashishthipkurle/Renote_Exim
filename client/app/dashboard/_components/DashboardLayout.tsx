@@ -22,44 +22,47 @@ import { useState } from "react";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import Image from "next/image";
 import LogoImg from "@/assests/LOGO_TEXT.png";
+import { useTranslation } from "@/lib/i18n/client";
 
 interface DashboardLayoutProps {
   children: ReactNode;
   role: "exporter" | "importer" | "admin";
 }
 
-const navigationByRole = {
-  exporter: [
-    { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/exporter" },
-    { icon: Package, label: "My Products", href: "/dashboard/exporter/products" },
-    { icon: ShoppingCart, label: "Orders", href: "/dashboard/exporter/orders" },
-    { icon: Truck, label: "Shipments", href: "/dashboard/exporter/orders" },
-    { icon: MessageSquare, label: "Messages", href: "/dashboard/exporter/messages" },
-    { icon: FileText, label: "Documents", href: "/dashboard/exporter/documents" },
-  ],
-  importer: [
-    { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/importer" },
-    { icon: Package, label: "Browse Products", href: "/dashboard/importer/browse" },
-    { icon: ShoppingCart, label: "My Orders", href: "/dashboard/importer/orders" },
-    { icon: Truck, label: "Shipments", href: "/dashboard/importer/orders" },
-    { icon: MessageSquare, label: "Messages", href: "/dashboard/importer/messages" },
-    { icon: FileText, label: "Documents", href: "/dashboard/importer/documents" },
-  ],
-  admin: [
-    { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/admin" },
-    { icon: Package, label: "All Products", href: "/dashboard/admin/products" },
-    { icon: ShoppingCart, label: "All Orders", href: "/dashboard/admin/orders" },
-    { icon: Truck, label: "Shipments", href: "/dashboard/admin/shipments" },
-    { icon: BarChart3, label: "Analytics", href: "/dashboard/admin/analytics" },
-    { icon: FileText, label: "Users", href: "/dashboard/admin/users" },
-    { icon: Bell, label: "Notifications", href: "/dashboard/admin/notifications" },
-  ],
-};
 
 export default function DashboardLayout({ children, role }: DashboardLayoutProps) {
+  const { t } = useTranslation();
   const pathname = usePathname();
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const navigationByRole = {
+    exporter: [
+      { icon: LayoutDashboard, label: t("sidebar.dashboard", "Dashboard"), href: "/dashboard/exporter" },
+      { icon: Package, label: t("sidebar.my_products", "My Products"), href: "/dashboard/exporter/products" },
+      { icon: ShoppingCart, label: t("sidebar.orders", "Orders"), href: "/dashboard/exporter/orders" },
+      { icon: Truck, label: t("sidebar.shipments", "Shipments"), href: "/dashboard/exporter/orders" },
+      { icon: MessageSquare, label: t("sidebar.messages", "Messages"), href: "/dashboard/exporter/messages" },
+      { icon: FileText, label: t("sidebar.documents", "Documents"), href: "/dashboard/exporter/documents" },
+    ],
+    importer: [
+      { icon: LayoutDashboard, label: t("sidebar.dashboard", "Dashboard"), href: "/dashboard/importer" },
+      { icon: Package, label: t("sidebar.browse_products", "Browse Products"), href: "/dashboard/importer/browse" },
+      { icon: ShoppingCart, label: t("sidebar.my_orders", "My Orders"), href: "/dashboard/importer/orders" },
+      { icon: Truck, label: t("sidebar.shipments", "Shipments"), href: "/dashboard/importer/orders" },
+      { icon: MessageSquare, label: t("sidebar.messages", "Messages"), href: "/dashboard/importer/messages" },
+      { icon: FileText, label: t("sidebar.documents", "Documents"), href: "/dashboard/importer/documents" },
+    ],
+    admin: [
+      { icon: LayoutDashboard, label: t("sidebar.dashboard", "Dashboard"), href: "/dashboard/admin" },
+      { icon: Package, label: t("sidebar.all_products", "All Products"), href: "/dashboard/admin/products" },
+      { icon: ShoppingCart, label: t("sidebar.all_orders", "All Orders"), href: "/dashboard/admin/orders" },
+      { icon: Truck, label: t("sidebar.shipments", "Shipments"), href: "/dashboard/admin/shipments" },
+      { icon: BarChart3, label: t("sidebar.analytics", "Analytics"), href: "/dashboard/admin/analytics" },
+      { icon: FileText, label: t("sidebar.users", "Users"), href: "/dashboard/admin/users" },
+      { icon: Bell, label: t("sidebar.notifications", "Notifications"), href: "/dashboard/admin/notifications" },
+    ],
+  };
 
   const navigation = navigationByRole[role];
 

@@ -9,6 +9,7 @@ import { Analytics } from "@vercel/analytics/react";
 import dynamic from "next/dynamic";
 import CommandMenu from "@/components/ui/CommandMenu";
 import CookieConsent from "@/components/ui/CookieConsent";
+import { I18nProvider } from "@/components/i18n/I18nProvider";
 
 const CinematicPreloader = dynamic(() => import("@/components/ui/CinematicPreloader"), {
   ssr: false,
@@ -87,19 +88,21 @@ export default function RootLayout({
         `}} />
       </head>
       <body className={`${sora.variable} font-sans antialiased`}>
-        <ThemeProvider>
-          <AuthProvider>
-            <SkipToContent />
-            <CinematicPreloader />
-            <main id="main-content">
-              {children}
-            </main>
-            <Toaster position="top-right" richColors />
-            <CommandMenu />
-            <CookieConsent />
-            <Analytics />
-          </AuthProvider>
-        </ThemeProvider>
+        <I18nProvider>
+          <ThemeProvider>
+            <AuthProvider>
+              <SkipToContent />
+              <CinematicPreloader />
+              <main id="main-content">
+                {children}
+              </main>
+              <Toaster position="top-right" richColors />
+              <CommandMenu />
+              <CookieConsent />
+              <Analytics />
+            </AuthProvider>
+          </ThemeProvider>
+        </I18nProvider>
       </body>
     </html>
   );

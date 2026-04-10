@@ -29,14 +29,17 @@ import {
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { useTranslation } from "@/lib/i18n/client";
 
 interface NavItem {
   href: string;
-  label: string;
+  labelKey: string;
+  defaultLabel: string;
   icon: ComponentType<{ className?: string }>;
 }
 
 export default function ExporterSidebar({ basePath }: { basePath: string }) {
+  const { t } = useTranslation();
   const pathname = usePathname();
   const { user } = useAuth();
   const isMaster = user?.email === "exporter@gmail.com";
@@ -65,7 +68,7 @@ export default function ExporterSidebar({ basePath }: { basePath: string }) {
               <SidebarMenuButton
                 asChild
                 isActive={isActive(item.href)}
-                tooltip={item.label}
+                tooltip={t(item.labelKey, item.defaultLabel)}
                 className={cn(
                   "rounded-xl transition-all duration-300",
                   isActive(item.href)
@@ -75,7 +78,7 @@ export default function ExporterSidebar({ basePath }: { basePath: string }) {
               >
                 <Link href={item.href} className="flex items-center gap-3 w-full">
                   <item.icon className="size-5 transition-colors" />
-                  <span className="font-semibold text-sm">{item.label}</span>
+                  <span className="font-semibold text-sm">{t(item.labelKey, item.defaultLabel)}</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -90,7 +93,7 @@ export default function ExporterSidebar({ basePath }: { basePath: string }) {
             <SidebarMenuButton
               asChild
               isActive={isActive(`${basePath}/settings`)}
-              tooltip="Settings"
+              tooltip={t("sidebar.settings", "Settings")}
               className={cn(
                 "rounded-xl transition-all duration-300",
                 isActive(`${basePath}/settings`)
@@ -100,7 +103,7 @@ export default function ExporterSidebar({ basePath }: { basePath: string }) {
             >
               <Link href={`${basePath}/settings`} className="flex items-center gap-3 w-full">
                 <Settings className="size-5 transition-colors" />
-                <span className="font-semibold text-sm">Settings</span>
+                <span className="font-semibold text-sm">{t("sidebar.settings", "Settings")}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

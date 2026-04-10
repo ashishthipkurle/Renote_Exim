@@ -1,8 +1,8 @@
-"use client";
-
 import Link from "next/link";
+import { useTranslation } from "@/lib/i18n/client";
 
 export default function HomeFooter() {
+  const { t } = useTranslation();
   return (
     <footer className="bg-background border-t border-border pt-20 pb-10">
       <div className="max-w-7xl mx-auto px-6">
@@ -17,7 +17,7 @@ export default function HomeFooter() {
               </span>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed mb-6">
-              Reimagining global trade infrastructure for the digital age. Secure, fast, and transparent.
+              {t("footer.description", "Reimagining global trade infrastructure for the digital age. Secure, fast, and transparent.")}
             </p>
             <div className="flex gap-4">
               <a
@@ -45,64 +45,64 @@ export default function HomeFooter() {
           </div>
 
           <div>
-            <h4 className="text-foreground font-bold mb-6">Platform</h4>
+            <h4 className="text-foreground font-bold mb-6">{t("footer.col_platform", "Platform")}</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
               <li>
                 <Link className="hover:text-primary transition-colors" href="/products">
-                  Marketplace
+                  {t("marketplace", "Marketplace")}
                 </Link>
               </li>
               <li>
                 <Link className="hover:text-primary transition-colors" href="/dashboard/admin/shipments">
-                  Logistics
+                  {t("sidebar.shipments", "Logistics")}
                 </Link>
               </li>
               <li>
                 <Link className="hover:text-primary transition-colors" href="/dashboard/admin/analytics">
-                  Finance
+                  {t("sidebar.analytics", "Finance")}
                 </Link>
               </li>
               <li>
                 <Link className="hover:text-primary transition-colors" href="/dashboard/admin/notifications">
-                  Compliance
+                  {t("sidebar.notifications", "Compliance")}
                 </Link>
               </li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-slate-900 dark:text-white font-bold mb-6">Company</h4>
+            <h4 className="text-slate-900 dark:text-white font-bold mb-6">{t("footer.col_company", "Company")}</h4>
             <ul className="space-y-3 text-sm text-slate-600 dark:text-slate-500">
               <li>
                 <Link className="hover:text-primary transition-colors" href="/about">
-                  About Us
+                  {t("footer.about", "About Us")}
                 </Link>
               </li>
               <li>
                 <Link className="hover:text-primary transition-colors" href="/careers">
-                  Careers
+                  {t("footer.careers", "Careers")}
                 </Link>
               </li>
               <li>
                 <Link className="hover:text-primary transition-colors" href="/press">
-                  Press
+                  {t("footer.press", "Press")}
                 </Link>
               </li>
               <li>
                 <Link className="hover:text-primary transition-colors" href="/contact">
-                  Contact
+                  {t("contact", "Contact")}
                 </Link>
               </li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-slate-900 dark:text-white font-bold mb-6">Subscribe</h4>
-            <p className="text-slate-600 dark:text-slate-500 text-sm mb-4">Get the latest trade insights.</p>
+            <h4 className="text-slate-900 dark:text-white font-bold mb-6">{t("footer.col_subscribe", "Subscribe")}</h4>
+            <p className="text-slate-600 dark:text-slate-500 text-sm mb-4">{t("footer.subscribe_desc", "Get the latest trade insights.")}</p>
             <div className="flex shadow-sm rounded-l-lg">
               <input
                 className="bg-white dark:bg-white/5 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white rounded-l-lg px-4 py-3 text-sm w-full focus:outline-none focus:border-primary transition-colors"
-                placeholder="Email address"
+                placeholder={t("footer.email_placeholder", "Email address")}
                 type="email"
               />
               <button className="bg-primary text-white px-4 py-2 rounded-r-lg hover:bg-primary/90 transition-colors primary-glow-hover" type="button" aria-label="Subscribe">
@@ -113,16 +113,16 @@ export default function HomeFooter() {
         </div>
 
         <div className="border-t border-border pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-muted-foreground">
-          <p>&copy; 2026 Ranote Exim. All rights reserved.</p>
+          <p>&copy; 2026 Ranote Exim. {t("footer.copyright", "All rights reserved.")}</p>
           <div className="flex gap-8 mt-4 md:mt-0">
             <Link className="hover:text-slate-800 dark:hover:text-slate-400 transition-colors" href="/privacy">
-              Privacy Policy
+              {t("footer.privacy", "Privacy Policy")}
             </Link>
             <Link className="hover:text-slate-800 dark:hover:text-slate-400 transition-colors" href="/terms">
-              Terms of Service
+              {t("footer.terms", "Terms of Service")}
             </Link>
             <Link className="hover:text-slate-800 dark:hover:text-slate-400 transition-colors" href="/cookies">
-              Cookie Settings
+              {t("footer.cookies", "Cookie Settings")}
             </Link>
           </div>
         </div>

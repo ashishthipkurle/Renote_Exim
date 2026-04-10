@@ -180,7 +180,7 @@ export async function POST(request: NextRequest) {
 
     // Try Prisma first
     try {
-      const product = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+      const product = await prisma.$transaction(async (tx) => {
         const newProduct = await tx.product.create({
           data: {
             ...validatedData,

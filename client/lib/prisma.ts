@@ -1,8 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: any
-}
+// Moved global definition to the end to correctly type with ReturnType
 
 const createPrismaClient = () => {
   const baseClient = new PrismaClient({
@@ -67,7 +65,14 @@ const createPrismaClient = () => {
   });
 };
 
-export const prisma = globalForPrisma.prisma ?? createPrismaClient();
+const prismaInstance = createPrismaClient();
+type PrismaClientType = typeof prismaInstance;
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClientType | undefined
+}
+
+export const prisma = globalForPrisma.prisma ?? prismaInstance;
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 

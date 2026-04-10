@@ -32,21 +32,21 @@ export default function HomeNavbar() {
   const LogoImg = isDark ? LogoDark : LogoLight;
 
   return (
-    <nav className="sticky top-0 w-full z-50 transition-all duration-300" 
-         style={{
-           background: "rgba(255, 255, 255, 0.03)", 
-           backdropFilter: "blur(20px)",
-           WebkitBackdropFilter: "blur(20px)",
-           boxShadow: "0 4px 30px rgba(0, 0, 0, 0.05)"
-         }}>
+    <nav className="sticky top-0 w-full z-50 transition-all duration-300"
+      style={{
+        background: "rgba(255, 255, 255, 0.03)",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+        boxShadow: "0 4px 30px rgba(0, 0, 0, 0.05)"
+      }}>
       <div className="relative w-full px-2 md:px-4 h-14 flex justify-between items-center">
         <Link href="/" className="flex items-center flex-shrink-0">
           <Image src={LogoImg} alt="Ranote Exim Logo" className={isDark ? "h-14 md:h-[75px] w-auto object-contain transition-all" : "h-8 md:h-10 w-auto object-contain transition-all"} unoptimized />
         </Link>
 
         <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-8">
-          <Link 
-            className="flex items-center gap-2.5 px-8 py-2.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 text-foreground dark:text-white text-sm font-black uppercase tracking-[0.3em] transition-all duration-500 hover:scale-105 group" 
+          <Link
+            className="flex items-center gap-2.5 px-8 py-2.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 text-foreground dark:text-white text-sm font-black uppercase tracking-[0.3em] transition-all duration-500 hover:scale-105 group"
             href="/products"
           >
             <ShoppingBag className="w-4 h-4 group-hover:rotate-12 transition-transform text-primary" />

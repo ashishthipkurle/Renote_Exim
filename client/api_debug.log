@@ -370,6 +370,23 @@
   "certifications": [],
   "quantity": 3
 }
+<<<<<<< HEAD
+[2026-04-03T14:07:35.805Z] [POST /api/products] Body: {
+  "name": "rice",
+  "category": "FOOD",
+  "description": "In marketing, a product is an object or a system that is made available for consumer use through the process of marketing. Product widely means literally anything that can be offered in a market keeping its demand in close connection. This ‘Product’",
+  "price": 8,
+  "regularPrice": 12,
+  "minOrderQty": 1,
+  "unit": "kg",
+  "originCountry": "india",
+  "hsCode": "852",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775225246/renote-exim/products/xsqfrrtdetcgbwqnzxvt.jpg"
+  ],
+  "certifications": [],
+  "quantity": 4
+=======
 [2026-04-03T08:04:14.920Z] [POST /api/products] Body: {
   "name": "Samsung 120 inch Qled TV",
   "category": "ELECTRONICS",
@@ -774,4 +791,5 @@
   "details": null,
   "hint": null,
   "message": "Could not find the 'stockQty' column of 'products' in the schema cache"
+>>>>>>> 305b3fb9cc3d80f2259a21c264d892a5748a1e0d
 }

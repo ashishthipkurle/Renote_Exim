@@ -48,6 +48,17 @@ export async function GET(request: NextRequest) {
             }
         });
 
+        interface Exporter {
+            id: string;
+            name: string | null;
+            companyName: string | null;
+            avatar: string | null;
+            description: string | null;
+            _count: {
+                exportedProducts: number;
+            };
+        }
+
         const partnersWithStats = await Promise.all(users.map(async (u: any) => {
             let totalVolume = 0;
             let categories: string[] = [];
