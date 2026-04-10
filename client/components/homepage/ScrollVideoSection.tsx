@@ -10,6 +10,7 @@ import { User, LogOut, ShoppingBag, Home, Info, Phone, ChevronDown, LayoutDashbo
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/components/auth/AuthProvider";
 import LogoImg from "@/assests/LOGO.png";
+import { useTranslation } from "@/lib/i18n/client";
 import ThumbnailImg from "@/assests/4k Video frame 2/1.png";
 
 
@@ -130,7 +131,7 @@ export default function ScrollVideoSection() {
 
   // Custom Cursor Logic
   useEffect(() => {
-    if (!loaded || failed) return;
+    if (failed) return;
     const section = sectionRef.current;
     const cursor = cursorRef.current;
     if (!section || !cursor) return;
@@ -160,7 +161,7 @@ export default function ScrollVideoSection() {
       section.removeEventListener("mouseenter", onMouseEnter);
       section.removeEventListener("mouseleave", onMouseLeave);
     };
-  }, [loaded, failed]);
+  }, [failed]);
 
   // Outside click logic for profile dropdown
   useEffect(() => {
@@ -352,6 +353,11 @@ export default function ScrollVideoSection() {
         resizeCanvas();
         drawFrame(0);
         return;
+      }
+
+      if (isExtractionRunning && globalFramesCache.filter(Boolean).length === 0) {
+        // Previous extraction was interrupted (e.g. HMR), reset the flag
+        isExtractionRunning = false;
       }
 
       if (isExtractionRunning) return;
@@ -582,141 +588,141 @@ export default function ScrollVideoSection() {
             )}
           </AnimatePresence>
 
-          {/* Intro Overlays */}
-          {loaded && (
-            <>
-              {/* ─── Immersive Glassmorphism Navigation Bar ─── */}
-              <nav
-                className="absolute top-6 left-1/2 -translate-x-1/2 z-[60] pointer-events-auto cursor-auto"
-                onMouseEnter={() => gsap.to(cursorRef.current, { scale: 0, opacity: 0, duration: 0.2, ease: "power2.out" })}
-                onMouseLeave={() => gsap.to(cursorRef.current, { scale: 1, opacity: 1, duration: 0.2, ease: "back.out(1.7)" })}
-              >
-                <div
-                  className="flex items-center gap-2 px-10 py-1.5"
-                  style={{
-                    background: "rgba(255, 255, 255, 0.03)",
-                    backdropFilter: "blur(24px) saturate(180%)",
-                    WebkitBackdropFilter: "blur(24px) saturate(180%)",
-                    borderRadius: "24px",
-                    border: "1px solid rgba(255, 255, 255, 0.08)",
-                    minWidth: "850px",
-                    justifyContent: "space-between",
-                    boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
-                  }}
-                >
-                  {/* Left Side: Navigation Links */}
-                  <div className="flex items-center gap-8">
-                    <Link href="/" className="flex items-center gap-2 group text-white/70 hover:text-white transition-all duration-300">
-                      <Home className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
-                      <span className="text-[10px] font-black uppercase tracking-[0.2em]">Home</span>
-                    </Link>
-                    <Link href="/about" className="flex items-center gap-2 group text-white/70 hover:text-white transition-all duration-300">
-                      <Info className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
-                      <span className="text-[10px] font-black uppercase tracking-[0.2em]">About</span>
-                    </Link>
-                  </div>
-
-                  {/* Centerpiece: Marketplace */}
-                  <Link
-                    href="/products"
-                    className="flex items-center gap-2.5 px-8 py-2.5 rounded-xl hover:bg-white/10 text-white text-sm font-black uppercase tracking-[0.3em] transition-all duration-500 hover:scale-105 group"
-                  >
-                    <ShoppingBag className="w-4 h-4 group-hover:rotate-12 transition-transform" />
-                    Marketplace
-                  </Link>
-
-                  {/* Right Side: Contact & Auth */}
-                  <div className="flex items-center gap-8">
-                    <Link href="/contact" className="flex items-center gap-2 group text-white/70 hover:text-white transition-all duration-300">
-                      <Phone className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
-                      <span className="text-[10px] font-black uppercase tracking-[0.2em]">Contact</span>
-                    </Link>
-
-                    <div className="flex items-center gap-4">
-                      {!authLoading && (
-                        user ? (
-                          <div className="relative" ref={dropdownRef}>
-                            <button
-                              onClick={() => setIsProfileOpen(!isProfileOpen)}
-                              className="flex items-center gap-2 group focus:outline-none"
-                            >
-                              <div className="size-8 rounded-full bg-white/20 ring-1 ring-white/30 overflow-hidden flex items-center justify-center flex-shrink-0 group-hover:ring-amber-400/50 transition-all">
-                                {user.avatar ? (
-                                  <Image src={user.avatar as string} alt="" width={32} height={32} className="w-full h-full object-cover" unoptimized />
-                                ) : (
-                                  <User className="w-4 h-4 text-white" />
-                                )}
-                              </div>
-                              <ChevronDown className={`w-3 h-3 text-white/50 group-hover:text-white transition-transform duration-300 ${isProfileOpen ? 'rotate-180' : ''}`} />
-                            </button>
-
-                            {/* Profile Dropdown */}
-                            <AnimatePresence>
-                              {isProfileOpen && (
-                                <motion.div
-                                  initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                                  exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                                  className="absolute right-0 mt-4 w-48 rounded-2xl overflow-hidden"
-                                  style={{
-                                    background: "rgba(0, 0, 0, 0.8)",
-                                    backdropFilter: "blur(12px)",
-                                    border: "1px solid rgba(255, 255, 255, 0.1)",
-                                    boxShadow: "0 10px 40px rgba(0,0,0,0.5)"
-                                  }}
-                                >
-                                  <div className="p-1.5 flex flex-col gap-1">
-                                    <Link
-                                      href={user.role === "USER" ? "/products" : `/dashboard/${user.role?.toLowerCase()}`}
-                                      className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-white/10 text-white/70 hover:text-white transition-all group"
-                                      onClick={() => setIsProfileOpen(false)}
-                                    >
-                                      <LayoutDashboard className="w-4 h-4 group-hover:text-amber-400" />
-                                      <span className="text-[10px] font-bold uppercase tracking-widest">Dashboard</span>
-                                    </Link>
-                                    <button
-                                      onClick={() => {
-                                        logout();
-                                        setIsProfileOpen(false);
-                                      }}
-                                      className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-red-500/10 text-white/70 hover:text-red-400 transition-all group w-full text-left"
-                                    >
-                                      <LogOut className="w-4 h-4" />
-                                      <span className="text-[10px] font-bold uppercase tracking-widest">Logout</span>
-                                    </button>
-                                  </div>
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
-                          </div>
-                        ) : (
-                          <div className="flex items-center gap-4">
-                            <Link
-                              href="/login"
-                              className="text-white/60 hover:text-white text-[10px] font-black uppercase tracking-[0.2em] transition-colors"
-                            >
-                              Login
-                            </Link>
-                            <Link
-                              href="/register"
-                              className="px-6 h-8 flex items-center justify-center rounded-full bg-amber-500 hover:bg-amber-400 text-black text-[9px] font-black uppercase tracking-[0.1em] transition-all hover:scale-105 active:scale-95 shadow-[0_4px_20px_rgba(245,158,11,0.2)]"
-                            >
-                              Sign Up
-                            </Link>
-                          </div>
-                        )
-                      )}
-
-                    </div>
-                  </div>
-                </div>
-              </nav>
-
-              {/* Logo Pinned to Corner */}
-              <div className="absolute top-0 left-0 z-10 p-0 m-0">
-                <Image src={LogoImg} alt="Ranote Exim Logo" className="w-[220px] md:w-[320px] lg:w-[450px] h-auto object-contain origin-top-left -ml-9 -mt-12 filter drop-shadow-[0_0_15px_rgba(0,0,0,0.4)]" unoptimized />
+          {/* ─── Immersive Glassmorphism Navigation Bar ─── */}
+          <nav
+            className="absolute top-6 left-1/2 -translate-x-1/2 z-[60] pointer-events-auto cursor-auto"
+            onMouseEnter={() => gsap.to(cursorRef.current, { scale: 0, opacity: 0, duration: 0.2, ease: "power2.out" })}
+            onMouseLeave={() => gsap.to(cursorRef.current, { scale: 1, opacity: 1, duration: 0.2, ease: "back.out(1.7)" })}
+          >
+            <div
+              className="flex items-center gap-2 px-10 py-1.5"
+              style={{
+                background: "rgba(255, 255, 255, 0.03)",
+                backdropFilter: "blur(24px) saturate(180%)",
+                WebkitBackdropFilter: "blur(24px) saturate(180%)",
+                borderRadius: "24px",
+                border: "1px solid rgba(255, 255, 255, 0.08)",
+                minWidth: "850px",
+                justifyContent: "space-between",
+                boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
+              }}
+            >
+              {/* Left Side: Navigation Links */}
+              <div className="flex items-center gap-8">
+                <Link href="/" className="flex items-center gap-2 group text-white/70 hover:text-white transition-all duration-300">
+                  <Home className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em]">Home</span>
+                </Link>
+                <Link href="/about" className="flex items-center gap-2 group text-white/70 hover:text-white transition-all duration-300">
+                  <Info className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em]">About</span>
+                </Link>
               </div>
 
+              {/* Centerpiece: Marketplace */}
+              <Link
+                href="/products"
+                className="flex items-center gap-2.5 px-8 py-2.5 rounded-xl hover:bg-white/10 text-white text-sm font-black uppercase tracking-[0.3em] transition-all duration-500 hover:scale-105 group"
+              >
+                <ShoppingBag className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+                Marketplace
+              </Link>
+
+              {/* Right Side: Contact & Auth */}
+              <div className="flex items-center gap-8">
+                <Link href="/contact" className="flex items-center gap-2 group text-white/70 hover:text-white transition-all duration-300">
+                  <Phone className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em]">Contact</span>
+                </Link>
+
+                <div className="flex items-center gap-4">
+                  {!authLoading && (
+                    user ? (
+                      <div className="relative" ref={dropdownRef}>
+                        <button
+                          onClick={() => setIsProfileOpen(!isProfileOpen)}
+                          className="flex items-center gap-2 group focus:outline-none"
+                        >
+                          <div className="size-8 rounded-full bg-white/20 ring-1 ring-white/30 overflow-hidden flex items-center justify-center flex-shrink-0 group-hover:ring-amber-400/50 transition-all">
+                            {user.avatar ? (
+                              <Image src={user.avatar as string} alt="" width={32} height={32} className="w-full h-full object-cover" unoptimized />
+                            ) : (
+                              <User className="w-4 h-4 text-white" />
+                            )}
+                          </div>
+                          <ChevronDown className={`w-3 h-3 text-white/50 group-hover:text-white transition-transform duration-300 ${isProfileOpen ? 'rotate-180' : ''}`} />
+                        </button>
+
+                        {/* Profile Dropdown */}
+                        <AnimatePresence>
+                          {isProfileOpen && (
+                            <motion.div
+                              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                              animate={{ opacity: 1, scale: 1, y: 0 }}
+                              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                              className="absolute right-0 mt-4 w-48 rounded-2xl overflow-hidden"
+                              style={{
+                                background: "rgba(0, 0, 0, 0.8)",
+                                backdropFilter: "blur(12px)",
+                                border: "1px solid rgba(255, 255, 255, 0.1)",
+                                boxShadow: "0 10px 40px rgba(0,0,0,0.5)"
+                              }}
+                            >
+                              <div className="p-1.5 flex flex-col gap-1">
+                                <Link
+                                  href={user.role === "USER" ? "/products" : `/dashboard/${user.role?.toLowerCase()}`}
+                                  className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-white/10 text-white/70 hover:text-white transition-all group"
+                                  onClick={() => setIsProfileOpen(false)}
+                                >
+                                  <LayoutDashboard className="w-4 h-4 group-hover:text-amber-400" />
+                                  <span className="text-[10px] font-bold uppercase tracking-widest">Dashboard</span>
+                                </Link>
+                                <button
+                                  onClick={() => {
+                                    logout();
+                                    setIsProfileOpen(false);
+                                  }}
+                                  className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-red-500/10 text-white/70 hover:text-red-400 transition-all group w-full text-left"
+                                >
+                                  <LogOut className="w-4 h-4" />
+                                  <span className="text-[10px] font-bold uppercase tracking-widest">Logout</span>
+                                </button>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-4">
+                        <Link
+                          href="/login"
+                          className="text-white/60 hover:text-white text-[10px] font-black uppercase tracking-[0.2em] transition-colors"
+                        >
+                          Login
+                        </Link>
+                        <Link
+                          href="/register"
+                          className="px-6 h-8 flex items-center justify-center rounded-full bg-amber-500 hover:bg-amber-400 text-black text-[9px] font-black uppercase tracking-[0.1em] transition-all hover:scale-105 active:scale-95 shadow-[0_4px_20px_rgba(245,158,11,0.2)]"
+                        >
+                          Sign Up
+                        </Link>
+                      </div>
+                    )
+                  )}
+
+                </div>
+              </div>
+            </div>
+          </nav>
+
+          {/* Logo Pinned to Corner */}
+          <div className="absolute top-0 left-0 z-10 p-0 m-0">
+            <Image src={LogoImg} alt="Ranote Exim Logo" className="w-[220px] md:w-[320px] lg:w-[450px] h-auto object-contain origin-top-left -ml-9 -mt-12 filter drop-shadow-[0_0_15px_rgba(0,0,0,0.4)]" unoptimized />
+          </div>
+
+          {/* Scroll-dependent Overlays */}
+          {loaded && (
+            <>
               {/* --- Scrollytelling Text Overlays --- */}
               {SCROLL_TEXTS.map((item, i) => {
                 const pos = POS_CLASSES[item.position];
@@ -753,16 +759,17 @@ export default function ScrollVideoSection() {
                 );
               })}
 
-              {/* Custom Follow Cursor (No Border) */}
-              <div
-                ref={cursorRef}
-                className="fixed top-0 left-0 z-[100] flex items-center justify-center w-24 h-24 rounded-full bg-white/10 backdrop-blur-md text-white text-xs font-black tracking-[0.2em] uppercase shadow-[0_0_30px_rgba(255,255,255,0.1)] pointer-events-none transition-colors duration-300"
-                style={{ opacity: 0, transform: "scale(0)", willChange: "transform, opacity" }}
-              >
-                {progress < 100 ? `${progress}%` : "Scroll"}
-              </div>
             </>
           )}
+
+          {/* Custom Follow Cursor (No Border) */}
+          <div
+            ref={cursorRef}
+            className="fixed top-0 left-0 z-[100] flex items-center justify-center w-24 h-24 rounded-full bg-white/10 backdrop-blur-md text-white text-xs font-black tracking-[0.2em] uppercase shadow-[0_0_30px_rgba(255,255,255,0.1)] pointer-events-none transition-colors duration-300"
+            style={{ opacity: 0, transform: "scale(0)", willChange: "transform, opacity" }}
+          >
+            {progress < 100 ? `${progress}%` : "Scroll"}
+          </div>
         </div>
       </section>
     </div>

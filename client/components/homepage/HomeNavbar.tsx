@@ -48,14 +48,14 @@ export default function HomeNavbar() {
         </Link>
 
         <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-8">
-        <Link
-          className="flex items-center gap-2.5 px-8 py-2.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 text-foreground dark:text-white text-sm font-black uppercase tracking-[0.3em] transition-all duration-500 hover:scale-105 group"
-          href="/products"
-        >
-          <ShoppingBag className="w-4 h-4 group-hover:rotate-12 transition-transform text-primary" />
-          Marketplace
-        </Link>
-      </div>
+          <Link 
+            className="flex items-center gap-2.5 px-8 py-2.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 text-foreground dark:text-white text-sm font-black uppercase tracking-[0.3em] transition-all duration-500 hover:scale-105 group" 
+            href="/products"
+          >
+            <ShoppingBag className="w-4 h-4 group-hover:rotate-12 transition-transform text-primary" />
+            Marketplace
+          </Link>
+        </div>
 
       <div className="flex items-center gap-2 md:gap-4">
         {user && (
