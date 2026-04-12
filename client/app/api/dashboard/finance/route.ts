@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
  where: { product: { exporterId: auth.userId } },
  include: {
  product: { select: { name: true } },
- importer: { select: { name: true, companyName: true } },
+ importer: { select: { name: true, businessName: true } },
  },
  orderBy: { createdAt: 'desc' },
  take: 5,
@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
  status: o.paymentStatus,
  orderStatus: o.status,
  product: o.product.name,
- buyer: o.importer.companyName || o.importer.name,
+ buyer: o.importer.businessName || o.importer.name,
  date: o.createdAt,
  })),
  });
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
  product: {
  select: {
  name: true,
- exporter: { select: { name: true, companyName: true } },
+ exporter: { select: { name: true, businessName: true } },
  },
  },
  },
@@ -135,7 +135,7 @@ export async function GET(request: NextRequest) {
  status: o.paymentStatus,
  orderStatus: o.status,
  product: o.product.name,
- seller: o.product.exporter.companyName || o.product.exporter.name,
+ seller: o.product.exporter.businessName || o.product.exporter.name,
  date: o.createdAt,
  })),
  });

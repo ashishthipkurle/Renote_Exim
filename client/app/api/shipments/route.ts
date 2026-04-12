@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
  order: {
  include: {
  product: { select: { name: true, category: true } },
- importer: { select: { name: true, companyName: true, country: true } },
+ importer: { select: { name: true, businessName: true, country: true } },
  },
  },
  },

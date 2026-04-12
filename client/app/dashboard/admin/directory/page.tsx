@@ -24,7 +24,7 @@ import clsx from "clsx";
 
 type DirectoryMember = {
  name: string;
- companyName: string;
+ businessName: string;
  country: string;
  role: string;
  email: string;
@@ -112,11 +112,11 @@ export default function AdminDirectoryPage() {
  {/* Visual Identity */}
  <div className="flex items-center gap-4 mb-6">
  <div className="size-14 rounded-lg bg-gradient-to-br from-white/10 to-white/5 border border-border flex items-center justify-center text-white font-black text-xl shadow-lg group-hover:scale-110 transition-transform">
- {m.companyName?.[0] || m.name?.[0]}
+ {m.businessName?.[0] || m.name?.[0]}
  </div>
  <div className="flex-1 min-w-0">
  <h3 className="text-white font-black text-sm truncate group-hover:text-white transition-colors">
- {m.companyName || m.name}
+ {m.businessName || m.name}
  </h3>
  <div className="flex items-center gap-1.5 mt-1">
  <span className={clsx(

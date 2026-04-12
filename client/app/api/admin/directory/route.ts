@@ -10,14 +10,14 @@ export async function GET(req: NextRequest) {
  where: {
  OR: [
  { name: { contains: search, mode: "insensitive" } },
- { companyName: { contains: search, mode: "insensitive" } },
+ { businessName: { contains: search, mode: "insensitive" } },
  { email: { contains: search, mode: "insensitive" } },
  ]
  },
- orderBy: { companyName: 'asc' },
+ orderBy: { businessName: 'asc' },
  select: {
  name: true,
- companyName: true,
+ businessName: true,
  country: true,
  role: true,
  email: true,

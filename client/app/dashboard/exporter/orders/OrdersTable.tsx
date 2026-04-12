@@ -118,7 +118,7 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
  order.orderNumber,
  order.product?.name,
  order.importer?.name,
- order.importer?.companyName,
+ order.importer?.businessName,
  ]
  .filter(Boolean)
  .join(" ")
@@ -268,7 +268,7 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
  <div className="min-w-0">
  <div className="text-xl font-black text-foreground dark:text-white truncate tracking-tighter uppercase group-hover:translate-x-1 transition-transform">{order.product?.name ?? "NULL_ASSET"}</div>
  <div className="text-[10px] text-muted-foreground/30 mt-2 font-black uppercase tracking-widest flex items-center gap-2 group-hover:text-muted-foreground transition-colors truncate">
- {order.importer?.companyName || order.importer?.name || "ANON_NODE"} // {order.importer?.country ?? "GLOBAL"}
+ {order.importer?.businessName || order.importer?.name || "ANON_NODE"} // {order.importer?.country ?? "GLOBAL"}
  </div>
  <div className="text-[9px] text-muted-foreground/10 mt-1 font-black uppercase tracking-widest ">
  QTY: {order.quantity ?? 0} // {order.product?.category || "GENERAL"}

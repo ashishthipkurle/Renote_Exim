@@ -164,19 +164,19 @@ export default async function ExporterInventoryPage({
  { k: "Active Telemetry", v: String(totalAvailable), sub: "Signal Verified Link", icon: ShieldCheck },
  { k: "Max Potential Yield", v: formatMoney(totalValue), sub: "Portfolio Index Val", icon: TrendingUp },
  ].map((s) => (
- <div key={s.k} className="bg-card/40 dark:bg-white/5 backdrop-blur-3xl border border-border dark:border-white/5 p-10 relative overflow-hidden group rounded-lg transition-all hover:border-border dark:border-white/10 shadow-xl dark:shadow-2xl">
- <div className="absolute top-0 right-0 w-32 h-32 bg-black/5 dark:bg-white/10 blur-3xl rounded-full -mr-16 -mt-16 group-hover:bg-black/10 dark:bg-white/15 transition-colors pointer-events-none" />
- <div className="flex items-start justify-between relative z-10 mb-8">
+ <div key={s.k} className="bg-card/40 dark:bg-white/5 backdrop-blur-3xl border border-border dark:border-white/5 p-6 relative overflow-hidden group rounded-lg transition-all hover:border-border dark:border-white/10 shadow-xl dark:shadow-2xl">
+ <div className="absolute top-0 right-0 w-24 h-24 bg-black/5 dark:bg-white/10 blur-3xl rounded-full -mr-12 -mt-12 group-hover:bg-black/10 dark:bg-white/15 transition-colors pointer-events-none" />
+ <div className="flex items-start justify-between relative z-10 mb-6">
  <div>
  <div className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-[0.3em] ">{s.k}</div>
  <div className="text-[9px] font-black text-muted-foreground/20 uppercase tracking-widest mt-1">{s.sub}</div>
  </div>
- <div className="p-3 rounded-lg bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 text-foreground dark:text-white transition-all group-hover:scale-110">
- <s.icon className="w-5 h-5" />
+ <div className="p-2.5 rounded-lg bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 text-foreground dark:text-white transition-all group-hover:scale-110">
+ <s.icon className="w-4 h-4" />
  </div>
  </div>
- <div className="text-4xl font-black text-foreground dark:text-white tracking-tighter uppercase group-hover:translate-x-1 transition-transform">{s.v}</div>
- <div className="mt-8 h-1.5 w-full bg-black/5 dark:bg-white/10 rounded-full overflow-hidden">
+ <div className="text-3xl font-black text-foreground dark:text-white tracking-tighter uppercase group-hover:translate-x-1 transition-transform">{s.v}</div>
+ <div className="mt-6 h-1 w-full bg-black/5 dark:bg-white/10 rounded-full overflow-hidden">
  <div className="h-full bg-primary w-3/4 dark:shadow-md shadow-none transition-all duration-1000 delay-300" />
  </div>
  </div>

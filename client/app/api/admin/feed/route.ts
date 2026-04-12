@@ -21,7 +21,7 @@ export async function GET() {
  take: 10,
  orderBy: { createdAt: "desc" },
  include: {
- exporter: { select: { companyName: true, name: true } },
+ exporter: { select: { businessName: true, name: true } },
  },
  }),
  ]);
@@ -45,7 +45,7 @@ export async function GET() {
  id: p.id,
  type: "PRODUCT_LISTED",
  title: "New Product Listing",
- description: `${p.name} listed by ${p.exporter.companyName || p.exporter.name}`,
+ description: `${p.name} listed by ${p.exporter.businessName || p.exporter.name}`,
  time: p.createdAt,
  })),
  ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()).slice(0, 20);

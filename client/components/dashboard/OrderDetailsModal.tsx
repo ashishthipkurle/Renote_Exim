@@ -86,7 +86,7 @@ export default function OrderDetailsModal({
  <div className="space-y-4 px-1">
  <div className="flex items-center gap-3 text-muted-foreground group">
  <Building2 className="w-4 h-4 text-white/40 group-hover:text-white transition-colors" />
- <span className="text-[10px] font-black uppercase tracking-widest">{order.product.exporter.companyName || order.product.exporter.name}</span>
+ <span className="text-[10px] font-black uppercase tracking-widest">{order.product.exporter.businessName || order.product.exporter.name}</span>
  </div>
  <div className="flex items-center gap-3 text-muted-foreground group">
  <Globe2 className="w-4 h-4 text-white/40 group-hover:text-white transition-colors" />

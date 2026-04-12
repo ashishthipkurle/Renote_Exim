@@ -48,7 +48,7 @@ export async function GET(
  },
  include: {
  product: {
- select: { name: true, category: true, images: true, unit: true, exporter: { select: { name: true, companyName: true } } },
+ select: { name: true, category: true, images: true, unit: true, exporter: { select: { name: true, businessName: true } } },
  },
  },
  orderBy: { createdAt: 'desc' },

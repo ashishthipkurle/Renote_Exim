@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
  const quotes = await prisma.quote.findMany({
  where,
  include: {
- exporter: { select: { name: true, companyName: true, country: true, avatar: true } }
+ exporter: { select: { name: true, businessName: true, country: true, avatar: true } }
  },
  orderBy: { createdAt: 'desc' }
  });

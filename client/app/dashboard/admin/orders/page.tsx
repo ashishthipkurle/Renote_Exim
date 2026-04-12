@@ -31,7 +31,7 @@ type Order = {
  createdAt: string;
  user: {
  name: string;
- companyName: string;
+ businessName: string;
  };
 };
 
@@ -147,7 +147,7 @@ export default function AdminOrdersPage() {
  <div className="flex flex-col">
  <div className="text-sm font-bold text-slate-300 flex items-center gap-1.5">
  <Building2 className="w-3.5 h-3.5 text-slate-500" />
- {o.user?.companyName || o.user?.name}
+ {o.user?.businessName || o.user?.name}
  </div>
  </div>
  </td>

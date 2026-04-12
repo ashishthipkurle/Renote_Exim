@@ -21,9 +21,9 @@ export async function GET(
  select: {
  id: true,
  name: true,
- companyName: true,
+ businessName: true,
  country: true,
- verified: true,
+ verificationStatus: true,
  email: true,
  phone: true,
  website: true,
@@ -97,7 +97,7 @@ export async function PUT(
  select: {
  id: true,
  name: true,
- companyName: true,
+ businessName: true,
  country: true,
  },
  },

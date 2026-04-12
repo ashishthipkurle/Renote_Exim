@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
  name: true,
  email: true,
  role: true,
- companyName: true,
+ businessName: true,
  country: true,
  phone: true,
  website: true,
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
 
 const updateProfileSchema = z.object({
  name: z.string().min(1).max(100).optional(),
- companyName: z.string().max(200).optional().nullable(),
+ businessName: z.string().max(200).optional().nullable(),
  country: z.string().max(100).optional().nullable(),
  phone: z.string().max(30).optional().nullable(),
  website: z.string().url().or(z.literal('')).optional().nullable(),
@@ -96,7 +96,7 @@ export async function PATCH(request: NextRequest) {
  name: true,
  email: true,
  role: true,
- companyName: true,
+ businessName: true,
  country: true,
  phone: true,
  website: true,

@@ -25,7 +25,7 @@ interface ProfileData {
  id: string;
  name: string;
  email: string;
- companyName: string | null;
+ businessName: string | null;
  country: string | null;
  phone: string | null;
  website: string | null;
@@ -45,7 +45,7 @@ export default function ImporterSettingsPage() {
 
  const [form, setForm] = useState({
  name: "",
- companyName: "",
+ businessName: "",
  country: "",
  phone: "",
  website: "",
@@ -60,7 +60,7 @@ export default function ImporterSettingsPage() {
  setProfile(user);
  setForm({
  name: user.name || "",
- companyName: user.companyName || "",
+ businessName: user.businessName || "",
  country: user.country || "",
  phone: user.phone || "",
  website: user.website || "",
@@ -175,7 +175,7 @@ export default function ImporterSettingsPage() {
 
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  <div className="md:col-span-2">
- <InputGroup label="Legal Entity Name" value={form.companyName} onChange={(v) => setForm({ ...form, companyName: v })} icon={Building2} placeholder="Acme Logistics International" />
+ <InputGroup label="Legal Entity Name" value={form.businessName} onChange={(v) => setForm({ ...form, businessName: v })} icon={Building2} placeholder="Acme Logistics International" />
  </div>
  <InputGroup label="Business Classification" value={form.businessType} onChange={(v) => setForm({ ...form, businessType: v })} icon={Briefcase} placeholder="Wholesale / Distribution" />
  <InputGroup label="Tax Identification Number" value={form.taxId} onChange={(v) => setForm({ ...form, taxId: v })} icon={FileText} placeholder="TAX-990-2211" />

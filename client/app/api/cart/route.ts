@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
  exporter: {
  select: {
  name: true,
- companyName: true,
+ businessName: true,
  country: true,
  },
  },

@@ -20,7 +20,7 @@ type User = {
  name: string;
  email: string;
  role: string;
- companyName: string;
+ businessName: string;
  country: string;
  verified: boolean;
  createdAt: string;
@@ -165,7 +165,7 @@ export default function AdminUsersPage() {
  <div className="flex flex-col">
  <div className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
  <Building2 className="w-3 h-3 text-slate-500" />
- {u.companyName || "N/A"}
+ {u.businessName || "N/A"}
  </div>
  <div className="text-[10px] text-slate-500 flex items-center gap-1.5 mt-1">
  <Globe className="w-3 h-3" />

@@ -10,7 +10,7 @@ interface ProfileData {
  id: string;
  name: string;
  email: string;
- companyName: string | null;
+ businessName: string | null;
  country: string | null;
  phone: string | null;
  website: string | null;
@@ -30,7 +30,7 @@ export default function ExporterSettingsPage() {
 
  const [form, setForm] = useState({
  name: "",
- companyName: "",
+ businessName: "",
  country: "",
  phone: "",
  website: "",
@@ -46,7 +46,7 @@ export default function ExporterSettingsPage() {
  setProfile(d);
  setForm({
  name: d.name || "",
- companyName: d.companyName || "",
+ businessName: d.businessName || "",
  country: d.country || "",
  phone: d.phone || "",
  website: d.website || "",
@@ -86,7 +86,7 @@ export default function ExporterSettingsPage() {
 
  const fields: { label: string; key: keyof typeof form; type?: string; placeholder: string; icon: any }[] = [
  { label: "Identity Name", key: "name", placeholder: "NODE_ALPHA_ADMIN", icon: User },
- { label: "Registry Company", key: "companyName", placeholder: "SECURE_EXPORTS_INC", icon: Building },
+ { label: "Registry Company", key: "businessName", placeholder: "SECURE_EXPORTS_INC", icon: Building },
  { label: "Origin Node", key: "country", placeholder: "GLOBAL_SYSTEM", icon: Globe },
  { label: "Signal Comms", key: "phone", type: "tel", placeholder: "+00 0000000000", icon: Phone },
  { label: "Network URL", key: "website", type: "url", placeholder: "HTTPS://NODE.NETWORK", icon: Link2 },

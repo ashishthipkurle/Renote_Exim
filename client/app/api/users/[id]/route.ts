@@ -13,7 +13,7 @@ export async function GET(
  name: true,
  avatar: true,
  role: true,
- companyName: true,
+ businessName: true,
  country: true,
  },
  });

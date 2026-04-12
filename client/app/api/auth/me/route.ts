@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
  name: user.name || null,
  email: user.email,
  role: user.role,
- companyName: user.companyName || null,
+ businessName: user.businessName || null,
  country: user.country || null,
  phone: user.phone || null,
  website: user.website || null,

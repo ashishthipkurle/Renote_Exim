@@ -37,7 +37,7 @@ type Product = {
  images?: string[];
  exporter?: {
  name?: string | null;
- companyName?: string | null;
+ businessName?: string | null;
  country?: string | null;
  };
 };
@@ -125,13 +125,13 @@ export default function CheckoutPage() {
  images: row.product?.images ?? [],
  exporter: {
  name: row.product?.exporter?.name ?? "Exporter",
- companyName: row.product?.exporter?.companyName ?? "Global Supplier",
+ businessName: row.product?.exporter?.businessName ?? "Global Supplier",
  country: row.product?.exporter?.country ?? row.product?.originCountry ?? "N/A",
  },
  },
  importer: {
  name: (user as any)?.name ?? "Importer",
- companyName: (user as any)?.companyName ?? "Trading Co.",
+ businessName: (user as any)?.businessName ?? "Trading Co.",
  country: (user as any)?.country ?? "N/A",
  },
  _local: true,

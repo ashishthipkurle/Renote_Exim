@@ -13,7 +13,7 @@ import LiveCallDock from "@/components/calls/LiveCallDock";
 type CallParticipant = {
  id: string;
  name: string | null;
- companyName: string | null;
+ businessName: string | null;
  avatar: string | null;
  role: string;
 };
@@ -119,7 +119,7 @@ export default function CallDeskPanel({ controller, title = "Call Desk" }: CallD
 
  const peer = schedule.requesterId === user.id ? schedule.receiver : schedule.requester;
  await controller.startCall({
- target: { id: peer.id, name: peer.companyName || peer.name },
+ target: { id: peer.id, name: peer.businessName || peer.name },
  callType: schedule.callType,
  scheduleId: schedule.id,
  });
@@ -185,7 +185,7 @@ export default function CallDeskPanel({ controller, title = "Call Desk" }: CallD
  <div>
  <p className="text-sm font-black text-foreground">{schedule.title || "Trade sync call"}</p>
  <p className="text-xs text-muted-foreground">
- with {peer.companyName || peer.name || "Trade Partner"}
+ with {peer.businessName || peer.name || "Trade Partner"}
  </p>
  </div>
  <span className="rounded-full border border-border px-2 py-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
@@ -277,7 +277,7 @@ export default function CallDeskPanel({ controller, title = "Call Desk" }: CallD
  const peer = schedule.requesterId === user?.id ? schedule.receiver : schedule.requester;
  return (
  <div key={schedule.id} className="rounded-xl border border-border bg-background/90 px-3 py-2">
- <p className="text-sm font-semibold text-foreground">{peer.companyName || peer.name || "Trade Partner"}</p>
+ <p className="text-sm font-semibold text-foreground">{peer.businessName || peer.name || "Trade Partner"}</p>
  <p className="text-xs text-muted-foreground">
  {schedule.callType.toLowerCase()} · {schedule.status.toLowerCase()} · {formatDateTime(schedule.scheduledFor)}
  </p>

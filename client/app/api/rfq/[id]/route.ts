@@ -15,7 +15,7 @@ export async function GET(
  const rfq = await prisma.rfq.findUnique({
  where: { id: params.id },
  include: {
- importer: { select: { name: true, companyName: true, country: true } },
+ importer: { select: { name: true, businessName: true, country: true } },
  _count: { select: { quotes: true } }
  }
  });

@@ -29,11 +29,11 @@ interface OrderItem {
  id: string; orderNumber: string; totalPrice: number;
  status: string; createdAt: string;
  product: { name: string; category?: string };
- importer: { name: string; companyName: string | null; country: string | null };
+ importer: { name: string; businessName: string | null; country: string | null };
 }
 interface CategoryRevenue { category: string; revenue: number; orderCount: number }
 interface Partner {
- id: string; name: string; companyName: string | null;
+ id: string; name: string; businessName: string | null;
  country: string | null; verified: boolean;
  orderCount: number; totalValue: number;
 }
@@ -184,7 +184,7 @@ export default function ExporterDashboard() {
  o.product.name.toLowerCase().includes(q) ||
  o.orderNumber.toLowerCase().includes(q) ||
  o.status.toLowerCase().includes(q) ||
- (o.importer.companyName || o.importer.name).toLowerCase().includes(q) ||
+ (o.importer.businessName || o.importer.name).toLowerCase().includes(q) ||
  (o.importer.country || "").toLowerCase().includes(q)
  ).slice(0, 8);
  }, [search, allOrders]);
@@ -193,7 +193,7 @@ export default function ExporterDashboard() {
  if (!search.trim()) return partners;
  const q = search.toLowerCase();
  return partners.filter(p =>
- (p.companyName || p.name).toLowerCase().includes(q) ||
+ (p.businessName || p.name).toLowerCase().includes(q) ||
  (p.country || "").toLowerCase().includes(q)
  );
  }, [search, partners]);
@@ -442,7 +442,7 @@ export default function ExporterDashboard() {
  <div className={`w-12 h-12 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center font-black text-[10px] border border-border dark:border-white/10 flex-shrink-0 group-hover:scale-110 transition-transform`}>{getInitials(order.product.name)}</div>
  <div className="min-w-0">
  <h4 className="text-xs font-black text-foreground dark:text-white uppercase tracking-wider truncate">{order.product.name}</h4>
- <p className="text-[9px] text-muted-foreground uppercase tracking-widest mt-1 opacity-60 font-black">{order.importer.companyName || order.importer.name} · {timeAgo(order.createdAt)}</p>
+ <p className="text-[9px] text-muted-foreground uppercase tracking-widest mt-1 opacity-60 font-black">{order.importer.businessName || order.importer.name} · {timeAgo(order.createdAt)}</p>
  </div>
  </div>
  <div className="text-right flex-shrink-0 ml-4">
@@ -530,9 +530,9 @@ export default function ExporterDashboard() {
  <tr key={p.id} className="border-b border-border dark:border-white/5 last:border-0 group hover:bg-white/[0.03] transition-all cursor-pointer">
  <td className="py-5 pl-2">
  <div className="flex items-center gap-4">
- <div className={`w-10 h-10 rounded-xl bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 flex items-center justify-center text-foreground dark:text-white shadow-inner group-hover:scale-110 transition-transform`}>{getInitials(p.companyName || p.name)}</div>
+ <div className={`w-10 h-10 rounded-xl bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 flex items-center justify-center text-foreground dark:text-white shadow-inner group-hover:scale-110 transition-transform`}>{getInitials(p.businessName || p.name)}</div>
  <div className="flex flex-col truncate">
- <span className="text-foreground dark:text-white text-xs tracking-wider font-black truncate max-w-[120px]">{p.companyName || p.name}</span>
+ <span className="text-foreground dark:text-white text-xs tracking-wider font-black truncate max-w-[120px]">{p.businessName || p.name}</span>
  {p.verified && <span className="text-[8px] text-muted-foreground/40 tracking-widest mt-0.5 opacity-60">VERIFIED SIGNAL</span>}
  </div>
  </div>

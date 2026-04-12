@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 type ImporterRow = {
  id: string;
  name: string | null;
- companyName: string | null;
+ businessName: string | null;
  country: string | null;
  avatar: string | null;
  orderCount: bigint | number;
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
  SELECT
  u.id,
  u.name,
- u."companyName",
+ u."businessName",
  u.country,
  u.avatar,
  COUNT(DISTINCT o.id) AS "orderCount",
@@ -51,10 +51,10 @@ export async function GET(request: NextRequest) {
  AND (
  ${search} = ''
  OR COALESCE(u.name, '') ILIKE '%' || ${search} || '%'
- OR COALESCE(u."companyName", '') ILIKE '%' || ${search} || '%'
+ OR COALESCE(u."businessName", '') ILIKE '%' || ${search} || '%'
  OR COALESCE(u.country, '') ILIKE '%' || ${search} || '%'
  )
- GROUP BY u.id, u.name, u."companyName", u.country, u.avatar
+ GROUP BY u.id, u.name, u."businessName", u.country, u.avatar
  ORDER BY MAX(o."createdAt") DESC
  LIMIT ${limit} OFFSET ${(page - 1) * limit}
  `) as ImporterRow[];
@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
  AND (
  ${search} = ''
  OR COALESCE(u.name, '') ILIKE '%' || ${search} || '%'
- OR COALESCE(u."companyName", '') ILIKE '%' || ${search} || '%'
+ OR COALESCE(u."businessName", '') ILIKE '%' || ${search} || '%'
  OR COALESCE(u.country, '') ILIKE '%' || ${search} || '%'
  )
  `;
@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
  importers: rows.map((row: ImporterRow) => ({
  id: row.id,
  name: row.name,
- companyName: row.companyName,
+ businessName: row.businessName,
  country: row.country,
  avatar: row.avatar,
  orderCount: Number(row.orderCount),

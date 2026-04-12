@@ -189,7 +189,7 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
  </div>
  <div>
  <div className="text-sm font-black text-foreground group-hover:text-primary transition-colors uppercase tracking-tighter">{order.product?.name ?? "Unknown Asset"}</div>
- <div className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-0.5">VIA: {order.product?.exporter?.companyName || order.product?.exporter?.name || "EXPORTER"}</div>
+ <div className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-0.5">VIA: {order.product?.exporter?.businessName || order.product?.exporter?.name || "EXPORTER"}</div>
  <div className="text-[11px] text-foreground mt-1 font-black tracking-tighter">{formatCurrency(order.totalPrice)}</div>
  </div>
  </div>
@@ -298,7 +298,7 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
  </div>
  <div className="rounded-lg bg-muted/50 border border-border p-3">
  <div className="text-muted-foreground text-xs uppercase tracking-widest">Seller</div>
- <div className="text-foreground font-semibold mt-1">{order.product?.exporter?.companyName || order.product?.exporter?.name || "Exporter"}</div>
+ <div className="text-foreground font-semibold mt-1">{order.product?.exporter?.businessName || order.product?.exporter?.name || "Exporter"}</div>
  </div>
  <div className="rounded-lg bg-muted/50 border border-border p-3">
  <div className="text-muted-foreground text-xs uppercase tracking-widest">Seller Country</div>

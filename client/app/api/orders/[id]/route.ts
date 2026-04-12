@@ -30,12 +30,12 @@ export async function GET(
  product: {
  include: {
  exporter: {
- select: { id: true, name: true, companyName: true, country: true, email: true }
+ select: { id: true, name: true, businessName: true, country: true, email: true }
  }
  }
  },
  importer: {
- select: { id: true, name: true, companyName: true, country: true, email: true }
+ select: { id: true, name: true, businessName: true, country: true, email: true }
  },
  shipment: true
  }

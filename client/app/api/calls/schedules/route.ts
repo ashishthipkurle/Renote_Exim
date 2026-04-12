@@ -82,8 +82,8 @@ export async function GET(request: NextRequest) {
  prisma.callSchedule.findMany({
  where,
  include: {
- requester: { select: { id: true, name: true, companyName: true, avatar: true, role: true } },
- receiver: { select: { id: true, name: true, companyName: true, avatar: true, role: true } },
+ requester: { select: { id: true, name: true, businessName: true, avatar: true, role: true } },
+ receiver: { select: { id: true, name: true, businessName: true, avatar: true, role: true } },
  sessions: {
  select: {
  id: true,
@@ -181,8 +181,8 @@ export async function POST(request: NextRequest) {
  timezone: payload.timezone,
  },
  include: {
- requester: { select: { id: true, name: true, companyName: true, avatar: true, role: true } },
- receiver: { select: { id: true, name: true, companyName: true, avatar: true, role: true } },
+ requester: { select: { id: true, name: true, businessName: true, avatar: true, role: true } },
+ receiver: { select: { id: true, name: true, businessName: true, avatar: true, role: true } },
  },
  });
 

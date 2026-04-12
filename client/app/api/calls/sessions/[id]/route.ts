@@ -84,8 +84,8 @@ export async function PATCH(
  endedReason: endedReason ?? existing.endedReason,
  },
  include: {
- caller: { select: { id: true, name: true, companyName: true, avatar: true, role: true } },
- callee: { select: { id: true, name: true, companyName: true, avatar: true, role: true } },
+ caller: { select: { id: true, name: true, businessName: true, avatar: true, role: true } },
+ callee: { select: { id: true, name: true, businessName: true, avatar: true, role: true } },
  schedule: {
  select: {
  id: true,

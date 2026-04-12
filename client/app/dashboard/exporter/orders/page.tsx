@@ -42,7 +42,7 @@ export default async function ExporterOrdersPage({
  { id: { contains: search, mode: "insensitive" } },
  { product: { is: { name: { contains: search, mode: "insensitive" } } } },
  { importer: { is: { name: { contains: search, mode: "insensitive" } } } },
- { importer: { is: { companyName: { contains: search, mode: "insensitive" } } } },
+ { importer: { is: { businessName: { contains: search, mode: "insensitive" } } } },
  ];
  }
 
@@ -63,7 +63,7 @@ export default async function ExporterOrdersPage({
  where,
  include: {
  product: { select: { name: true, category: true, images: true } },
- importer: { select: { name: true, companyName: true, country: true } },
+ importer: { select: { name: true, businessName: true, country: true } },
  shipment: true,
  },
  orderBy: { createdAt: "desc" },

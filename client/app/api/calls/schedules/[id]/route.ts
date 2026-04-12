@@ -28,8 +28,8 @@ export async function GET(
  const schedule = await prisma.callSchedule.findUnique({
  where: { id: params.id },
  include: {
- requester: { select: { id: true, name: true, companyName: true, avatar: true, role: true } },
- receiver: { select: { id: true, name: true, companyName: true, avatar: true, role: true } },
+ requester: { select: { id: true, name: true, businessName: true, avatar: true, role: true } },
+ receiver: { select: { id: true, name: true, businessName: true, avatar: true, role: true } },
  sessions: {
  orderBy: { createdAt: "desc" },
  take: 10,
@@ -177,8 +177,8 @@ export async function PATCH(
  where: { id: params.id },
  data: updateData,
  include: {
- requester: { select: { id: true, name: true, companyName: true, avatar: true, role: true } },
- receiver: { select: { id: true, name: true, companyName: true, avatar: true, role: true } },
+ requester: { select: { id: true, name: true, businessName: true, avatar: true, role: true } },
+ receiver: { select: { id: true, name: true, businessName: true, avatar: true, role: true } },
  },
  });
 

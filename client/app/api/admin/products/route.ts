@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
  exporter: {
  select: {
  name: true,
- companyName: true,
+ businessName: true,
  },
  },
  },

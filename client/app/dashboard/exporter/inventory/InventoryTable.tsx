@@ -19,7 +19,7 @@ type Product = {
  originCountry: string;
  category: string;
  available: boolean;
- quantity: number;
+ stockQty: number;
  images: string[];
 };
 
@@ -199,7 +199,7 @@ export default function InventoryTable({
  <div className="col-span-5">Identity_Node</div>
  <div className="col-span-2">Sector</div>
  <div className="col-span-2">Valuation</div>
- <div className="col-span-1 text-center">Protocol</div>
+ <div className="col-span-1 text-center">Inventory</div>
  <div className="col-span-2 text-right">Overrides</div>
  </div>
 
@@ -258,19 +258,13 @@ export default function InventoryTable({
  <div className="text-[8px] text-muted-foreground/20 font-black uppercase tracking-[0.3em] mt-2 group-hover:text-muted-foreground/40 transition-colors">INDEX_VAL / {product.unit}</div>
  </div>
 
- <div className="lg:col-span-1 flex justify-start lg:justify-center">
- <button
- onClick={() => updateQuantity(product.id, product.quantity, !product.available)}
- className={
- "inline-flex items-center gap-3 px-6 py-2.5 rounded-full border text-[9px] font-black uppercase tracking-[0.2em] shadow-xl dark:shadow-2xl transition-all hover:scale-105 active:scale-95 " +
- (product.available
- ? "text-primary-foreground bg-primary border-transparent shadow-white/10"
- : "text-muted-foreground/20 bg-black/5 dark:bg-white/10 border-border dark:border-white/5")
- }
- >
- <span className={`size-2 rounded-full ${product.available ? "bg-card dark:bg-[#0a0a0a] animate-pulse" : "bg-muted-foreground/20"}`} />
- {product.available ? "Active" : "Halted"}
- </button>
+ <div className="lg:col-span-1 flex flex-col items-start lg:items-center justify-center">
+ <div className="text-foreground dark:text-white font-black text-xl tracking-tighter group-hover:scale-105 transition-transform">
+ {product.stockQty}
+ </div>
+ <div className="text-[8px] text-muted-foreground/30 font-black uppercase tracking-[0.2em] mt-1 group-hover:text-muted-foreground/50 transition-colors">
+ {product.unit || 'units'}
+ </div>
  </div>
 
  <div className="lg:col-span-2 flex justify-end gap-3 mt-4 lg:mt-0">

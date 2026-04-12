@@ -24,7 +24,7 @@ export async function GET(
  } 
  }
  },
- importer: { select: { id: true, name: true, companyName: true, country: true } },
+ importer: { select: { id: true, name: true, businessName: true, country: true } },
  },
  },
  },

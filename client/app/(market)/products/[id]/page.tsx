@@ -56,7 +56,7 @@ export default async function ProductDetailPage({
  select: {
  id: true,
  name: true,
- companyName: true,
+ businessName: true,
  country: true,
  website: true,
  },
@@ -323,7 +323,7 @@ export default async function ProductDetailPage({
  Exporter
  </p>
  <p className="text-base font-extrabold text-foreground">
- {product.exporter.companyName || product.exporter.name}
+ {product.exporter.businessName || product.exporter.name}
  </p>
  <p className="text-sm text-muted-foreground">
  {product.exporter.country ?? product.originCountry}

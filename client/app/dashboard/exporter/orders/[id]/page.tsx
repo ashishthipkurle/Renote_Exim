@@ -54,7 +54,7 @@ export default async function OrderDetailPage({ params }: { params: { id: string
  select: { name: true, category: true, images: true, price: true, hsCode: true, exporterId: true }
  },
  importer: {
- select: { name: true, companyName: true, country: true, email: true }
+ select: { name: true, businessName: true, country: true, email: true }
  },
  shipment: true
  }
@@ -209,7 +209,7 @@ export default async function OrderDetailPage({ params }: { params: { id: string
  <div>
  <div className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight mb-0.5">Company</div>
  <div className="font-bold text-foreground leading-tight">
- {orderWithRel.importer.companyName || orderWithRel.importer.name}
+ {orderWithRel.importer.businessName || orderWithRel.importer.name}
  </div>
  </div>
  </div>

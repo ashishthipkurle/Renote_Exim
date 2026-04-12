@@ -89,7 +89,7 @@ export default async function ProductsPage({
  category: string;
  images: string[];
  quantity: number;
- exporter: { name: string | null; companyName: string | null; country: string | null };
+ exporter: { name: string | null; businessName: string | null; country: string | null };
  };
  let products: ProductWithExporter[] = [];
  let total = 0;
@@ -110,7 +110,7 @@ export default async function ProductsPage({
  category: true,
  images: true,
  quantity: true,
- exporter: { select: { name: true, companyName: true, country: true } },
+ exporter: { select: { name: true, businessName: true, country: true } },
  } as any,
  }) as unknown as ProductWithExporter[],
  prisma.product.count({ where }),
@@ -308,7 +308,7 @@ export default async function ProductsPage({
  <div className="flex items-center gap-2 text-muted-foreground">
  <span className="material-symbols-outlined text-sm text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
  <span className="text-xs font-medium">
- Verified Exporter: {product.exporter?.companyName || product.exporter?.name || "Partner"}
+ Verified Exporter: {product.exporter?.businessName || product.exporter?.name || "Partner"}
  </span>
  </div>
 

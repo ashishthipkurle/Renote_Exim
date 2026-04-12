@@ -21,7 +21,7 @@ type CallType = "AUDIO" | "VIDEO";
 type ContactTarget = {
  id: string;
  name?: string | null;
- companyName?: string | null;
+ businessName?: string | null;
 };
 
 type ScheduleCallModalProps = {
@@ -121,7 +121,7 @@ export default function ScheduleCallModal({
  Schedule Call
  </DialogTitle>
  <DialogDescription className="text-xs text-muted-foreground">
- Book a realtime {callType.toLowerCase()} call with {receiver?.companyName || receiver?.name || "this partner"}.
+ Book a realtime {callType.toLowerCase()} call with {receiver?.businessName || receiver?.name || "this partner"}.
  </DialogDescription>
  </DialogHeader>
 

@@ -29,7 +29,7 @@ export default async function ImporterOrdersPage({
  include: {
  product: {
  select: { name: true, category: true, images: true },
- include: { exporter: { select: { name: true, companyName: true, country: true } } },
+ include: { exporter: { select: { name: true, businessName: true, country: true } } },
  },
  shipment: true,
  },

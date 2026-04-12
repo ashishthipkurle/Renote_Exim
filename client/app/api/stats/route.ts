@@ -17,25 +17,25 @@ export async function GET(request: NextRequest) {
 
  if (scope === 'importer' || auth.role === 'IMPORTER') {
  const [totalOrders, activeShipments, totalSpentResult, pendingOrders, paidOrders] = await Promise.all([
- prisma.order.count({ where: { importerId: auth.userId } }),
+ prisma.order.count({ where: { buyerId: auth.userId } }),
  prisma.shipment.count({
  where: {
- order: { importerId: auth.userId },
- status: { in: ['PREPARING', 'IN_TRANSIT', 'CUSTOMS', 'OUT_FOR_DELIVERY'] },
+ order: { buyerId: auth.userId },
+ currentStatus: { in: ['PREPARING', 'IN_TRANSIT', 'CUSTOMS', 'OUT_FOR_DELIVERY'] },
  },
  }),
  prisma.order.aggregate({
- where: { importerId: auth.userId, paymentStatus: { in: ['PAID', 'PARTIAL'] } },
+ where: { buyerId: auth.userId, paymentStatus: { in: ['PAID', 'PARTIAL'] } },
  _sum: { totalPrice: true },
  }),
  prisma.order.count({
  where: {
- importerId: auth.userId,
- status: { in: ['PENDING', 'CONFIRMED', 'PROCESSING'] },
+ buyerId: auth.userId,
+ orderStatus: { in: ['QUOTE_REQUESTED', 'PO_RAISED', 'PAYMENT_CONFIRMED', 'PROCESSING'] },
  },
  }),
  prisma.order.findMany({
- where: { importerId: auth.userId, paymentStatus: { in: ['PAID', 'PARTIAL'] } },
+ where: { buyerId: auth.userId, paymentStatus: { in: ['PAID', 'PARTIAL'] } },
  include: { product: true },
  }),
  ]);
@@ -81,19 +81,19 @@ export async function GET(request: NextRequest) {
  prisma.product.count({ where: { exporterId: auth.userId } }),
  prisma.order.count({
  where: {
- product: { exporterId: auth.userId },
- status: { in: ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED'] },
+ sellerId: auth.userId,
+ orderStatus: { in: ['QUOTE_REQUESTED', 'PO_RAISED', 'PAYMENT_CONFIRMED', 'PROCESSING', 'SHIPPED'] },
  },
  }),
  prisma.order.aggregate({
  where: {
- product: { exporterId: auth.userId },
+ sellerId: auth.userId,
  paymentStatus: { in: ['PAID', 'PARTIAL'] },
  },
  _sum: { totalPrice: true },
  }),
  prisma.shipment.count({
- where: { order: { product: { exporterId: auth.userId } } },
+ where: { order: { sellerId: auth.userId } },
  }),
  ]);
 
@@ -116,7 +116,7 @@ export async function GET(request: NextRequest) {
  _sum: { totalPrice: true },
  }),
  prisma.shipment.count({
- where: { status: { in: ['PREPARING', 'IN_TRANSIT', 'CUSTOMS', 'OUT_FOR_DELIVERY'] } },
+ where: { currentStatus: { in: ['PREPARING', 'IN_TRANSIT', 'CUSTOMS', 'OUT_FOR_DELIVERY'] } },
  }),
  prisma.order.count({
  where: {

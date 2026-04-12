@@ -40,8 +40,8 @@ export async function GET(request: NextRequest) {
  prisma.callSession.findMany({
  where,
  include: {
- caller: { select: { id: true, name: true, companyName: true, avatar: true, role: true } },
- callee: { select: { id: true, name: true, companyName: true, avatar: true, role: true } },
+ caller: { select: { id: true, name: true, businessName: true, avatar: true, role: true } },
+ callee: { select: { id: true, name: true, businessName: true, avatar: true, role: true } },
  schedule: {
  select: {
  id: true,
@@ -152,8 +152,8 @@ export async function POST(request: NextRequest) {
  status: "RINGING",
  },
  include: {
- caller: { select: { id: true, name: true, companyName: true, avatar: true, role: true } },
- callee: { select: { id: true, name: true, companyName: true, avatar: true, role: true } },
+ caller: { select: { id: true, name: true, businessName: true, avatar: true, role: true } },
+ callee: { select: { id: true, name: true, businessName: true, avatar: true, role: true } },
  },
  });
 

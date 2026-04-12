@@ -31,7 +31,7 @@ interface WishlistItem {
  unit: string;
  originCountry: string;
  images: string[];
- exporter: { name: string; companyName: string | null };
+ exporter: { name: string; businessName: string | null };
  savedAt: string;
 }
 
@@ -45,7 +45,7 @@ interface Product {
  originCountry: string;
  images: string[];
  quantity?: number;
- exporter: { name: string | null; companyName: string | null; country: string | null };
+ exporter: { name: string | null; businessName: string | null; country: string | null };
 }
 
 interface ProductsResponse {
@@ -420,7 +420,7 @@ function MarketplaceProductCard({ product, onToggleWishlist }: { product: Produc
  <div className="mt-6 py-4 border-y border-border flex items-center justify-between">
  <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Verified Merchant</div>
  <div className="text-[11px] font-black text-foreground max-w-[120px] truncate uppercase tracking-tight">
- {product.exporter.companyName || product.exporter.name || "UNIDENTIFIED"}
+ {product.exporter.businessName || product.exporter.name || "UNIDENTIFIED"}
  </div>
  </div>
 
@@ -473,7 +473,7 @@ function WishlistCard({ item, onToggle }: { item: WishlistItem; onToggle: () => 
  <h3 className="text-sm font-black text-foreground group-hover:text-primary transition-all line-clamp-1 uppercase tracking-tighter">{item.name}</h3>
  <div className="flex items-center gap-2 mt-1.5 opacity-60">
  <Building2 className="w-3 h-3 text-muted-foreground" />
- <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{item.exporter.companyName || item.exporter.name}</span>
+ <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{item.exporter.businessName || item.exporter.name}</span>
  </div>
  </div>
 

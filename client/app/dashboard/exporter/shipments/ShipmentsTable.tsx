@@ -104,7 +104,7 @@ export default function ShipmentsTable({
 
  <div className="lg:col-span-2">
  <div className="text-sm font-bold text-foreground/90 truncate">
- {shipment.order.importer.companyName || shipment.order.importer.name}
+ {shipment.order.importer.businessName || shipment.order.importer.name}
  </div>
  <div className="text-[9px] text-muted-foreground flex items-center gap-1 font-black uppercase tracking-wider mt-1">
  <MapPin className="w-3 h-3 text-foreground dark:text-white" />

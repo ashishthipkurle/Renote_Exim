@@ -125,7 +125,7 @@ export async function GET(request: NextRequest) {
  prisma.$queryRaw`
  SELECT 
  u.name as supplier,
- u."companyName",
+ u."businessName",
  COALESCE(SUM(o."totalPrice"), 0) as spent,
  COUNT(o.id) as "orderCount"
  FROM orders o
@@ -133,10 +133,10 @@ export async function GET(request: NextRequest) {
  JOIN users u ON p."exporterId" = u.id
  WHERE o."importerId" = ${auth.userId}
  AND o."paymentStatus" IN ('PAID', 'PARTIAL')
- GROUP BY u.id, u.name, u."companyName"
+ GROUP BY u.id, u.name, u."businessName"
  ORDER BY spent DESC
  LIMIT 5
- ` as Promise<Array<{ supplier: string; companyName: string | null; spent: number; orderCount: number }>>,
+ ` as Promise<Array<{ supplier: string; businessName: string | null; spent: number; orderCount: number }>>,
  // Spending by category
  prisma.$queryRaw`
  SELECT 
@@ -166,7 +166,7 @@ export async function GET(request: NextRequest) {
  orderCount: Number(m.orderCount),
  })),
  supplierBreakdown: (supplierBreakdown || []).map((s) => ({
- name: s.companyName || s.supplier,
+ name: s.businessName || s.supplier,
  spent: Number(s.spent),
  orderCount: Number(s.orderCount),
  })),

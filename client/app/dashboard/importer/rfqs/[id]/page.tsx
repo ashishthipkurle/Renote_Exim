@@ -140,7 +140,7 @@ export default function RFQDetailPage({ params }: { params: Promise<{ id: string
  )}
  </div>
  <div>
- <p className="text-foreground font-black text-xl tracking-tighter uppercase">{quote.exporter?.companyName || quote.exporter?.name}</p>
+ <p className="text-foreground font-black text-xl tracking-tighter uppercase">{quote.exporter?.businessName || quote.exporter?.name}</p>
  <p className="text-[9px] text-muted-foreground font-black uppercase tracking-[0.2em] mt-1 opacity-60">{quote.exporter?.country} · VERIFIED ORIGIN</p>
  </div>
  </div>

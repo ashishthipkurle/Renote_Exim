@@ -26,7 +26,7 @@ type Product = {
  images: string[];
  exporter: {
  name: string;
- companyName: string;
+ businessName: string;
  };
 };
 
@@ -224,7 +224,7 @@ export default function AdminProductsPage() {
 
  <div className="flex items-center gap-2 text-xs text-slate-400">
  <Building2 className="w-3.5 h-3.5 text-slate-600" />
- <span className="truncate">{p.exporter?.companyName || p.exporter?.name}</span>
+ <span className="truncate">{p.exporter?.businessName || p.exporter?.name}</span>
  </div>
 
  <div className="flex items-center justify-between pt-2 border-t border-white/5">
