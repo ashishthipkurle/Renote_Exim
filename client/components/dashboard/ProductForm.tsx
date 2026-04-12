@@ -265,8 +265,8 @@ export default function ProductForm({
     };
 
     const inputClass =
-        "w-full px-5 py-4 bg-card/60 border border-white/5 focus:border-white/50 rounded-2xl text-sm text-white placeholder:text-slate-600 focus:outline-none transition-all shadow-inner";
-    const labelClass = "block text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-2.5 ml-1";
+        "w-full px-5 py-4 bg-background border border-border focus:border-primary rounded-2xl text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none transition-all shadow-sm";
+    const labelClass = "block text-[10px] font-black text-muted-foreground uppercase tracking-[0.15em] mb-2.5 ml-1";
     const errorClass = "text-[10px] font-bold text-red-400 mt-1.5 ml-1 uppercase tracking-wider";
 
     return (
@@ -307,8 +307,8 @@ export default function ProductForm({
                 {/* Left Column: Main Specs */}
                 <div className="lg:col-span-12 xl:col-span-8 space-y-8">
                     {/* Basic Info */}
-                    <div className="bg-[#151c2a]/60 backdrop-blur-xl border border-white/5 shadow-2xl rounded-[2.5rem] p-10 space-y-8 relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 blur-[80px] rounded-full -mr-32 -mt-32 group-hover:bg-white/10 transition-colors pointer-events-none" />
+                    <div className="bg-card backdrop-blur-xl border border-border shadow-2xl rounded-[2.5rem] p-10 space-y-8 relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[80px] rounded-full -mr-32 -mt-32 group-hover:bg-primary/10 transition-colors pointer-events-none" />
 
                         <h2 className="text-sm font-black text-foreground tracking-[0.25em] uppercase opacity-50 mb-4 italic">{t("product_form.core_specs", "Core Specifications")}</h2>
 
@@ -360,7 +360,7 @@ export default function ProductForm({
                                                 value={customCategory}
                                                 onChange={(e) => setCustomCategory(e.target.value)}
                                                 placeholder="e.g. Artisanal Rare Earth Magnets"
-                                                className={inputClass + " border-white/30 bg-white/5"}
+                                                className={inputClass + " border-primary/30 bg-primary/5"}
                                             />
                                             <p className="text-[9px] text-white/60 mt-2 ml-1 italic font-medium uppercase tracking-wider">This will create a new unique sector for your listing</p>
                                         </div>
@@ -568,10 +568,10 @@ export default function ProductForm({
                     </div>
 
                     {/* Status Guard */}
-                    <div className="bg-white/5 border border-white/20 rounded-[2.5rem] p-8 relative overflow-hidden group">
-                        <Save className="w-10 h-10 text-white mb-4 opacity-30" />
-                        <p className="text-[10px] font-black text-white uppercase tracking-[0.2em]">{t("product_form.listing_protocols", "Listing Protocols")}</p>
-                        <ul className="text-[10px] text-slate-500 mt-4 space-y-2 italic font-medium leading-relaxed">
+                    <div className="bg-muted border border-border rounded-[2.5rem] p-8 relative overflow-hidden group">
+                        <Save className="w-10 h-10 text-primary mb-4 opacity-30" />
+                        <p className="text-[10px] font-black text-foreground uppercase tracking-[0.2em]">{t("product_form.listing_protocols", "Listing Protocols")}</p>
+                        <ul className="text-[10px] text-muted-foreground mt-4 space-y-2 italic font-medium leading-relaxed">
                             <li>• {t("product_form.protocols.price", "Prices should be in USD.")}</li>
                             <li>• {t("product_form.protocols.metric", "Weights must use metric units.")}</li>
                             <li>• {t("product_form.protocols.trust", "Quality images increase buyer trust.")}</li>
@@ -595,7 +595,7 @@ export default function ProductForm({
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="flex-1 sm:flex-none relative group px-12 py-4 bg-white hover:bg-neutral-100 disabled:opacity-50 text-black font-black text-[10px] uppercase tracking-[0.3em] rounded-2xl shadow-2xl shadow-white/10 transition-all active:scale-95 overflow-hidden"
+                            className="flex-1 sm:flex-none relative group px-12 py-4 bg-primary hover:bg-primary/90 disabled:opacity-50 text-primary-foreground font-black text-[10px] uppercase tracking-[0.3em] rounded-2xl shadow-2xl shadow-primary/10 transition-all active:scale-95 overflow-hidden"
                         >
                             <span className="relative z-10 flex items-center gap-3">
                                 {isSubmitting ? (
@@ -605,7 +605,7 @@ export default function ProductForm({
                                 )}
                                 {isEdit ? t("product_form.commit_updates", "Commit Updates") : t("product_form.deploy_listing", "Deploy Listing")}
                             </span>
-                            <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                            <div className="absolute inset-0 bg-white/5 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                         </button>
                     </div>
                 </div>

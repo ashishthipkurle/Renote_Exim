@@ -47,56 +47,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create the profile and auto-verify
+    // Create the profile and auto-sync
     if (userId) {
       try {
-        const fs = await import("fs");
-        const path = await import("path");
-        const logPath = path.join(process.cwd(), "debug-register.log");
-        const log = (msg: string) => fs.appendFileSync(logPath, `[${new Date().toISOString()}] ${msg}\n`);
-
         const prismaModule = await import("@/lib/prisma");
 
-        // Auto-verify the user email so they can log in immediately
-        try {
-          await prismaModule.prisma.$executeRawUnsafe(
-            `UPDATE auth.users SET email_verified = true WHERE email = $1`,
-            validatedData.email
-          );
-          log("Auto-verify successful");
-        } catch (e: any) {
-          log(`Auto-verify failed: ${e.message || String(e)}`);
-          console.warn("Auto-verify failed:", e);
-        }
-
         // Create/update public profile
-        try {
-          await prismaModule.prisma.user.upsert({
-            where: { id: userId },
-            update: {
-              name: validatedData.name,
-              email: validatedData.email,
-              role: validatedData.role,
-              businessName: validatedData.companyName || null,
-              country: validatedData.country,
-              phone: validatedData.phone || null,
-            },
-            create: {
-              id: userId,
-              name: validatedData.name,
-              email: validatedData.email,
-              role: validatedData.role,
-              businessName: validatedData.companyName || null,
-              country: validatedData.country,
-              phone: validatedData.phone || null,
-              verificationStatus: "PENDING",
-            },
-          });
-          log("Prisma upsert successful");
-        } catch (e: any) {
-          log(`Prisma upsert failed: ${e.message || String(e)}`);
-          throw e; // throw to be caught by outer sync catch
-        }
+        await prismaModule.prisma.user.upsert({
+          where: { id: userId },
+          update: {
+            name: validatedData.name,
+            email: validatedData.email,
+            role: validatedData.role,
+            businessName: validatedData.companyName || null,
+            country: validatedData.country,
+            phone: validatedData.phone || null,
+          },
+          create: {
+            id: userId,
+            name: validatedData.name,
+            email: validatedData.email,
+            role: validatedData.role,
+            businessName: validatedData.companyName || null,
+            country: validatedData.country,
+            phone: validatedData.phone || null,
+            verificationStatus: "VERIFIED", 
+          },
+        });
 
         // Welcome notification
         try {
@@ -105,23 +82,18 @@ export async function POST(request: NextRequest) {
               userId: userId,
               type: "ORDER_UPDATE",
               title: "Welcome to Renote Exim!",
-              message: `Welcome ${validatedData.name ?? ""}! Your account has been created.`,
+              message: `Welcome ${validatedData.name ?? ""}! Your account has been created successfully.`,
             },
           });
-          log("Notification successful");
         } catch (e) {
           console.warn("Welcome notification failed:", e);
         }
       } catch (e: any) {
-        const fs = await import("fs");
-        const path = await import("path");
-        const logPath = path.join(process.cwd(), "debug-register.log");
-        fs.appendFileSync(logPath, `[${new Date().toISOString()}] Prisma sync failed during registration: ${e.message || String(e)}\n\n`);
-        console.warn("Prisma sync failed during registration:", e);
+        console.warn("Prisma sync failed during registration:", e.message);
       }
     }
 
-    // If we got a session directly, use it
+    // Return session or perform auto-login
     if (session?.accessToken) {
       const response = NextResponse.json(
         {
@@ -132,12 +104,10 @@ export async function POST(request: NextRequest) {
         { status: 201 }
       );
       
-      console.log("[Register] Success. Setting response cookie:", AUTH_COOKIE_NAME);
       response.cookies.set(AUTH_COOKIE_NAME, session.accessToken, AUTH_COOKIE_OPTIONS);
       return response;
     }
 
-    // No session - try auto-login since we just verified the email
     if (userId) {
       try {
         const loginResult = await nhost.auth.signInEmailPassword({
@@ -159,7 +129,7 @@ export async function POST(request: NextRequest) {
           return response;
         }
       } catch (e) {
-        console.warn("Auto-login after registration failed:", e);
+        console.warn("Auto-login failed:", e);
       }
     }
 

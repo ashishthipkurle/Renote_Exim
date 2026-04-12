@@ -11,7 +11,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const auth = await getApiAuthContext(request);
+    const { auth, error: authError } = await getApiAuthContext(request);
     const role = auth?.role || 'USER';
 
     const product = await prisma.product.findUnique({
@@ -60,10 +60,10 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const auth = await getApiAuthContext(request);
+    const { auth, error: authError } = await getApiAuthContext(request);
 
-    if (!auth) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (authError || !auth) {
+      return authError || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Check if product exists and belongs to user
@@ -144,7 +144,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const auth = await getApiAuthContext(request);
+    const { auth, error: authError } = await getApiAuthContext(request);
 
     if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

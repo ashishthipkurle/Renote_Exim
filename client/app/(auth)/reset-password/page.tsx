@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import axios from "axios";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
-import { getSupabaseBrowserClient } from "@/lib/auth-client";
+import { getCookie } from "@/lib/auth-client";
 
 function getApiErrorMessage(error: unknown): string | null {
   if (!error || typeof error !== "object") return null;
@@ -36,17 +36,12 @@ export default function ResetPasswordPage() {
   });
 
   useEffect(() => {
-    // Check if the user is actually authorized to be here
-    // Supabase will have set a session if they came from a recovery link
-    const checkSession = async () => {
-      const supabase = getSupabaseBrowserClient();
-      const { data } = await supabase.auth.getSession();
-      if (!data.session) {
-        toast.error("Invalid or expired reset link.");
-        router.push("/login");
-      }
-    };
-    checkSession();
+    // Check if the user is authorized via cookie
+    const token = getCookie("sb_access_token");
+    if (!token) {
+      toast.error("Invalid or expired reset session.");
+      router.push("/login");
+    }
   }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {

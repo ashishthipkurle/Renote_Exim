@@ -6,9 +6,9 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
     try {
-        const auth = await getApiAuthContext(request);
-        if (!auth) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const { auth, error: authError } = await getApiAuthContext(request);
+        if (authError || !auth) {
+            return authError || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         const { searchParams } = request.nextUrl;

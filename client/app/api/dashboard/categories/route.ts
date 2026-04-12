@@ -7,9 +7,9 @@ export const dynamic = 'force-dynamic';
 // GET /api/dashboard/categories — Product categories with stats
 export async function GET(request: NextRequest) {
   try {
-    const auth = await getApiAuthContext(request);
-    if (!auth) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { auth, error: authError } = await getApiAuthContext(request);
+    if (authError || !auth) {
+      return authError || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     if (auth.role === 'EXPORTER') {
@@ -93,9 +93,9 @@ export async function GET(request: NextRequest) {
 // POST /api/dashboard/categories — Toggle category preference
 export async function POST(request: NextRequest) {
   try {
-    const auth = await getApiAuthContext(request);
-    if (!auth || auth.role !== 'IMPORTER') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { auth, error: authError } = await getApiAuthContext(request);
+    if (authError || !auth || auth.role !== 'IMPORTER') {
+      return authError || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { category } = await request.json();

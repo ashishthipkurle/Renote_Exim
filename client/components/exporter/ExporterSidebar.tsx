@@ -45,15 +45,15 @@ export default function ExporterSidebar({ basePath }: { basePath: string }) {
   const isMaster = user?.email === "exporter@gmail.com";
 
   const nav: NavItem[] = [
-    { href: basePath, label: "Dashboard", icon: LayoutDashboard },
-    { href: `${basePath}/inventory`, label: "Inventory", icon: Boxes },
-    { href: `${basePath}/orders`, label: "Orders", icon: FolderTree },
-    { href: `${basePath}/rfqs`, label: "RFQs", icon: FileText },
-    { href: `${basePath}/directory`, label: "Buyers", icon: Users },
-    ...(isMaster ? [{ href: `${basePath}/users`, label: "Registry", icon: ShieldCheck }] : []),
-    { href: `${basePath}/suppliers`, label: "Dealers", icon: Handshake },
-    { href: `${basePath}/analytics`, label: "Analytics", icon: LineChart },
-    { href: `${basePath}/finance`, label: "Finance", icon: CreditCard },
+    { href: basePath, labelKey: "sidebar.dashboard", defaultLabel: "Dashboard", icon: LayoutDashboard },
+    { href: `${basePath}/inventory`, labelKey: "sidebar.inventory", defaultLabel: "Inventory", icon: Boxes },
+    { href: `${basePath}/orders`, labelKey: "sidebar.orders", defaultLabel: "Orders", icon: FolderTree },
+    { href: `${basePath}/rfqs`, labelKey: "sidebar.rfqs", defaultLabel: "RFQs", icon: FileText },
+    { href: `${basePath}/directory`, labelKey: "sidebar.buyers", defaultLabel: "Buyers", icon: Users },
+    ...(isMaster ? [{ href: `${basePath}/users`, labelKey: "sidebar.registry", defaultLabel: "Registry", icon: ShieldCheck }] : []),
+    { href: `${basePath}/suppliers`, labelKey: "sidebar.dealers", defaultLabel: "Dealers", icon: Handshake },
+    { href: `${basePath}/analytics`, labelKey: "sidebar.analytics", defaultLabel: "Analytics", icon: LineChart },
+    { href: `${basePath}/finance`, labelKey: "sidebar.finance", defaultLabel: "Finance", icon: CreditCard },
   ];
 
   const isActive = (href: string) =>

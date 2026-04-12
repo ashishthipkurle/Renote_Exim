@@ -116,7 +116,7 @@ export default function CategoryDirectory({ usedCategories = [] }: { usedCategor
     };
 
     return (
-        <div className="bg-card/40 dark:bg-white/5 backdrop-blur-3xl border border-border dark:border-white/5 rounded-[3rem] p-10 lg:p-12 shadow-xl dark:shadow-2xl relative overflow-hidden group min-h-[700px] transition-all duration-700">
+        <div className="bg-card/40 backdrop-blur-3xl border border-border rounded-[3rem] p-10 lg:p-12 shadow-xl dark:shadow-2xl relative overflow-hidden group min-h-[700px] transition-all duration-700">
             {/* ── Background Elements ── */}
             <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/5 via-transparent to-transparent pointer-events-none transition-opacity duration-1000 ${isSelected ? 'opacity-20' : 'opacity-100'}`} />
             <div className={`absolute -bottom-48 -right-48 w-[600px] h-[600px] bg-black/5 dark:bg-white/10 blur-[150px] rounded-full transition-all duration-1000 pointer-events-none ${isSelected ? 'scale-150 -translate-x-1/2 -translate-y-1/2 opacity-20' : 'group-hover:bg-black/10 dark:bg-white/15'}`} />
@@ -135,13 +135,13 @@ export default function CategoryDirectory({ usedCategories = [] }: { usedCategor
                     <div className="flex items-center gap-4 flex-wrap">
                         {!isSelected ? (
                             <div className="relative w-full xl:w-[500px] group">
-                                <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/40 group-focus-within:text-foreground dark:text-white transition-colors" />
+                                <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground transition-colors" />
                                 <input
                                     type="text"
                                     placeholder="Search 1000+ industry clusters..."
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
-                                    className="w-full pl-14 pr-6 py-5 bg-card/40 dark:bg-white/5 border border-border dark:border-white/5 rounded-2xl text-[10px] text-foreground dark:text-white font-black uppercase placeholder:text-muted-foreground/20 focus:outline-none focus:border-border dark:border-white/20 transition-all shadow-inner tracking-widest italic"
+                                    className="w-full pl-14 pr-6 py-5 bg-background/40 border border-border rounded-2xl text-[10px] text-foreground font-black uppercase placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary transition-all shadow-inner tracking-widest italic"
                                 />
                             </div>
                         ) : (
@@ -168,7 +168,7 @@ export default function CategoryDirectory({ usedCategories = [] }: { usedCategor
                                             <button
                                                 key={s.name}
                                                 onClick={() => handleSelect(s.name)}
-                                                className="flex flex-col items-center justify-center p-6 bg-black/5 dark:bg-white/10 border border-border dark:border-white/5 rounded-3xl hover:bg-primary hover:border-transparent transition-all duration-500 group/btn active:scale-95 shadow-xl dark:shadow-2xl backdrop-blur-xl"
+                                                className="flex flex-col items-center justify-center p-6 bg-muted border border-border rounded-3xl hover:bg-primary hover:border-transparent transition-all duration-500 group/btn active:scale-95 shadow-xl dark:shadow-2xl backdrop-blur-xl"
                                             >
                                                 <span className="text-3xl mb-3 group-hover/btn:scale-125 transition-transform duration-500">{s.icon}</span>
                                                 <span className="text-[9px] font-black uppercase tracking-[0.2em] text-foreground dark:text-white group-hover/btn:text-primary-foreground transition-colors">{s.name}</span>
@@ -176,10 +176,10 @@ export default function CategoryDirectory({ usedCategories = [] }: { usedCategor
                                         ))}
                                         <button
                                             onClick={() => handleSelect("OTHER")}
-                                            className="flex flex-col items-center justify-center p-6 bg-black/5 dark:bg-white/10 border border-border dark:border-white/5 rounded-3xl hover:bg-primary transition-all duration-500 group/btn active:scale-95 shadow-xl dark:shadow-2xl backdrop-blur-xl"
+                                            className="flex flex-col items-center justify-center p-6 bg-muted border border-border rounded-3xl hover:bg-primary transition-all duration-500 group/btn active:scale-95 shadow-xl dark:shadow-2xl backdrop-blur-xl"
                                         >
-                                            <Plus className="w-7 h-7 text-foreground dark:text-white group-hover/btn:text-primary-foreground mb-3" />
-                                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-foreground dark:text-white group-hover/btn:text-primary-foreground transition-colors">Other</span>
+                                            <Plus className="w-7 h-7 text-foreground group-hover/btn:text-primary-foreground mb-3" />
+                                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-foreground group-hover/btn:text-primary-foreground transition-colors">Other</span>
                                         </button>
                                     </div>
                                 </div>
@@ -231,7 +231,7 @@ export default function CategoryDirectory({ usedCategories = [] }: { usedCategor
                                 exit={{ x: 100, opacity: 0 }}
                                 className="absolute inset-0 z-20 h-full"
                             >
-                                <div className="bg-card/60 dark:bg-white/[0.07] backdrop-blur-3xl border border-border dark:border-white/10 rounded-[4rem] p-12 lg:p-16 shadow-[0_0_100px_rgba(0,0,0,0.5)] h-full overflow-y-auto custom-scrollbar">
+                                <div className="bg-card/60 backdrop-blur-3xl border border-border rounded-[4rem] p-12 lg:p-16 shadow-[0_0_100px_rgba(0,0,0,0.5)] h-full overflow-y-auto custom-scrollbar">
                                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-10 mb-16">
                                         <div>
                                             <h3 className="text-4xl font-black text-foreground dark:text-white uppercase italic tracking-tighter">Listing Protocol</h3>

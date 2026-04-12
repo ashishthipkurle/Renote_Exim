@@ -1,54 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { createSupabaseRouteClient } from "@/lib/supabase/route";
+import { getApiAuthContext } from "@/lib/auth-server";
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
     try {
-        const { supabase } = createSupabaseRouteClient(req);
+        // 1. Resolve identity via Nhost
+        const { auth, error } = await getApiAuthContext(req);
         
-        // 1. Get the token from Authorization header or Cookies
-        const authHeader = req.headers.get("authorization") || req.headers.get("Authorization");
-        let token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
-        
-        if (!token) {
-            const sessionData = await supabase.auth.getSession();
-            token = sessionData.data.session?.access_token || null;
-        }
+        if (error) return error;
 
-        // 2. Resolve identity
-        let userEmail: string | null = null;
-
-        if (token) {
-            // Try standard Supabase verification first
-            const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-            
-            if (user) {
-                userEmail = user.email || null;
-            } else {
-                // FALLBACK: If getUser fails (common on localhost with network/env issues), 
-                // we decode the JWT to check the email claim.
-                // This is safe because we are strictly checking for the HARDCODED master email.
-                try {
-                    const payloadBase64 = token.split(".")[1];
-                    const payload = JSON.parse(Buffer.from(payloadBase64, "base64").toString());
-                    userEmail = payload.email || null;
-                    console.log("Registry Auth: Using JWT fallback for email:", userEmail);
-                } catch (e) {
-                    console.error("JWT Fallback decode failed:", e);
-                }
-            }
-        }
-
-        // 3. Protocol Guard for Master Admin
+        // 2. Protocol Guard for Master Admin
+        const userEmail = auth?.email;
         if (!userEmail || userEmail.toLowerCase() !== "exporter@gmail.com") {
             return NextResponse.json({ 
                 error: `Access Denied: Master Clearance Required (Detected: ${userEmail || 'No Session'})` 
             }, { status: 403 });
         }
 
-        // 4. Data Retrieval
+        // 3. Data Retrieval
         const searchParams = req.nextUrl.searchParams;
         const page = parseInt(searchParams.get("page") || "1");
         const pageSize = parseInt(searchParams.get("pageSize") || "20");
@@ -115,30 +86,10 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
     try {
-        const { supabase } = createSupabaseRouteClient(req);
-        
-        const authHeader = req.headers.get("authorization") || req.headers.get("Authorization");
-        let token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
-        
-        if (!token) {
-            const { data: sessionData } = await supabase.auth.getSession();
-            token = sessionData.session?.access_token || null;
-        }
+        const { auth, error } = await getApiAuthContext(req);
+        if (error) return error;
 
-        let userEmail: string | null = null;
-        if (token) {
-            const { data: { user } } = await supabase.auth.getUser(token);
-            if (user) {
-                userEmail = user.email || null;
-            } else {
-                try {
-                    const payloadBase64 = token.split(".")[1];
-                    const payload = JSON.parse(Buffer.from(payloadBase64, "base64").toString());
-                    userEmail = payload.email || null;
-                } catch (e) {}
-            }
-        }
-
+        const userEmail = auth?.email;
         if (!userEmail || userEmail.toLowerCase() !== "exporter@gmail.com") {
              return NextResponse.json({ error: "Access Denied: Master Clearance Required" }, { status: 403 });
         }
@@ -187,3 +138,4 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Failed to perform action" }, { status: 500 });
     }
 }
+

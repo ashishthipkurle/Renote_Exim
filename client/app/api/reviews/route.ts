@@ -4,8 +4,10 @@ import { getApiAuthContext } from '@/lib/auth-server';
 
 export async function POST(request: NextRequest) {
   try {
-    const context = await getApiAuthContext(request);
-    if (!context) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { auth: context, error: authError } = await getApiAuthContext(request);
+    if (authError || !context) {
+      return authError || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     const { orderId, userId, rating, comment } = await request.json();
 

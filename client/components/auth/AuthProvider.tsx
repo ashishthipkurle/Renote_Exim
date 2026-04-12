@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import axios from "axios";
+import { nhost } from "@/lib/nhost";
 import type { StoredUser } from "@/lib/auth-client";
 
 type AuthContextType = {
@@ -14,48 +15,39 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
-  refreshUser: async () => {},
-  logout: async () => {},
+  refreshUser: async () => { },
+  logout: async () => { },
 });
-
-/**
- * Helper: read the sb_access_token cookie value from document.cookie.
- */
-function getAccessTokenFromCookie(): string | null {
-  if (typeof document === "undefined") return null;
-  const match = document.cookie.match(/(?:^|;\s*)sb_access_token=([^;]*)/);
-  if (!match) return null;
-  try {
-    return decodeURIComponent(match[1]) || null;
-  } catch {
-    return null;
-  }
-}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<StoredUser | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const clearMiddlewareTokenCookie = () => {
-    if (typeof document === "undefined") return;
-    document.cookie = "sb_access_token=; Path=/; Max-Age=0; SameSite=Lax";
-  };
-
-  const fetchUser = useCallback(async (token?: string) => {
+  /**
+   * Syncs the Nhost session to server-side cookies via our sync API.
+   */
+  const syncSession = useCallback(async (session: any) => {
     try {
-      console.log("[Auth Trace] Attempting session discovery...");
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      const res = await axios.get("/api/auth/me", { headers });
-      
+      await axios.post("/api/auth/sync", {
+        accessToken: session?.accessToken || null,
+        refreshToken: session?.refreshToken || null,
+        user: session?.user || null,
+      });
+      console.log("[Auth Sync] Session synchronized to cookies.");
+    } catch (error) {
+      console.error("[Auth Sync] Failed to synchronize session:", error);
+    }
+  }, []);
+
+  const fetchUser = useCallback(async () => {
+    try {
+      const res = await axios.get("/api/auth/me");
       if (res.data.user) {
-        console.log("[Auth Trace] Session found:", res.data.user.email, "(Role:", res.data.user.role, ")");
         setUser(res.data.user);
       } else {
-        console.log("[Auth Trace] No active session found.");
         setUser(null);
       }
     } catch (error) {
-      console.warn("[Auth Trace] Session fetch failed or unauthorized.");
       setUser(null);
     } finally {
       setLoading(false);
@@ -63,7 +55,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const refreshUser = useCallback(async () => {
-    console.log("[Auth Trace] Force refreshing session state...");
     setLoading(true);
     await fetchUser();
   }, [fetchUser]);
@@ -71,13 +62,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     try {
       setLoading(true);
-      await axios.post("/api/auth/logout").catch(() => {});
-
+      await nhost.auth.signOut();
+      await axios.post("/api/auth/logout").catch(() => { });
+      
       if (typeof window !== "undefined") {
         window.localStorage.removeItem("user");
       }
-
-      clearMiddlewareTokenCookie();
+      
       setUser(null);
     } catch (error) {
       console.error("Logout failed", error);
@@ -87,10 +78,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    // On mount, check if there's an existing session.
-    // Since we use HTTP-Only cookies, we attempt a blind fetch.
+    // 1. Initial Discovery and Sync
     fetchUser();
-  }, [fetchUser]);
+    
+    // 2. Listen for Nhost session changes (including background refreshes)
+    const unsubscribe = nhost.sessionStorage.onChange((session) => {
+      console.log("[AuthProvider] Session state changed. Active session:", !!session);
+      
+      if (session) {
+         syncSession(session);
+         // We could call fetchUser() here if we want to immediately get the profile from API
+      } else {
+         syncSession(null);
+         setUser(null);
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [fetchUser, syncSession]);
 
   return (
     <AuthContext.Provider value={{ user, loading, refreshUser, logout }}>
@@ -100,3 +107,4 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 }
 
 export const useAuth = () => useContext(AuthContext);
+

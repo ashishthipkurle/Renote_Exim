@@ -7,9 +7,9 @@ export const dynamic = 'force-dynamic';
 // GET /api/dashboard/finance — Financial summary for the authenticated user
 export async function GET(request: NextRequest) {
   try {
-    const auth = await getApiAuthContext(request);
-    if (!auth) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { auth, error: authError } = await getApiAuthContext(request);
+    if (authError || !auth) {
+      return authError || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     if (auth.role === 'EXPORTER') {
@@ -152,8 +152,8 @@ export async function GET(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const auth = await getApiAuthContext(request);
-    if (!auth || auth.role !== 'IMPORTER') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (authError || !auth || auth.role !== 'IMPORTER') {
+      return authError || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { monthlyBudget } = await request.json();

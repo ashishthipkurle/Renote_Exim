@@ -12,6 +12,7 @@ export type AuthContext = {
 };
 
 export const AUTH_COOKIE_NAME = "sb_access_token";
+export const REFRESH_COOKIE_NAME = "sb_refresh_token";
 
 export const AUTH_COOKIE_OPTIONS = {
   path: "/",
@@ -54,7 +55,7 @@ export async function getApiAuthContext(
     const subdomain = process.env.NEXT_PUBLIC_NHOST_SUBDOMAIN;
     const region = process.env.NEXT_PUBLIC_NHOST_REGION;
     const verifyUrl = `https://${subdomain}.auth.${region}.nhost.run/v1/user`;
-    
+
     const verifyRes = await fetch(verifyUrl, {
       method: "GET",
       headers: {
@@ -65,6 +66,60 @@ export async function getApiAuthContext(
 
     if (!verifyRes.ok) {
       console.warn("[Auth] Token verification API failed with status:", verifyRes.status);
+      
+      // 2b. If invalid/expired, try to refresh using the refresh token
+      const refreshToken = cookieStore.get(REFRESH_COOKIE_NAME)?.value;
+      if (refreshToken) {
+        console.log("[Auth] Attempting token refresh...");
+        const refreshRes = await fetch(`https://${subdomain}.auth.${region}.nhost.run/v1/token`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ refreshToken }),
+          cache: "no-store",
+        });
+
+        if (refreshRes.ok) {
+          const refreshData = await refreshRes.json();
+          const newAccessToken = refreshData.accessToken;
+          const newRefreshToken = refreshData.refreshToken;
+
+          if (newAccessToken) {
+            console.log("[Auth] Token refreshed successfully");
+            // Set the new tokens in cookies for the next request
+            try {
+              cookieStore.set(AUTH_COOKIE_NAME, newAccessToken, AUTH_COOKIE_OPTIONS);
+              if (newRefreshToken) {
+                cookieStore.set(REFRESH_COOKIE_NAME, newRefreshToken, {
+                  ...AUTH_COOKIE_OPTIONS,
+                  maxAge: 60 * 60 * 24 * 30, // 30 days
+                });
+              }
+            } catch (cookieErr) {
+              console.warn("[Auth] Failed to set new cookies in getApiAuthContext:", cookieErr);
+            }
+
+            // Return user data from the refresh response
+            const userData = refreshData.user;
+            if (userData?.id) {
+               return await getContextForUser(userData.id, allowedRoles);
+            } else {
+               console.warn("[Auth] Refresh successful but no user.id in response.");
+            }
+          } else {
+            console.warn("[Auth] Refresh API succeeded but returned no new access token.");
+          }
+        } else {
+          console.warn("[Auth] Refresh API failed with status:", refreshRes.status);
+          try {
+            const errBody = await refreshRes.json();
+            console.warn("[Auth] Refresh API error:", errBody);
+          } catch {}
+        }
+      } else {
+        console.warn("[Auth] No refresh token found in cookies.");
+      }
+
+      console.warn("[Auth] Returning 401 'Invalid or expired token'.");
       return {
         auth: null,
         error: NextResponse.json({ error: "Invalid or expired token" }, { status: 401 }),
@@ -97,7 +152,7 @@ export async function getApiAuthContext(
     });
 
     if (!dbUser) {
-      console.warn("[Auth] User in Nhost but missing in Prisma:", user.id);
+      console.warn("[Auth] User in Nhost but missing in Prisma:", userId);
       return {
         auth: null,
         error: NextResponse.json({ error: "User profile not found in database" }, { status: 401 }),
@@ -137,6 +192,42 @@ export async function getApiAuthContext(
 }
 
 /**
+ * Internal helper to fetch user from DB and verify roles
+ */
+async function getContextForUser(userId: string, allowedRoles?: Role[]): Promise<{ auth: AuthContext | null; error: NextResponse | null }> {
+  const dbUser = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!dbUser) {
+    return {
+      auth: null,
+      error: NextResponse.json({ error: "User profile not found in database" }, { status: 401 }),
+    };
+  }
+
+  if (allowedRoles && allowedRoles.length > 0 && !allowedRoles.includes(dbUser.role)) {
+    return {
+      auth: null,
+      error: NextResponse.json(
+        { error: "Forbidden: You do not have the required permissions" },
+        { status: 403 }
+      ),
+    };
+  }
+
+  return {
+    auth: {
+      userId: dbUser.id,
+      role: dbUser.role,
+      email: dbUser.email,
+      user: dbUser,
+    },
+    error: null,
+  };
+}
+
+/**
  * Shorthand for simple getServerAuthContext (legacy support)
  */
 export async function getServerAuthContext(req?: NextRequest): Promise<AuthContext | null> {
@@ -150,4 +241,14 @@ export async function getServerAuthContext(req?: NextRequest): Promise<AuthConte
 export function setServerAuthCookie(accessToken: string) {
   const cookieStore = cookies();
   cookieStore.set(AUTH_COOKIE_NAME, accessToken, AUTH_COOKIE_OPTIONS);
+}
+
+/**
+ * Clears the auth cookies
+ */
+export function clearServerAuthCookie() {
+    const cookieStore = cookies();
+    cookieStore.delete(AUTH_COOKIE_NAME);
+    cookieStore.delete(REFRESH_COOKIE_NAME);
+    cookieStore.delete('nhost-session'); // Clear old ones too
 }

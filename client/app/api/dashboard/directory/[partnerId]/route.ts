@@ -10,9 +10,9 @@ export async function GET(
     { params }: { params: { partnerId: string } }
 ) {
     try {
-        const auth = await getApiAuthContext(request);
-        if (!auth) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const { auth, error: authError } = await getApiAuthContext(request);
+        if (authError || !auth) {
+            return authError || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         const { partnerId } = params;

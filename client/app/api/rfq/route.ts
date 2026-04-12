@@ -4,9 +4,9 @@ import { getApiAuthContext } from '@/lib/auth-server';
 
 export async function POST(request: NextRequest) {
   try {
-    const context = await getApiAuthContext(request);
-    if (!context || context.role !== 'IMPORTER') {
-      return NextResponse.json({ error: 'Only importers can create RFQs' }, { status: 403 });
+    const { auth: context, error: authError } = await getApiAuthContext(request);
+    if (authError || !context || context.role !== 'IMPORTER') {
+      return authError || NextResponse.json({ error: 'Only importers can create RFQs' }, { status: 403 });
     }
 
     const { title, description, category, quantity, unit, budget, deadline, exporterId } = await request.json();
@@ -34,8 +34,10 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const context = await getApiAuthContext(request);
-    if (!context) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { auth: context, error: authError } = await getApiAuthContext(request);
+    if (authError || !context) {
+      return authError || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     const rfqs = await (prisma as any).rfq.findMany({
       where: context.role === 'IMPORTER' 

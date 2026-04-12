@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { createSupabaseRouteClient } from "@/lib/supabase/route";
+import { getApiAuthContext } from "@/lib/auth-server";
 
 /**
  * GET /api/messaging
@@ -8,11 +8,10 @@ import { createSupabaseRouteClient } from "@/lib/supabase/route";
  */
 export async function GET(req: NextRequest) {
   try {
-    const { supabase } = createSupabaseRouteClient(req);
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const { auth, error: authError } = await getApiAuthContext(req);
 
-    if (authError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (authError || !auth) {
+      return authError || NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
@@ -28,8 +27,8 @@ export async function GET(req: NextRequest) {
       const messages = await prisma.message.findMany({
         where: {
           OR: [
-            { senderId: user.id, receiverId: otherUserId },
-            { senderId: otherUserId, receiverId: user.id },
+            { senderId: auth.userId, receiverId: otherUserId },
+            { senderId: otherUserId, receiverId: auth.userId },
           ],
           ...(orderId ? { orderId } : {}),
           ...(beforeDate && !Number.isNaN(beforeDate.getTime()) ? { createdAt: { lt: beforeDate } } : {}),
@@ -56,7 +55,7 @@ export async function GET(req: NextRequest) {
       WITH conversation_messages AS (
         SELECT
           CASE
-            WHEN m."senderId" = ${user.id} THEN m."receiverId"
+            WHEN m."senderId" = ${auth.userId} THEN m."receiverId"
             ELSE m."senderId"
           END AS "otherUserId",
           m.id,
@@ -64,7 +63,7 @@ export async function GET(req: NextRequest) {
           m."createdAt",
           m."senderId"
         FROM messages m
-        WHERE m."senderId" = ${user.id} OR m."receiverId" = ${user.id}
+        WHERE m."senderId" = ${auth.userId} OR m."receiverId" = ${auth.userId}
       ),
       latest_messages AS (
         SELECT DISTINCT ON ("otherUserId")
@@ -81,7 +80,7 @@ export async function GET(req: NextRequest) {
           m."senderId" AS "otherUserId",
           COUNT(*)::int AS "unreadCount"
         FROM messages m
-        WHERE m."receiverId" = ${user.id} AND m."isRead" = false
+        WHERE m."receiverId" = ${auth.userId} AND m."isRead" = false
         GROUP BY m."senderId"
       )
       SELECT
@@ -142,11 +141,10 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
-    const { supabase } = createSupabaseRouteClient(req);
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const { auth, error: authError } = await getApiAuthContext(req);
 
-    if (authError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (authError || !auth) {
+      return authError || NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { receiverId, content, orderId, subject } = await req.json();
@@ -162,7 +160,7 @@ export async function POST(req: NextRequest) {
 
     const newMessage = await prisma.message.create({
       data: {
-        senderId: user.id,
+        senderId: auth.userId,
         receiverId,
         body: messageText,
         orderId,

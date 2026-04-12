@@ -9,8 +9,11 @@ export async function GET(request: NextRequest) {
     const { auth, error } = await getApiAuthContext(request);
 
     if (error || !auth) {
+      // Return the specific error from context if available
+      if (error) return error;
+      
       return NextResponse.json(
-        { error: error?.statusText || "Unauthorized" },
+        { error: "Unauthorized access" },
         { status: 401 }
       );
     }

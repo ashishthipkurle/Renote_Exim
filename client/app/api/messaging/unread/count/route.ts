@@ -4,8 +4,8 @@ import { getApiAuthContext } from '@/lib/auth-server';
 
 export async function GET(request: NextRequest) {
   try {
-    const context = await getApiAuthContext(request);
-    if (!context) return NextResponse.json({ count: 0 });
+    const { auth: context, error: authError } = await getApiAuthContext(request);
+    if (authError || !context) return NextResponse.json({ count: 0 });
 
     const count = await prisma.message.count({
       where: {

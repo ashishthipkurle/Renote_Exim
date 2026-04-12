@@ -4,10 +4,11 @@ import { getApiAuthContext } from '@/lib/auth-server';
 
 export async function GET(request: NextRequest) {
   try {
-    const context = await getApiAuthContext(request);
+    const { auth: context, error: authError } = await getApiAuthContext(request);
     
-    // If not logged in, return top trending products
-    if (!context) {
+    // If not logged in or invalid token, return top trending products
+    // (In this public route, we treat auth errors as guest access)
+    if (authError || !context) {
       const trending = await prisma.product.findMany({
         take: 10,
         orderBy: {

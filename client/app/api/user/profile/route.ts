@@ -8,9 +8,9 @@ export const dynamic = 'force-dynamic';
 // GET /api/user/profile — Get current user profile
 export async function GET(request: NextRequest) {
   try {
-    const auth = await getApiAuthContext(request);
-    if (!auth) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { auth, error: authError } = await getApiAuthContext(request);
+    if (authError || !auth) {
+      return authError || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
@@ -65,9 +65,9 @@ const updateProfileSchema = z.object({
 // PATCH /api/user/profile — Update user profile
 export async function PATCH(request: NextRequest) {
   try {
-    const auth = await getApiAuthContext(request);
-    if (!auth) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { auth, error: authError } = await getApiAuthContext(request);
+    if (authError || !auth) {
+      return authError || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -130,9 +130,9 @@ export async function PATCH(request: NextRequest) {
 // DELETE /api/user/profile — Delete user account
 export async function DELETE(request: NextRequest) {
   try {
-    const auth = await getApiAuthContext(request);
-    if (!auth) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { auth, error: authError } = await getApiAuthContext(request);
+    if (authError || !auth) {
+      return authError || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Cascade deletion is handled at the DB level via schema.prisma onDelete: Cascade

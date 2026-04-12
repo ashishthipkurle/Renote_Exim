@@ -4,9 +4,9 @@ import { getApiAuthContext } from '@/lib/auth-server';
 
 export async function POST(request: NextRequest) {
   try {
-    const context = await getApiAuthContext(request);
-    if (!context || context.role !== 'EXPORTER') {
-      return NextResponse.json({ error: 'Only exporters can submit quotes' }, { status: 403 });
+    const { auth: context, error: authError } = await getApiAuthContext(request);
+    if (authError || !context || context.role !== 'EXPORTER') {
+      return authError || NextResponse.json({ error: 'Only exporters can submit quotes' }, { status: 403 });
     }
 
     const { rfqId, price, leadTime, validUntil, terms, note } = await request.json();
@@ -42,9 +42,10 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const rfqId = searchParams.get('rfqId');
-    const context = await getApiAuthContext(request);
-    
-    if (!context) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { auth: context, error: authError } = await getApiAuthContext(request);
+    if (authError || !context) {
+      return authError || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     const where: any = {};
     if (rfqId) where.rfqId = rfqId;
@@ -72,9 +73,9 @@ export async function GET(request: NextRequest) {
 // PATCH for accepting/rejecting quotes
 export async function PATCH(request: NextRequest) {
   try {
-    const context = await getApiAuthContext(request);
-    if (!context || context.role !== 'IMPORTER') {
-      return NextResponse.json({ error: 'Only importers can manage quotes' }, { status: 403 });
+    const { auth: context, error: authError } = await getApiAuthContext(request);
+    if (authError || !context || context.role !== 'IMPORTER') {
+      return authError || NextResponse.json({ error: 'Only importers can manage quotes' }, { status: 403 });
     }
 
     const { id, status } = await request.json();

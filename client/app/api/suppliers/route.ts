@@ -18,9 +18,9 @@ const supplierSchema = z.object({
 // GET /api/suppliers - List all suppliers for the exporter
 export async function GET(request: NextRequest) {
     try {
-        const auth = await getApiAuthContext(request);
-        if (!auth) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const { auth, error: authError } = await getApiAuthContext(request);
+        if (authError || !auth) {
+            return authError || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         const role = auth.role as any;
@@ -69,10 +69,13 @@ export async function GET(request: NextRequest) {
 // POST /api/suppliers - Create a new supplier
 export async function POST(request: NextRequest) {
     try {
-        const auth = await getApiAuthContext(request);
-        const role = auth?.role as any;
-        if (!auth || (role !== 'EXPORTER' && role !== 'ADMIN')) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const { auth, error: authError } = await getApiAuthContext(request);
+        if (authError || !auth) {
+            return authError || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+        const role = auth.role as any;
+        if (role !== 'EXPORTER' && role !== 'ADMIN') {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
         }
 
         const body = await request.json();

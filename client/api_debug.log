@@ -793,3 +793,834 @@
   "message": "Could not find the 'stockQty' column of 'products' in the schema cache"
 >>>>>>> 305b3fb9cc3d80f2259a21c264d892a5748a1e0d
 }
+[2026-04-11T18:50:30.293Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled TV",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled TV",
+  "price": 1200,
+  "regularPrice": 33989,
+  "minOrderQty": 14,
+  "unit": "pics",
+  "originCountry": "India",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775933392/renote-exim/products/zewmxfca4xg6wqqpuyzc.jpg"
+  ],
+  "certifications": [],
+  "quantity": 6
+}
+[2026-04-11T18:50:31.533Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled TV",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled TV",
+  "price": 1200,
+  "regularPrice": 33989,
+  "minOrderQty": 14,
+  "unit": "pics",
+  "originCountry": "India",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775933392/renote-exim/products/zewmxfca4xg6wqqpuyzc.jpg"
+  ],
+  "certifications": [],
+  "quantity": 6
+}
+[2026-04-11T18:50:33.572Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled TV",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled TV",
+  "price": 1200,
+  "regularPrice": 33989,
+  "minOrderQty": 14,
+  "unit": "pics",
+  "originCountry": "India",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775933392/renote-exim/products/zewmxfca4xg6wqqpuyzc.jpg"
+  ],
+  "certifications": [],
+  "quantity": 6
+}
+[2026-04-11T18:52:30.783Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled TV",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled TV",
+  "price": 1200,
+  "regularPrice": 33989,
+  "minOrderQty": 14,
+  "unit": "pics",
+  "originCountry": "India",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775933392/renote-exim/products/zewmxfca4xg6wqqpuyzc.jpg"
+  ],
+  "certifications": [],
+  "quantity": 6
+}
+[2026-04-11T18:52:31.742Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled TV",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled TV",
+  "price": 1200,
+  "regularPrice": 33989,
+  "minOrderQty": 14,
+  "unit": "pics",
+  "originCountry": "India",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775933392/renote-exim/products/zewmxfca4xg6wqqpuyzc.jpg"
+  ],
+  "certifications": [],
+  "quantity": 6
+}
+[2026-04-11T18:52:33.125Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled TV",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled TV",
+  "price": 1200,
+  "regularPrice": 33989,
+  "minOrderQty": 14,
+  "unit": "pics",
+  "originCountry": "India",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775933392/renote-exim/products/zewmxfca4xg6wqqpuyzc.jpg"
+  ],
+  "certifications": [],
+  "quantity": 6
+}
+[2026-04-12T12:50:54.858Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled Tv",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled Tv",
+  "price": 234,
+  "regularPrice": 1234,
+  "minOrderQty": 112,
+  "unit": "pics",
+  "originCountry": "India",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775998226/renote-exim/products/tu0evjiwyecr0ejcc460.jpg"
+  ],
+  "certifications": [],
+  "quantity": 23
+}
+[2026-04-12T12:50:55.676Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled Tv",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled Tv",
+  "price": 234,
+  "regularPrice": 1234,
+  "minOrderQty": 112,
+  "unit": "pics",
+  "originCountry": "India",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775998226/renote-exim/products/tu0evjiwyecr0ejcc460.jpg"
+  ],
+  "certifications": [],
+  "quantity": 23
+}
+[2026-04-12T12:50:56.983Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled Tv",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled Tv",
+  "price": 234,
+  "regularPrice": 1234,
+  "minOrderQty": 112,
+  "unit": "pics",
+  "originCountry": "India",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775998226/renote-exim/products/tu0evjiwyecr0ejcc460.jpg"
+  ],
+  "certifications": [],
+  "quantity": 23
+}
+[2026-04-12T12:51:05.136Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled Tv",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled Tv",
+  "price": 234,
+  "regularPrice": 1234,
+  "minOrderQty": 112,
+  "unit": "pics",
+  "originCountry": "India",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775998226/renote-exim/products/tu0evjiwyecr0ejcc460.jpg"
+  ],
+  "certifications": [],
+  "quantity": 23
+}
+[2026-04-12T12:51:05.906Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled Tv",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled Tv",
+  "price": 234,
+  "regularPrice": 1234,
+  "minOrderQty": 112,
+  "unit": "pics",
+  "originCountry": "India",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775998226/renote-exim/products/tu0evjiwyecr0ejcc460.jpg"
+  ],
+  "certifications": [],
+  "quantity": 23
+}
+[2026-04-12T12:51:07.199Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled Tv",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled Tv",
+  "price": 234,
+  "regularPrice": 1234,
+  "minOrderQty": 112,
+  "unit": "pics",
+  "originCountry": "India",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775998226/renote-exim/products/tu0evjiwyecr0ejcc460.jpg"
+  ],
+  "certifications": [],
+  "quantity": 23
+}
+[2026-04-12T12:59:26.830Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled Tv",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled Tv",
+  "price": 234,
+  "regularPrice": 1234,
+  "minOrderQty": 112,
+  "unit": "pics",
+  "originCountry": "India",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775998226/renote-exim/products/tu0evjiwyecr0ejcc460.jpg"
+  ],
+  "certifications": [],
+  "quantity": 23
+}
+[2026-04-12T12:59:26.949Z] [POST /api/products] ERROR 500: 
+Invalid `prisma.product.create()` invocation:
+
+{
+  data: {
+    name: "Samsung 120 inch Qled Tv",
+    category: "ELECTRONICS",
+              ~~~~~~~~~~~~~
+    description: "Samsung 120 inch Qled Tv",
+    price: 234,
+    regularPrice: 1234,
+    minOrderQty: 112,
+    unit: "pics",
+    originCountry: "India",
+    images: [
+      "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775998226/renote-exim/products/tu0evjiwyecr0ejcc460.jpg"
+    ],
+    certifications: [],
+    available: true,
+    stockQty: 23,
+    exporterId: "a2cefc36-7993-4243-8f6b-ea0b6dabbbfe"
+  },
+  include: {
+    exporter: {
+      select: {
+        id: true,
+        name: true,
+        companyName: true,
+        country: true
+      }
+    }
+  }
+}
+
+Invalid value for argument `category`. Expected ProductCategory.
+[2026-04-12T12:59:27.934Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled Tv",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled Tv",
+  "price": 234,
+  "regularPrice": 1234,
+  "minOrderQty": 112,
+  "unit": "pics",
+  "originCountry": "India",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775998226/renote-exim/products/tu0evjiwyecr0ejcc460.jpg"
+  ],
+  "certifications": [],
+  "quantity": 23
+}
+[2026-04-12T12:59:28.105Z] [POST /api/products] ERROR 500: 
+Invalid `prisma.product.create()` invocation:
+
+{
+  data: {
+    name: "Samsung 120 inch Qled Tv",
+    category: "ELECTRONICS",
+              ~~~~~~~~~~~~~
+    description: "Samsung 120 inch Qled Tv",
+    price: 234,
+    regularPrice: 1234,
+    minOrderQty: 112,
+    unit: "pics",
+    originCountry: "India",
+    images: [
+      "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775998226/renote-exim/products/tu0evjiwyecr0ejcc460.jpg"
+    ],
+    certifications: [],
+    available: true,
+    stockQty: 23,
+    exporterId: "a2cefc36-7993-4243-8f6b-ea0b6dabbbfe"
+  },
+  include: {
+    exporter: {
+      select: {
+        id: true,
+        name: true,
+        companyName: true,
+        country: true
+      }
+    }
+  }
+}
+
+Invalid value for argument `category`. Expected ProductCategory.
+[2026-04-12T12:59:29.282Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled Tv",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled Tv",
+  "price": 234,
+  "regularPrice": 1234,
+  "minOrderQty": 112,
+  "unit": "pics",
+  "originCountry": "India",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775998226/renote-exim/products/tu0evjiwyecr0ejcc460.jpg"
+  ],
+  "certifications": [],
+  "quantity": 23
+}
+[2026-04-12T12:59:29.399Z] [POST /api/products] ERROR 500: 
+Invalid `prisma.product.create()` invocation:
+
+{
+  data: {
+    name: "Samsung 120 inch Qled Tv",
+    category: "ELECTRONICS",
+              ~~~~~~~~~~~~~
+    description: "Samsung 120 inch Qled Tv",
+    price: 234,
+    regularPrice: 1234,
+    minOrderQty: 112,
+    unit: "pics",
+    originCountry: "India",
+    images: [
+      "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775998226/renote-exim/products/tu0evjiwyecr0ejcc460.jpg"
+    ],
+    certifications: [],
+    available: true,
+    stockQty: 23,
+    exporterId: "a2cefc36-7993-4243-8f6b-ea0b6dabbbfe"
+  },
+  include: {
+    exporter: {
+      select: {
+        id: true,
+        name: true,
+        companyName: true,
+        country: true
+      }
+    }
+  }
+}
+
+Invalid value for argument `category`. Expected ProductCategory.
+[2026-04-12T13:11:49.769Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled Tv",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled Tv",
+  "price": 234,
+  "regularPrice": 1234,
+  "minOrderQty": 112,
+  "unit": "pics",
+  "originCountry": "India",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775998226/renote-exim/products/tu0evjiwyecr0ejcc460.jpg"
+  ],
+  "certifications": [],
+  "quantity": 23
+}
+[2026-04-12T13:11:49.890Z] [POST /api/products] ERROR 500: 
+Invalid `prisma.product.create()` invocation:
+
+{
+  data: {
+    name: "Samsung 120 inch Qled Tv",
+    description: "Samsung 120 inch Qled Tv",
+    price: 234,
+    regularPrice: 1234,
+    minOrderQty: 112,
+    unit: "pics",
+    originCountry: "India",
+    images: [
+      "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775998226/renote-exim/products/tu0evjiwyecr0ejcc460.jpg"
+    ],
+    certifications: [],
+    available: true,
+    category: "Electronics",
+    stockQty: 23,
+    exporterId: "a2cefc36-7993-4243-8f6b-ea0b6dabbbfe"
+  },
+  include: {
+    exporter: {
+      select: {
+        id: true,
+        name: true,
+        companyName: true,
+        ~~~~~~~~~~~
+        country: true,
+?       email?: true,
+?       role?: true,
+?       verificationStatus?: true,
+?       businessName?: true,
+?       b2bActive?: true,
+?       b2cActive?: true,
+?       preferredCurrency?: true,
+?       budgetLimit?: true,
+?       contactInfo?: true,
+?       createdAt?: true,
+?       updatedAt?: true,
+?       password?: true,
+?       avatar?: true,
+?       phone?: true,
+?       deletedAt?: true,
+?       address?: true,
+?       receivedCalls?: true,
+?       requestedCalls?: true,
+?       incomingSessions?: true,
+?       outgoingSessions?: true,
+?       cart?: true,
+?       documents?: true,
+?       messagesReceived?: true,
+?       messagesSent?: true,
+?       notifications?: true,
+?       ordersAsBuyer?: true,
+?       ordersAsSeller?: true,
+?       products?: true,
+?       suppliersAsExporter?: true,
+?       suppliersAsImporter?: true,
+?       _count?: true
+      }
+    }
+  }
+}
+
+Unknown field `companyName` for select statement on model `User`. Available options are marked with ?.
+[2026-04-12T13:11:50.608Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled Tv",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled Tv",
+  "price": 234,
+  "regularPrice": 1234,
+  "minOrderQty": 112,
+  "unit": "pics",
+  "originCountry": "India",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775998226/renote-exim/products/tu0evjiwyecr0ejcc460.jpg"
+  ],
+  "certifications": [],
+  "quantity": 23
+}
+[2026-04-12T13:11:50.727Z] [POST /api/products] ERROR 500: 
+Invalid `prisma.product.create()` invocation:
+
+{
+  data: {
+    name: "Samsung 120 inch Qled Tv",
+    description: "Samsung 120 inch Qled Tv",
+    price: 234,
+    regularPrice: 1234,
+    minOrderQty: 112,
+    unit: "pics",
+    originCountry: "India",
+    images: [
+      "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775998226/renote-exim/products/tu0evjiwyecr0ejcc460.jpg"
+    ],
+    certifications: [],
+    available: true,
+    category: "Electronics",
+    stockQty: 23,
+    exporterId: "a2cefc36-7993-4243-8f6b-ea0b6dabbbfe"
+  },
+  include: {
+    exporter: {
+      select: {
+        id: true,
+        name: true,
+        companyName: true,
+        ~~~~~~~~~~~
+        country: true,
+?       email?: true,
+?       role?: true,
+?       verificationStatus?: true,
+?       businessName?: true,
+?       b2bActive?: true,
+?       b2cActive?: true,
+?       preferredCurrency?: true,
+?       budgetLimit?: true,
+?       contactInfo?: true,
+?       createdAt?: true,
+?       updatedAt?: true,
+?       password?: true,
+?       avatar?: true,
+?       phone?: true,
+?       deletedAt?: true,
+?       address?: true,
+?       receivedCalls?: true,
+?       requestedCalls?: true,
+?       incomingSessions?: true,
+?       outgoingSessions?: true,
+?       cart?: true,
+?       documents?: true,
+?       messagesReceived?: true,
+?       messagesSent?: true,
+?       notifications?: true,
+?       ordersAsBuyer?: true,
+?       ordersAsSeller?: true,
+?       products?: true,
+?       suppliersAsExporter?: true,
+?       suppliersAsImporter?: true,
+?       _count?: true
+      }
+    }
+  }
+}
+
+Unknown field `companyName` for select statement on model `User`. Available options are marked with ?.
+[2026-04-12T13:11:51.907Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled Tv",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled Tv",
+  "price": 234,
+  "regularPrice": 1234,
+  "minOrderQty": 112,
+  "unit": "pics",
+  "originCountry": "India",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775998226/renote-exim/products/tu0evjiwyecr0ejcc460.jpg"
+  ],
+  "certifications": [],
+  "quantity": 23
+}
+[2026-04-12T13:11:51.995Z] [POST /api/products] ERROR 500: 
+Invalid `prisma.product.create()` invocation:
+
+{
+  data: {
+    name: "Samsung 120 inch Qled Tv",
+    description: "Samsung 120 inch Qled Tv",
+    price: 234,
+    regularPrice: 1234,
+    minOrderQty: 112,
+    unit: "pics",
+    originCountry: "India",
+    images: [
+      "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775998226/renote-exim/products/tu0evjiwyecr0ejcc460.jpg"
+    ],
+    certifications: [],
+    available: true,
+    category: "Electronics",
+    stockQty: 23,
+    exporterId: "a2cefc36-7993-4243-8f6b-ea0b6dabbbfe"
+  },
+  include: {
+    exporter: {
+      select: {
+        id: true,
+        name: true,
+        companyName: true,
+        ~~~~~~~~~~~
+        country: true,
+?       email?: true,
+?       role?: true,
+?       verificationStatus?: true,
+?       businessName?: true,
+?       b2bActive?: true,
+?       b2cActive?: true,
+?       preferredCurrency?: true,
+?       budgetLimit?: true,
+?       contactInfo?: true,
+?       createdAt?: true,
+?       updatedAt?: true,
+?       password?: true,
+?       avatar?: true,
+?       phone?: true,
+?       deletedAt?: true,
+?       address?: true,
+?       receivedCalls?: true,
+?       requestedCalls?: true,
+?       incomingSessions?: true,
+?       outgoingSessions?: true,
+?       cart?: true,
+?       documents?: true,
+?       messagesReceived?: true,
+?       messagesSent?: true,
+?       notifications?: true,
+?       ordersAsBuyer?: true,
+?       ordersAsSeller?: true,
+?       products?: true,
+?       suppliersAsExporter?: true,
+?       suppliersAsImporter?: true,
+?       _count?: true
+      }
+    }
+  }
+}
+
+Unknown field `companyName` for select statement on model `User`. Available options are marked with ?.
+[2026-04-12T13:17:41.952Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled Tv",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled Tv",
+  "price": 234,
+  "regularPrice": 1234,
+  "minOrderQty": 112,
+  "unit": "pics",
+  "originCountry": "India",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775998226/renote-exim/products/tu0evjiwyecr0ejcc460.jpg"
+  ],
+  "certifications": [],
+  "quantity": 23
+}
+[2026-04-12T13:17:42.559Z] [POST /api/products] ERROR 500: 
+Invalid `prisma.product.create()` invocation:
+
+{
+  data: {
+    name: "Samsung 120 inch Qled Tv",
+    description: "Samsung 120 inch Qled Tv",
+    price: 234,
+    regularPrice: 1234,
+    minOrderQty: 112,
+    unit: "pics",
+    originCountry: "India",
+    images: [
+      "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775998226/renote-exim/products/tu0evjiwyecr0ejcc460.jpg"
+    ],
+    certifications: [],
+    available: true,
+    category: "Electronics",
+    stockQty: 23,
+    exporterId: "a2cefc36-7993-4243-8f6b-ea0b6dabbbfe"
+  },
+  include: {
+    exporter: {
+      select: {
+        id: true,
+        name: true,
+        companyName: true,
+        ~~~~~~~~~~~
+        country: true,
+?       email?: true,
+?       role?: true,
+?       verificationStatus?: true,
+?       businessName?: true,
+?       b2bActive?: true,
+?       b2cActive?: true,
+?       preferredCurrency?: true,
+?       budgetLimit?: true,
+?       contactInfo?: true,
+?       createdAt?: true,
+?       updatedAt?: true,
+?       password?: true,
+?       avatar?: true,
+?       phone?: true,
+?       deletedAt?: true,
+?       address?: true,
+?       receivedCalls?: true,
+?       requestedCalls?: true,
+?       incomingSessions?: true,
+?       outgoingSessions?: true,
+?       cart?: true,
+?       documents?: true,
+?       messagesReceived?: true,
+?       messagesSent?: true,
+?       notifications?: true,
+?       ordersAsBuyer?: true,
+?       ordersAsSeller?: true,
+?       products?: true,
+?       suppliersAsExporter?: true,
+?       suppliersAsImporter?: true,
+?       _count?: true
+      }
+    }
+  }
+}
+
+Unknown field `companyName` for select statement on model `User`. Available options are marked with ?.
+[2026-04-12T13:17:44.673Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled Tv",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled Tv",
+  "price": 234,
+  "regularPrice": 1234,
+  "minOrderQty": 112,
+  "unit": "pics",
+  "originCountry": "India",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775998226/renote-exim/products/tu0evjiwyecr0ejcc460.jpg"
+  ],
+  "certifications": [],
+  "quantity": 23
+}
+[2026-04-12T13:17:44.800Z] [POST /api/products] ERROR 500: 
+Invalid `prisma.product.create()` invocation:
+
+{
+  data: {
+    name: "Samsung 120 inch Qled Tv",
+    description: "Samsung 120 inch Qled Tv",
+    price: 234,
+    regularPrice: 1234,
+    minOrderQty: 112,
+    unit: "pics",
+    originCountry: "India",
+    images: [
+      "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775998226/renote-exim/products/tu0evjiwyecr0ejcc460.jpg"
+    ],
+    certifications: [],
+    available: true,
+    category: "Electronics",
+    stockQty: 23,
+    exporterId: "a2cefc36-7993-4243-8f6b-ea0b6dabbbfe"
+  },
+  include: {
+    exporter: {
+      select: {
+        id: true,
+        name: true,
+        companyName: true,
+        ~~~~~~~~~~~
+        country: true,
+?       email?: true,
+?       role?: true,
+?       verificationStatus?: true,
+?       businessName?: true,
+?       b2bActive?: true,
+?       b2cActive?: true,
+?       preferredCurrency?: true,
+?       budgetLimit?: true,
+?       contactInfo?: true,
+?       createdAt?: true,
+?       updatedAt?: true,
+?       password?: true,
+?       avatar?: true,
+?       phone?: true,
+?       deletedAt?: true,
+?       address?: true,
+?       receivedCalls?: true,
+?       requestedCalls?: true,
+?       incomingSessions?: true,
+?       outgoingSessions?: true,
+?       cart?: true,
+?       documents?: true,
+?       messagesReceived?: true,
+?       messagesSent?: true,
+?       notifications?: true,
+?       ordersAsBuyer?: true,
+?       ordersAsSeller?: true,
+?       products?: true,
+?       suppliersAsExporter?: true,
+?       suppliersAsImporter?: true,
+?       _count?: true
+      }
+    }
+  }
+}
+
+Unknown field `companyName` for select statement on model `User`. Available options are marked with ?.
+[2026-04-12T13:17:46.339Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled Tv",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled Tv",
+  "price": 234,
+  "regularPrice": 1234,
+  "minOrderQty": 112,
+  "unit": "pics",
+  "originCountry": "India",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775998226/renote-exim/products/tu0evjiwyecr0ejcc460.jpg"
+  ],
+  "certifications": [],
+  "quantity": 23
+}
+[2026-04-12T13:17:46.785Z] [POST /api/products] ERROR 500: 
+Invalid `prisma.product.create()` invocation:
+
+{
+  data: {
+    name: "Samsung 120 inch Qled Tv",
+    description: "Samsung 120 inch Qled Tv",
+    price: 234,
+    regularPrice: 1234,
+    minOrderQty: 112,
+    unit: "pics",
+    originCountry: "India",
+    images: [
+      "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775998226/renote-exim/products/tu0evjiwyecr0ejcc460.jpg"
+    ],
+    certifications: [],
+    available: true,
+    category: "Electronics",
+    stockQty: 23,
+    exporterId: "a2cefc36-7993-4243-8f6b-ea0b6dabbbfe"
+  },
+  include: {
+    exporter: {
+      select: {
+        id: true,
+        name: true,
+        companyName: true,
+        ~~~~~~~~~~~
+        country: true,
+?       email?: true,
+?       role?: true,
+?       verificationStatus?: true,
+?       businessName?: true,
+?       b2bActive?: true,
+?       b2cActive?: true,
+?       preferredCurrency?: true,
+?       budgetLimit?: true,
+?       contactInfo?: true,
+?       createdAt?: true,
+?       updatedAt?: true,
+?       password?: true,
+?       avatar?: true,
+?       phone?: true,
+?       deletedAt?: true,
+?       address?: true,
+?       receivedCalls?: true,
+?       requestedCalls?: true,
+?       incomingSessions?: true,
+?       outgoingSessions?: true,
+?       cart?: true,
+?       documents?: true,
+?       messagesReceived?: true,
+?       messagesSent?: true,
+?       notifications?: true,
+?       ordersAsBuyer?: true,
+?       ordersAsSeller?: true,
+?       products?: true,
+?       suppliersAsExporter?: true,
+?       suppliersAsImporter?: true,
+?       _count?: true
+      }
+    }
+  }
+}
+
+Unknown field `companyName` for select statement on model `User`. Available options are marked with ?.
+[2026-04-12T13:22:09.530Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled Tv",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled Tv",
+  "price": 234,
+  "regularPrice": 1234,
+  "minOrderQty": 112,
+  "unit": "pics",
+  "originCountry": "India",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1775998226/renote-exim/products/tu0evjiwyecr0ejcc460.jpg"
+  ],
+  "certifications": [],
+  "quantity": 23
+}

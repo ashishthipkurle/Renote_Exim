@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { createSupabaseRouteClient } from "@/lib/supabase/route";
+import { getApiAuthContext } from "@/lib/auth-server";
 
 /**
  * PATCH /api/messaging/read
@@ -8,11 +8,10 @@ import { createSupabaseRouteClient } from "@/lib/supabase/route";
  */
 export async function PATCH(req: NextRequest) {
   try {
-    const { supabase } = createSupabaseRouteClient(req);
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const { auth, error: authError } = await getApiAuthContext(req);
 
-    if (authError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (authError || !auth) {
+      return authError || NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { senderId } = await req.json();
@@ -24,11 +23,11 @@ export async function PATCH(req: NextRequest) {
     await prisma.message.updateMany({
       where: {
         senderId,
-        receiverId: user.id,
-        read: false,
+        receiverId: auth.userId,
+        isRead: false,
       },
       data: {
-        read: true,
+        isRead: true,
       },
     });
 

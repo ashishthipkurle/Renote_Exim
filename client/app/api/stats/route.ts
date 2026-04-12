@@ -7,9 +7,9 @@ export const dynamic = 'force-dynamic';
 // GET /api/stats — Dashboard statistics for the authenticated user
 export async function GET(request: NextRequest) {
   try {
-    const auth = await getApiAuthContext(request);
-    if (!auth) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { auth, error: authError } = await getApiAuthContext(request);
+    if (authError || !auth) {
+      return authError || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);

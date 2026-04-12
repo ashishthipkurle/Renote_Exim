@@ -7,9 +7,9 @@ export const dynamic = 'force-dynamic';
 // GET /api/dashboard/inventory — Importer's Wishlist with Price Tracking
 export async function GET(request: NextRequest) {
     try {
-        const auth = await getApiAuthContext(request);
-        if (!auth || auth.role !== 'IMPORTER') {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const { auth, error: authError } = await getApiAuthContext(request);
+        if (authError || !auth || auth.role !== 'IMPORTER') {
+            return authError || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         // Fetch wishlist items with product details and price history
@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
 // POST /api/dashboard/inventory — Toggle product in wishlist
 export async function POST(request: NextRequest) {
     try {
-        const auth = await getApiAuthContext(request);
+        const { auth, error: authError } = await getApiAuthContext(request);
         if (!auth || auth.role !== 'IMPORTER') {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import ExporterSidebar from "@/components/exporter/ExporterSidebar";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";

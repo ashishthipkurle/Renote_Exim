@@ -21,23 +21,32 @@ export async function POST(request: NextRequest) {
     // Nhost v4 SDK throws on auth failure, so we must catch it
     let result: any;
     try {
+      console.log("[Login] Attempting sign-in for:", validatedData.email);
       result = await nhost.auth.signInEmailPassword({
         email: validatedData.email,
         password: validatedData.password,
       });
+      console.log("[Login] Nhost SDK raw result keys:", Object.keys(result));
     } catch (authError: any) {
       const msg = authError?.body?.message || authError?.message || "Invalid email or password";
+      console.error("[Login] Nhost SDK threw error:", msg);
       return NextResponse.json({ error: msg }, { status: 401 });
     }
 
     const error = result.error || result.body?.error;
     const session = result.session || result.body?.session;
-    const mfa = result.mfa || result.body?.mfa;
 
-    if (error || !session?.user || !session.accessToken) {
+    if (error) {
       return NextResponse.json(
-        { error: error?.message ?? "Invalid email or password" },
+        { error: error.message ?? "Invalid email or password" },
         { status: 401 }
+      );
+    }
+
+    if (!session?.user || !session.accessToken) {
+      return NextResponse.json(
+        { error: "Authentication failed to establish session. Please try again." },
+        { status: 500 }
       );
     }
 
@@ -56,7 +65,17 @@ export async function POST(request: NextRequest) {
       token: session.accessToken,
     });
 
+    console.log("[Login] Setting auth cookies");
     response.cookies.set(AUTH_COOKIE_NAME, session.accessToken, AUTH_COOKIE_OPTIONS);
+    
+    // Also set refresh token cookie
+    if (session.refreshToken) {
+      response.cookies.set("sb_refresh_token", session.refreshToken, {
+        ...AUTH_COOKIE_OPTIONS,
+        maxAge: 60 * 60 * 24 * 30, // 30 days
+      });
+    }
+
     return response;
 
   } catch (error: any) {
