@@ -12,10 +12,12 @@ import {
  ChevronDown,
  HomeIcon,
  LogOut,
- LayoutDashboard
+ LayoutDashboard,
+ ListOrdered
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useSidebar } from "@/components/ui/sidebar";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useTranslation } from "@/lib/i18n/client";
@@ -33,7 +35,10 @@ export default function DashboardHeader() {
  const [mounted, setMounted] = React.useState(false);
 
  const [isProfileOpen, setIsProfileOpen] = useState(false);
- const dropdownRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const pathname = usePathname();
+  const isMarketplace = pathname === "/products" || pathname.startsWith("/products/");
 
  const notificationsHref =
  user?.role === "IMPORTER"
@@ -111,6 +116,17 @@ export default function DashboardHeader() {
  {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
  </button>
  )}
+
+ {/* Orders */}
+  {isMarketplace && (
+    <Link
+      href="/orders"
+      className="size-9 flex items-center justify-center rounded-full hover:bg-primary/10 transition-all border border-transparent hover:border-primary/20 group text-muted-foreground hover:text-primary"
+      title="Orders"
+    >
+      <ListOrdered className="w-4 h-4" />
+    </Link>
+  )}
 
  {/* Cart */}
  <div className="size-9 flex items-center justify-center rounded-full hover:bg-primary/10 transition-all border border-transparent hover:border-primary/20 group">

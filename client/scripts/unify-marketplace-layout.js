@@ -1,169 +1,38 @@
-import Image from "next/image";
-import Link from "next/link";
-import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
-import { ProductCategory } from "@/lib/types";
-import EmptyState from "@/components/ui/EmptyState";
+const fs = require('fs');
+
+const path = 'app/(market)/products/page.tsx';
+let content = fs.readFileSync(path, 'utf8');
+
+// 1. Add imports
+const newImports = `
 import ImporterSidebar from "@/components/importer/ImporterSidebar";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { DashboardScaler } from "@/components/dashboard/DashboardScaler";
 import PageTransition from "@/components/ui/PageTransition";
-import { getServerAuthContext } from "@/lib/auth-server";
+`;
 
-export const dynamic = "force-dynamic";
-
-const ALL_CATEGORIES: { value: ProductCategory; label: string }[] = [
-  { value: ProductCategory.ELECTRONICS, label: "Electronics" },
-  { value: ProductCategory.TEXTILES, label: "Textiles" },
-  { value: ProductCategory.FOOD, label: "Food" },
-  { value: ProductCategory.CHEMICALS, label: "Chemicals" },
-  { value: ProductCategory.MACHINES, label: "Machinery" },
-  { value: ProductCategory.MEDICAL, label: "Medical" },
-  { value: ProductCategory.HANDICRAFTS, label: "Handicrafts" },
-  { value: ProductCategory.AUTOMOTIVE, label: "Automotive" },
-  { value: ProductCategory.CONSTRUCTION, label: "Construction" },
-  { value: ProductCategory.AGRICULTURE, label: "Agriculture" },
-  { value: ProductCategory.OTHER, label: "Other" },
-];
-
-function formatMoney(amount: number) {
-  return new Intl.NumberFormat(undefined, {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  }).format(amount);
+if (!content.includes('ImporterSidebar')) {
+    content = content.replace(/import EmptyState from "@\/components\/ui\/EmptyState";/, `import EmptyState from "@/components/ui/EmptyState";\n${newImports}`);
 }
 
-export default async function ProductsPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
-  const resolvedParams = await searchParams;
-  const categoryParam = typeof resolvedParams.category === "string" ? resolvedParams.category : undefined;
-  const searchQuery = typeof resolvedParams.search === "string" ? resolvedParams.search : undefined;
-  const originParam = typeof resolvedParams.origin === "string" ? resolvedParams.origin : undefined;
-  const minPriceParam = typeof resolvedParams.minPrice === "string" ? parseFloat(resolvedParams.minPrice) : undefined;
-  const maxPriceParam = typeof resolvedParams.maxPrice === "string" ? parseFloat(resolvedParams.maxPrice) : undefined;
-  const sortParam = typeof resolvedParams.sort === "string" ? resolvedParams.sort : "newest";
-  const page = typeof resolvedParams.page === "string" ? Math.max(1, parseInt(resolvedParams.page)) : 1;
-  const limit = 30;
+// 2. Identify the content we want to wrap.
+// We want to keep all the fetching logic at the top.
+// The return statement starts around line 164.
 
-  const auth = await getServerAuthContext();
-  const role = auth?.role || "USER";
+const startOfReturn = content.indexOf('<div className="bg-surface');
+const endOfFile = content.lastIndexOf(');');
 
-  // Build Prisma where clause
-  const where: Prisma.ProductWhereInput = { available: true };
+if (startOfReturn === -1) {
+    console.error("Could not find start of return statement");
+    process.exit(1);
+}
 
-  if (categoryParam && ALL_CATEGORIES.some((c) => c.value === categoryParam)) {
-    where.category = categoryParam as ProductCategory;
-  }
+// Extract the inner content and refactor it
+// We need to remove the old <aside> and wrap the rest in the dashboard layout.
+// The main content area was <main className="flex-1 lg:ml-64 px-8 md:px-16 py-12 bg-surface">
 
-  if (searchQuery && searchQuery.trim().length > 0) {
-    where.OR = [
-      { name: { contains: searchQuery.trim(), mode: "insensitive" } },
-      { description: { contains: searchQuery.trim(), mode: "insensitive" } },
-    ];
-  }
-
-  if (originParam && originParam.trim().length > 0) {
-    where.originCountry = { contains: originParam.trim(), mode: "insensitive" };
-  }
-
-  if (minPriceParam && !isNaN(minPriceParam)) {
-    where.price = { ...(where.price as Record<string, number> || {}), gte: minPriceParam };
-  }
-  if (maxPriceParam && !isNaN(maxPriceParam)) {
-    where.price = { ...(where.price as Record<string, number> || {}), lte: maxPriceParam };
-  }
-
-  // Sort
-  let orderBy: Prisma.ProductOrderByWithRelationInput = { createdAt: "desc" };
-  if (sortParam === "price_asc") orderBy = { price: "asc" };
-  else if (sortParam === "price_desc") orderBy = { price: "desc" };
-  else if (sortParam === "name") orderBy = { name: "asc" };
-
-  type ProductWithExporter = {
-    id: string;
-    name: string;
-    price: number;
-    regularPrice: number;
-    originCountry: string;
-    category: string;
-    images: string[];
-    stockQty: number;
-    exporter: { name: string | null; businessName: string | null; country: string | null };
-  };
-  let products: ProductWithExporter[] = [];
-  let total = 0;
-
-  try {
-    [products, total] = await Promise.all([
-      prisma.product.findMany({
-        where,
-        skip: (page - 1) * limit,
-        take: limit,
-        orderBy,
-        select: {
-          id: true,
-          name: true,
-          price: true,
-          regularPrice: true,
-          originCountry: true,
-          category: true,
-          images: true,
-          stockQty: true,
-          exporter: { select: { name: true, businessName: true, country: true } },
-        } as any,
-      }) as unknown as ProductWithExporter[],
-      prisma.product.count({ where }),
-    ]);
-
-    // Apply role-based price swap
-    products = products.map((p) => ({
-      ...p,
-      price: role === "IMPORTER" ? p.price : (p.regularPrice || p.price)
-    }));
-  } catch (error) {
-    console.error("Failed to fetch products from Prisma:", error);
-    products = [];
-  }
-
-  const totalPages = Math.ceil(total / limit);
-
-  function buildUrl(overrides: Record<string, string | undefined>) {
-    const params = new URLSearchParams();
-    const merged: Record<string, string | undefined> = {
-      category: categoryParam,
-      search: searchQuery,
-      origin: originParam,
-      minPrice: minPriceParam?.toString(),
-      maxPrice: maxPriceParam?.toString(),
-      sort: sortParam !== "newest" ? sortParam : undefined,
-      ...overrides,
-    };
-    for (const [k, v] of Object.entries(merged)) {
-      if (v) params.set(k, v);
-    }
-    const qs = params.toString();
-    return `/products${qs ? `?${qs}` : ""}`;
-  }
-
-  const iconMap: Record<string, string> = {
-    ELECTRONICS: "devices",
-    TEXTILES: "texture",
-    FOOD: "restaurant",
-    CHEMICALS: "science",
-    MACHINES: "precision_manufacturing",
-    MEDICAL: "medical_services",
-    HANDICRAFTS: "brush",
-    AUTOMOTIVE: "directions_car",
-    CONSTRUCTION: "architecture",
-    AGRICULTURE: "agriculture",
-    OTHER: "grid_view",
-  };
-
+const newReturn = `
   return (
     <SidebarProvider>
       <DashboardScaler targetWidth={1440}>
@@ -180,10 +49,10 @@ export default async function ProductsPage({
                 
                 <Link
                   href={buildUrl({ category: undefined, page: undefined })}
-                  className={`flex items-center px-4 py-2 rounded-lg transition-all group ${!categoryParam ? "bg-primary/5 text-primary font-bold shadow-sm" : "text-slate-500 hover:bg-slate-50 hover:text-primary"}`}
+                  className={\`flex items-center px-4 py-2.5 rounded-xl transition-all group \${!categoryParam ? "bg-primary/10 text-primary font-bold border border-primary/20" : "text-slate-500 dark:text-muted-foreground hover:bg-slate-100 dark:hover:bg-white/5 hover:text-primary"}\`}
                 >
-                  <span className="material-symbols-outlined mr-3 text-[20px]">auto_awesome</span>
-                  <span className="font-headline font-semibold text-sm uppercase tracking-tight">New Arrivals</span>
+                  <span className="material-symbols-outlined mr-3 text-lg">auto_awesome</span>
+                  <span className="font-headline font-semibold text-xs tracking-tight uppercase">New Arrivals</span>
                 </Link>
 
                 {ALL_CATEGORIES.map((cat) => {
@@ -192,22 +61,38 @@ export default async function ProductsPage({
                     <Link
                       key={cat.value}
                       href={buildUrl({ category: isActive ? undefined : cat.value, page: undefined })}
-                      className={`flex items-center px-4 py-2 rounded-lg transition-all group ${isActive ? "bg-primary/5 text-primary font-bold shadow-sm" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"}`}
+                      className={\`flex items-center px-4 py-2.5 rounded-xl transition-all group \${isActive ? "bg-primary/10 text-primary font-bold border border-primary/20" : "text-slate-500 dark:text-muted-foreground hover:bg-slate-100 dark:hover:bg-white/5 hover:text-primary"}\`}
                     >
-                      <span className="material-symbols-outlined mr-3 text-[20px]">{iconMap[cat.value] || "category"}</span>
-                      <span className="font-headline font-semibold text-sm uppercase tracking-tight">{cat.label}</span>
+                      <span className="material-symbols-outlined mr-3 text-lg">{iconMap[cat.value] || "category"}</span>
+                      <span className="font-headline font-semibold text-xs tracking-tight uppercase">{cat.label}</span>
                     </Link>
                   );
                 })}
               </div>
             </ImporterSidebar>
             
-            <SidebarInset className="overflow-hidden">
-              <div className="flex-1 overflow-y-auto custom-scrollbar bg-surface h-[calc(100vh-80px)]">
+            <SidebarInset>
+              <div className="flex-1 overflow-auto custom-scrollbar bg-surface min-h-screen">
                 <PageTransition>
                   {/* Editorial Header Section */}
-                  <div className="w-full px-8 py-8">
-                  
+                  <div className="max-w-screen-xl mx-auto px-8 md:px-16 py-12">
+                    <div className="mb-20">
+                      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                        <div>
+                          <span className="font-label text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4 block">Marketplace Curation</span>
+                          <h1 className="text-5xl md:text-7xl font-headline font-bold text-foreground tracking-tight leading-none mb-4">
+                            Marketplace Discovery
+                          </h1>
+                          <p className="text-muted-foreground text-lg font-body max-w-2xl">
+                            A refined selection of industrial chemicals, advanced machinery, and premium materials sourced from globally verified partners.
+                          </p>
+                        </div>
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-4xl font-headline font-bold text-foreground">{total.toLocaleString()}</span>
+                          <span className="text-muted-foreground font-label text-xs uppercase tracking-widest">Listings Found</span>
+                        </div>
+                      </div>
+                    </div>
 
                     {/* ─── Product Grid ─── */}
                     <div className="">
@@ -229,7 +114,7 @@ export default async function ProductsPage({
 
                             return (
                               <div key={product.id} className="group">
-                                <Link href={`/products/${product.id}`} className="block">
+                                <Link href={\`/products/\${product.id}\`} className="block">
                                   {/* Card Image */}
                                   <div className="relative mb-3 overflow-hidden rounded-lg bg-[#f8f9fa] dark:bg-white/[0.03] aspect-square border border-border dark:border-white/5 group-hover:border-primary/40 transition-all duration-500 shadow-sm group-hover:shadow-md">
                                     {image ? (
@@ -306,7 +191,7 @@ export default async function ProductsPage({
                             <Link
                               key={p}
                               href={buildUrl({ page: p })}
-                              className={`w-12 h-12 rounded-full flex items-center justify-center font-headline font-bold transition-all ${p === page ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" : "hover:bg-accent text-muted-foreground"}`}
+                              className={\`w-12 h-12 rounded-full flex items-center justify-center font-headline font-bold transition-all \${p === page ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" : "hover:bg-accent text-muted-foreground"}\`}
                             >
                               {p}
                             </Link>
@@ -323,4 +208,8 @@ export default async function ProductsPage({
       </DashboardScaler>
     </SidebarProvider>
   );
-}
+`;
+
+const finalContent = content.substring(0, startOfReturn) + newReturn;
+fs.writeFileSync(path, finalContent);
+console.log("Successfully unified Marketplace layout with Dashboard components.");

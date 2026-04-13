@@ -11,7 +11,8 @@ import {
  Wallet,
  Settings,
  FileText,
- Users,
+  Users,
+  ShoppingBag
 } from "lucide-react";
 import {
  Sidebar,
@@ -24,31 +25,36 @@ import {
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 
+
 interface NavItem {
- href: string;
- label: string;
- icon: ComponentType<{ className?: string }>;
+  href: string;
+  label: string;
+  icon: ComponentType<{ className?: string }>;
 }
 
-export default function ImporterSidebar({ basePath }: { basePath: string }) {
+export default function ImporterSidebar({ basePath, children }: { basePath: string; children?: React.ReactNode }) {
  const pathname = usePathname();
 
  const nav: NavItem[] = [
- { href: basePath, label: "Dashboard", icon: Home },
- { href: `${basePath}/directory`, label: "Sellers", icon: Users },
- { href: `${basePath}/orders`, label: "Orders", icon: Truck },
- { href: `${basePath}/rfqs`, label: "RFQs", icon: FileText },
- { href: `${basePath}/inventory`, label: "Inventory", icon: Boxes },
- { href: `${basePath}/analytics`, label: "Analytics", icon: LineChart },
- { href: `${basePath}/finance`, label: "Finance", icon: Wallet },
- ];
+    { href: basePath, label: "Dashboard", icon: Home },
+    { href: "/products", label: "Marketplace", icon: ShoppingBag },
+    { href: `${basePath}/directory`, label: "Sellers", icon: Users },
+    { href: `${basePath}/orders`, label: "Orders", icon: Truck },
+    { href: `${basePath}/rfqs`, label: "RFQs", icon: FileText },
+    { href: `${basePath}/inventory`, label: "Inventory", icon: Boxes },
+    { href: `${basePath}/analytics`, label: "Analytics", icon: LineChart },
+    { href: `${basePath}/finance`, label: "Finance", icon: Wallet },
+  ];
 
  const isActive = (href: string) =>
  pathname === href || (href !== basePath && pathname.startsWith(href + "/"));
 
+ const isMarketplace = pathname === "/products" || pathname.startsWith("/products/");
+
  return (
  <Sidebar variant="inset" className="border-r-0">
  <SidebarContent className="px-3 pt-4">
+ {!isMarketplace && (
  <SidebarMenu>
  {nav.map((item) => (
  <SidebarMenuItem key={item.href}>
@@ -71,8 +77,15 @@ export default function ImporterSidebar({ basePath }: { basePath: string }) {
  </SidebarMenuItem>
  ))}
  </SidebarMenu>
- </SidebarContent>
+ )}
+      {children && (
+        <div className="mt-8 mb-4 px-2">
+          {children}
+        </div>
+      )}
+    </SidebarContent>
 
+ {!isMarketplace && (
  <SidebarFooter className="px-6 pt-4 pb-2 space-y-4">
  <SidebarSeparator />
  <SidebarMenu>
@@ -96,6 +109,7 @@ export default function ImporterSidebar({ basePath }: { basePath: string }) {
  </SidebarMenuItem>
  </SidebarMenu>
  </SidebarFooter>
+ )}
  </Sidebar>
  );
 }

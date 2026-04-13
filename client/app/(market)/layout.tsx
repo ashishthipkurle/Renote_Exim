@@ -7,9 +7,7 @@ export default function MarketplaceLayout({
 }) {
  return (
  <div className="h-dvh overflow-y-auto custom-scrollbar bg-background">
- <MarketplaceHeader />
  <div className="w-full">{children}</div>
  </div>
  );
 }
-
