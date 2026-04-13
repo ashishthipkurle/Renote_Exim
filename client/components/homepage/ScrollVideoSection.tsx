@@ -592,7 +592,7 @@ export default function ScrollVideoSection() {
  <Home className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
  <span className="text-[10px] font-black uppercase tracking-[0.2em]">Home</span>
  </Link>
- <Link href="/about" className="flex items-center gap-2 group text-white/70 hover:text-white transition-all duration-300">
+ <Link href="/faq" className="flex items-center gap-2 group text-white/70 hover:text-white transition-all duration-300">
  <Info className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
  <span className="text-[10px] font-black uppercase tracking-[0.2em]">About</span>
  </Link>
@@ -609,7 +609,7 @@ export default function ScrollVideoSection() {
 
  {/* Right Side: Contact & Auth */}
  <div className="flex items-center gap-8">
- <Link href="/contact" className="flex items-center gap-2 group text-white/70 hover:text-white transition-all duration-300">
+ <Link href="/faq" className="flex items-center gap-2 group text-white/70 hover:text-white transition-all duration-300">
  <Phone className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
  <span className="text-[10px] font-black uppercase tracking-[0.2em]">Contact</span>
  </Link>
