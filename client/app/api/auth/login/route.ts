@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { loginSchema } from "@/lib/validations";
 import { nhost } from "@/lib/nhost";
-import { AUTH_COOKIE_NAME, AUTH_COOKIE_OPTIONS } from "@/lib/auth-server";
+import { AUTH_COOKIE_NAME, REFRESH_COOKIE_NAME, AUTH_COOKIE_OPTIONS, REFRESH_COOKIE_OPTIONS } from "@/lib/auth-server";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
  return typeof value === "object" && value !== null;
@@ -70,10 +70,7 @@ export async function POST(request: NextRequest) {
  
  // Also set refresh token cookie
  if (session.refreshToken) {
- response.cookies.set("sb_refresh_token", session.refreshToken, {
- ...AUTH_COOKIE_OPTIONS,
- maxAge: 60 * 60 * 24 * 30, // 30 days
- });
+ response.cookies.set(REFRESH_COOKIE_NAME, session.refreshToken, REFRESH_COOKIE_OPTIONS);
  }
 
  return response;

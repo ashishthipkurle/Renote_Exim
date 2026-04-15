@@ -17,31 +17,31 @@ const createPrismaClient = () => {
     query: {
       $allModels: {
         async findMany({ model, args, query }) {
-          if (['User', 'Product', 'Order'].includes(model)) {
+          if (['User', 'Product'].includes(model)) {
             args.where = { ...args.where, deletedAt: null } as any;
           }
           return query(args);
         },
         async findFirst({ model, args, query }) {
-          if (['User', 'Product', 'Order'].includes(model)) {
+          if (['User', 'Product'].includes(model)) {
             args.where = { ...args.where, deletedAt: null } as any;
           }
           return query(args);
         },
         async findUnique({ model, args, query }) {
-          if (['User', 'Product', 'Order'].includes(model)) {
+          if (['User', 'Product'].includes(model)) {
             args.where = { ...args.where, deletedAt: null } as any;
           }
           return query(args);
         },
         async count({ model, args, query }) {
-          if (['User', 'Product', 'Order'].includes(model)) {
+          if (['User', 'Product'].includes(model)) {
             args.where = { ...args.where, deletedAt: null } as any;
           }
           return query(args);
         },
         async delete({ model, args, query }) {
-          if (['User', 'Product', 'Order'].includes(model)) {
+          if (['User', 'Product'].includes(model)) {
             const modelName = model.toLowerCase() as any;
             return (baseClient as any)[modelName].update({
               where: args.where,
@@ -51,7 +51,7 @@ const createPrismaClient = () => {
           return query(args);
         },
         async deleteMany({ model, args, query }) {
-          if (['User', 'Product', 'Order'].includes(model)) {
+          if (['User', 'Product'].includes(model)) {
             const modelName = model.toLowerCase() as any;
             return (baseClient as any)[modelName].updateMany({
               where: args.where,

@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
  try {
  // 1. Get the current auth context (Nhost native)
- const { auth, error } = await getApiAuthContext(request);
+   const { auth, error, newAccessToken, newRefreshToken } = await getApiAuthContext(request);
 
  if (error || !auth) {
  // Return the specific error from context if available
@@ -37,7 +37,11 @@ export async function GET(request: NextRequest) {
  updatedAt: user.updatedAt instanceof Date ? user.updatedAt.toISOString() : user.updatedAt,
  };
 
- return NextResponse.json({ user: profile });
+   return NextResponse.json({ 
+    user: profile,
+    newAccessToken: newAccessToken || null,
+    newRefreshToken: newRefreshToken || null
+  });
 
  } catch (error) {
  console.error("Get user error:", error);

@@ -22,6 +22,30 @@ export const AUTH_COOKIE_OPTIONS = {
   maxAge: 60 * 60 * 24 * 7, // 1 week
 };
 
+export const REFRESH_COOKIE_OPTIONS = {
+  ...AUTH_COOKIE_OPTIONS,
+  maxAge: 60 * 60 * 24 * 30, // 30 days
+};
+
+/**
+ * Helper to perform a fetch with a timeout to prevent hanging the server
+ */
+async function fetchWithTimeout(url: string, options: any, timeout = 5000) {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+    clearTimeout(id);
+    return response;
+  } catch (error) {
+    clearTimeout(id);
+    throw error;
+  }
+}
+
 /**
  * Gets the current authenticated user context on the server side.
  * This matches the legacy getApiAuthContext signature from lib/supabase/auth.ts
@@ -30,7 +54,7 @@ export const AUTH_COOKIE_OPTIONS = {
 export async function getApiAuthContext(
   request: NextRequest,
   allowedRoles?: Role[]
-): Promise<{ auth: AuthContext | null; error: NextResponse | null }> {
+): Promise<{ auth: AuthContext | null; error: NextResponse | null; newAccessToken?: string; newRefreshToken?: string }> {
   try {
     // 1. Get token from cookies or Authorization header
     const cookieStore = cookies();
@@ -44,7 +68,7 @@ export async function getApiAuthContext(
     }
 
     if (!accessToken) {
-      console.log("[Auth] No access token found in request");
+      console.log("[Auth Server] No access token found in cookies.");
       return {
         auth: null,
         error: NextResponse.json({ error: "Missing authentication token" }, { status: 401 }),
@@ -56,70 +80,69 @@ export async function getApiAuthContext(
     const region = process.env.NEXT_PUBLIC_NHOST_REGION;
     const verifyUrl = `https://${subdomain}.auth.${region}.nhost.run/v1/user`;
 
-    const verifyRes = await fetch(verifyUrl, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-      cache: "no-store",
-    });
+    console.log("[Auth Server] Verifying token via Nhost API...");
+    let verifyRes;
+    try {
+      verifyRes = await fetchWithTimeout(verifyUrl, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        cache: "no-store",
+      }, 5000); // 5s timeout
+    } catch (e: any) {
+      console.error("[Auth Server] Verification call failed or timed out:", e.message);
+      return {
+        auth: null,
+        error: NextResponse.json({ error: "Auth verification timeout" }, { status: 401 }),
+      };
+    }
 
     if (!verifyRes.ok) {
-      console.warn("[Auth] Token verification API failed with status:", verifyRes.status);
+      console.warn("[Auth Server] Token invalid (Status:", verifyRes.status, "). Attempting refresh...");
       
       // 2b. If invalid/expired, try to refresh using the refresh token
       const refreshToken = cookieStore.get(REFRESH_COOKIE_NAME)?.value;
       if (refreshToken) {
-        console.log("[Auth] Attempting token refresh...");
-        const refreshRes = await fetch(`https://${subdomain}.auth.${region}.nhost.run/v1/token`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ refreshToken }),
-          cache: "no-store",
-        });
+        let refreshRes;
+        try {
+          refreshRes = await fetchWithTimeout(`https://${subdomain}.auth.${region}.nhost.run/v1/token`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ refreshToken }),
+            cache: "no-store",
+          }, 5000); // 5s timeout
+        } catch (e: any) {
+          console.error("[Auth Server] Refresh call timed out:", e.message);
+          return { auth: null, error: null }; // Silent fail to let client take over
+        }
 
-        if (refreshRes.ok) {
+        if (refreshRes && refreshRes.ok) {
           const refreshData = await refreshRes.json();
-          const newAccessToken = refreshData.accessToken;
-          const newRefreshToken = refreshData.refreshToken;
+          const newAccessToken = refreshData.accessToken || refreshData.session?.accessToken || refreshData.jwt_token;
+          const newRefreshToken = refreshData.refreshToken || refreshData.session?.refreshToken;
 
           if (newAccessToken) {
-            console.log("[Auth] Token refreshed successfully");
-            // Set the new tokens in cookies for the next request
-            try {
-              cookieStore.set(AUTH_COOKIE_NAME, newAccessToken, AUTH_COOKIE_OPTIONS);
-              if (newRefreshToken) {
-                cookieStore.set(REFRESH_COOKIE_NAME, newRefreshToken, {
-                  ...AUTH_COOKIE_OPTIONS,
-                  maxAge: 60 * 60 * 24 * 30, // 30 days
-                });
-              }
-            } catch (cookieErr) {
-              console.warn("[Auth] Failed to set new cookies in getApiAuthContext:", cookieErr);
-            }
-
+            console.log("[Auth Server] Token refreshed successfully.");
+            
             // Return user data from the refresh response
-            const userData = refreshData.user;
+            const userData = refreshData.user || refreshData.session?.user;
             if (userData?.id) {
-               return await getContextForUser(userData.id, allowedRoles);
-            } else {
-               console.warn("[Auth] Refresh successful but no user.id in response.");
+               const context = await getContextForUser(userData.id, allowedRoles);
+               if (context.auth) {
+                 return {
+                   ...context,
+                   newAccessToken,
+                   newRefreshToken,
+                 };
+               }
             }
-          } else {
-            console.warn("[Auth] Refresh API succeeded but returned no new access token.");
           }
         } else {
-          console.warn("[Auth] Refresh API failed with status:", refreshRes.status);
-          try {
-            const errBody = await refreshRes.json();
-            console.warn("[Auth] Refresh API error:", errBody);
-          } catch {}
+          console.warn("[Auth Server] Refresh failed (Status:", refreshRes?.status, ")");
         }
-      } else {
-        console.warn("[Auth] No refresh token found in cookies.");
       }
 
-      console.warn("[Auth] Returning 401 'Invalid or expired token'.");
       return {
         auth: null,
         error: NextResponse.json({ error: "Invalid or expired token" }, { status: 401 }),
@@ -127,7 +150,7 @@ export async function getApiAuthContext(
     }
 
     const nhostUser = await verifyRes.json();
-    const userId = nhostUser.id;
+    const userId = nhostUser.id || nhostUser.user?.id;
 
     if (!userId) {
       console.warn("[Auth] No user ID in Nhost response");

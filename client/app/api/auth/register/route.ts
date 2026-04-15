@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { registerSchema } from "@/lib/validations";
 import { nhost } from "@/lib/nhost";
-import { AUTH_COOKIE_NAME, AUTH_COOKIE_OPTIONS } from "@/lib/auth-server";
+import { AUTH_COOKIE_NAME, REFRESH_COOKIE_NAME, AUTH_COOKIE_OPTIONS, REFRESH_COOKIE_OPTIONS } from "@/lib/auth-server";
 
 export async function POST(request: NextRequest) {
  try {
@@ -105,6 +105,9 @@ export async function POST(request: NextRequest) {
  );
  
  response.cookies.set(AUTH_COOKIE_NAME, session.accessToken, AUTH_COOKIE_OPTIONS);
+ if (session.refreshToken) {
+   response.cookies.set(REFRESH_COOKIE_NAME, session.refreshToken, REFRESH_COOKIE_OPTIONS);
+ }
  return response;
  }
 
@@ -126,6 +129,9 @@ export async function POST(request: NextRequest) {
  );
  
  response.cookies.set(AUTH_COOKIE_NAME, loginResult.session.accessToken, AUTH_COOKIE_OPTIONS);
+ if (loginResult.session.refreshToken) {
+   response.cookies.set(REFRESH_COOKIE_NAME, loginResult.session.refreshToken, REFRESH_COOKIE_OPTIONS);
+ }
  return response;
  }
  } catch (e) {

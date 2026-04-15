@@ -30,7 +30,7 @@ import LogoDark from "@/assests/Logo-2-without-circle.png";
 export default function DashboardHeader() {
  const { t } = useTranslation();
  const { open, toggleSidebar } = useSidebar();
- const { user, logout } = useAuth();
+ const { user, loading, logout } = useAuth();
  const { theme, setTheme } = useTheme();
  const [mounted, setMounted] = React.useState(false);
 
@@ -145,57 +145,72 @@ export default function DashboardHeader() {
 
  <div className="h-6 w-px bg-border dark:bg-white/10 mx-1 xs:block" />
 
- {/* PROFILE DROPDOWN */}
- <div className="relative" ref={dropdownRef}>
- <button
- onClick={() => setIsProfileOpen(!isProfileOpen)}
- className="h-auto p-1 pr-2 gap-2 flex items-center rounded-full hover:bg-primary/10 hover:text-primary border border-transparent hover:border-primary/20 transition-all active:scale-95 group"
- >
- <div className="size-8 rounded-full bg-black/10 dark:bg-white/10 ring-2 ring-black/10 dark:ring-white/10 group-hover:ring-black/30 dark:group-hover:ring-white/30 transition-all overflow-hidden flex items-center justify-center text-foreground dark:text-white font-bold text-xs">
- {user?.avatar ? (
- <Image src={user.avatar as string} alt="Avatar" width={32} height={32} className="w-full h-full object-cover" unoptimized />
- ) : (
- user?.name?.[0] || <User className="w-4 h-4" />
- )}
- </div>
- <ChevronDown className={`h-4 w-4 text-muted-foreground group-hover:text-primary transition-transform ${isProfileOpen ? 'rotate-180 text-primary' : ''}`} />
- </button>
+  {/* PROFILE DROPDOWN OR SIGN IN */}
+  {mounted && (
+    <div className="relative" ref={dropdownRef}>
+      {loading ? (
+        <div className="size-9 rounded-full bg-muted animate-pulse border border-border/50" />
+      ) : user ? (
+        <>
+          <button
+            onClick={() => setIsProfileOpen(!isProfileOpen)}
+            className="h-auto p-1 pr-2 gap-2 flex items-center rounded-full hover:bg-primary/10 hover:text-primary border border-transparent hover:border-primary/20 transition-all active:scale-95 group"
+          >
+            <div className="size-8 rounded-full bg-black/10 dark:bg-white/10 ring-2 ring-black/10 dark:ring-white/10 group-hover:ring-black/30 dark:group-hover:ring-white/30 transition-all overflow-hidden flex items-center justify-center text-foreground dark:text-white font-bold text-xs">
+              {user.avatar ? (
+                <Image src={user.avatar as string} alt="Avatar" width={32} height={32} className="w-full h-full object-cover" unoptimized />
+              ) : (
+                user.name?.[0] || <User className="w-4 h-4" />
+              )}
+            </div>
+            <ChevronDown className={`h-4 w-4 text-muted-foreground group-hover:text-primary transition-transform ${isProfileOpen ? 'rotate-180 text-primary' : ''}`} />
+          </button>
 
- {/* Custom Dropdown Content */}
- {isProfileOpen && (
- <div className="absolute right-0 mt-2 w-64 p-2 rounded-lg border border-border dark:border-white/10 bg-background/95 backdrop-blur-xl shadow-2xl animate-in fade-in zoom-in-95 z-50">
- <div className="p-3">
- <p className="text-sm font-bold leading-none">{user?.name || "Exporter"}</p>
- <p className="text-xs font-medium text-muted-foreground truncate mt-1">{user?.email || "Protocol verified"}</p>
- </div>
+          {isProfileOpen && (
+            <div className="absolute right-0 mt-2 w-64 p-2 rounded-lg border border-border dark:border-white/10 bg-background/95 backdrop-blur-xl shadow-2xl animate-in fade-in zoom-in-95 z-50">
+              <div className="p-3">
+                <p className="text-sm font-bold leading-none">{user.name || "User"}</p>
+                <p className="text-xs font-medium text-muted-foreground truncate mt-1">{user.email}</p>
+              </div>
 
- <div className="h-px bg-border/50 dark:bg-white/5 my-1" />
+              <div className="h-px bg-border/50 dark:bg-white/5 my-1" />
 
- <div className="p-1 space-y-1">
- <Link href="/" className="flex items-center rounded-xl cursor-pointer py-2.5 px-3 hover:bg-secondary/80 transition-colors" onClick={() => setIsProfileOpen(false)}>
- <HomeIcon className="mr-3 h-4 w-4 text-muted-foreground" />
- <span className="text-sm font-medium">{t("home", "Home")}</span>
- </Link>
- <Link href="/dashboard" className="flex items-center rounded-xl cursor-pointer py-2.5 px-3 hover:bg-secondary/80 transition-colors" onClick={() => setIsProfileOpen(false)}>
- <LayoutDashboard className="mr-3 h-4 w-4 text-muted-foreground" />
- <span className="text-sm font-medium">{t("dashboard", "Dashboard")}</span>
- </Link>
- </div>
+              <div className="p-1 space-y-1">
+                <Link href="/" className="flex items-center rounded-xl cursor-pointer py-2.5 px-3 hover:bg-secondary/80 transition-colors" onClick={() => setIsProfileOpen(false)}>
+                  <HomeIcon className="mr-3 h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">{t("home", "Home")}</span>
+                </Link>
+                <Link href="/dashboard" className="flex items-center rounded-xl cursor-pointer py-2.5 px-3 hover:bg-secondary/80 transition-colors" onClick={() => setIsProfileOpen(false)}>
+                  <LayoutDashboard className="mr-3 h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">{t("dashboard", "Dashboard")}</span>
+                </Link>
+              </div>
 
- <div className="h-px bg-border/50 dark:bg-white/5 my-1" />
+              <div className="h-px bg-border/50 dark:bg-white/5 my-1" />
 
- <div className="p-1">
- <button
- onClick={() => { setIsProfileOpen(false); logout(); }}
- className="w-full flex items-center rounded-xl cursor-pointer py-2.5 px-3 text-red-500 hover:bg-red-500/10 transition-colors"
- >
- <LogOut className="mr-3 h-4 w-4" />
- <span className="text-sm font-bold">{t("signout", "Log out")}</span>
- </button>
- </div>
- </div>
- )}
- </div>
+              <div className="p-1">
+                <button
+                  onClick={() => { setIsProfileOpen(false); logout(); }}
+                  className="w-full flex items-center rounded-xl cursor-pointer py-2.5 px-3 text-red-500 hover:bg-red-500/10 transition-colors"
+                >
+                  <LogOut className="mr-3 h-4 w-4" />
+                  <span className="text-sm font-bold">{t("signout", "Log out")}</span>
+                </button>
+              </div>
+            </div>
+          )}
+        </>
+      ) : (
+        <Link
+          href="/login"
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-full text-sm font-bold hover:opacity-90 transition-all active:scale-95 shadow-lg shadow-primary/20 flex items-center gap-2"
+        >
+          <LogOut className="w-4 h-4 rotate-180" />
+          <span>{t("signin", "Sign In")}</span>
+        </Link>
+      )}
+    </div>
+  )}
 
  </div>
  </div>

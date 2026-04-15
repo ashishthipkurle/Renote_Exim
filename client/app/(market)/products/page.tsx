@@ -41,6 +41,9 @@ export default async function ProductsPage({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const resolvedParams = await searchParams;
+  const start = Date.now();
+  console.log("[Products Page] Starting render at:", new Date(start).toLocaleTimeString());
+
   const categoryParam = typeof resolvedParams.category === "string" ? resolvedParams.category : undefined;
   const searchQuery = typeof resolvedParams.search === "string" ? resolvedParams.search : undefined;
   const originParam = typeof resolvedParams.origin === "string" ? resolvedParams.origin : undefined;
@@ -129,6 +132,9 @@ export default async function ProductsPage({
     console.error("Failed to fetch products from Prisma:", error);
     products = [];
   }
+
+  const end = Date.now();
+  console.log(`[Products Page] Rendered ${products.length} products in ${end - start}ms`);
 
   const totalPages = Math.ceil(total / limit);
 

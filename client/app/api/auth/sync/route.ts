@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { AUTH_COOKIE_NAME, REFRESH_COOKIE_NAME, AUTH_COOKIE_OPTIONS, setServerAuthCookie } from "@/lib/auth-server";
+import { AUTH_COOKIE_NAME, REFRESH_COOKIE_NAME, AUTH_COOKIE_OPTIONS, REFRESH_COOKIE_OPTIONS } from "@/lib/auth-server";
 import { cookies } from "next/headers";
 
 /**
@@ -29,10 +29,7 @@ export async function POST(request: NextRequest) {
 
  // Set the refresh token cookie if provided
  if (refreshToken) {
- response.cookies.set(REFRESH_COOKIE_NAME, refreshToken, {
- ...AUTH_COOKIE_OPTIONS,
- maxAge: 60 * 60 * 24 * 30, // 30 days
- });
+ response.cookies.set(REFRESH_COOKIE_NAME, refreshToken, REFRESH_COOKIE_OPTIONS);
  }
 
  return response;
