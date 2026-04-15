@@ -24,7 +24,7 @@ export default function CTASection() {
           </Link>
           <Link
             className="w-full sm:w-auto text-foreground border border-border hover:bg-background/50 dark:hover:bg-white/5 font-bold py-5 px-12 rounded-xl transition-all duration-300 text-lg hover:-translate-y-1"
-            href="/contact"
+            href="/faq"
           >
             {t("cta.contact_btn", "Contact Sales")}
           </Link>

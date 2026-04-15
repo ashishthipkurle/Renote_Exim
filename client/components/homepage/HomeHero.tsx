@@ -19,7 +19,6 @@ export default function HomeHero() {
       const viewportHeight = window.innerHeight;
 
       // Calculate how far the section has scrolled *past* the top of the viewport.
-      // 0 when exactly at the top border (straight in section). Increases as it scrolls past.
       const scrolled = Math.max(0, -rect.top);
 
       const newY = 20 + scrolled * 0.04;
@@ -104,15 +103,15 @@ export default function HomeHero() {
             href="/products"
           >
             {t("hero.cta_start", "Start Importing")}
-            <span className="material-icons group-hover:translate-x-1 transition-transform text-sm"></span>
+            <span className="material-icons group-hover:translate-x-1 transition-transform text-sm">arrow_forward</span>
           </Link>
-          <button
+          <Link
             className="w-full sm:w-1/2 hover:bg-background/80 dark:hover:bg-white/10 text-foreground font-semibold py-5 px-8 rounded-xl transition-all duration-300 text-lg flex items-center justify-center gap-2 border border-border hover:border-border/80 hover:-translate-y-1 bg-background/40 backdrop-blur-xl shadow-lg"
-            type="button"
+            href="/products"
           >
-            <span className="material-icons text-primary text-xl"></span>
+            <span className="material-icons text-primary text-xl">shopping_cart</span>
             {t("hero.cta_buy", "Buy Products")}
-          </button>
+          </Link>
         </div>
       </div>
 

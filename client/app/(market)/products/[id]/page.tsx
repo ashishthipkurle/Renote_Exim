@@ -56,9 +56,8 @@ export default async function ProductDetailPage({
           select: {
             id: true,
             name: true,
-            companyName: true,
+            businessName: true,
             country: true,
-            website: true,
           },
         },
       },
@@ -131,7 +130,7 @@ export default async function ProductDetailPage({
           {/* Left: Image Gallery */}
           <div className="lg:col-span-7 flex flex-col gap-4">
             {/* Main Image */}
-            <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-muted/30 border border-border relative group">
+            <div className="aspect-[4/3] rounded-lg overflow-hidden bg-muted/30 border border-border relative group">
               {heroImage ? (
                 <Image
                   src={heroImage}
@@ -224,7 +223,7 @@ export default async function ProductDetailPage({
             </p>
 
             {/* ── Price Card ── */}
-            <div className="rounded-2xl border border-border bg-card p-6 shadow-lg space-y-6">
+            <div className="rounded-lg border border-border bg-card p-6 shadow-lg space-y-6">
               {/* Price + Stock */}
               <div className="flex justify-between items-end">
                 <div>
@@ -323,21 +322,11 @@ export default async function ProductDetailPage({
                 Exporter
               </p>
               <p className="text-base font-extrabold text-foreground">
-                {product.exporter.companyName || product.exporter.name}
+                {product.exporter.businessName || product.exporter.name}
               </p>
               <p className="text-sm text-muted-foreground">
                 {product.exporter.country ?? product.originCountry}
               </p>
-              {product.exporter.website && (
-                <a
-                  href={product.exporter.website}
-                  className="text-primary text-sm font-semibold hover:underline mt-1 inline-block"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Visit website →
-                </a>
-              )}
             </div>
 
             {/* Certifications */}
@@ -410,7 +399,7 @@ export default async function ProductDetailPage({
         </div>
 
         {/* Specs Grid */}
-        <div className="rounded-2xl border border-border bg-card/50 p-8">
+        <div className="rounded-lg border border-border bg-card/50 p-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
             <div className="flex items-center justify-between py-3 border-b border-border/50">
               <span className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -457,7 +446,7 @@ export default async function ProductDetailPage({
                 <ShieldCheck className="h-4 w-4 text-primary/60" /> Stock
               </span>
               <span className="text-sm font-bold text-foreground">
-                {product.quantity} {product.unit}
+                {product.stockQty} {product.unit}
               </span>
             </div>
           </div>

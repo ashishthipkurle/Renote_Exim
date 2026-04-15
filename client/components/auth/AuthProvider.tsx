@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import axios from "axios";
+import { nhost } from "@/lib/nhost";
 import type { StoredUser } from "@/lib/auth-client";
 
 type AuthContextType = {
@@ -14,70 +15,109 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
-  refreshUser: async () => {},
-  logout: async () => {},
+  refreshUser: async () => { },
+  logout: async () => { },
 });
 
-/**
- * Helper: read the sb_access_token cookie value from document.cookie.
- */
-function getAccessTokenFromCookie(): string | null {
-  if (typeof document === "undefined") return null;
-  const match = document.cookie.match(/(?:^|;\s*)sb_access_token=([^;]*)/);
-  if (!match) return null;
-  try {
-    return decodeURIComponent(match[1]) || null;
-  } catch {
-    return null;
-  }
-}
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<StoredUser | null>(null);
+  const [user, setUser] = useState<StoredUser | null>(() => {
+    // Synchronous initialization from localStorage to prevent flicker
+    if (typeof window !== "undefined") {
+      const cached = window.localStorage.getItem("user_profile");
+      if (cached) {
+        try {
+          return JSON.parse(cached);
+        } catch (e) {
+          return null;
+        }
+      }
+    }
+    return null;
+  });
   const [loading, setLoading] = useState(true);
 
-  const clearMiddlewareTokenCookie = () => {
-    if (typeof document === "undefined") return;
-    document.cookie = "sb_access_token=; Path=/; Max-Age=0; SameSite=Lax";
-  };
-
-  const fetchUser = useCallback(async (token?: string) => {
+  /**
+   * Syncs the Nhost session to server-side cookies via our sync API.
+   */
+  const syncSession = useCallback(async (session: any) => {
     try {
-      console.log("[Auth Trace] Attempting session discovery...");
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      const res = await axios.get("/api/auth/me", { headers });
-      
-      if (res.data.user) {
-        console.log("[Auth Trace] Session found:", res.data.user.email, "(Role:", res.data.user.role, ")");
-        setUser(res.data.user);
-      } else {
-        console.log("[Auth Trace] No active session found.");
-        setUser(null);
-      }
+      await axios.post("/api/auth/sync", {
+        accessToken: session?.accessToken || null,
+        refreshToken: session?.refreshToken || null,
+        user: session?.user || null,
+      });
+      console.log("[AuthProvider] Session synced to cookies.");
     } catch (error) {
-      console.warn("[Auth Trace] Session fetch failed or unauthorized.");
-      setUser(null);
-    } finally {
-      setLoading(false);
+      console.error("[AuthProvider] Failed to sync session:", error);
     }
   }, []);
 
+  const fetchUser = useCallback(async () => {
+    try {
+      setLoading(true);
+      // Add cache buster to ensure we get fresh data after redirect
+      const res = await axios.get(`/api/auth/me?t=${Date.now()}`);
+      console.log("[AuthProvider] User fetch result:", !!res.data.user);
+      
+      if (res.data.user) {
+        setUser(res.data.user);
+        // Persist to localStorage for fast re-mount
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem("user_profile", JSON.stringify(res.data.user));
+        }
+        
+        // If the server-side refreshed the token, sync it back
+        if (res.data.newAccessToken) {
+          console.log("[AuthProvider] Server refresh detected.");
+          await syncSession({
+            accessToken: res.data.newAccessToken,
+            refreshToken: res.data.newRefreshToken,
+            user: res.data.user
+          });
+          
+          try {
+            // @ts-ignore
+            nhost.auth.setSession({
+              accessToken: res.data.newAccessToken,
+              refreshToken: res.data.newRefreshToken,
+            });
+          } catch (e) {}
+        }
+      } else {
+        setUser(null);
+        if (typeof window !== "undefined") {
+          window.localStorage.removeItem("user_profile");
+        }
+      }
+    } catch (error: any) {
+      console.error("[AuthProvider] User fetch error:", error.response?.status || error.message);
+      // Only clear if it's a 401
+      if (error.response?.status === 401) {
+        setUser(null);
+        if (typeof window !== "undefined") {
+          window.localStorage.removeItem("user_profile");
+        }
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [syncSession]);
+
   const refreshUser = useCallback(async () => {
-    console.log("[Auth Trace] Force refreshing session state...");
-    setLoading(true);
     await fetchUser();
   }, [fetchUser]);
 
   const logout = async () => {
     try {
       setLoading(true);
-      await axios.post("/api/auth/logout").catch(() => {});
-
+      await nhost.auth.signOut();
+      await axios.post("/api/auth/logout").catch(() => { });
+      
       if (typeof window !== "undefined") {
+        window.localStorage.removeItem("user_profile");
         window.localStorage.removeItem("user");
       }
-
-      clearMiddlewareTokenCookie();
+      
       setUser(null);
     } catch (error) {
       console.error("Logout failed", error);
@@ -87,10 +127,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    // On mount, check if there's an existing session.
-    // Since we use HTTP-Only cookies, we attempt a blind fetch.
+    console.log("[AuthProvider] Provider mounted. Current user state:", !!user);
+    // 1. Initial Discovery
     fetchUser();
-  }, [fetchUser]);
+    
+    // 2. Listen for Nhost session changes
+    let isFirstEvent = true;
+    
+    const unsubscribe = nhost.sessionStorage.onChange((session) => {
+      console.log("[AuthProvider] Nhost session event. Has session:", !!session);
+      
+      if (session) {
+        isFirstEvent = false;
+        syncSession(session);
+      } else {
+        if (!isFirstEvent) {
+          syncSession(null);
+          setUser(null);
+          if (typeof window !== "undefined") {
+            window.localStorage.removeItem("user_profile");
+          }
+        }
+        isFirstEvent = false;
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [fetchUser, syncSession]);
 
   return (
     <AuthContext.Provider value={{ user, loading, refreshUser, logout }}>

@@ -1,8 +1,22 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import { useTranslation } from "@/lib/i18n/client";
 
 export default function HomeFooter() {
   const { t } = useTranslation();
+  const [email, setEmail] = useState("");
+  const [subscribed, setSubscribed] = useState(false);
+
+  const handleSubscribe = () => {
+    if (email && email.includes("@")) {
+      setSubscribed(true);
+      setEmail("");
+      setTimeout(() => setSubscribed(false), 3000);
+    }
+  };
+
   return (
     <footer className="bg-background border-t border-border pt-20 pb-10">
       <div className="max-w-7xl mx-auto px-6">
@@ -22,22 +36,28 @@ export default function HomeFooter() {
             <div className="flex gap-4">
               <a
                 className="w-8 h-8 rounded-full bg-slate-200 dark:bg-white/5 flex items-center justify-center text-slate-500 hover:bg-primary hover:text-white transition-colors"
-                href="#"
+                href="https://facebook.com"
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="Facebook"
               >
                 <i className="material-icons text-sm">facebook</i>
               </a>
               <a
                 className="w-8 h-8 rounded-full bg-slate-200 dark:bg-white/5 flex items-center justify-center text-slate-500 hover:bg-primary hover:text-white transition-colors"
-                href="#"
-                aria-label="Work"
+                href="https://linkedin.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LinkedIn"
               >
                 <i className="material-icons text-sm">work</i>
               </a>
               <a
                 className="w-8 h-8 rounded-full bg-slate-200 dark:bg-white/5 flex items-center justify-center text-slate-500 hover:bg-primary hover:text-white transition-colors"
-                href="#"
-                aria-label="Community"
+                href="https://twitter.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Twitter"
               >
                 <i className="material-icons text-sm">flutter_dash</i>
               </a>
@@ -53,17 +73,17 @@ export default function HomeFooter() {
                 </Link>
               </li>
               <li>
-                <Link className="hover:text-primary transition-colors" href="/dashboard/admin/shipments">
+                <Link className="hover:text-primary transition-colors" href="/register">
                   {t("sidebar.shipments", "Logistics")}
                 </Link>
               </li>
               <li>
-                <Link className="hover:text-primary transition-colors" href="/dashboard/admin/analytics">
+                <Link className="hover:text-primary transition-colors" href="/register">
                   {t("sidebar.analytics", "Finance")}
                 </Link>
               </li>
               <li>
-                <Link className="hover:text-primary transition-colors" href="/dashboard/admin/notifications">
+                <Link className="hover:text-primary transition-colors" href="/faq">
                   {t("sidebar.notifications", "Compliance")}
                 </Link>
               </li>
@@ -74,22 +94,22 @@ export default function HomeFooter() {
             <h4 className="text-slate-900 dark:text-white font-bold mb-6">{t("footer.col_company", "Company")}</h4>
             <ul className="space-y-3 text-sm text-slate-600 dark:text-slate-500">
               <li>
-                <Link className="hover:text-primary transition-colors" href="/about">
+                <Link className="hover:text-primary transition-colors" href="/faq">
                   {t("footer.about", "About Us")}
                 </Link>
               </li>
               <li>
-                <Link className="hover:text-primary transition-colors" href="/careers">
+                <Link className="hover:text-primary transition-colors" href="/faq">
                   {t("footer.careers", "Careers")}
                 </Link>
               </li>
               <li>
-                <Link className="hover:text-primary transition-colors" href="/press">
+                <Link className="hover:text-primary transition-colors" href="/faq">
                   {t("footer.press", "Press")}
                 </Link>
               </li>
               <li>
-                <Link className="hover:text-primary transition-colors" href="/contact">
+                <Link className="hover:text-primary transition-colors" href="/faq">
                   {t("contact", "Contact")}
                 </Link>
               </li>
@@ -99,16 +119,31 @@ export default function HomeFooter() {
           <div>
             <h4 className="text-slate-900 dark:text-white font-bold mb-6">{t("footer.col_subscribe", "Subscribe")}</h4>
             <p className="text-slate-600 dark:text-slate-500 text-sm mb-4">{t("footer.subscribe_desc", "Get the latest trade insights.")}</p>
-            <div className="flex shadow-sm rounded-l-lg">
-              <input
-                className="bg-white dark:bg-white/5 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white rounded-l-lg px-4 py-3 text-sm w-full focus:outline-none focus:border-primary transition-colors"
-                placeholder={t("footer.email_placeholder", "Email address")}
-                type="email"
-              />
-              <button className="bg-primary text-white px-4 py-2 rounded-r-lg hover:bg-primary/90 transition-colors primary-glow-hover" type="button" aria-label="Subscribe">
-                <span className="material-icons text-sm">arrow_forward</span>
-              </button>
-            </div>
+            {subscribed ? (
+              <div className="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm font-semibold py-3">
+                <span className="material-icons text-sm">check_circle</span>
+                Subscribed successfully!
+              </div>
+            ) : (
+              <div className="flex shadow-sm rounded-l-lg">
+                <input
+                  className="bg-white dark:bg-white/5 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white rounded-l-lg px-4 py-3 text-sm w-full focus:outline-none focus:border-primary transition-colors"
+                  placeholder={t("footer.email_placeholder", "Email address")}
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSubscribe()}
+                />
+                <button 
+                  className="bg-primary text-white px-4 py-2 rounded-r-lg hover:bg-primary/90 transition-colors primary-glow-hover" 
+                  type="button" 
+                  aria-label="Subscribe"
+                  onClick={handleSubscribe}
+                >
+                  <span className="material-icons text-sm">arrow_forward</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
 

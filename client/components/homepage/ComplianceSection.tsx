@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useTranslation } from "@/lib/i18n/client";
 
 export default function ComplianceSection() {
@@ -13,7 +14,7 @@ export default function ComplianceSection() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="glass-card bg-background/70 backdrop-blur-md p-8 rounded-xl border border-border hover:border-primary/50 transition-all duration-300 hover:-translate-y-2 group shadow-xl">
+          <Link href="/register" className="glass-card bg-background/70 backdrop-blur-md p-8 rounded-xl border border-border hover:border-primary/50 transition-all duration-300 hover:-translate-y-2 group shadow-xl block">
             <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center mb-6 group-hover:bg-primary/30 transition-colors shadow-inner">
               <span className="material-symbols-outlined text-primary text-2xl">description</span>
             </div>
@@ -25,9 +26,9 @@ export default function ComplianceSection() {
               <span className="text-xs font-mono text-green-700 dark:text-green-400 font-bold">{t("compliance.card1_stat", "99.8% Accuracy")}</span>
               <span className="material-icons text-slate-500 dark:text-slate-400 text-sm group-hover:text-primary transition-colors">arrow_forward</span>
             </div>
-          </div>
+          </Link>
 
-          <div className="glass-card bg-white/70 dark:bg-[#0B0E14]/60 backdrop-blur-md p-8 rounded-xl border border-white/40 dark:border-white/10 hover:border-primary/50 transition-all duration-300 hover:-translate-y-2 group relative shadow-xl">
+          <Link href="/register" className="glass-card bg-white/70 dark:bg-[#0B0E14]/60 backdrop-blur-md p-8 rounded-xl border border-white/40 dark:border-white/10 hover:border-primary/50 transition-all duration-300 hover:-translate-y-2 group relative shadow-xl block">
             <div className="absolute inset-0 bg-gradient-to-b from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl"></div>
             <div className="relative z-10">
               <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center mb-6 group-hover:bg-primary/30 transition-colors shadow-inner">
@@ -42,9 +43,9 @@ export default function ComplianceSection() {
                 <span className="material-icons text-slate-500 dark:text-slate-400 text-sm group-hover:text-primary transition-colors">arrow_forward</span>
               </div>
             </div>
-          </div>
+          </Link>
 
-          <div className="glass-card bg-white/70 dark:bg-[#0B0E14]/60 backdrop-blur-md p-8 rounded-xl border border-white/40 dark:border-white/10 hover:border-primary/50 transition-all duration-300 hover:-translate-y-2 group shadow-xl">
+          <Link href="/register" className="glass-card bg-white/70 dark:bg-[#0B0E14]/60 backdrop-blur-md p-8 rounded-xl border border-white/40 dark:border-white/10 hover:border-primary/50 transition-all duration-300 hover:-translate-y-2 group shadow-xl block">
             <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center mb-6 group-hover:bg-primary/30 transition-colors shadow-inner">
               <span className="material-symbols-outlined text-primary text-2xl">token</span>
             </div>
@@ -56,7 +57,7 @@ export default function ComplianceSection() {
               <span className="text-xs font-mono text-purple-700 dark:text-purple-400 font-bold">{t("compliance.card3_stat", "Crypto-Secured")}</span>
               <span className="material-icons text-slate-500 dark:text-slate-400 text-sm group-hover:text-primary transition-colors">arrow_forward</span>
             </div>
-          </div>
+          </Link>
         </div>
       </div>
     </section>

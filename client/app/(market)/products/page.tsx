@@ -1,10 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
-
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { ProductCategory } from "@/lib/types";
 import EmptyState from "@/components/ui/EmptyState";
+import ImporterSidebar from "@/components/importer/ImporterSidebar";
+import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { DashboardScaler } from "@/components/dashboard/DashboardScaler";
+import PageTransition from "@/components/ui/PageTransition";
 import { getServerAuthContext } from "@/lib/auth-server";
 
 export const dynamic = "force-dynamic";
@@ -37,6 +41,9 @@ export default async function ProductsPage({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const resolvedParams = await searchParams;
+  const start = Date.now();
+  console.log("[Products Page] Starting render at:", new Date(start).toLocaleTimeString());
+
   const categoryParam = typeof resolvedParams.category === "string" ? resolvedParams.category : undefined;
   const searchQuery = typeof resolvedParams.search === "string" ? resolvedParams.search : undefined;
   const originParam = typeof resolvedParams.origin === "string" ? resolvedParams.origin : undefined;
@@ -88,8 +95,8 @@ export default async function ProductsPage({
     originCountry: string;
     category: string;
     images: string[];
-    quantity: number;
-    exporter: { name: string | null; companyName: string | null; country: string | null };
+    stockQty: number;
+    exporter: { name: string | null; businessName: string | null; country: string | null };
   };
   let products: ProductWithExporter[] = [];
   let total = 0;
@@ -109,8 +116,8 @@ export default async function ProductsPage({
           originCountry: true,
           category: true,
           images: true,
-          quantity: true,
-          exporter: { select: { name: true, companyName: true, country: true } },
+          stockQty: true,
+          exporter: { select: { name: true, businessName: true, country: true } },
         } as any,
       }) as unknown as ProductWithExporter[],
       prisma.product.count({ where }),
@@ -125,6 +132,9 @@ export default async function ProductsPage({
     console.error("Failed to fetch products from Prisma:", error);
     products = [];
   }
+
+  const end = Date.now();
+  console.log(`[Products Page] Rendered ${products.length} products in ${end - start}ms`);
 
   const totalPages = Math.ceil(total / limit);
 
@@ -161,201 +171,162 @@ export default async function ProductsPage({
   };
 
   return (
-    <div className="bg-surface text-on-surface selection:bg-primary-fixed">
-      <div className="flex pt-0 min-h-screen">
-        {/* ─── Left Sidebar ─── */}
-        <aside className="h-screen w-64 fixed left-0 top-20 bg-surface-container-low hidden lg:block overflow-y-auto border-r border-surface-container-high z-40">
-          <div className="flex flex-col py-10 space-y-2">
-            <div className="px-8 mb-6">
-              <h3 className="font-headline font-semibold text-sm uppercase tracking-wider text-foreground">Categories</h3>
-              <p className="text-xs text-muted-foreground mt-1">Refine by Department</p>
-            </div>
+    <SidebarProvider>
+      <DashboardScaler targetWidth={1440}>
+        <div className="flex flex-col h-full w-full bg-board transition-colors duration-300 overflow-hidden border border-slate-200 dark:border-white/5 shadow-2xl">
+          <DashboardHeader />
 
-            {/* New Arrivals (clear category) */}
-            <Link
-              href={buildUrl({ category: undefined, page: undefined })}
-              className={`flex items-center pl-6 py-3 transition-all group ${!categoryParam ? "text-primary-foreground bg-primary rounded-l-full font-bold shadow-lg shadow-primary/20" : "text-muted-foreground hover:bg-accent"}`}
-            >
-              <span className="material-symbols-outlined mr-3 text-lg">auto_awesome</span>
-              <span className="font-headline font-semibold text-sm uppercase tracking-wider">New Arrivals</span>
-            </Link>
-
-            {ALL_CATEGORIES.map((cat) => {
-              const isActive = categoryParam === cat.value;
-              return (
+          <div className="flex flex-1 overflow-hidden relative border-t border-slate-200 dark:border-white/5">
+            <ImporterSidebar basePath="/dashboard/importer">
+              {/* Marketplace Categories integrated into Sidebar */}
+              <div className="flex flex-col py-4 space-y-2">
+                <div className="px-4 mb-4">
+                  <h3 className="font-headline font-semibold text-[10px] uppercase tracking-wider text-muted-foreground">Market Verticals</h3>
+                </div>
+                
                 <Link
-                  key={cat.value}
-                  href={buildUrl({ category: isActive ? undefined : cat.value, page: undefined })}
-                  className={`flex items-center pl-6 py-3 transition-colors group ${isActive ? "text-primary-foreground bg-primary rounded-l-full font-bold shadow-lg shadow-primary/20" : "text-muted-foreground hover:bg-accent"}`}
+                  href={buildUrl({ category: undefined, page: undefined })}
+                  className={`flex items-center px-4 py-2 rounded-lg transition-all group ${!categoryParam ? "bg-primary/5 text-primary font-bold shadow-sm" : "text-slate-500 hover:bg-slate-50 hover:text-primary"}`}
                 >
-                  <span className="material-symbols-outlined mr-3 text-lg">{iconMap[cat.value] || "category"}</span>
-                  <span className="font-headline font-semibold text-sm uppercase tracking-wider">{cat.label}</span>
+                  <span className="material-symbols-outlined mr-3 text-[20px]">auto_awesome</span>
+                  <span className="font-headline font-semibold text-sm uppercase tracking-tight">New Arrivals</span>
                 </Link>
-              );
-            })}
 
-            {/* Discovery Tools */}
-            <div className="mt-12 px-8">
-              <h3 className="font-headline font-semibold text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-4">Discovery Tools</h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between group cursor-pointer">
-                  <span className="text-sm font-body text-muted-foreground">Verified Exporters</span>
-                  <div className="w-8 h-4 bg-accent rounded-full relative">
-                    <div className="absolute left-1 top-1 w-2 h-2 bg-muted-foreground rounded-full" />
-                  </div>
-                </div>
-                <div className="flex items-center justify-between group cursor-pointer">
-                  <span className="text-sm font-body text-muted-foreground">In Stock Only</span>
-                  <div className="w-8 h-4 bg-primary rounded-full relative">
-                    <div className="absolute right-1 top-1 w-2 h-2 bg-primary-foreground rounded-full" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </aside>
-
-        {/* ─── Main Content Canvas ─── */}
-        <main className="flex-1 lg:ml-64 px-8 md:px-16 py-12 bg-surface">
-          {/* Editorial Header Section */}
-          <div className="max-w-screen-xl mx-auto mb-20">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-              <div>
-                <span className="font-label text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4 block">Marketplace Curation</span>
-                <h1 className="text-5xl md:text-7xl font-headline font-bold text-foreground tracking-tight leading-none mb-4">
-                  Marketplace Discovery
-                </h1>
-                <p className="text-muted-foreground text-lg font-body max-w-2xl">
-                  A refined selection of industrial chemicals, advanced machinery, and premium materials sourced from globally verified partners.
-                </p>
-              </div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-4xl font-headline font-bold text-foreground">{total.toLocaleString()}</span>
-                <span className="text-muted-foreground font-label text-xs uppercase tracking-widest">Listings Found</span>
-              </div>
-            </div>
-          </div>
-
-          {/* ─── Product Grid ─── */}
-          <div className="max-w-screen-xl mx-auto">
-            {products.length === 0 ? (
-              <div className="py-20">
-                <EmptyState
-                  iconName="searchX"
-                  title="No Listings Found"
-                  description="We couldn't find any products matching your current filters. Try broadening your search or clearing filters."
-                  actionLabel="Clear all filters"
-                  href="/products"
-                />
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-y-24 gap-x-12">
-                {products.map((product) => {
-                  const image = product.images?.[0] ?? null;
-                  const isInStock = product.quantity > 0;
-
+                {ALL_CATEGORIES.map((cat) => {
+                  const isActive = categoryParam === cat.value;
                   return (
-                    <div key={product.id} className="group">
-                      <Link href={`/products/${product.id}`} className="block">
-                        {/* Card Image */}
-                        <div className="relative mb-6 overflow-hidden rounded-xl bg-card aspect-[4/5] shadow-inner shadow-black/10">
-                          {image ? (
-                            <Image
-                              src={image}
-                              alt={product.name}
-                              fill
-                              sizes="(max-width:640px) 100vw,(max-width:1280px) 50vw,33vw"
-                              className="object-cover transition-transform duration-700 group-hover:scale-105"
-                            />
-                          ) : (
-                            <div className="absolute inset-0 flex items-center justify-center text-muted-foreground/30">
-                              <span className="material-symbols-outlined text-6xl">inventory_2</span>
-                            </div>
-                          )}
-                          {/* Badge */}
-                          <div className="absolute top-4 left-4">
-                            {isInStock ? (
-                              <span className="bg-tertiary-fixed text-on-tertiary-container px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
-                                <span className="material-symbols-outlined text-[12px]" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                                In Stock
-                              </span>
-                            ) : (
-                              <span className="bg-surface-container-high text-on-surface-variant px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
-                                <span className="material-symbols-outlined text-[12px]">schedule</span>
-                                Pre-Order
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Card Body */}
-                        <div className="space-y-3">
-                          <div className="flex justify-between items-start">
-                            <div className="flex-1 mr-4">
-                              <span className="text-[10px] font-label uppercase tracking-widest text-primary-foreground bg-primary/20 px-2 py-0.5 rounded">
-                                {product.category}
-                              </span>
-                              <h2 className="text-2xl font-headline font-bold mt-2 text-foreground line-clamp-1">
-                                {product.name}
-                              </h2>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-xl font-headline font-bold text-foreground">{formatMoney(product.price)}</p>
-                              <p className="text-[10px] font-label text-muted-foreground uppercase tracking-tighter">/ Unit</p>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-2 text-muted-foreground">
-                            <span className="material-symbols-outlined text-sm text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
-                            <span className="text-xs font-medium">
-                              Verified Exporter: {product.exporter?.companyName || product.exporter?.name || "Partner"}
-                            </span>
-                          </div>
-
-                          <div className="pt-4 flex items-center justify-between border-t border-border">
-                            <span className="text-primary font-headline font-bold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
-                              View Details
-                              <span className="material-symbols-outlined text-sm transition-transform group-hover:translate-x-1">arrow_forward</span>
-                            </span>
-                            <div className="p-2 rounded-full bg-accent hover:bg-accent/80 transition-colors text-muted-foreground">
-                              <span className="material-symbols-outlined text-lg">favorite</span>
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
+                    <Link
+                      key={cat.value}
+                      href={buildUrl({ category: isActive ? undefined : cat.value, page: undefined })}
+                      className={`flex items-center px-4 py-2 rounded-lg transition-all group ${isActive ? "bg-primary/5 text-primary font-bold shadow-sm" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"}`}
+                    >
+                      <span className="material-symbols-outlined mr-3 text-[20px]">{iconMap[cat.value] || "category"}</span>
+                      <span className="font-headline font-semibold text-sm uppercase tracking-tight">{cat.label}</span>
+                    </Link>
                   );
                 })}
               </div>
-            )}
+            </ImporterSidebar>
+            
+            <SidebarInset className="overflow-hidden">
+              <div className="flex-1 overflow-y-auto custom-scrollbar bg-surface h-[calc(100vh-80px)]">
+                <PageTransition>
+                  {/* Editorial Header Section */}
+                  <div className="w-full px-8 py-8">
+                  
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="mt-24 mb-12 flex justify-center items-center gap-4">
-                {page > 1 && (
-                  <Link
-                    href={buildUrl({ page: (page - 1).toString() })}
-                    className="px-6 py-3 border border-border rounded-full font-headline font-bold text-sm tracking-tight hover:bg-accent transition-all text-foreground"
-                  >
-                    ← Previous
-                  </Link>
-                )}
-                <span className="px-4 py-2 text-sm text-muted-foreground">
-                  Page {page} of {totalPages}
-                </span>
-                {page < totalPages && (
-                  <Link
-                    href={buildUrl({ page: (page + 1).toString() })}
-                    className="px-8 py-4 bg-primary text-primary-foreground rounded-full font-headline font-bold tracking-tight hover:opacity-90 transition-opacity shadow-lg shadow-primary/20"
-                  >
-                    Load More Listings →
-                  </Link>
-                )}
+                    {/* ─── Product Grid ─── */}
+                    <div className="">
+                      {products.length === 0 ? (
+                        <div className="py-20 text-center">
+                          <EmptyState
+                            iconName="searchX"
+                            title="No Listings Found"
+                            description="We couldn't find any products matching your current filters. Try broadening your search or clearing filters."
+                            actionLabel="Clear all filters"
+                            href="/products"
+                          />
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                          {products.map((product) => {
+                            const image = product.images?.[0] ?? null;
+                            const isInStock = product.stockQty > 0;
+
+                            return (
+                              <div key={product.id} className="group">
+                                <Link href={`/products/${product.id}`} className="block">
+                                  {/* Card Image */}
+                                  <div className="relative mb-3 overflow-hidden rounded-lg bg-[#f8f9fa] dark:bg-white/[0.03] aspect-square border border-border dark:border-white/5 group-hover:border-primary/40 transition-all duration-500 shadow-sm group-hover:shadow-md">
+                                    {image ? (
+                                      <Image
+                                        src={image}
+                                        alt={product.name}
+                                        fill
+                                        sizes="(max-width:640px) 100vw,(max-width:1280px) 50vw,33vw"
+                                        className="object-contain p-2 transition-transform duration-700 group-hover:scale-110"
+                                      />
+                                    ) : (
+                                      <div className="absolute inset-0 flex items-center justify-center text-muted-foreground/30">
+                                        <span className="material-symbols-outlined text-6xl">inventory_2</span>
+                                      </div>
+                                    )}
+                                    {/* Badge */}
+                                    <div className="absolute top-4 left-4">
+                                      {isInStock ? (
+                                        <span className="bg-tertiary-fixed text-on-tertiary-container px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
+                                          <span className="material-symbols-outlined text-[12px]" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                                          In Stock
+                                        </span>
+                                      ) : (
+                                        <span className="bg-surface-container-high text-on-surface-variant px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
+                                          <span className="material-symbols-outlined text-[12px]">schedule</span>
+                                          Pre-Order
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  {/* Card Body */}
+                                  <div className="space-y-3">
+                                    <div className="flex justify-between items-start">
+                                      <div className="flex-1 mr-4">
+                                        <span className="text-[10px] font-label uppercase tracking-widest text-primary-foreground bg-primary/20 px-2 py-0.5 rounded">
+                                          {product.category}
+                                        </span>
+                                        <h2 className="text-base font-headline font-bold mt-1 text-foreground line-clamp-2 leading-tight group-hover:text-primary transition-colors uppercase tracking-tight">
+                                          {product.name}
+                                        </h2>
+                                      </div>
+                                      <div className="text-right">
+                                        <p className="text-lg font-headline font-bold text-foreground">{formatMoney(product.price)}</p>
+                                        <p className="text-[10px] font-label text-muted-foreground uppercase tracking-widest">/ Unit</p>
+                                      </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                      <span className="material-symbols-outlined text-sm text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+                                      <span className="text-xs font-medium">
+                                        Verified Exporter: {product.exporter?.businessName || product.exporter?.name || "Partner"}
+                                      </span>
+                                    </div>
+
+                                    <div className="pt-4 flex items-center justify-between border-t border-border">
+                                      <span className="text-primary font-headline font-bold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
+                                        View Details
+                                        <span className="material-symbols-outlined text-sm transition-transform group-hover:translate-x-1">arrow_forward</span>
+                                      </span>
+                                    </div>
+                                  </div>
+                                </Link>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      {/* Pagination */}
+                      {totalPages > 1 && (
+                        <div className="flex justify-center gap-2 mt-20">
+                          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                            <Link
+                              key={p}
+                              href={buildUrl({ page: p })}
+                              className={`w-12 h-12 rounded-full flex items-center justify-center font-headline font-bold transition-all ${p === page ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" : "hover:bg-accent text-muted-foreground"}`}
+                            >
+                              {p}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </PageTransition>
               </div>
-            )}
+            </SidebarInset>
           </div>
-        </main>
-      </div>
-    </div>
+        </div>
+      </DashboardScaler>
+    </SidebarProvider>
   );
 }

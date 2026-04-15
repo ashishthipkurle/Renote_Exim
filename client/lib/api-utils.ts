@@ -1,18 +1,6 @@
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+import { nhost } from "./nhost";
 
-/**
- * Read the sb_access_token cookie value (client-side only).
- */
-function getAccessTokenFromCookie(): string | null {
-  if (typeof document === "undefined") return null;
-  const match = document.cookie.match(/(?:^|;\s*)sb_access_token=([^;]*)/);
-  if (!match) return null;
-  try {
-    return decodeURIComponent(match[1]) || null;
-  } catch {
-    return null;
-  }
-}
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 /**
  * Makes an authenticated fetch request to an API endpoint.
@@ -25,7 +13,9 @@ export async function authFetch<T = unknown>(
   retries = 3,
   backoffMs = 500
 ): Promise<T> {
-  const token = getAccessTokenFromCookie();
+  // Securely get the token from memory/localStorage rather than HTTP-Only cookies
+  const session = nhost.getUserSession();
+  const token = session?.accessToken || null;
 
   const headers: Record<string, string> = {
     ...(options.headers as Record<string, string>),
@@ -46,16 +36,17 @@ export async function authFetch<T = unknown>(
       const res = await fetch(url, {
         ...options,
         headers,
+        credentials: "include", // Ensure HttpOnly cookies are strictly sent
       });
 
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
-        
+
         // Don't retry client errors (4xx) except 429 Too Many Requests
         if (res.status >= 400 && res.status < 500 && res.status !== 429) {
           throw new Error(errorData.error || `API request failed with status ${res.status}`);
         }
-        
+
         throw new Error(`API error ${res.status}: ${errorData.error || "Unknown error"}`);
       }
 

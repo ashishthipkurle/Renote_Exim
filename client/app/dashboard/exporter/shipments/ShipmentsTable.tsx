@@ -6,143 +6,143 @@ import { Truck, MapPin, Search } from "lucide-react";
 import Link from 'next/link';
 
 const SHIPMENT_STATUS: Record<string, { label: string; color: string }> = {
-    PREPARING: { label: "Preparing", color: "text-neutral-400 bg-neutral-400/10 border-neutral-400/20" },
-    IN_TRANSIT: { label: "In Transit", color: "text-foreground dark:text-white bg-black/10 dark:bg-white/15 border-border dark:border-white/20" },
-    CUSTOMS: { label: "Customs", color: "text-neutral-300 bg-neutral-300/10 border-neutral-300/20" },
-    OUT_FOR_DELIVERY: { label: "Out for Delivery", color: "text-foreground dark:text-white bg-white/15 border-white/25" },
-    DELIVERED: { label: "Delivered", color: "text-foreground dark:text-white bg-black/20 dark:bg-white/20 border-white/30" },
-    RETURNED: { label: "Returned", color: "text-neutral-500 bg-neutral-500/10 border-neutral-500/20" },
+ PREPARING: { label: "Preparing", color: "text-neutral-400 bg-neutral-400/10 border-neutral-400/20" },
+ IN_TRANSIT: { label: "In Transit", color: "text-foreground dark:text-white bg-black/10 dark:bg-white/15 border-border dark:border-white/20" },
+ CUSTOMS: { label: "Customs", color: "text-neutral-300 bg-neutral-300/10 border-neutral-300/20" },
+ OUT_FOR_DELIVERY: { label: "Out for Delivery", color: "text-foreground dark:text-white bg-white/15 border-white/25" },
+ DELIVERED: { label: "Delivered", color: "text-foreground dark:text-white bg-black/20 dark:bg-white/20 border-white/30" },
+ RETURNED: { label: "Returned", color: "text-neutral-500 bg-neutral-500/10 border-neutral-500/20" },
 };
 
 function formatDate(d: Date | string) {
-    return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(new Date(d));
+ return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(new Date(d));
 }
 
 export default function ShipmentsTable({
-    shipments,
-    searchParamKey = "search",
-    pageParamKey = "page",
+ shipments,
+ searchParamKey = "search",
+ pageParamKey = "page",
 }: {
-    shipments: any[];
-    searchParamKey?: string;
-    pageParamKey?: string;
+ shipments: any[];
+ searchParamKey?: string;
+ pageParamKey?: string;
 }) {
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const [isPending, startTransition] = useTransition();
-    const [searchQuery, setSearchQuery] = useState(searchParams.get(searchParamKey) || "");
+ const router = useRouter();
+ const searchParams = useSearchParams();
+ const [isPending, startTransition] = useTransition();
+ const [searchQuery, setSearchQuery] = useState(searchParams.get(searchParamKey) || "");
 
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        const params = new URLSearchParams(searchParams);
-        if (searchQuery) params.set(searchParamKey, searchQuery);
-        else params.delete(searchParamKey);
-        params.delete(pageParamKey);
+ const handleSearch = (e: React.FormEvent) => {
+ e.preventDefault();
+ const params = new URLSearchParams(searchParams);
+ if (searchQuery) params.set(searchParamKey, searchQuery);
+ else params.delete(searchParamKey);
+ params.delete(pageParamKey);
 
-        startTransition(() => {
-            router.push(`?${params.toString()}`);
-        });
-    };
+ startTransition(() => {
+ router.push(`?${params.toString()}`);
+ });
+ };
 
-    return (
-        <div className="space-y-6">
-            <div className="flex justify-end">
-                <form onSubmit={handleSearch} className="relative w-full lg:w-96">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <input
-                        type="text"
-                        placeholder="Search by tracking number, buyer, or product..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 bg-muted/50 border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-white/50 focus:ring-1 focus:ring-white/20 transition-all text-sm"
-                    />
-                </form>
-            </div>
+ return (
+ <div className="space-y-6">
+ <div className="flex justify-end">
+ <form onSubmit={handleSearch} className="relative w-full lg:w-96">
+ <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+ <input
+ type="text"
+ placeholder="Search by tracking number, buyer, or product..."
+ value={searchQuery}
+ onChange={(e) => setSearchQuery(e.target.value)}
+ className="w-full pl-10 pr-4 py-2.5 bg-muted/50 border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-white/50 focus:ring-1 focus:ring-white/20 transition-all text-sm"
+ />
+ </form>
+ </div>
 
-            <div className="space-y-4 relative">
-                {isPending && (
-                    <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-[2rem]">
-                        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-border dark:border-white"></div>
-                    </div>
-                )}
+ <div className="space-y-4 relative">
+ {isPending && (
+ <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
+ <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-border dark:border-white"></div>
+ </div>
+ )}
 
-                {shipments.length === 0 ? (
-                    <div className="bg-card border border-border shadow-xl dark:shadow-2xl rounded-[2rem] p-16 text-center">
-                        <Truck className="w-16 h-16 text-muted-foreground/30 mx-auto mb-6" />
-                        <h2 className="text-2xl font-black text-foreground mb-3 uppercase ">No Global Logistics ID&apos;d</h2>
-                        <p className="text-muted-foreground text-sm mb-8 max-w-md mx-auto leading-relaxed">
-                            There are currently no active shipments in transit. Your logistics chain will appear here once orders are dispatched.
-                        </p>
-                    </div>
-                ) : (
-                    <>
-                        <div className="hidden lg:grid grid-cols-12 gap-4 px-8 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] italic">
-                            <div className="col-span-3 text-foreground dark:text-white opacity-50">Logistics ID / Asset</div>
-                            <div className="col-span-2">Recipient Entity</div>
-                            <div className="col-span-2">Carrier Network</div>
-                            <div className="col-span-2">Transmission Status</div>
-                            <div className="col-span-1">Arrival Est.</div>
-                            <div className="col-span-2 text-right">Initialized</div>
-                        </div>
+ {shipments.length === 0 ? (
+ <div className="bg-card border border-border shadow-xl dark:shadow-2xl rounded-lg p-16 text-center">
+ <Truck className="w-16 h-16 text-muted-foreground/30 mx-auto mb-6" />
+ <h2 className="text-2xl font-black text-foreground mb-3 uppercase ">No Global Logistics ID&apos;d</h2>
+ <p className="text-muted-foreground text-sm mb-8 max-w-md mx-auto leading-relaxed">
+ There are currently no active shipments in transit. Your logistics chain will appear here once orders are dispatched.
+ </p>
+ </div>
+ ) : (
+ <>
+ <div className="hidden lg:grid grid-cols-12 gap-4 px-8 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] ">
+ <div className="col-span-3 text-foreground dark:text-white opacity-50">Logistics ID / Asset</div>
+ <div className="col-span-2">Recipient Entity</div>
+ <div className="col-span-2">Carrier Network</div>
+ <div className="col-span-2">Transmission Status</div>
+ <div className="col-span-1">Arrival Est.</div>
+ <div className="col-span-2 text-right">Initialized</div>
+ </div>
 
-                        {shipments.map((shipment) => {
-                            const cfg = SHIPMENT_STATUS[shipment.status] ?? SHIPMENT_STATUS.PREPARING;
-                            return (
-                                <Link
-                                    key={shipment.id}
-                                    href={`/dashboard/exporter/shipments/${shipment.id}`}
-                                    className="bg-card border border-border hover:border-white/40 transition-all duration-500 shadow-xl dark:shadow-2xl rounded-[2rem] p-5 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4 items-center group hover:scale-[1.01] block"
-                                >
-                                    <div className="lg:col-span-3">
-                                        <div className="text-sm font-black text-foreground truncate group-hover:text-foreground dark:text-white transition-colors">
-                                            {shipment.trackingNumber}
-                                        </div>
-                                        <div className="text-[10px] text-muted-foreground mt-1 line-clamp-1 font-medium italic group-hover:text-muted-foreground/80">
-                                            {shipment.order.items?.[0]?.product?.name || "Order Item"}
-                                        </div>
-                                    </div>
+ {shipments.map((shipment) => {
+ const cfg = SHIPMENT_STATUS[shipment.status] ?? SHIPMENT_STATUS.PREPARING;
+ return (
+ <Link
+ key={shipment.id}
+ href={`/dashboard/exporter/shipments/${shipment.id}`}
+ className="bg-card border border-border hover:border-white/40 transition-all duration-500 shadow-xl dark:shadow-2xl rounded-lg p-5 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4 items-center group hover:scale-[1.01] block"
+ >
+ <div className="lg:col-span-3">
+ <div className="text-sm font-black text-foreground truncate group-hover:text-foreground dark:text-white transition-colors">
+ {shipment.trackingNumber}
+ </div>
+ <div className="text-[10px] text-muted-foreground mt-1 line-clamp-1 font-medium group-hover:text-muted-foreground/80">
+ {shipment.order.items?.[0]?.product?.name || "Order Item"}
+ </div>
+ </div>
 
-                                    <div className="lg:col-span-2">
-                                        <div className="text-sm font-bold text-foreground/90 truncate">
-                                            {shipment.order.importer.companyName || shipment.order.importer.name}
-                                        </div>
-                                        <div className="text-[9px] text-muted-foreground flex items-center gap-1 font-black uppercase tracking-wider mt-1">
-                                            <MapPin className="w-3 h-3 text-foreground dark:text-white" />
-                                            {shipment.order.importer.country ?? "INTERNATIONAL ZONE"}
-                                        </div>
-                                    </div>
+ <div className="lg:col-span-2">
+ <div className="text-sm font-bold text-foreground/90 truncate">
+ {shipment.order.importer.businessName || shipment.order.importer.name}
+ </div>
+ <div className="text-[9px] text-muted-foreground flex items-center gap-1 font-black uppercase tracking-wider mt-1">
+ <MapPin className="w-3 h-3 text-foreground dark:text-white" />
+ {shipment.order.importer.country ?? "INTERNATIONAL ZONE"}
+ </div>
+ </div>
 
-                                    <div className="lg:col-span-2">
-                                        <div className="text-xs font-black text-muted-foreground uppercase tracking-widest bg-muted border border-border px-3 py-1.5 rounded-xl w-fit">
-                                            {shipment.carrier || "UNDISCLOSED"}
-                                        </div>
-                                    </div>
+ <div className="lg:col-span-2">
+ <div className="text-xs font-black text-muted-foreground uppercase tracking-widest bg-muted border border-border px-3 py-1.5 rounded-xl w-fit">
+ {shipment.carrier || "UNDISCLOSED"}
+ </div>
+ </div>
 
-                                    <div className="lg:col-span-2">
-                                        <span className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-[9px] font-black uppercase tracking-[0.2em] shadow-sm ${cfg.color}`}>
-                                            <span className="size-1.5 rounded-full bg-current animate-pulse" />
-                                            {cfg.label}
-                                        </span>
-                                    </div>
+ <div className="lg:col-span-2">
+ <span className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border text-[9px] font-black uppercase tracking-[0.2em] shadow-sm ${cfg.color}`}>
+ <span className="size-1.5 rounded-full bg-current animate-pulse" />
+ {cfg.label}
+ </span>
+ </div>
 
-                                    <div className="lg:col-span-1">
-                                        <div className="text-sm font-black text-foreground/90">
-                                            {shipment.estimatedArrival
-                                                ? formatDate(shipment.estimatedArrival)
-                                                : "CALCULATING"}
-                                        </div>
-                                    </div>
+ <div className="lg:col-span-1">
+ <div className="text-sm font-black text-foreground/90">
+ {shipment.estimatedArrival
+ ? formatDate(shipment.estimatedArrival)
+ : "CALCULATING"}
+ </div>
+ </div>
 
-                                    <div className="lg:col-span-2 text-right">
-                                        <div className="text-[9px] font-black text-muted-foreground uppercase tracking-widest italic">{formatDate(shipment.createdAt)}</div>
-                                    </div>
-                                </Link>
-                            );
-                        })}
-                    </>
-                )}
-            </div>
-        </div>
-    );
+ <div className="lg:col-span-2 text-right">
+ <div className="text-[9px] font-black text-muted-foreground uppercase tracking-widest ">{formatDate(shipment.createdAt)}</div>
+ </div>
+ </Link>
+ );
+ })}
+ </>
+ )}
+ </div>
+ </div>
+ );
 }
 

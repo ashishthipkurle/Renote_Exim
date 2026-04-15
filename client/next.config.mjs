@@ -1,5 +1,3 @@
-import { withSentryConfig } from "@sentry/nextjs";
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
@@ -19,9 +17,6 @@ const nextConfig = {
     ],
   },
   output: "standalone",
-  experimental: {
-    serverComponentsExternalPackages: ["@sentry/nextjs"],
-  },
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -30,14 +25,4 @@ const nextConfig = {
   },
 }
 
-export default withSentryConfig(nextConfig, {
-  silent: true,
-  org: "ranote-exim",
-  project: "platform",
-}, {
-  widenClientFileUpload: true,
-  transpileClientSDK: true,
-  tunnelRoute: "/monitoring",
-  hideSourceMaps: true,
-  disableLogger: true,
-});
+export default nextConfig;

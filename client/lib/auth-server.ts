@@ -12,6 +12,7 @@ export type AuthContext = {
 };
 
 export const AUTH_COOKIE_NAME = "sb_access_token";
+export const REFRESH_COOKIE_NAME = "sb_refresh_token";
 
 export const AUTH_COOKIE_OPTIONS = {
   path: "/",
@@ -21,6 +22,30 @@ export const AUTH_COOKIE_OPTIONS = {
   maxAge: 60 * 60 * 24 * 7, // 1 week
 };
 
+export const REFRESH_COOKIE_OPTIONS = {
+  ...AUTH_COOKIE_OPTIONS,
+  maxAge: 60 * 60 * 24 * 30, // 30 days
+};
+
+/**
+ * Helper to perform a fetch with a timeout to prevent hanging the server
+ */
+async function fetchWithTimeout(url: string, options: any, timeout = 5000) {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+    clearTimeout(id);
+    return response;
+  } catch (error) {
+    clearTimeout(id);
+    throw error;
+  }
+}
+
 /**
  * Gets the current authenticated user context on the server side.
  * This matches the legacy getApiAuthContext signature from lib/supabase/auth.ts
@@ -29,7 +54,7 @@ export const AUTH_COOKIE_OPTIONS = {
 export async function getApiAuthContext(
   request: NextRequest,
   allowedRoles?: Role[]
-): Promise<{ auth: AuthContext | null; error: NextResponse | null }> {
+): Promise<{ auth: AuthContext | null; error: NextResponse | null; newAccessToken?: string; newRefreshToken?: string }> {
   try {
     // 1. Get token from cookies or Authorization header
     const cookieStore = cookies();
@@ -43,7 +68,7 @@ export async function getApiAuthContext(
     }
 
     if (!accessToken) {
-      console.log("[Auth] No access token found in request");
+      console.log("[Auth Server] No access token found in cookies.");
       return {
         auth: null,
         error: NextResponse.json({ error: "Missing authentication token" }, { status: 401 }),
@@ -54,17 +79,70 @@ export async function getApiAuthContext(
     const subdomain = process.env.NEXT_PUBLIC_NHOST_SUBDOMAIN;
     const region = process.env.NEXT_PUBLIC_NHOST_REGION;
     const verifyUrl = `https://${subdomain}.auth.${region}.nhost.run/v1/user`;
-    
-    const verifyRes = await fetch(verifyUrl, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-      cache: "no-store",
-    });
+
+    console.log("[Auth Server] Verifying token via Nhost API...");
+    let verifyRes;
+    try {
+      verifyRes = await fetchWithTimeout(verifyUrl, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        cache: "no-store",
+      }, 5000); // 5s timeout
+    } catch (e: any) {
+      console.error("[Auth Server] Verification call failed or timed out:", e.message);
+      return {
+        auth: null,
+        error: NextResponse.json({ error: "Auth verification timeout" }, { status: 401 }),
+      };
+    }
 
     if (!verifyRes.ok) {
-      console.warn("[Auth] Token verification API failed with status:", verifyRes.status);
+      console.warn("[Auth Server] Token invalid (Status:", verifyRes.status, "). Attempting refresh...");
+      
+      // 2b. If invalid/expired, try to refresh using the refresh token
+      const refreshToken = cookieStore.get(REFRESH_COOKIE_NAME)?.value;
+      if (refreshToken) {
+        let refreshRes;
+        try {
+          refreshRes = await fetchWithTimeout(`https://${subdomain}.auth.${region}.nhost.run/v1/token`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ refreshToken }),
+            cache: "no-store",
+          }, 5000); // 5s timeout
+        } catch (e: any) {
+          console.error("[Auth Server] Refresh call timed out:", e.message);
+          return { auth: null, error: null }; // Silent fail to let client take over
+        }
+
+        if (refreshRes && refreshRes.ok) {
+          const refreshData = await refreshRes.json();
+          const newAccessToken = refreshData.accessToken || refreshData.session?.accessToken || refreshData.jwt_token;
+          const newRefreshToken = refreshData.refreshToken || refreshData.session?.refreshToken;
+
+          if (newAccessToken) {
+            console.log("[Auth Server] Token refreshed successfully.");
+            
+            // Return user data from the refresh response
+            const userData = refreshData.user || refreshData.session?.user;
+            if (userData?.id) {
+               const context = await getContextForUser(userData.id, allowedRoles);
+               if (context.auth) {
+                 return {
+                   ...context,
+                   newAccessToken,
+                   newRefreshToken,
+                 };
+               }
+            }
+          }
+        } else {
+          console.warn("[Auth Server] Refresh failed (Status:", refreshRes?.status, ")");
+        }
+      }
+
       return {
         auth: null,
         error: NextResponse.json({ error: "Invalid or expired token" }, { status: 401 }),
@@ -72,7 +150,7 @@ export async function getApiAuthContext(
     }
 
     const nhostUser = await verifyRes.json();
-    const userId = nhostUser.id;
+    const userId = nhostUser.id || nhostUser.user?.id;
 
     if (!userId) {
       console.warn("[Auth] No user ID in Nhost response");
@@ -97,7 +175,7 @@ export async function getApiAuthContext(
     });
 
     if (!dbUser) {
-      console.warn("[Auth] User in Nhost but missing in Prisma:", user.id);
+      console.warn("[Auth] User in Nhost but missing in Prisma:", userId);
       return {
         auth: null,
         error: NextResponse.json({ error: "User profile not found in database" }, { status: 401 }),
@@ -137,6 +215,42 @@ export async function getApiAuthContext(
 }
 
 /**
+ * Internal helper to fetch user from DB and verify roles
+ */
+async function getContextForUser(userId: string, allowedRoles?: Role[]): Promise<{ auth: AuthContext | null; error: NextResponse | null }> {
+  const dbUser = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!dbUser) {
+    return {
+      auth: null,
+      error: NextResponse.json({ error: "User profile not found in database" }, { status: 401 }),
+    };
+  }
+
+  if (allowedRoles && allowedRoles.length > 0 && !allowedRoles.includes(dbUser.role)) {
+    return {
+      auth: null,
+      error: NextResponse.json(
+        { error: "Forbidden: You do not have the required permissions" },
+        { status: 403 }
+      ),
+    };
+  }
+
+  return {
+    auth: {
+      userId: dbUser.id,
+      role: dbUser.role,
+      email: dbUser.email,
+      user: dbUser,
+    },
+    error: null,
+  };
+}
+
+/**
  * Shorthand for simple getServerAuthContext (legacy support)
  */
 export async function getServerAuthContext(req?: NextRequest): Promise<AuthContext | null> {
@@ -150,4 +264,14 @@ export async function getServerAuthContext(req?: NextRequest): Promise<AuthConte
 export function setServerAuthCookie(accessToken: string) {
   const cookieStore = cookies();
   cookieStore.set(AUTH_COOKIE_NAME, accessToken, AUTH_COOKIE_OPTIONS);
+}
+
+/**
+ * Clears the auth cookies
+ */
+export function clearServerAuthCookie() {
+    const cookieStore = cookies();
+    cookieStore.delete(AUTH_COOKIE_NAME);
+    cookieStore.delete(REFRESH_COOKIE_NAME);
+    cookieStore.delete('nhost-session'); // Clear old ones too
 }

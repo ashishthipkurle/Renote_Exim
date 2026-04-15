@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -9,6 +9,30 @@ export default function ConnectivitySection() {
   const { t } = useTranslation();
   const airplaneRef = useRef<HTMLImageElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
+  const [vesselCount, setVesselCount] = useState(0);
+  const [flightCount, setFlightCount] = useState(0);
+
+  // Animate counters on mount
+  useEffect(() => {
+    const targetVessels = 1492;
+    const targetFlights = 418;
+    const duration = 2000;
+    const steps = 60;
+    const interval = duration / steps;
+    let step = 0;
+
+    const timer = setInterval(() => {
+      step++;
+      const progress = Math.min(step / steps, 1);
+      // Ease out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setVesselCount(Math.round(targetVessels * eased));
+      setFlightCount(Math.round(targetFlights * eased));
+      if (step >= steps) clearInterval(timer);
+    }, interval);
+
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -57,7 +81,7 @@ export default function ConnectivitySection() {
           </div>
         </div>
 
-        <div className="w-full h-[600px] bg-slate-200 dark:bg-[#080b12] rounded-2xl border border-slate-300 dark:border-white/10 relative overflow-hidden shadow-2xl">
+        <div className="w-full h-[600px] bg-slate-200 dark:bg-[#080b12] rounded-lg border border-slate-300 dark:border-white/10 relative overflow-hidden shadow-2xl">
           <div className="absolute inset-0 opacity-20 dark:opacity-50 bg-[url('https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg')] bg-cover bg-no-repeat bg-center dark:invert dark:filter"></div>
           <div className="absolute inset-0">
             <svg className="absolute inset-0 w-full h-full pointer-events-none">
@@ -81,11 +105,11 @@ export default function ConnectivitySection() {
           <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end pointer-events-none">
             <div className="glass-panel p-4 rounded-xl border border-slate-300 dark:border-white/5 backdrop-blur-md bg-white/60 dark:bg-black/20">
               <p className="text-xs text-slate-600 dark:text-slate-400 uppercase mb-1">{t("connectivity.active_vessels", "Active Vessels")}</p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-white font-mono">1,492</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-white font-mono">{vesselCount.toLocaleString()}</p>
             </div>
             <div className="glass-panel p-4 rounded-xl border border-slate-300 dark:border-white/5 backdrop-blur-md bg-white/60 dark:bg-black/20">
               <p className="text-xs text-slate-600 dark:text-slate-400 uppercase mb-1">{t("connectivity.flights_in_air", "Flights In-Air")}</p>
-              <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400 font-mono">418</p>
+              <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400 font-mono">{flightCount}</p>
             </div>
           </div>
         </div>

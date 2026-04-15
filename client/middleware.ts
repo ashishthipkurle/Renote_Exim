@@ -59,10 +59,16 @@ export async function middleware(request: NextRequest) {
     // Fail open if Redis is down
   }
 
-  // Future expansion: Nhost SSR JWT decoding for strict role routing
-  const hasAuthToken = request.cookies.getAll().some(c => c.name.includes('nhost') || c.name.includes('sb_access_token') || c.name.includes('token'));
-  
-  if (path.startsWith('/dashboard/') && !hasAuthToken) {
+  // 3. Authentication & Route Guarding
+  const hasAuthToken = request.cookies.getAll().some(c => 
+    c.name.includes('nhost') || 
+    c.name.includes('sb_access_token') || 
+    c.name.includes('token')
+  );
+
+  // Protected Dashboard Pages: Redirect unauthenticated users to login
+  if (path.startsWith('/dashboard') && !hasAuthToken) {
+    console.log("[Middleware] Unauthenticated user on protected page, redirecting to /login");
     return NextResponse.redirect(new URL('/login', request.url));
   }
 

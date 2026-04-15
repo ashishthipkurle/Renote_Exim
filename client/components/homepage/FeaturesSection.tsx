@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Image from "next/image";
 import { useTranslation } from "@/lib/i18n/client";
 
@@ -15,13 +16,13 @@ export default function FeaturesSection() {
             </h2>
             <p className="text-muted-foreground text-lg">{t("features.subtitle", "Our platform combines institutional-grade financial tools with real-time supply chain visibility.")}</p>
           </div>
-          <button className="text-primary hover:text-slate-900 dark:hover:text-white font-semibold flex items-center gap-2 transition-colors group" type="button">
+          <Link href="/products" className="text-primary hover:text-slate-900 dark:hover:text-white font-semibold flex items-center gap-2 transition-colors group">
             {t("features.explore_btn", "Explore Capabilities")} <span className="material-icons group-hover:translate-x-1 transition-transform">arrow_forward</span>
-          </button>
+          </Link>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
-          <div className="bg-slate-900 border border-slate-800 dark:bg-transparent rounded-2xl p-8 relative group overflow-hidden h-[450px] flex flex-col justify-end hover:shadow-2xl dark:hover:shadow-[0_0_40px_rgba(19,91,236,0.15)] reveal-trigger" style={{ transitionDelay: "0ms" }}>
+          <Link href="/products" className="bg-slate-900 border border-slate-800 dark:bg-transparent rounded-lg p-8 relative group overflow-hidden h-[450px] flex flex-col justify-end hover:shadow-2xl dark:hover:shadow-[0_0_40px_rgba(19,91,236,0.15)] reveal-trigger" style={{ transitionDelay: "0ms" }}>
             <div className="absolute inset-0 z-0">
               <Image
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdACOt5E6X3UdwnFb8tiSClZI5sFRnyDfjOc9oLAun06nw-9LllRIlSrJvBskhY4ylHulzIxDGMJ_fb9U6momci6kMKvXDjBQURIQGu_jC-oeuyeLB7SajYmhGTeeDNMoUunSpwXInqwJUPqafyddm8cqfsEHI-t8UFj8EKTZ-xoISuMGiXdXGZwwhOsAFU-iB0ioFhqSmmOLv-TFjUTyJDCk4xxHvaxCDs7aTW3Ob-fQrOEmB5YO1J8MYBVO4PvAWSIdvIer2wUs"
@@ -40,9 +41,9 @@ export default function FeaturesSection() {
               <p className="text-slate-200 text-sm leading-relaxed mb-6 drop-shadow-md group-hover:text-white transition-colors">{t("features.feature1_desc", "Precision monitoring of your cargo via satellite and IoT sensors across air, sea, and land routes.")}</p>
               <div className="h-[1px] w-full bg-gradient-to-r from-primary/50 to-transparent mb-4 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-700" />
             </div>
-          </div>
+          </Link>
 
-          <div className="bg-slate-900 border border-slate-800 dark:bg-transparent rounded-2xl p-8 relative group overflow-hidden h-[450px] flex flex-col justify-end hover:shadow-2xl dark:hover:shadow-[0_0_40px_rgba(19,91,236,0.15)] reveal-trigger" style={{ transitionDelay: "150ms" }}>
+          <Link href="/register" className="bg-slate-900 border border-slate-800 dark:bg-transparent rounded-lg p-8 relative group overflow-hidden h-[450px] flex flex-col justify-end hover:shadow-2xl dark:hover:shadow-[0_0_40px_rgba(19,91,236,0.15)] reveal-trigger" style={{ transitionDelay: "150ms" }}>
             <div className="absolute inset-0 z-0">
               <Image
                 src="/home/financial-graphs.png"
@@ -61,9 +62,9 @@ export default function FeaturesSection() {
               <p className="text-slate-200 text-sm leading-relaxed mb-6 drop-shadow-md group-hover:text-white transition-colors">{t("features.feature2_desc", "Smart contracts hold funds securely until delivery conditions are met and verified by digital BOLs.")}</p>
               <div className="h-[1px] w-full bg-gradient-to-r from-primary/50 to-transparent mb-4 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-700" />
             </div>
-          </div>
+          </Link>
 
-          <div className="bg-slate-900 border border-slate-800 dark:bg-transparent rounded-2xl p-8 relative group overflow-hidden h-[450px] flex flex-col justify-end hover:shadow-2xl dark:hover:shadow-[0_0_40px_rgba(19,91,236,0.15)] reveal-trigger" style={{ transitionDelay: "300ms" }}>
+          <Link href="/faq" className="bg-slate-900 border border-slate-800 dark:bg-transparent rounded-lg p-8 relative group overflow-hidden h-[450px] flex flex-col justify-end hover:shadow-2xl dark:hover:shadow-[0_0_40px_rgba(19,91,236,0.15)] reveal-trigger" style={{ transitionDelay: "300ms" }}>
             <div className="absolute inset-0 z-0">
               <Image
                 src="/assets/compliance-abstract.jpg"
@@ -85,7 +86,7 @@ export default function FeaturesSection() {
               <p className="text-slate-200 text-sm leading-relaxed mb-6 drop-shadow-md group-hover:text-white transition-colors">{t("features.feature3_desc", "Automated customs documentation and regulatory checks for over 190 jurisdictions.")}</p>
               <div className="h-[1px] w-full bg-gradient-to-r from-primary/50 to-transparent mb-4 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-700" />
             </div>
-          </div>
+          </Link>
         </div>
       </div>
     </section>

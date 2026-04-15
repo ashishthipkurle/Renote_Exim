@@ -18,6 +18,7 @@ export default function HomeNavbar() {
   const { theme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -36,12 +37,12 @@ export default function HomeNavbar() {
 
   return (
     <nav className="sticky top-0 w-full z-50 transition-all duration-300" 
-         style={{
-           background: "rgba(255, 255, 255, 0.03)", 
-           backdropFilter: "blur(20px)",
-           WebkitBackdropFilter: "blur(20px)",
-           boxShadow: "0 4px 30px rgba(0, 0, 0, 0.05)"
-         }}>
+      style={{
+        background: "rgba(255, 255, 255, 0.03)", 
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+        boxShadow: "0 4px 30px rgba(0, 0, 0, 0.05)"
+      }}>
       <div className="relative w-full px-2 md:px-4 h-14 flex justify-between items-center">
         <Link href="/" className="flex items-center flex-shrink-0">
           <Image src={LogoImg} alt="Ranote Exim Logo" className={isDark ? "h-14 md:h-[75px] w-auto object-contain transition-all" : "h-8 md:h-10 w-auto object-contain transition-all"} unoptimized />
@@ -129,11 +130,68 @@ export default function HomeNavbar() {
               </Link>
             </>
           )}
-          <button className="md:hidden text-slate-900 dark:text-white" type="button" aria-label="Menu">
-            <span className="material-icons">menu</span>
+          <button 
+            className="md:hidden text-slate-900 dark:text-white" 
+            type="button" 
+            aria-label="Menu"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            <span className="material-icons">{isMobileMenuOpen ? "close" : "menu"}</span>
           </button>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden absolute top-14 left-0 w-full bg-white/95 dark:bg-[#0A0E17]/95 backdrop-blur-xl border-b border-slate-200 dark:border-white/10 shadow-2xl z-50 animate-in slide-in-from-top duration-200">
+          <div className="flex flex-col p-4 gap-2">
+            <Link 
+              href="/products" 
+              className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 text-foreground font-semibold transition-colors"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <ShoppingBag className="w-4 h-4 text-primary" />
+              Marketplace
+            </Link>
+            <Link 
+              href="/faq" 
+              className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 text-foreground font-semibold transition-colors"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <span className="material-icons text-primary text-lg">help_outline</span>
+              FAQ
+            </Link>
+            {user && (
+              <Link 
+                href={user.role === "USER" ? "/products" : `/dashboard/${user.role.toLowerCase()}`}
+                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 text-foreground font-semibold transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <span className="material-icons text-primary text-lg">dashboard</span>
+                Dashboard
+              </Link>
+            )}
+            {!user && !loading && (
+              <div className="flex gap-3 pt-2 border-t border-slate-100 dark:border-white/10 mt-2">
+                <Link 
+                  href="/login" 
+                  className="flex-1 text-center py-3 rounded-lg border border-border text-foreground font-semibold hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {t("login", "Login")}
+                </Link>
+                <Link 
+                  href="/register" 
+                  className="flex-1 text-center py-3 rounded-lg bg-primary text-white font-semibold hover:bg-primary/90 transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {t("signup", "Get Started")}
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
