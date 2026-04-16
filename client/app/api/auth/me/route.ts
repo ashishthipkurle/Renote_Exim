@@ -37,11 +37,27 @@ export async function GET(request: NextRequest) {
  updatedAt: user.updatedAt instanceof Date ? user.updatedAt.toISOString() : user.updatedAt,
  };
 
-   return NextResponse.json({ 
+  const response = NextResponse.json({ 
     user: profile,
     newAccessToken: newAccessToken || null,
     newRefreshToken: newRefreshToken || null
   });
+
+  // If tokens were refreshed, securely save them in cookies directly on the server
+  if (newAccessToken) {
+    console.log("[Auth API] Token refreshed. Updating server-side cookies directly.");
+    try {
+      const { AUTH_COOKIE_NAME, REFRESH_COOKIE_NAME, AUTH_COOKIE_OPTIONS, REFRESH_COOKIE_OPTIONS } = await import("@/lib/auth-server");
+      response.cookies.set(AUTH_COOKIE_NAME, newAccessToken, AUTH_COOKIE_OPTIONS);
+      if (newRefreshToken) {
+        response.cookies.set(REFRESH_COOKIE_NAME, newRefreshToken, REFRESH_COOKIE_OPTIONS);
+      }
+    } catch (err) {
+      console.warn("[Auth API] Could not set cookies during refresh:", err);
+    }
+  }
+
+  return response;
 
  } catch (error) {
  console.error("Get user error:", error);

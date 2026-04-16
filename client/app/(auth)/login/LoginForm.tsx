@@ -165,7 +165,7 @@ export default function LoginForm() {
               </div>
             </div>
 
-            <div className="absolute bottom-10 right-10 opacity-70">
+            {/* <div className="absolute bottom-10 right-10 opacity-70">
               <div className="p-5 rounded-lg bg-background/60 backdrop-blur border border-border shadow-sm">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
@@ -180,7 +180,7 @@ export default function LoginForm() {
                   <div className="absolute inset-y-0 left-0 w-2/3 bg-gradient-to-r from-primary to-primary/60 opacity-70" />
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -198,7 +198,7 @@ export default function LoginForm() {
                   <Zap className="w-5 h-5" />
                 </div>
                 <span className="text-2xl font-black tracking-tight">
-                  Renote<span className="text-primary">Exim</span>
+                  Ranote<span className="text-primary">Exim</span>
                 </span>
               </Link>
 

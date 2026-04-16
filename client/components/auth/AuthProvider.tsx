@@ -110,15 +110,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     try {
       setLoading(true);
-      await nhost.auth.signOut();
+      
+      // 1. ALWAYS clear server cookies first. If this fails, we still want to try to clear client state.
       await axios.post("/api/auth/logout").catch(() => { });
       
+      // 2. Clear local storage immediately so the UI updates
       if (typeof window !== "undefined") {
         window.localStorage.removeItem("user_profile");
         window.localStorage.removeItem("user");
       }
-      
       setUser(null);
+
+      // 3. Finally, tell Nhost to sign out. This might throw if the session has already expired 
+      // locally, which is why it's carefully wrapped in a catch to avoid breaking the function.
+      await nhost.auth.signOut().catch((e) => console.log("Nhost signout skipped:", e.message));
+      
     } catch (error) {
       console.error("Logout failed", error);
     } finally {
@@ -131,30 +137,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // 1. Initial Discovery
     fetchUser();
     
-    // 2. Listen for Nhost session changes
-    let isFirstEvent = true;
-    
-    const unsubscribe = nhost.sessionStorage.onChange((session) => {
-      console.log("[AuthProvider] Nhost session event. Has session:", !!session);
-      
-      if (session) {
-        isFirstEvent = false;
-        syncSession(session);
-      } else {
-        if (!isFirstEvent) {
-          syncSession(null);
-          setUser(null);
-          if (typeof window !== "undefined") {
-            window.localStorage.removeItem("user_profile");
-          }
-        }
-        isFirstEvent = false;
-      }
-    });
-
-    return () => {
-      unsubscribe();
-    };
+    // No client-side SDK event listener is required.
+    // Our entire authentication system uses a robust server-side cookie pattern
+    // where `/api/auth/me` governs the state on mount and explicit `/api/auth/sync` is used when needed.
   }, [fetchUser, syncSession]);
 
   return (

@@ -177,7 +177,7 @@ function RegisterFormContent() {
                   <Zap className="w-4 h-4" />
                 </div>
                 <span className="text-xl font-black tracking-tight">
-                  Renote<span className="text-primary">Exim</span>
+                  Ranote<span className="text-primary">Exim</span>
                 </span>
               </Link>
 

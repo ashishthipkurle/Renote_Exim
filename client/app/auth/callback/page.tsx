@@ -32,7 +32,7 @@ export default function AuthCallbackPage() {
         if (!refreshToken) {
           // Check if we are already logged in (e.g. cookies exist)
           await refreshUser();
-          router.push("/products");
+          router.push("/dashboard");
           return;
         }
 
@@ -55,7 +55,7 @@ export default function AuthCallbackPage() {
         if (!tokenRes.ok) {
            // If exchange fails, we might still have a valid session from a previous run
            await refreshUser();
-           router.push("/products");
+           router.push("/dashboard");
            return;
         }
 
@@ -97,13 +97,13 @@ export default function AuthCallbackPage() {
         toast.success("Login successful!");
         
         // Use full window redirect for maximum reliability with cookies/state
-        window.location.href = "/products";
+        window.location.href = "/dashboard";
 
       } catch (error: any) {
         console.error("Auth Error:", error);
         // Final attempt to see if we're actually logged in
         await refreshUser();
-        window.location.href = "/products";
+        window.location.href = "/dashboard";
       }
     };
 

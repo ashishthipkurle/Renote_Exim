@@ -20,11 +20,17 @@ export const AUTH_COOKIE_OPTIONS = {
   secure: process.env.NODE_ENV === "production",
   sameSite: "lax" as const,
   maxAge: 60 * 60 * 24 * 7, // 1 week
+  get expires() {
+    return new Date(Date.now() + 60 * 60 * 24 * 7 * 1000);
+  }
 };
 
 export const REFRESH_COOKIE_OPTIONS = {
   ...AUTH_COOKIE_OPTIONS,
   maxAge: 60 * 60 * 24 * 30, // 30 days
+  get expires() {
+    return new Date(Date.now() + 60 * 60 * 24 * 30 * 1000);
+  }
 };
 
 /**
