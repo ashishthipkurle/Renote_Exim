@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { AUTH_COOKIE_NAME, REFRESH_COOKIE_NAME, AUTH_COOKIE_OPTIONS, REFRESH_COOKIE_OPTIONS } from "@/lib/auth-server";
 import { cookies } from "next/headers";
@@ -38,3 +39,4 @@ export async function POST(request: NextRequest) {
  return NextResponse.json({ error: "Failed to sync session" }, { status: 500 });
  }
 }
+

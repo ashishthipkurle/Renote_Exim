@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
 import { getServerAuthContext } from "@/lib/auth-server";
@@ -56,3 +57,4 @@ export async function POST(req: NextRequest) {
  );
  }
 }
+

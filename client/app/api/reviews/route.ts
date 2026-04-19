@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getApiAuthContext } from '@/lib/auth-server';
@@ -62,3 +63,4 @@ export async function GET(request: NextRequest) {
  return NextResponse.json({ error: 'Failed to fetch reviews' }, { status: 500 });
  }
 }
+

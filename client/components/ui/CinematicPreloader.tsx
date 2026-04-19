@@ -1,80 +1,84 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 import gsap from "gsap";
+// We use dynamic import for the GIF to avoid hydration mismatches if needed, but standard import is fine.
+import loadingGif from "@/assests/Transparent loading gif.gif";
 
-/**
- * CinematicPreloader - Standardized & Polished
- * 
- * Rules:
- * 1. Plays once per session per major area (Home, Marketplace, Dashboard).
- * 2. Uses a sleek Top/Bottom vertical split animation site-wide.
- * 3. Syncs with Home Page video ready state.
- */
 export default function CinematicPreloader() {
-  const [status, setStatus] = useState<"idle" | "playing" | "finished">("idle");
-  const [activeTexts, setActiveTexts] = useState<string[]>(["ENTERING", "RANOTE EXIM", "PORTAL"]);
   const pathname = usePathname();
-  const [mounted, setMounted] = useState(false);
+
+  // Route determining logic
+  const isDashboard = pathname ? pathname.startsWith("/dashboard") : false;
+  const isMarketplace = pathname ? pathname.startsWith("/products") : false;
+  const isAuth = pathname === "/login" || pathname === "/register";
+  const isHome = pathname === "/";
+  const isMajorRoute = isHome || isMarketplace || isDashboard || isAuth;
+
+  // "ssr-blocking" -> "evaluating" -> "cinematic" | "gif" | "finished"
+  const [status, setStatus] = useState<"ssr-blocking" | "cinematic" | "gif" | "finished">(
+    isMajorRoute ? "ssr-blocking" : "finished"
+  );
+
+  const [activeTexts, setActiveTexts] = useState<string[]>(["ENTERING", "RANOTE EXIM", "PORTAL"]);
+
+  // We rely on CSS to provide the background color
+  const bgClass = "bg-white dark:bg-[#050505]";
+
+  // Track the previous pathname to detect genuine SPA navigations
+  const previousPathname = useRef<string | null>(null);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    if (!isMajorRoute) return;
 
-  // Effect 1: Trigger Logic
-  useEffect(() => {
-    if (typeof window === "undefined") return;
+    const isInitialRender = previousPathname.current === null;
+    const isPathnameChanged = previousPathname.current !== null && previousPathname.current !== pathname;
 
-    // Remove the SSR flicker-fix class from html
-    document.documentElement.classList.remove('is-home');
+    // Update the ref to current pathname
+    previousPathname.current = pathname;
 
-    const isDashboard = pathname ? pathname.startsWith("/dashboard") : false;
-    const isMarketplace = pathname ? pathname.startsWith("/products") : false;
-    const isHome = pathname === "/";
-
-    const currentGroup = isHome ? "home" : isMarketplace ? "marketplace" : isDashboard ? "dashboard" : "other";
-
-    // Only play for major areas
-    const shouldPlay = ["home", "marketplace", "dashboard"].includes(currentGroup);
-
-    if (shouldPlay) {
-      if (status === "idle") {
-        console.log(`[Preloader] Triggering animation for ${currentGroup}`);
-        let texts = ["ENTERING", "RANOTE EXIM", "PORTAL"];
-        if (isHome) texts = ["ENTERING", "RANOTE EXIM", "YOUR TRADING PARTNER"];
-        else if (isMarketplace) texts = ["ENTERING", "RANOTE EXIM", "MARKET PLACER"];
-        else if (pathname?.startsWith("/dashboard/exporter")) texts = ["ENTERING", "RANOTE EXIM", "EXPORTER DASHBOARD"];
-        else if (pathname?.startsWith("/dashboard/importer")) texts = ["ENTERING", "RANOTE EXIM", "IMPORTER DASHBOARD"];
-
-        setActiveTexts(texts);
-        setStatus("playing");
-      }
-    } else {
-      if (status !== "finished") {
-        setStatus("finished");
-      }
-    }
-  }, [pathname, status]);
-
-  // Effect 2: Animation Controller
-  useEffect(() => {
-    if (status !== "playing") {
-      if (status === "finished") {
-        document.body.style.overflow = "";
-        document.documentElement.style.overflow = "";
-      }
+    // React 18 Strict Mode fires `useEffect` twice. If the pathname hasn't actually changed,
+    // and it's not the initial setup, we should completely ignore this execution.
+    if (!isInitialRender && !isPathnameChanged) {
       return;
     }
+
+    let isReload = false;
+    if (isInitialRender) {
+      // Only read performance API on the explicit first page load
+      const entries = performance.getEntriesByType("navigation");
+      isReload = entries.length > 0 && (entries[0] as PerformanceNavigationTiming).type === "reload";
+    }
+
+    // Since we ignore non-path-change re-renders, if it's NOT the initial render,
+    // it MUST be a genuine path change (SPA navigation), so isReload will be false.
+
+    if (isReload) {
+      setStatus("gif");
+    } else {
+      // Set the appropriate cinematic texts based on the route
+      let texts = ["ENTERING", "RANOTE EXIM", "PORTAL"];
+      if (isHome) texts = ["ENTERING", "RANOTE EXIM", "YOUR TRADING PARTNER"];
+      else if (isMarketplace) texts = ["ENTERING", "RANOTE EXIM", "MARKET PLACER"];
+      else if (pathname?.startsWith("/dashboard/exporter")) texts = ["ENTERING", "RANOTE EXIM", "EXPORTER DASHBOARD"];
+      else if (pathname?.startsWith("/dashboard/importer")) texts = ["ENTERING", "RANOTE EXIM", "IMPORTER DASHBOARD"];
+      else if (isAuth) texts = ["ENTERING", "RANOTE EXIM", "AUTHENTICATION"];
+
+      setActiveTexts(texts);
+      setStatus("cinematic");
+    }
+  }, [pathname, isMajorRoute, isHome, isMarketplace, isAuth]);
+
+  // Cinematic GSAP Controller
+  useEffect(() => {
+    if (status !== "cinematic") return;
 
     document.body.style.overflow = "hidden";
     document.documentElement.style.overflow = "hidden";
 
-    const timeoutId = setTimeout(() => {
-      if (status === "playing") {
-        setStatus("finished");
-      }
-    }, 15000); // 15s failsafe
+    const timeoutId = setTimeout(() => setStatus("finished"), 15000); // 15s failsafe
 
     const tl = gsap.timeline({
       onComplete: () => {
@@ -150,13 +154,43 @@ export default function CinematicPreloader() {
     };
   }, [status, pathname]);
 
+  // GIF Controller
+  useEffect(() => {
+    if (status !== "gif") return;
+
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+
+    const timeoutId = setTimeout(() => {
+      gsap.to("#gif-loader-container", {
+        opacity: 0,
+        duration: 0.5,
+        ease: "power2.out",
+        onComplete: () => setStatus("finished")
+      });
+    }, 2200);
+
+    return () => clearTimeout(timeoutId);
+  }, [status]);
+
+  // Cleanup overflow on finish
+  useEffect(() => {
+    if (status === "finished") {
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+
+      // Cleanup the global CSS block just in case
+      document.documentElement.classList.remove('is-home', 'is-preloading');
+    }
+  }, [status]);
+
   if (status === "finished") return null;
 
-  // Responsive background for all areas to respect user's light/dark preference
-  const bgClass = "bg-white dark:bg-[#050505]";
-  
-  // Use transparent overlay once splitting starts to allow page reveal
-  const overlayClass = (mounted && status === "playing") ? "bg-transparent" : bgClass;
+  // IMPORTANT: We render the shutter panels ALWAYS from the very first SSR render.
+  // This is what prevents the flash! We don't wait for 'mounted'.
+
+  // The overlay becomes transparent during 'cinematic' mode so the shutters can reveal the page underneath
+  const overlayClass = status === "cinematic" ? "bg-transparent" : bgClass;
 
   return (
     <div
@@ -173,41 +207,54 @@ export default function CinematicPreloader() {
         .shutter-bottom { bottom: 0; }
       `}</style>
 
-      {mounted && (
-        <>
-          {/* Top Panel (Removed border-b) */}
-          <div 
-            className={`shutter-panel shutter-top ${bgClass}`} 
-            id="shutter-top"
-          ></div>
-          
-          {/* Bottom Panel (Removed border-t) */}
-          <div 
-            className={`shutter-panel shutter-bottom ${bgClass}`} 
-            id="shutter-bottom"
-          ></div>
+      {/* 
+        We render the shutters in ALL states (including SSR). 
+        In "gif" and "ssr-blocking" states, they just sit there providing a solid background. 
+      */}
+      <div className={`shutter-panel shutter-top ${bgClass}`} id="shutter-top"></div>
+      <div className={`shutter-panel shutter-bottom ${bgClass}`} id="shutter-bottom"></div>
 
-          {/* Text Layer */}
-          <div className="absolute inset-0 z-[10002] flex flex-col items-center justify-center p-4">
-            <div className="relative z-[10002] text-center">
-              <div className="flex flex-row items-center justify-center gap-6 md:gap-12 whitespace-nowrap">
-                {activeTexts.map((text, i) => (
-                  <div key={i} className="text-reveal-mask">
-                    <h1 className={`text-reveal-item font-sans font-black tracking-tight opacity-0 uppercase whitespace-nowrap ${i === 1 ? 'text-2xl md:text-6xl text-[#D4AF37] border-x-4 border-[#D4AF37] px-6' :
-                      'text-xl md:text-4xl text-foreground/40'
-                      }`}>
-                      {text}
-                    </h1>
-                  </div>
-                ))}
-              </div>
+      {/* Layer for Cinematic Text */}
+      {status === "cinematic" && (
+        <div className="absolute inset-0 z-[10002] flex flex-col items-center justify-center p-4">
+          <div className="relative z-[10002] text-center">
+            <div className="flex flex-row items-center justify-center gap-6 md:gap-12 whitespace-nowrap">
+              {activeTexts.map((text, i) => (
+                <div key={i} className="text-reveal-mask">
+                  <h1 className={`text-reveal-item font-sans font-black tracking-tight opacity-0 uppercase whitespace-nowrap ${i === 1 ? 'text-2xl md:text-6xl text-[#D4AF37] border-x-4 border-[#D4AF37] px-6' :
+                    'text-xl md:text-4xl text-foreground/40'
+                    }`}>
+                    {text}
+                  </h1>
+                </div>
+              ))}
+            </div>
 
-              <div className="mt-12 w-48 h-px bg-[#D4AF37]/10 mx-auto relative overflow-hidden" id="loader-bar-container">
-                <div className="absolute inset-y-0 left-0 bg-[#D4AF37] w-0" id="loader-progress"></div>
-              </div>
+            <div className="mt-12 w-48 h-px bg-[#D4AF37]/10 mx-auto relative overflow-hidden" id="loader-bar-container">
+              <div className="absolute inset-y-0 left-0 bg-[#D4AF37] w-0" id="loader-progress"></div>
             </div>
           </div>
-        </>
+        </div>
+      )}
+
+      {/* Layer for GIF Loader */}
+      {(status === "gif" || status === "ssr-blocking") && (
+        <div id="gif-loader-container" className="absolute inset-0 z-[10002] flex flex-col items-center justify-center transition-opacity duration-300">
+          {/* We only render the *content* of the GIF loader after we decide it's a GIF to avoid a sudden jump, 
+              or we could render it instantly. Let's render it instantly so it's flush. */}
+          <div className="flex flex-col items-center justify-center">
+            <Image
+              src={loadingGif}
+              alt="Loading..."
+              className="w-40 h-40 md:w-56 md:h-56 object-contain opacity-0 animate-[fadeIn_0.3s_ease-out_forwards]"
+              priority
+              unoptimized
+            />
+            <h2 className="-mt-6 md:-mt-10 text-lg md:text-xl font-sans font-bold tracking-widest uppercase text-[#D4AF37] animate-pulse opacity-0 animate-[fadeIn_0.3s_ease-out_0.2s_forwards]">
+              Ranote Exim
+            </h2>
+          </div>
+        </div>
       )}
     </div>
   );

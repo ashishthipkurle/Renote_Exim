@@ -221,9 +221,9 @@ export default function TrendingCategories() {
               <p className="text-slate-200 text-sm md:text-base leading-relaxed mb-10 max-w-lg drop-shadow-md font-medium">
                 {cat.desc}
               </p>
-              <Link 
+              <Link
                 href={`/products?category=${cat.category}`}
-                className="px-8 py-3.5 border border-white/40 text-white rounded-full hover:bg-white hover:text-black transition-all bg-black/30 backdrop-blur pointer-events-auto font-semibold flex items-center gap-3 group text-sm tracking-wide"
+                className="w-max px-8 py-3.5 border border-white/40 text-white rounded-full hover:bg-white hover:text-black transition-all bg-black/30 backdrop-blur pointer-events-auto font-semibold flex items-center gap-3 group text-sm tracking-wide"
               >
                 <span className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-black/10 transition-colors material-icons text-xs">explore</span>
                 DISCOVER MARKET

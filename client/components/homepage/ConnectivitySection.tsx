@@ -39,10 +39,10 @@ export default function ConnectivitySection() {
     if (airplaneRef.current && sectionRef.current) {
       gsap.fromTo(
         airplaneRef.current,
-        { x: "0vw", y: "80vh" },
+        { x: "0px", y: "800px" },
         {
-          x: "0vw",
-          y: "-80vh",
+          x: "0px",
+          y: "-800px",
           ease: "none",
           scrollTrigger: {
             trigger: sectionRef.current,

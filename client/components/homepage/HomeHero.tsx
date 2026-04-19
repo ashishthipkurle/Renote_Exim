@@ -47,7 +47,7 @@ export default function HomeHero() {
   return (
     <header
       ref={sectionRef}
-      className="relative min-h-[95vh] flex items-center justify-center overflow-hidden pt-20 pb-12 bg-background transition-colors duration-500"
+      className="relative min-h-[900px] lg:min-h-[1000px] flex items-center justify-center overflow-hidden pt-20 pb-12 bg-background transition-colors duration-500"
     >
       <div className="absolute inset-0 z-0">
 

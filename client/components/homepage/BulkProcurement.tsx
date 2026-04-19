@@ -30,18 +30,18 @@ export default function BulkProcurement() {
         { scale: 0.5, y: 100, opacity: 0, rotationX: 45 },
         { scale: 1, y: 0, opacity: 1, rotationX: 0, duration: 1, ease: "elastic.out(1, 0.5)" }
       )
-      .fromTo(
-        bulkMainCardRef.current,
-        { x: -200, opacity: 0, rotationY: 45 },
-        { x: 0, opacity: 1, rotationY: 0, duration: 0.8, ease: "power3.out" },
-        "-=0.6"
-      )
-      .fromTo(
-        bulkSubCardsRef.current.children,
-        { x: 200, opacity: 0, rotationY: -45, scale: 0.8 },
-        { x: 0, opacity: 1, rotationY: 0, scale: 1, duration: 0.6, stagger: 0.15, ease: "back.out(1.5)" },
-        "-=0.6"
-      );
+        .fromTo(
+          bulkMainCardRef.current,
+          { x: -200, opacity: 0, rotationY: 45 },
+          { x: 0, opacity: 1, rotationY: 0, duration: 0.8, ease: "power3.out" },
+          "-=0.6"
+        )
+        .fromTo(
+          bulkSubCardsRef.current.children,
+          { x: 200, opacity: 0, rotationY: -45, scale: 0.8 },
+          { x: 0, opacity: 1, rotationY: 0, scale: 1, duration: 0.6, stagger: 0.15, ease: "back.out(1.5)" },
+          "-=0.6"
+        );
     }
   }, []);
 

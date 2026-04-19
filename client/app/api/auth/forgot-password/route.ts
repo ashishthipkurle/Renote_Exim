@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { forgotPasswordSchema } from "@/lib/validations";
@@ -46,3 +47,4 @@ export async function POST(request: NextRequest) {
  );
  }
 }
+

@@ -10,10 +10,7 @@ import dynamic from "next/dynamic";
 import CommandMenu from "@/components/ui/CommandMenu";
 import CookieConsent from "@/components/ui/CookieConsent";
 import { I18nProvider } from "@/components/i18n/I18nProvider";
-
-const CinematicPreloader = dynamic(() => import("@/components/ui/CinematicPreloader"), {
- ssr: false,
-});
+import CinematicPreloader from "@/components/ui/CinematicPreloader";
 
 const sora = Sora({
  subsets: ["latin"],

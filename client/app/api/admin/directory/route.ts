@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
@@ -32,3 +33,4 @@ export async function GET(req: NextRequest) {
  return NextResponse.json({ error: "Failed to fetch directory" }, { status: 500 });
  }
 }
+

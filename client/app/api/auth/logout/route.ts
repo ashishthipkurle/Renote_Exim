@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { clearServerAuthCookie } from "@/lib/auth-server";
 
@@ -16,3 +17,4 @@ export async function POST(request: NextRequest) {
  );
  }
 }
+
