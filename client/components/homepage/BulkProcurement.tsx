@@ -5,18 +5,16 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ShieldCheck, Check, ArrowRight } from "lucide-react";
 import { useTranslation } from "@/lib/i18n/client";
-import { ProductCategory } from "@/lib/types";
 
 export default function BulkProcurement() {
   const { t } = useTranslation();
   const bulkSectionRef = useRef<HTMLElement>(null);
   const bulkHeadingRef = useRef<HTMLDivElement>(null);
   const bulkMainCardRef = useRef<HTMLDivElement>(null);
-  const bulkSubCardsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
-    if (bulkSectionRef.current && bulkHeadingRef.current && bulkMainCardRef.current && bulkSubCardsRef.current) {
+    if (bulkSectionRef.current && bulkHeadingRef.current && bulkMainCardRef.current) {
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: bulkSectionRef.current,
@@ -34,12 +32,6 @@ export default function BulkProcurement() {
           bulkMainCardRef.current,
           { x: -200, opacity: 0, rotationY: 45 },
           { x: 0, opacity: 1, rotationY: 0, duration: 0.8, ease: "power3.out" },
-          "-=0.6"
-        )
-        .fromTo(
-          bulkSubCardsRef.current.children,
-          { x: 200, opacity: 0, rotationY: -45, scale: 0.8 },
-          { x: 0, opacity: 1, rotationY: 0, scale: 1, duration: 0.6, stagger: 0.15, ease: "back.out(1.5)" },
           "-=0.6"
         );
     }
@@ -70,10 +62,10 @@ export default function BulkProcurement() {
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-600">{t("bulk.title_part2", "SOLUTIONS")}</span>
           </h2>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div ref={bulkMainCardRef} className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-8 md:p-10 rounded-lg border border-white/50 dark:border-white/10 relative overflow-hidden shadow-2xl opacity-0 flex flex-col justify-center h-full max-w-xl mx-auto lg:mr-auto">
+        <div className="flex justify-end pr-0 lg:pr-8">
+          <div ref={bulkMainCardRef} className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl p-8 md:p-10 rounded-2xl border border-white/50 dark:border-white/10 relative overflow-hidden shadow-2xl opacity-0 flex flex-col justify-center max-w-md w-full">
             <div className="w-12 h-12 rounded-xl bg-white dark:bg-slate-800 border border-blue-100 dark:border-slate-700 flex items-center justify-center mb-6 shadow-sm relative z-10">
-              <ShieldCheck className="w-6 h-6 text-blue-600 dark:text-blue-400 stroke-[1.5]" />
+              <ShieldCheck className="w-6 h-6 text-[#D4AF37] stroke-[1.5]" />
             </div>
             <h3 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white mb-4 relative z-10">{t("bulk.card_title", "Verified Global Suppliers")}</h3>
             <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-8 max-w-sm relative z-10">
@@ -94,52 +86,11 @@ export default function BulkProcurement() {
               </li>
             </ul>
             <div className="mt-auto relative z-10">
-              <Link href="/register" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center gap-2 group/btn max-w-max text-sm shadow-lg shadow-blue-500/20">
+              <Link href="/register" className="bg-[#D4AF37] hover:bg-[#B8962E] text-white font-bold py-3.5 px-8 rounded-xl transition-all duration-300 flex items-center gap-2 group/btn max-w-max text-sm shadow-xl shadow-[#D4AF37]/20 hover:shadow-[#D4AF37]/40 hover:-translate-y-1">
                 {t("bulk.button", "Request Bulk Quote")}
                 <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
               </Link>
             </div>
-          </div>
-
-          <div ref={bulkSubCardsRef} className="grid grid-cols-1 gap-4" style={{ perspective: "1000px" }}>
-            <Link href={`/products?category=${ProductCategory.CONSTRUCTION}`} className="p-6 rounded-lg bg-card border border-border shadow-sm hover:border-primary/50 transition-all duration-300 flex items-center gap-6 group cursor-pointer hover:bg-muted opacity-0 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
-              <div className="w-14 h-14 rounded-lg bg-slate-800 flex items-center justify-center relative">
-                <span className="absolute inset-0 bg-primary/20 animate-pulse rounded-lg"></span>
-                <span className="material-symbols-outlined text-2xl text-white relative z-10">diamond</span>
-              </div>
-              <div className="flex-1">
-                <h4 className="text-slate-900 dark:text-white font-bold text-lg group-hover:text-primary transition-colors">{t("bulk.category1_title", "Raw Metals & Minerals")}</h4>
-                <p className="text-xs text-slate-500 mt-1">{t("bulk.category1_desc", "Copper, Lithium, Rare Earths")}</p>
-              </div>
-              <span className="material-icons text-slate-600 group-hover:text-white transition-colors">chevron_right</span>
-            </Link>
-
-            <Link href={`/products?category=${ProductCategory.AGRICULTURE}`} className="p-6 rounded-lg bg-white dark:bg-white/5 border border-slate-100 shadow-sm dark:border-white/5 dark:shadow-none hover:border-primary/50 transition-all duration-300 flex items-center gap-6 group cursor-pointer hover:bg-slate-50 dark:hover:bg-white/10 opacity-0 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
-              <div className="w-14 h-14 rounded-lg bg-slate-800 flex items-center justify-center relative">
-                <span className="absolute inset-0 bg-yellow-500/20 animate-pulse rounded-lg" style={{ animationDelay: "0.5s" }}></span>
-                <span className="material-symbols-outlined text-2xl text-white relative z-10">agriculture</span>
-              </div>
-              <div className="flex-1">
-                <h4 className="text-slate-900 dark:text-white font-bold text-lg group-hover:text-primary transition-colors">{t("bulk.category2_title", "Global Agriculture")}</h4>
-                <p className="text-xs text-slate-500 mt-1">{t("bulk.category2_desc", "Wheat, Soy, Coffee, Cotton")}</p>
-              </div>
-              <span className="material-icons text-slate-600 group-hover:text-white transition-colors">chevron_right</span>
-            </Link>
-
-            <Link href={`/products?category=${ProductCategory.OTHER}`} className="p-6 rounded-lg bg-white dark:bg-white/5 border border-slate-100 shadow-sm dark:border-white/5 dark:shadow-none hover:border-primary/50 transition-all duration-300 flex items-center gap-6 group cursor-pointer hover:bg-slate-50 dark:hover:bg-white/10 opacity-0 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
-              <div className="w-14 h-14 rounded-lg bg-slate-800 flex items-center justify-center relative">
-                <span className="absolute inset-0 bg-blue-500/20 animate-pulse rounded-lg" style={{ animationDelay: "1s" }}></span>
-                <span className="material-symbols-outlined text-2xl text-white relative z-10">bolt</span>
-              </div>
-              <div className="flex-1">
-                <h4 className="text-slate-900 dark:text-white font-bold text-lg group-hover:text-primary transition-colors">{t("bulk.category3_title", "Energy Solutions")}</h4>
-                <p className="text-xs text-slate-500 mt-1">{t("bulk.category3_desc", "Solar Panels, Batteries, Biofuels")}</p>
-              </div>
-              <span className="material-icons text-slate-600 group-hover:text-white transition-colors">chevron_right</span>
-            </Link>
           </div>
         </div>
       </div>

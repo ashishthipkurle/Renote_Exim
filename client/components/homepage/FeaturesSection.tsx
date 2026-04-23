@@ -5,9 +5,9 @@ import { useTranslation } from "@/lib/i18n/client";
 export default function FeaturesSection() {
   const { t } = useTranslation();
   return (
-    <section className="py-24 relative overflow-hidden bg-muted dark:bg-[#0A0A0A]">
+    <section id="features-section" className="py-12 min-h-screen flex flex-col justify-center relative overflow-hidden bg-muted dark:bg-[#0A0A0A] sticky top-0 z-[1] pointer-events-auto">
       <div className="absolute top-0 right-0 w-1/3 h-full bg-primary/5 blur-[100px] pointer-events-none" />
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
+      <div className="max-w-7xl mx-auto px-6 relative z-10 w-full">
         <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6 reveal-trigger">
           <div className="max-w-xl">
             <h2 className="text-4xl font-bold text-foreground mb-4">

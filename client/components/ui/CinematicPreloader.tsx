@@ -121,11 +121,16 @@ export default function CinematicPreloader() {
         // Wait for the video's first frame to be ready
         if (!(window as any).homeVideoReady) {
           tl.pause();
-          const onReady = () => {
-            window.removeEventListener('home-video-ready', onReady);
+          let resumed = false;
+          const resume = () => {
+            if (resumed) return;
+            resumed = true;
+            window.removeEventListener('home-video-ready', resume);
             tl.play();
           };
-          window.addEventListener('home-video-ready', onReady);
+          window.addEventListener('home-video-ready', resume);
+          // Failsafe: don't let the preloader get stuck forever on slow devices (iPad)
+          setTimeout(resume, 3000);
         }
       }, undefined, "wait-for-video");
 
@@ -201,7 +206,10 @@ export default function CinematicPreloader() {
       <style>{`
         .text-reveal-mask { overflow: hidden; display: inline-block; }
         .shutter-panel {
-          position: absolute; left: 0; width: 100%; height: 50.5vh; z-index: 10000;
+          position: absolute; left: 0; width: 100%; height: 55dvh; height: 55vh; z-index: 10000;
+        }
+        @supports (height: 1dvh) {
+          .shutter-panel { height: 55dvh; }
         }
         .shutter-top { top: 0; }
         .shutter-bottom { bottom: 0; }

@@ -375,7 +375,19 @@ export default function ScrollVideoSection() {
             video.style.height = "1px";
             document.body.appendChild(video);
 
-            video.src = "/videos/Continuous_Shot_Company_Video_Generation.mp4";
+            // Fetch video securely into RAM first to bypass extreme rate-limiting on typical browser range-request seeking
+            let finalSrc = "/videos/Continuous_Shot_Company_Video_Generation.mp4";
+            try {
+                const response = await fetch(finalSrc);
+                if (response.ok) {
+                    const blob = await response.blob();
+                    finalSrc = URL.createObjectURL(blob);
+                }
+            } catch (e) {
+                console.warn("[ScrollVideo] Failed to fetch blob, using origin src", e);
+            }
+
+            video.src = finalSrc;
             video.muted = true;
             video.playsInline = true;
             video.setAttribute("playsinline", "");
@@ -574,7 +586,7 @@ export default function ScrollVideoSection() {
         >
             <section
                 ref={sectionRef}
-                className="fixed inset-0 min-w-[1440px] bg-black overflow-hidden m-0 p-0 cursor-none"
+                className="fixed inset-0 w-full bg-black overflow-hidden m-0 p-0 cursor-none"
             >
                 <div className="w-full h-full relative overflow-hidden pointer-events-none">
 
@@ -627,14 +639,15 @@ export default function ScrollVideoSection() {
                         onMouseLeave={() => gsap.to(cursorRef.current, { scale: 1, opacity: 1, duration: 0.2, ease: "back.out(1.7)" })}
                     >
                         <div
-                            className="flex items-center gap-2 px-10 py-1.5"
+                            className="flex items-center gap-2 px-4 md:px-10 py-1.5"
                             style={{
                                 background: "rgba(255, 255, 255, 0.03)",
                                 backdropFilter: "blur(24px) saturate(180%)",
                                 WebkitBackdropFilter: "blur(24px) saturate(180%)",
                                 borderRadius: "24px",
                                 border: "1px solid rgba(255, 255, 255, 0.08)",
-                                minWidth: "750px",
+                                width: "max-content",
+                                maxWidth: "94vw",
                                 justifyContent: "space-between",
                                 boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
                             }}

@@ -4,7 +4,7 @@ import { useTranslation } from "@/lib/i18n/client";
 export default function ComplianceSection() {
   const { t } = useTranslation();
   return (
-    <section className="py-24 bg-[url('/assets/pexels-yankrukov-8867376.jpg')] bg-cover bg-top bg-fixed border-t border-border relative z-20">
+    <section className="py-24 bg-[url('/assets/pexels-yankrukov-8867376.jpg')] bg-cover bg-top border-t border-border relative z-20">
       <div className="absolute inset-0 bg-background/20 backdrop-blur-[2px]"></div>
       <div className="max-w-6xl mx-auto px-6 relative z-10 reveal-on-scroll">
         <div className="text-center mb-16">

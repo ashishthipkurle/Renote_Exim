@@ -45,7 +45,7 @@ export default function GlobalHubsSection() {
     };
 
     return (
-        <section ref={sectionRef} className="py-24 relative bg-background overflow-hidden flex items-center min-h-[900px] lg:min-h-[1000px]">
+        <section ref={sectionRef} className="py-24 relative z-[20] bg-background overflow-hidden flex items-center min-h-[900px] lg:min-h-[1000px] shadow-[0_-20px_50px_rgba(0,0,0,0.3)]">
             {/* Port Background */}
             <div className="absolute top-0 right-0 w-full md:w-[60%] h-full z-0">
                 <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent z-10" />

@@ -21,7 +21,12 @@ import {
 
 import { prisma } from "@/lib/prisma";
 import AddToCartButton from "@/components/marketplace/AddToCartButton";
+import BuyNowButton from "@/components/marketplace/BuyNowButton";
 import { getServerAuthContext } from "@/lib/auth-server";
+import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { DashboardScaler } from "@/components/dashboard/DashboardScaler";
+import PageTransition from "@/components/ui/PageTransition";
 
 type ProductReview = {
   orderId: string;
@@ -103,26 +108,33 @@ export default async function ProductDetailPage({
   const hasHalf = avgRating - fullStars >= 0.5;
 
   return (
-    <div className="bg-background min-h-screen">
-      {/* Breadcrumb */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-6 pb-2">
-        <nav className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Link href="/" className="hover:text-primary transition-colors">
-            Home
-          </Link>
-          <span className="opacity-40">/</span>
-          <Link
-            href="/products"
-            className="hover:text-primary transition-colors"
-          >
-            Marketplace
-          </Link>
-          <span className="opacity-40">/</span>
-          <span className="text-foreground font-semibold line-clamp-1">
-            {product.name}
-          </span>
-        </nav>
-      </div>
+    <SidebarProvider defaultOpen={false}>
+      <DashboardScaler targetWidth={1440}>
+        <div className="flex flex-col h-full w-full bg-board transition-colors duration-300 overflow-hidden border border-slate-200 dark:border-white/5 shadow-2xl">
+          <DashboardHeader />
+          <SidebarInset className="overflow-hidden">
+            <div className="flex-1 overflow-y-auto custom-scrollbar bg-surface h-[calc(100vh-60px)]">
+              <PageTransition>
+                <div className="bg-background min-h-screen">
+                  {/* Breadcrumb */}
+                  <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-6 pb-2">
+                    <nav className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Link href="/" className="hover:text-primary transition-colors">
+                        Home
+                      </Link>
+                      <span className="opacity-40">/</span>
+                      <Link
+                        href="/products"
+                        className="hover:text-primary transition-colors"
+                      >
+                        Marketplace
+                      </Link>
+                      <span className="opacity-40">/</span>
+                      <span className="text-foreground font-semibold line-clamp-1">
+                        {product.name}
+                      </span>
+                    </nav>
+                  </div>
 
       {/* ── Hero Section ── */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
@@ -130,13 +142,13 @@ export default async function ProductDetailPage({
           {/* Left: Image Gallery */}
           <div className="lg:col-span-7 flex flex-col gap-4">
             {/* Main Image */}
-            <div className="aspect-[4/3] rounded-lg overflow-hidden bg-muted/30 border border-border relative group">
+            <div className="min-h-[400px] lg:h-[600px] rounded-2xl overflow-hidden bg-white dark:bg-white/[0.03] border border-border dark:border-white/5 relative group flex items-center justify-center p-4">
               {heroImage ? (
                 <Image
                   src={heroImage}
                   alt={product.name}
                   fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="object-contain transition-all duration-700 group-hover:scale-105 p-4"
                   priority
                 />
               ) : (
@@ -170,7 +182,7 @@ export default async function ProductDetailPage({
                         alt={`${product.name} ${idx + 1}`}
                         fill
                         className={
-                          "object-cover transition-opacity " +
+                          "object-contain p-1 transition-opacity " +
                           (idx === 0
                             ? "opacity-100"
                             : "opacity-60 hover:opacity-100")
@@ -278,12 +290,10 @@ export default async function ProductDetailPage({
               </div>
 
               {/* Buy Now */}
-              <Link
-                href="/checkout"
-                className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98]"
-              >
-                Buy Now <ArrowRight className="h-4 w-4" />
-              </Link>
+              <BuyNowButton
+                productId={product.id}
+                className="w-full h-14 rounded-xl bg-primary px-6 text-base font-bold text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98]"
+              />
 
               {/* Add to Cart */}
               <AddToCartButton
@@ -627,6 +637,12 @@ export default async function ProductDetailPage({
           </div>
         </div>
       </footer>
-    </div>
+                </div>
+              </PageTransition>
+            </div>
+          </SidebarInset>
+        </div>
+      </DashboardScaler>
+    </SidebarProvider>
   );
 }

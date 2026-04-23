@@ -16,6 +16,7 @@ import ComplianceSection from "@/components/homepage/ComplianceSection";
 import CTASection from "@/components/homepage/CTASection";
 import HomeFooter from "@/components/homepage/HomeFooter";
 import ScrollVideoSection from "@/components/homepage/ScrollVideoSection";
+import InlineScrollVideo from "@/components/homepage/InlineScrollVideo";
 
 export default function HomeClient() {
   const { user, loading } = useAuth();
@@ -83,7 +84,18 @@ export default function HomeClient() {
         <ForwardMarquee />
         <StatsBar />
         <TrendingCategories />
-        <FeaturesSection />
+        {/* ─── Scroll-Linked Video Scene Boundary ─── */}
+        <div className="relative w-full z-10">
+          <FeaturesSection />
+          
+          <InlineScrollVideo
+            videoSrc="/videos/new_ui_video.mp4"
+            previousSectionId="features-section"
+            totalFrames={120}
+            scrollDistance={2500}
+          />
+        </div>
+        
         <GlobalHubsSection />
         <ReverseMarquee />
         <BulkProcurement />

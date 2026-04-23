@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Sora } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
@@ -56,6 +56,13 @@ export const metadata: Metadata = {
  },
 };
 
+export const viewport: Viewport = {
+ width: "device-width",
+ initialScale: 1,
+ maximumScale: 5,
+ viewportFit: "cover",
+};
+
 import SkipToContent from "@/components/SkipToContent";
 
 export default function RootLayout({
@@ -84,7 +91,7 @@ export default function RootLayout({
  })();
  `}} />
  </head>
- <body className={`${sora.variable} font-sans antialiased`}>
+ <body className={`${sora.variable} font-sans antialiased overflow-x-hidden w-full`}>
  <I18nProvider>
  <ThemeProvider>
  <AuthProvider>
