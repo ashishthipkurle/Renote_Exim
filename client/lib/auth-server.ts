@@ -62,10 +62,25 @@ export async function getApiAuthContext(
   allowedRoles?: Role[]
 ): Promise<{ auth: AuthContext | null; error: NextResponse | null; newAccessToken?: string; newRefreshToken?: string }> {
   try {
-    // 1. Get token from cookies or Authorization header
+    // 1. Get token — Priority: middleware-refreshed header > cookies > Authorization header
     const cookieStore = cookies();
-    let accessToken = cookieStore.get(AUTH_COOKIE_NAME)?.value;
+    let accessToken: string | undefined;
+    
+    // Check if middleware already refreshed the token for this request
+    if (request) {
+      const refreshedToken = request.headers.get("x-refreshed-access-token");
+      if (refreshedToken) {
+        console.log("[Auth Server] Using middleware-refreshed token.");
+        accessToken = refreshedToken;
+      }
+    }
+    
+    // Fall back to cookie
+    if (!accessToken) {
+      accessToken = cookieStore.get(AUTH_COOKIE_NAME)?.value;
+    }
 
+    // Fall back to Authorization header
     if (!accessToken && request) {
       const authHeader = request.headers.get("Authorization");
       if (authHeader && authHeader.startsWith("Bearer ")) {
@@ -74,7 +89,7 @@ export async function getApiAuthContext(
     }
 
     if (!accessToken) {
-      console.log("[Auth Server] No access token found in cookies.");
+      console.log("[Auth Server] No access token found.");
       return {
         auth: null,
         error: NextResponse.json({ error: "Missing authentication token" }, { status: 401 }),
@@ -98,9 +113,10 @@ export async function getApiAuthContext(
       }, 5000); // 5s timeout
     } catch (e: any) {
       console.error("[Auth Server] Verification call failed or timed out:", e.message);
+      // changed status 401 to 503 so client doesn't treat network drop as auth failure
       return {
         auth: null,
-        error: NextResponse.json({ error: "Auth verification timeout" }, { status: 401 }),
+        error: NextResponse.json({ error: "Auth verification timeout", isTimeout: true }, { status: 503 }),
       };
     }
 
@@ -120,7 +136,10 @@ export async function getApiAuthContext(
           }, 5000); // 5s timeout
         } catch (e: any) {
           console.error("[Auth Server] Refresh call timed out:", e.message);
-          return { auth: null, error: null }; // Silent fail to let client take over
+          return { 
+            auth: null, 
+            error: NextResponse.json({ error: "Auth refresh timeout", isTimeout: true }, { status: 503 }) 
+          };
         }
 
         if (refreshRes && refreshRes.ok) {
@@ -129,7 +148,22 @@ export async function getApiAuthContext(
           const newRefreshToken = refreshData.refreshToken || refreshData.session?.refreshToken;
 
           if (newAccessToken) {
-            console.log("[Auth Server] Token refreshed successfully.");
+            console.log("[Auth Server] Token refreshed successfully. Persisting new cookies...");
+            
+            // CRITICAL: Immediately persist the refreshed tokens to cookies
+            // This ensures that even server component callers (layouts) that can't
+            // set response headers will still have the new tokens available for
+            // subsequent requests from the browser.
+            try {
+              const cookieJar = cookies();
+              cookieJar.set(AUTH_COOKIE_NAME, newAccessToken, AUTH_COOKIE_OPTIONS);
+              if (newRefreshToken) {
+                cookieJar.set(REFRESH_COOKIE_NAME, newRefreshToken, REFRESH_COOKIE_OPTIONS);
+              }
+              console.log("[Auth Server] Refreshed tokens persisted to cookies.");
+            } catch (cookieErr) {
+              console.warn("[Auth Server] Could not set cookies directly (may be in a read-only context):", cookieErr);
+            }
             
             // Return user data from the refresh response
             const userData = refreshData.user || refreshData.session?.user;
@@ -258,9 +292,34 @@ async function getContextForUser(userId: string, allowedRoles?: Role[]): Promise
 
 /**
  * Shorthand for simple getServerAuthContext (legacy support)
+ * Note: Token refresh is handled by middleware. This reads the refreshed token
+ * from the x-refreshed-access-token header when available.
  */
 export async function getServerAuthContext(req?: NextRequest): Promise<AuthContext | null> {
-  const { auth } = await getApiAuthContext(req as NextRequest);
+  // If no request is provided (called from layouts), create a minimal request-like
+  // object that carries the headers from the current request context.
+  let effectiveReq = req;
+  if (!effectiveReq) {
+    try {
+      const { headers: getHeaders } = await import("next/headers");
+      const headersList = getHeaders();
+      // Build a minimal NextRequest-like object with the headers
+      effectiveReq = {
+        headers: {
+          get: (name: string) => headersList.get(name),
+        },
+      } as unknown as NextRequest;
+    } catch (e) {
+      // Fallback if headers() isn't available
+    }
+  }
+  
+  const { auth, error } = await getApiAuthContext(effectiveReq as NextRequest);
+  
+  if (!auth && error) {
+    console.log("[getServerAuthContext] Auth failed, returning null.");
+  }
+  
   return auth;
 }
 

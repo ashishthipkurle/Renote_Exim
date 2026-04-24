@@ -28,21 +28,22 @@ export default async function ExporterOrdersPage({
  product: { is: { exporterId: auth.userId } },
  };
 
- if (resolvedSearchParams.status && resolvedSearchParams.status !== "ALL") {
- const s = Array.isArray(resolvedSearchParams.status) ? resolvedSearchParams.status[0] : resolvedSearchParams.status;
- const status = (s || "").toUpperCase();
- if (Object.values(OrderStatus).includes(status as any)) {
- where.status = status as OrderStatus;
- }
- }
+  if (resolvedSearchParams.status && resolvedSearchParams.status !== "ALL") {
+    const s = Array.isArray(resolvedSearchParams.status) ? resolvedSearchParams.status[0] : resolvedSearchParams.status;
+    const status = (s || "").toUpperCase();
+    if (Object.values(OrderStatus).includes(status as any)) {
+      where.orderStatus = status as OrderStatus;
+    }
+  }
+
 
  if (typeof resolvedSearchParams.search === 'string' && resolvedSearchParams.search) {
  const search = resolvedSearchParams.search;
  where.OR = [
  { id: { contains: search, mode: "insensitive" } },
  { product: { is: { name: { contains: search, mode: "insensitive" } } } },
- { importer: { is: { name: { contains: search, mode: "insensitive" } } } },
- { importer: { is: { businessName: { contains: search, mode: "insensitive" } } } },
+ { buyer: { is: { name: { contains: search, mode: "insensitive" } } } },
+ { buyer: { is: { businessName: { contains: search, mode: "insensitive" } } } },
  ];
  }
 
@@ -63,7 +64,7 @@ export default async function ExporterOrdersPage({
  where,
  include: {
  product: { select: { name: true, category: true, images: true } },
- importer: { select: { name: true, businessName: true, country: true } },
+ buyer: { select: { name: true, businessName: true, country: true } },
  shipment: true,
  },
  orderBy: { createdAt: "desc" },
@@ -77,10 +78,10 @@ export default async function ExporterOrdersPage({
  const baseWhere = { product: { exporterId: auth.userId } };
  const [allCount, pendingCount, procCount, shippedCount, delivCount] = await Promise.all([
  prisma.order.count({ where: baseWhere }),
- prisma.order.count({ where: { ...baseWhere, status: "PENDING" } }),
- prisma.order.count({ where: { ...baseWhere, status: { in: ["CONFIRMED", "PROCESSING"] } } }),
- prisma.order.count({ where: { ...baseWhere, status: "SHIPPED" } }),
- prisma.order.count({ where: { ...baseWhere, status: "DELIVERED" } }),
+ prisma.order.count({ where: { ...baseWhere, orderStatus: "QUOTE_REQUESTED" } }),
+ prisma.order.count({ where: { ...baseWhere, orderStatus: { in: ["QUOTE_CONFIRMED", "PROCESSING"] } } }),
+ prisma.order.count({ where: { ...baseWhere, orderStatus: "SHIPPED" } }),
+ prisma.order.count({ where: { ...baseWhere, orderStatus: "DELIVERED" } }),
  ]);
 
  statusCounts = {

@@ -45,7 +45,6 @@ export default function ClientSidebar({ basePath }: { basePath: string }) {
  { href: basePath, label: "Dashboard", icon: Home },
  { href: `${basePath}/directory`, label: "Directory", icon: Users },
  { href: `${basePath}/orders`, label: "Orders", icon: Truck },
- { href: `${basePath}/rfqs`, label: "RFQs", icon: FileText },
  { href: `${basePath}/inventory`, label: "Inventory", icon: LayoutGrid },
  { href: `${basePath}/analytics`, label: "Analytics", icon: LineChart },
  { href: `${basePath}/finance`, label: "Finance", icon: Wallet },

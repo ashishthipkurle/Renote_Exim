@@ -48,7 +48,7 @@ export default function ExporterSidebar({ basePath }: { basePath: string }) {
  { href: basePath, labelKey: "sidebar.dashboard", defaultLabel: "Dashboard", icon: LayoutDashboard },
  { href: `${basePath}/inventory`, labelKey: "sidebar.inventory", defaultLabel: "Inventory", icon: Boxes },
  { href: `${basePath}/orders`, labelKey: "sidebar.orders", defaultLabel: "Orders", icon: FolderTree },
- { href: `${basePath}/rfqs`, labelKey: "sidebar.rfqs", defaultLabel: "RFQs", icon: FileText },
+ { href: `${basePath}/feedback`, labelKey: "sidebar.feedback", defaultLabel: "Reviews", icon: MessageSquare },
  { href: `${basePath}/directory`, labelKey: "sidebar.buyers", defaultLabel: "Buyers", icon: Users },
  ...(isMaster ? [{ href: `${basePath}/users`, labelKey: "sidebar.registry", defaultLabel: "Registry", icon: ShieldCheck }] : []),
  { href: `${basePath}/suppliers`, labelKey: "sidebar.dealers", defaultLabel: "Dealers", icon: Handshake },

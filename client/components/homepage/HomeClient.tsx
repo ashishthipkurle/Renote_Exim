@@ -96,13 +96,15 @@ export default function HomeClient() {
           />
         </div>
         
-        <GlobalHubsSection />
-        <ReverseMarquee />
-        <BulkProcurement />
-        <ConnectivitySection />
-        <ComplianceSection />
-        <CTASection />
-        <HomeFooter />
+        <div id="post-video-content" style={{ display: 'block' }}>
+          <GlobalHubsSection />
+          <ReverseMarquee />
+          <BulkProcurement />
+          <ConnectivitySection />
+          <ComplianceSection />
+          <CTASection />
+          <HomeFooter />
+        </div>
       </div>
     </div>
   );

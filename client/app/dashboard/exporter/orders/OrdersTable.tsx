@@ -106,20 +106,22 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
  });
 
  let filtered = merged;
- if (currentStatus !== "ALL") {
- filtered = filtered.filter((order) => order.status === currentStatus);
- }
+    if (currentStatus !== "ALL") {
+      filtered = filtered.filter((order) => order.orderStatus === currentStatus);
+    }
+
 
  if (searchQuery.trim()) {
  const query = searchQuery.trim().toLowerCase();
  filtered = filtered.filter((order) => {
  const fields = [
  order.id,
- order.orderNumber,
- order.product?.name,
- order.importer?.name,
- order.importer?.businessName,
- ]
+        order.orderNumber,
+        order.product?.name,
+        order.buyer?.name,
+        order.buyer?.businessName,
+      ]
+
  .filter(Boolean)
  .join(" ")
  .toLowerCase();
@@ -243,8 +245,9 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
  </div>
 
  <div className="space-y-4">
- {displayOrders.map((order) => {
- const cfg = STATUS_CONFIG[order.status] ?? STATUS_CONFIG.PENDING;
+    {displayOrders.map((order) => {
+      const cfg = STATUS_CONFIG[order.orderStatus] ?? STATUS_CONFIG.PENDING;
+
  const StatusIcon = cfg.icon;
  const isExpanded = expandedOrderId === order.id;
  const review = reviewsByOrder[order.id];
@@ -267,9 +270,10 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
  </div>
  <div className="min-w-0">
  <div className="text-xl font-black text-foreground dark:text-white truncate tracking-tighter uppercase group-hover:translate-x-1 transition-transform">{order.product?.name ?? "NULL_ASSET"}</div>
- <div className="text-[10px] text-muted-foreground/30 mt-2 font-black uppercase tracking-widest flex items-center gap-2 group-hover:text-muted-foreground transition-colors truncate">
- {order.importer?.businessName || order.importer?.name || "ANON_NODE"} // {order.importer?.country ?? "GLOBAL"}
- </div>
+  <div className="text-[10px] text-muted-foreground/30 mt-2 font-black uppercase tracking-widest flex items-center gap-2 group-hover:text-muted-foreground transition-colors truncate">
+    {order.buyer?.businessName || order.buyer?.name || "ANON_NODE"} // {order.buyer?.country ?? "GLOBAL"}
+  </div>
+
  <div className="text-[9px] text-muted-foreground/10 mt-1 font-black uppercase tracking-widest ">
  QTY: {order.quantity ?? 0} // {order.product?.category || "GENERAL"}
  </div>
@@ -282,10 +286,11 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
  </div>
 
  <div className="lg:col-span-2 flex justify-center">
- <span className={`inline-flex items-center gap-3 px-6 py-2.5 rounded-full border text-[9px] font-black uppercase tracking-[0.2em] shadow-xl dark:shadow-2xl transition-all ${cfg.color}`}>
- <StatusIcon className={`w-3.5 h-3.5 ${order.status !== 'DELIVERED' ? 'animate-pulse' : ''}`} />
- {cfg.label}
- </span>
+  <span className={`inline-flex items-center gap-3 px-6 py-2.5 rounded-full border text-[9px] font-black uppercase tracking-[0.2em] shadow-xl dark:shadow-2xl transition-all ${cfg.color}`}>
+    <StatusIcon className={`w-3.5 h-3.5 ${order.orderStatus !== 'DELIVERED' ? 'animate-pulse' : ''}`} />
+    {cfg.label}
+  </span>
+
  </div>
 
  <div className="lg:col-span-1 text-center">

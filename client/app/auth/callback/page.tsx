@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { toast } from "sonner";
 import axios from "axios";
-import { Loader2, Zap } from "lucide-react";
+import { Zap } from "lucide-react";
+import GifLoader from "@/components/ui/GifLoader";
+
 
 /**
  * OAuth Callback Page - Simplified & Robust
@@ -123,14 +125,9 @@ export default function AuthCallbackPage() {
         </div>
 
         <div className="flex flex-col items-center gap-4">
-          <div className="relative">
-            <div className="w-16 h-16 rounded-full border-4 border-muted flex items-center justify-center">
-              <Loader2 className="w-8 h-8 text-primary animate-spin" />
-            </div>
-            <div className="absolute -inset-2 rounded-full border-2 border-primary/20 animate-ping" />
-          </div>
-          <p className="text-muted-foreground font-medium">{message}</p>
+          <GifLoader text={message} />
         </div>
+
       </div>
     </div>
   );

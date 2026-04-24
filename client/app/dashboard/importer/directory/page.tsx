@@ -12,18 +12,19 @@ import {
  ShieldCheck,
  TrendingUp,
  ChevronLeft,
- Send,
- Loader2,
- Waves,
- History,
- X,
- Package,
- ArrowRight,
- Mic,
- MicOff,
- VideoOff,
- PhoneOff
+  Send,
+  Waves,
+  History,
+  X,
+  Package,
+  ArrowRight,
+  Mic,
+  MicOff,
+  VideoOff,
+  PhoneOff
 } from "lucide-react";
+import GifLoader from "@/components/ui/GifLoader";
+
 import { authFetch, formatCurrency, getInitials } from "@/lib/api-utils";
 import { useRealtimeCall } from "@/hooks/useRealtimeCall";
 import { useChat } from "@/hooks/useChat";
@@ -208,12 +209,12 @@ export default function ImporterDirectoryPage() {
  </div>
 
  <div className="flex-1 overflow-y-auto custom-scrollbar px-2 pt-2">
- {loading && exporters.length === 0 ? (
- <div className="p-20 text-center flex flex-col items-center gap-6 opacity-30">
- <Loader2 className="w-8 h-8 animate-spin" />
- <span className="text-[10px] font-black uppercase tracking-[0.4em]">Indexing Global Nodes...</span>
- </div>
- ) : exporters.length === 0 ? (
+  {loading && exporters.length === 0 ? (
+    <div className="p-20 text-center flex flex-col items-center justify-center min-h-[400px]">
+      <GifLoader text="Indexing Global Nodes..." />
+    </div>
+  ) : exporters.length === 0 ? (
+
  <div className="p-20 text-center opacity-30 flex flex-col items-center gap-5">
  <Globe className="w-12 h-12 grayscale" />
  <span className="text-xs font-black uppercase tracking-widest text-center ">No Exporters Found</span>
@@ -336,11 +337,12 @@ export default function ImporterDirectoryPage() {
  {/* Main Chat Area */}
  <div className="flex-1 flex flex-col min-w-0 bg-[url('/grid.svg')] bg-fixed">
  <div ref={scrollRef} className="flex-1 overflow-y-auto p-12 space-y-10 flex flex-col custom-scrollbar">
- {messagesLoading && messages.length === 0 ? (
- <div className="flex-1 flex items-center justify-center opacity-30">
- <Loader2 className="w-8 h-8 animate-spin" />
- </div>
- ) : messages.length === 0 ? (
+  {messagesLoading && messages.length === 0 ? (
+    <div className="flex-1 flex items-center justify-center">
+      <GifLoader showText={false} />
+    </div>
+  ) : messages.length === 0 ? (
+
  <div className="flex-1 flex flex-col items-center justify-center text-center max-w-sm mx-auto opacity-30 space-y-8">
  <div className="p-8 rounded-lg bg-primary/10 border border-primary/10 rotate-6">
  <MessageSquare className="w-16 h-16 text-primary" />

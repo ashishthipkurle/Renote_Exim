@@ -37,10 +37,8 @@ export default function ImporterSidebar({ basePath, children }: { basePath: stri
 
  const nav: NavItem[] = [
     { href: basePath, label: "Dashboard", icon: Home },
-    { href: "/products", label: "Marketplace", icon: ShoppingBag },
     { href: `${basePath}/directory`, label: "Sellers", icon: Users },
     { href: `${basePath}/orders`, label: "Orders", icon: Truck },
-    { href: `${basePath}/rfqs`, label: "RFQs", icon: FileText },
     { href: `${basePath}/inventory`, label: "Inventory", icon: Boxes },
     { href: `${basePath}/analytics`, label: "Analytics", icon: LineChart },
     { href: `${basePath}/finance`, label: "Finance", icon: Wallet },

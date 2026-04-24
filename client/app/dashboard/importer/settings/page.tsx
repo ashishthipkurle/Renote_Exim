@@ -16,9 +16,11 @@ import {
  Briefcase,
  FileText,
  Save,
- Loader2,
+ Save,
  CheckCircle2
 } from "lucide-react";
+import GifLoader from "@/components/ui/GifLoader";
+
 import { toast } from "sonner";
 
 interface ProfileData {
@@ -90,13 +92,14 @@ export default function ImporterSettingsPage() {
  }
  };
 
- if (loading) {
- return (
- <div className="h-full flex items-center justify-center bg-background">
- <Loader2 className="w-10 h-10 text-foreground animate-spin" />
- </div>
- );
- }
+  if (loading) {
+    return (
+      <div className="h-full flex items-center justify-center bg-background">
+        <GifLoader />
+      </div>
+    );
+  }
+
 
  return (
  <div className="h-dvh overflow-hidden flex flex-col bg-background transition-colors duration-300">

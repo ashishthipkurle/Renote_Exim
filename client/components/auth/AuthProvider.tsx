@@ -134,12 +134,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     console.log("[AuthProvider] Provider mounted. Current user state:", !!user);
-    // 1. Initial Discovery
+    
+    // 1. Initial Data Fetch
     fetchUser();
     
-    // No client-side SDK event listener is required.
-    // Our entire authentication system uses a robust server-side cookie pattern
-    // where `/api/auth/me` governs the state on mount and explicit `/api/auth/sync` is used when needed.
+    // 2. Proactive Token Refresh
+    // Nhost tokens expire in 15 mins. Refresh every 10 mins.
+    const REFRESH_INTERVAL_MS = 10 * 60 * 1000;
+    const intervalId = setInterval(() => {
+      console.log("[AuthProvider] Periodic token refresh triggered.");
+      fetchUser();
+    }, REFRESH_INTERVAL_MS);
+
+    // 3. Visibility Change Handler
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        console.log("[AuthProvider] Tab became visible. Refreshing session...");
+        fetchUser();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      clearInterval(intervalId);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, [fetchUser, syncSession]);
 
   return (

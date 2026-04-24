@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+import GifLoader from "./GifLoader";
+
 
 interface LoadingSpinnerProps {
  size?: "sm" | "md" | "lg";
@@ -49,16 +51,14 @@ export default function LoadingSpinner({
  return <div className="flex items-center gap-2">{spinnerContent}</div>;
  }
 
- if (variant === "overlay") {
- return (
- <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-xl z-50">
- <div className="flex flex-col items-center gap-6 animate-in zoom-in-95 fade-in duration-500">
- {spinnerContent}
- {text && <p className="text-[10px] font-black text-white uppercase tracking-[0.2em] opacity-60">{text}</p>}
- </div>
- </div>
- );
- }
+  if (variant === "overlay") {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-white/80 dark:bg-[#050505]/80 backdrop-blur-xl z-50">
+        <GifLoader text={text} />
+      </div>
+    );
+  }
+
 
  return (
  <div className="flex flex-col items-center gap-6">
