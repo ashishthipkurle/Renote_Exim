@@ -1,14 +1,14 @@
 "use client";
 
 import CallDeskPanel from "@/components/calls/CallDeskPanel";
-import { useRealtimeCall } from "@/hooks/useRealtimeCall";
+import { useCallController } from "@/components/session/GlobalCallProvider";
 
 export default function ImporterCallsPage() {
- const controller = useRealtimeCall();
+	const controller = useCallController();
 
- return (
- <div className="h-full overflow-y-auto">
- <CallDeskPanel controller={controller} title="Importer Call Desk" />
- </div>
- );
+	return (
+		<div className="h-full overflow-y-auto">
+			<CallDeskPanel controller={controller} title="Importer Call Desk" />
+		</div>
+	);
 }

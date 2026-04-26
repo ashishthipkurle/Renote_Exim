@@ -1,95 +1,89 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Mic, MicOff, Video, VideoOff } from "lucide-react";
 
 interface VideoPlayerProps {
- stream: MediaStream | null;
- name: string;
- image?: string | null;
- isLocal?: boolean;
- isMuted?: boolean;
- isVideoOff?: boolean;
- className?: string;
+    stream: MediaStream | null;
+    name: string;
+    image?: string | null;
+    isLocal?: boolean;
+    isMuted?: boolean;
+    isVideoOff?: boolean;
+    className?: string;
 }
 
 export function VideoPlayer({
- stream,
- name,
- image,
- isLocal = false,
- isMuted = false,
- isVideoOff = false,
- className = "",
+    stream,
+    name,
+    image,
+    isLocal = false,
+    isMuted = false,
+    isVideoOff = false,
+    className = "",
 }: VideoPlayerProps) {
- const videoRef = useRef<HTMLVideoElement>(null);
+    const videoRef = useRef<HTMLVideoElement>(null);
 
- useEffect(() => {
- if (videoRef.current && stream) {
- videoRef.current.srcObject = stream;
- }
- }, [stream]);
+    useEffect(() => {
+        if (videoRef.current && stream) {
+            videoRef.current.srcObject = stream;
+        }
+    }, [stream]);
 
- const initials = name
- .split(" ")
- .map((n) => n[0])
- .join("")
- .toUpperCase()
- .slice(0, 2);
+    const initials = name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2);
 
- return (
- <div className={`relative bg-[var(--color-card)] rounded-xl overflow-hidden ${className}`}>
- {/* Video element */}
- {stream && !isVideoOff ? (
- <video
- ref={videoRef}
- autoPlay
- playsInline
- muted={isLocal}
- className="w-full h-full object-cover"
- />
- ) : (
- // Placeholder when no video
- <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[var(--color-card)] to-[var(--color-card-dark)]">
- <Avatar className="size-24">
- <AvatarImage src={image || undefined} />
- <AvatarFallback className="text-2xl bg-[var(--color-primary)]/20 text-[var(--color-primary)]">
- {initials}
- </AvatarFallback>
- </Avatar>
- </div>
- )}
+    const hasVideo = stream && stream.getVideoTracks().some((t) => t.enabled) && !isVideoOff;
 
- {/* Name overlay */}
- <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
- <div className="flex items-center justify-between">
- <span className="text-white text-sm font-medium">
- {name} {isLocal && "(You)"}
- </span>
- <div className="flex items-center gap-2">
- {isMuted && (
- <div className="bg-red-500/80 rounded-full p-1">
- <MicOff className="size-3 text-white" />
- </div>
- )}
- {isVideoOff && (
- <div className="bg-red-500/80 rounded-full p-1">
- <VideoOff className="size-3 text-white" />
- </div>
- )}
- </div>
- </div>
- </div>
+    return (
+        <div className={`relative overflow-hidden ${className}`} style={{ background: "#3c4043" }}>
+            {/* Video element — always mounted so stream doesn't disconnect */}
+            <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted={isLocal}
+                style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    display: hasVideo ? "block" : "none",
+                }}
+            />
 
- {/* Local indicator */}
- {isLocal && (
- <div className="absolute top-3 left-3">
- <span className="text-xs bg-[var(--color-primary)] text-white px-2 py-1 rounded-full">
- You
- </span>
- </div>
- )}
- </div>
- );
+            {/* Avatar fallback when no video */}
+            {!hasVideo && (
+                <div
+                    style={{
+                        position: "absolute",
+                        inset: 0,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        background: isLocal ? "#3c4043" : "linear-gradient(135deg, #4a6cf7 0%, #3b5998 50%, #4a6cf7 100%)",
+                    }}
+                >
+                    <div
+                        style={{
+                            width: isLocal ? 48 : 96,
+                            height: isLocal ? 48 : 96,
+                            borderRadius: "50%",
+                            background: isLocal ? "#5f6368" : "#6e88d6",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: isLocal ? 20 : 40,
+                            fontWeight: 500,
+                            color: "#e8eaed",
+                        }}
+                    >
+                        {initials}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
 }

@@ -59,17 +59,17 @@ export function LiveChatPanel({
  };
 
  return (
- <div className="flex flex-col h-full bg-[var(--color-card)] border border-[var(--color-border)] rounded-xl">
+ <div className="flex flex-col h-full bg-card/60 backdrop-blur-3xl border border-border/50 rounded-2xl overflow-hidden shadow-2xl">
  {/* Header */}
- <div className="p-4 border-b border-[var(--color-border)]">
+ <div className="p-4 border-b border-border/50 bg-muted/20">
  <div className="flex items-center justify-between">
- <h3 className="font-semibold text-[var(--color-foreground)]">Chat</h3>
- <div className="flex items-center gap-2">
+ <h3 className="font-black text-xs uppercase tracking-widest text-primary">Live Negotiation Chat</h3>
+ <div className="flex items-center gap-2 bg-background/50 px-3 py-1 rounded-full border border-border/50">
  <span
- className={`size-2 rounded-full ${isConnected ? "bg-green-500" : "bg-red-500"
+ className={`size-2 rounded-full ${isConnected ? "bg-emerald-500 animate-pulse" : "bg-destructive"
  }`}
  />
- <span className="text-xs text-muted-foreground">
+ <span className="text-[10px] font-black uppercase tracking-tighter text-muted-foreground">
  {isConnected ? "Connected" : "Reconnecting..."}
  </span>
  </div>
@@ -77,11 +77,14 @@ export function LiveChatPanel({
  </div>
 
  {/* Messages */}
- <div className="flex-1 overflow-y-auto p-4 space-y-4">
+ <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
  {messages.length === 0 ? (
- <div className="flex flex-col items-center justify-center h-full text-center">
- <p className="text-muted-foreground text-sm">No messages yet</p>
- <p className="text-xs text-muted-foreground mt-1">
+ <div className="flex flex-col items-center justify-center h-full text-center opacity-40">
+ <div className="size-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+ <Send className="size-6 text-primary" />
+ </div>
+ <p className="text-[10px] font-black uppercase tracking-widest">No messages yet</p>
+ <p className="text-[9px] font-medium mt-1">
  Start the conversation!
  </p>
  </div>
@@ -98,30 +101,30 @@ export function LiveChatPanel({
  return (
  <div
  key={msg.id}
- className={`flex gap-2 ${isOwn ? "flex-row-reverse" : ""}`}
+ className={`flex gap-3 ${isOwn ? "flex-row-reverse" : ""}`}
  >
- <Avatar className="size-8 shrink-0">
+ <Avatar className="size-8 shrink-0 border border-border/50">
  <AvatarImage src={msg.senderImage || undefined} />
- <AvatarFallback className="text-xs">
+ <AvatarFallback className="text-[10px] font-bold bg-muted">
  {initials}
  </AvatarFallback>
  </Avatar>
  <div
- className={`max-w-[80%] rounded-lg p-3 ${isOwn
- ? "bg-[var(--color-primary)] text-white"
- : "bg-[var(--color-muted)]"
+ className={`max-w-[85%] rounded-2xl px-4 py-3 shadow-sm ${isOwn
+ ? "bg-primary text-primary-foreground rounded-tr-none"
+ : "bg-muted/50 backdrop-blur-sm border border-border/50 rounded-tl-none"
  }`}
  >
  {!isOwn && (
- <p className="text-xs font-medium mb-1 opacity-70">
+ <p className="text-[9px] font-black uppercase tracking-widest mb-1 opacity-60">
  {msg.senderName}
  </p>
  )}
- <p className="text-sm whitespace-pre-wrap break-words">
+ <p className="text-sm leading-relaxed whitespace-pre-wrap break-words font-medium">
  {msg.content}
  </p>
  <p
- className={`text-xs mt-1 ${isOwn ? "text-white/70" : "text-muted-foreground"
+ className={`text-[9px] font-bold mt-2 tracking-tighter ${isOwn ? "text-primary-foreground/70" : "text-muted-foreground"
  }`}
  >
  {format(new Date(msg.timestamp), "HH:mm")}
@@ -135,21 +138,23 @@ export function LiveChatPanel({
  </div>
 
  {/* Input */}
- <div className="p-4 border-t border-[var(--color-border)]">
- <div className="flex gap-2">
+ <div className="p-4 border-t border-border/50 bg-muted/10">
+ <div className="flex gap-3 items-end">
+ <div className="flex-1 relative">
  <Textarea
  placeholder={disabled ? "Chat disabled" : "Type a message..."}
  value={message}
  onChange={(e) => setMessage(e.target.value)}
  onKeyDown={handleKeyDown}
  disabled={disabled}
- className="min-h-[50px] max-h-[100px] resize-none"
+ className="min-h-[44px] max-h-[120px] resize-none bg-background/50 border-border/50 rounded-xl px-4 py-3 text-sm focus-visible:ring-primary/30"
  />
+ </div>
  <Button
  onClick={handleSend}
  disabled={disabled || isSending || !message.trim()}
  size="icon"
- className="h-auto"
+ className="size-11 rounded-xl bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95"
  >
  {isSending ? (
  <Loader2 className="size-4 animate-spin" />

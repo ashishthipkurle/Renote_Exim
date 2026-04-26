@@ -76,19 +76,19 @@ export function SessionTimer({
 
  return (
  <div
- className={`flex items-center gap-2 px-4 py-2 rounded-full font-mono text-sm font-medium transition-colors ${isExpired
- ? "bg-red-500/20 text-red-500"
+ className={`flex items-center gap-3 px-6 py-2.5 rounded-full font-black text-sm uppercase tracking-widest transition-all shadow-xl backdrop-blur-3xl border-2 ${isExpired
+ ? "bg-destructive/20 text-destructive border-destructive/30"
  : isCritical
- ? "bg-red-500/20 text-red-500 animate-pulse"
+ ? "bg-destructive/30 text-destructive border-destructive/50 animate-pulse"
  : isWarning
- ? "bg-yellow-500/20 text-yellow-600"
- : "bg-[var(--color-card)] text-[var(--color-foreground)]"
+ ? "bg-primary/20 text-primary border-primary/30"
+ : "bg-card/40 text-foreground border-border/50"
  }`}
  >
  {isCritical || isWarning ? (
  <AlertTriangle className="size-4" />
  ) : (
- <Clock className="size-4" />
+ <Clock className="size-4 text-primary" />
  )}
  <span>
  {isExpired ? "Session Ended" : formatTime(remainingMs)}

@@ -112,6 +112,8 @@ export function useRealtimeCall() {
   const activeCallRef = useRef<ActiveCallInfo | null>(null);
   const pendingSignalsRef = useRef<Map<string, SignalData[]>>(new Map());
   const hasSentIncomingInviteRef = useRef(false);
+  const ringtoneRef = useRef<HTMLAudioElement | null>(null); // reserved for future use
+  const isAcceptingRef = useRef(false);
   const endingSessionIdsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
@@ -133,8 +135,8 @@ export function useRealtimeCall() {
           method: "PATCH",
           body: JSON.stringify({ action, endedReason }),
         });
-      } catch {
-        // Session bookkeeping should not block UI controls.
+      } catch (err) {
+        console.warn("[Call Hook] Failed to update session metadata:", err);
       }
     },
     []
@@ -157,8 +159,8 @@ export function useRealtimeCall() {
       try {
         peerRef.current.removeAllListeners();
         peerRef.current.destroy();
-      } catch {
-        // Ignore destroy failures.
+      } catch (err) {
+        console.warn("[Call Hook] Error during peer destruction:", err);
       }
       peerRef.current = null;
     }
@@ -166,6 +168,10 @@ export function useRealtimeCall() {
 
   const sendSignalEvent = useCallback(
     async (event: "incoming-call" | "call-signal" | "call-accepted" | "call-ended", payload: Record<string, unknown>) => {
+      if (!socket.connected) {
+        console.error("[Call Hook] Socket disconnected. Cannot send event:", event);
+        return;
+      }
       socket.emit(event, payload);
     },
     [socket]
@@ -174,10 +180,28 @@ export function useRealtimeCall() {
   const ensureLocalStream = useCallback(async (callType: CallMode) => {
     if (localStreamRef.current) return localStreamRef.current;
 
-    const stream = await navigator.mediaDevices.getUserMedia(getMediaConstraints(callType));
-    localStreamRef.current = stream;
-    setLocalStream(stream);
-    return stream;
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia(getMediaConstraints(callType));
+        localStreamRef.current = stream;
+        setLocalStream(stream);
+        return stream;
+    } catch (err) {
+        console.error("[Call Hook] Media access failed:", err);
+        // If VIDEO failed, try audio-only as fallback
+        if (callType === "VIDEO") {
+          console.warn("[Call Hook] Video failed, falling back to audio-only");
+          try {
+            const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+            localStreamRef.current = audioStream;
+            setLocalStream(audioStream);
+            setIsCameraEnabled(false);
+            return audioStream;
+          } catch (audioErr) {
+            console.error("[Call Hook] Audio fallback also failed:", audioErr);
+          }
+        }
+        throw new Error("Unable to access camera or microphone. Please check permissions.");
+    }
   }, []);
 
   const applyPendingSignals = useCallback((sessionId: string, peer: PeerInstance) => {
@@ -187,8 +211,8 @@ export function useRealtimeCall() {
     queued.forEach((signal) => {
       try {
         peer.signal(signal);
-      } catch {
-        // Ignore invalid queued signals.
+      } catch (err) {
+        console.warn("[Call Hook] Failed to apply queued signal:", err);
       }
     });
 
@@ -198,7 +222,15 @@ export function useRealtimeCall() {
   const endCurrentCall = useCallback(
     async (reason = "ended", remoteRequested = false) => {
       const current = activeCallRef.current;
-      if (!current) return;
+      
+      // If no active call, check if we're in ringing/calling state and reset
+      if (!current) {
+        destroyPeer();
+        stopAndClearStreams();
+        setPhase("idle");
+        setIncomingCall(null);
+        return;
+      }
 
       if (endingSessionIdsRef.current.has(current.sessionId)) return;
       endingSessionIdsRef.current.add(current.sessionId);
@@ -211,8 +243,8 @@ export function useRealtimeCall() {
             toUserId: current.peerUserId,
             reason,
           });
-        } catch {
-          // Ignore realtime send failures.
+        } catch (err) {
+          console.warn("[Call Hook] Failed to send end signal:", err);
         }
       }
 
@@ -225,7 +257,7 @@ export function useRealtimeCall() {
       setActiveCall(null);
       activeCallRef.current = null;
       setPhase("ended");
-      setTimeout(() => setPhase("idle"), 400);
+      setTimeout(() => setPhase("idle"), 800);
 
       endingSessionIdsRef.current.delete(current.sessionId);
     },
@@ -238,8 +270,8 @@ export function useRealtimeCall() {
     if (current && current.sessionId === payload.sessionId && peerRef.current) {
       try {
         peerRef.current.signal(payload.signal);
-      } catch {
-        // Ignore malformed incoming signals.
+      } catch (err) {
+        console.warn("[Call Hook] Direct signal application failed:", err);
       }
       return;
     }
@@ -260,6 +292,8 @@ export function useRealtimeCall() {
       },
       stream: MediaStream
     ) => {
+      destroyPeer(); // Ensure no leftover peers
+
       const peer = new Peer({
         initiator: opts.initiator,
         trickle: true,
@@ -268,6 +302,8 @@ export function useRealtimeCall() {
           iceServers: [
             { urls: "stun:stun.l.google.com:19302" },
             { urls: "stun:stun1.l.google.com:19302" },
+            { urls: "stun:stun2.l.google.com:19302" },
+            { urls: "stun:stun3.l.google.com:19302" },
           ],
         },
       });
@@ -299,20 +335,36 @@ export function useRealtimeCall() {
       });
 
       peer.on("stream", (nextRemoteStream) => {
+        console.log("[Call Hook] Remote stream received");
         setRemoteStream(nextRemoteStream);
       });
 
       peer.on("connect", async () => {
+        console.log("[Call Hook] Peer connection established");
         setPhase("in-call");
         await updateSession(opts.sessionId, "connect");
       });
 
       peer.on("close", () => {
-        void endCurrentCall("peer-closed", true);
+        console.log("[Call Hook] Peer connection closed");
+        // Only end call if we were actually connected. During calling/connecting,
+        // close events are normal (peer hasn't answered yet).
+        if (phaseRef.current === "in-call") {
+          void endCurrentCall("peer-closed", true);
+        }
       });
 
       peer.on("error", (eventError: Error) => {
-        setError(eventError.message || "Call error");
+        console.error("[Call Hook] Peer error:", eventError);
+        // Don't auto-terminate the call for errors during the calling/connecting phase.
+        // ICE negotiation timeouts and failed candidates are normal while waiting
+        // for the remote user to accept. Only treat errors as fatal during in-call.
+        if (phaseRef.current === "in-call") {
+          setError(eventError.message || "Connection failed. Please retry.");
+          void endCurrentCall("failed", false);
+        } else {
+          console.warn("[Call Hook] Non-fatal peer error during", phaseRef.current, "- ignoring");
+        }
       });
 
       peerRef.current = peer;
@@ -320,7 +372,7 @@ export function useRealtimeCall() {
 
       return peer;
     },
-    [applyPendingSignals, endCurrentCall, sendSignalEvent, updateSession, user?.id, user?.name]
+    [applyPendingSignals, destroyPeer, endCurrentCall, sendSignalEvent, updateSession, user?.id, user?.name]
   );
 
   const startCall = useCallback(
@@ -371,7 +423,7 @@ export function useRealtimeCall() {
           stream
         );
       } catch (startError) {
-        const message = startError instanceof Error ? startError.message : "Unable to start call";
+        const message = startError instanceof Error ? startError.message : "Unable to initiate connection";
         setError(message);
         setPhase("idle");
         stopAndClearStreams();
@@ -383,18 +435,25 @@ export function useRealtimeCall() {
   const acceptCall = useCallback(async () => {
     if (!user?.id || !incomingCall) return;
 
+    // CRITICAL: Clear incomingRef FIRST to prevent the race condition where
+    // onCallEnded sees incomingRef still set and kills the call during accept.
+    const savedIncoming = { ...incomingCall };
+    setIncomingCall(null);
+    incomingRef.current = null;
+    isAcceptingRef.current = true;
+
     setError(null);
     setPhase("connecting");
 
     try {
-      const stream = await ensureLocalStream(incomingCall.callType);
+      const stream = await ensureLocalStream(savedIncoming.callType);
 
       const nextActiveCall: ActiveCallInfo = {
-        sessionId: incomingCall.sessionId,
-        peerUserId: incomingCall.fromUserId,
-        peerName: incomingCall.fromName,
-        callType: incomingCall.callType,
-        scheduleId: incomingCall.scheduleId,
+        sessionId: savedIncoming.sessionId,
+        peerUserId: savedIncoming.fromUserId,
+        peerName: savedIncoming.fromName,
+        callType: savedIncoming.callType,
+        scheduleId: savedIncoming.scheduleId,
         initiatedByMe: false,
       };
 
@@ -404,24 +463,25 @@ export function useRealtimeCall() {
       createPeer(
         {
           initiator: false,
-          sessionId: incomingCall.sessionId,
-          peerUserId: incomingCall.fromUserId,
-          callType: incomingCall.callType,
-          scheduleId: incomingCall.scheduleId,
+          sessionId: savedIncoming.sessionId,
+          peerUserId: savedIncoming.fromUserId,
+          callType: savedIncoming.callType,
+          scheduleId: savedIncoming.scheduleId,
         },
         stream
       );
 
       await sendSignalEvent("call-accepted", {
-        sessionId: incomingCall.sessionId,
+        sessionId: savedIncoming.sessionId,
         fromUserId: user.id,
-        toUserId: incomingCall.fromUserId,
+        toUserId: savedIncoming.fromUserId,
       });
 
-      setIncomingCall(null);
-      incomingRef.current = null;
+      isAcceptingRef.current = false;
     } catch (acceptError) {
-      const message = acceptError instanceof Error ? acceptError.message : "Unable to accept call";
+      isAcceptingRef.current = false;
+      const message = acceptError instanceof Error ? acceptError.message : "Unable to accept connection";
+      console.error("[Call Hook] Accept call failed:", message);
       setError(message);
       setPhase("idle");
       stopAndClearStreams();
@@ -440,8 +500,8 @@ export function useRealtimeCall() {
       } satisfies EndPayload);
 
       await updateSession(incomingCall.sessionId, "declined", "declined");
-    } catch {
-      // Ignore realtime or persistence failures for decline action.
+    } catch (err) {
+      console.warn("[Call Hook] Failed to send decline signal:", err);
     }
 
     pendingSignalsRef.current.delete(incomingCall.sessionId);
@@ -470,7 +530,10 @@ export function useRealtimeCall() {
     if (!stream) return;
 
     const hasVideo = stream.getVideoTracks().length > 0;
-    if (!hasVideo) return;
+    if (!hasVideo) {
+        // If camera was off, try to re-enable? (This is complex as it requires new stream)
+        return;
+    }
 
     const nextEnabled = !isCameraEnabled;
     stream.getVideoTracks().forEach((track) => {
@@ -495,6 +558,7 @@ export function useRealtimeCall() {
         !!activeCallRef.current;
 
       if (hasActive) {
+        console.log("[Call Hook] Busy: Rejecting incoming call from", payload.fromUserId);
         void sendSignalEvent("call-ended", {
           sessionId: payload.sessionId,
           fromUserId: user.id,
@@ -504,6 +568,9 @@ export function useRealtimeCall() {
         void updateSession(payload.sessionId, "failed", "busy");
         return;
       }
+
+      // Clear any leftover error from previous calls
+      setError(null);
 
       if (payload.signal) {
         pendingSignalsRef.current.set(payload.sessionId, [payload.signal]);
@@ -530,12 +597,22 @@ export function useRealtimeCall() {
       if (!payload?.toUserId || payload.toUserId !== user.id) return;
       if (!activeCallRef.current) return;
       if (activeCallRef.current.sessionId !== payload.sessionId) return;
+      console.log("[Call Hook] Call accepted by remote partner");
       setPhase("connecting");
     };
 
     const onCallEnded = (payload: EndPayload) => {
       if (!payload?.toUserId || payload.toUserId !== user.id) return;
 
+      console.log("[Call Hook] Remote partner ended/declined call:", payload.reason);
+
+      // If we're currently accepting the call, ignore end signals — they're stale
+      if (isAcceptingRef.current) {
+        console.log("[Call Hook] Ignoring call-ended during accept flow");
+        return;
+      }
+
+      // Only handle incoming-call cancellation if we're still in ringing state
       if (incomingRef.current && incomingRef.current.sessionId === payload.sessionId) {
         setIncomingCall(null);
         incomingRef.current = null;
@@ -576,6 +653,57 @@ export function useRealtimeCall() {
     updateSession,
     user?.id,
   ]);
+
+  // ─── Ringtone Effect ───
+  // Play a ringtone during calling (outgoing) and ringing (incoming) phases
+  useEffect(() => {
+    const shouldPlay = phase === "calling" || phase === "ringing";
+
+    if (shouldPlay) {
+      try {
+        // Create a ringtone using Web Audio API (no external file needed)
+        const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const createRingTone = () => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.type = phase === "ringing" ? "sine" : "sine";
+          osc.frequency.value = phase === "ringing" ? 440 : 480;
+          gain.gain.value = 0.15;
+          return { osc, gain };
+        };
+
+        let intervalId: ReturnType<typeof setInterval>;
+        let currentOsc: OscillatorNode | null = null;
+
+        const playTone = () => {
+          if (audioCtx.state === "closed") return;
+          const { osc, gain } = createRingTone();
+          osc.start();
+          currentOsc = osc;
+          // Ring for 1 second, silence for 2 seconds
+          setTimeout(() => {
+            if (audioCtx.state !== "closed") {
+              gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+              setTimeout(() => { try { osc.stop(); } catch {} }, 150);
+            }
+          }, phase === "ringing" ? 800 : 1200);
+        };
+
+        playTone();
+        intervalId = setInterval(playTone, phase === "ringing" ? 2500 : 3500);
+
+        return () => {
+          clearInterval(intervalId);
+          try { currentOsc?.stop(); } catch {}
+          try { audioCtx.close(); } catch {}
+        };
+      } catch (e) {
+        console.warn("[Call Hook] Could not play ringtone:", e);
+      }
+    }
+  }, [phase]);
 
   return {
     phase,

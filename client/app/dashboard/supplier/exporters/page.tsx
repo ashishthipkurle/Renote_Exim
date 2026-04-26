@@ -13,29 +13,22 @@ import {
  UserCheck,
  MessageCircle,
  Video,
- Waves,
  CalendarClock,
  ChevronLeft,
  Send,
  Loader2,
- Mic,
- MicOff,
- VideoOff,
  Phone,
- PhoneOff,
  Handshake,
  Users2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useRealtimeCall } from "@/hooks/useRealtimeCall";
+import { useCallController } from "@/components/session/GlobalCallProvider";
 import { useChat } from "@/hooks/useChat";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 
-// Session components for call overlay
-import { VideoPlayer } from "@/components/session/VideoPlayer";
-import { SessionTimer } from "@/components/session/SessionTimer";
+// Session components
 import ScheduleCallModal from "@/components/calls/ScheduleCallModal";
 
 interface ExporterPartner {
@@ -48,6 +41,7 @@ interface ExporterPartner {
  country: string | null;
  category: string | null;
  createdAt: string;
+ unreadCount: number;
 }
 
 interface TradeHistoryOrder {
@@ -69,7 +63,7 @@ interface TradeHistoryOrder {
 
 export default function SupplierExportersPage() {
  // 1. Data Hooks
- const callController = useRealtimeCall();
+ const callController = useCallController();
  
  // 2. Local State
  const [exporters, setExporters] = useState<ExporterPartner[]>([]);
@@ -133,6 +127,9 @@ export default function SupplierExportersPage() {
  address: exp.country || "Global"
  });
  void fetchHistory(exp.exporterId);
+ 
+ // Clear unread count locally when selected
+ setExporters(prev => prev.map(e => (e.exporterId === selectedId || e.id === selectedId) ? { ...e, unreadCount: 0 } : e));
  }
  } else {
  setSelectedUser(null);
@@ -222,8 +219,15 @@ export default function SupplierExportersPage() {
  className={`w-full group relative bg-card/30 border transition-all duration-500 rounded-lg p-6 text-left ${isSelected ? "border-[#D4AF37] ring-1 ring-[#D4AF37]/20 shadow-2xl shadow-[#D4AF37]/10" : "border-border hover:border-[#D4AF37]/40 hover:bg-muted/30"}`}
  >
  <div className="flex items-center gap-5">
+ <div className="relative">
  <div className="size-16 rounded-lg bg-gradient-to-br from-[#D4AF37] to-yellow-600/10 flex shrink-0 items-center justify-center text-black font-black text-2xl shadow-lg shadow-[#D4AF37]/10 group-hover:scale-105 transition-transform">
  {getInitials(exp.name || "U")}
+ </div>
+ {exp.unreadCount > 0 && (
+ <span className="absolute -top-2 -right-2 size-6 rounded-full bg-[#D4AF37] text-black text-[10px] font-black flex items-center justify-center shadow-lg animate-bounce-subtle border-2 border-background">
+ {exp.unreadCount > 9 ? "9+" : exp.unreadCount}
+ </span>
+ )}
  </div>
  <div className="flex-1 min-w-0">
  <div className="flex justify-between items-start mb-1">
@@ -467,70 +471,8 @@ export default function SupplierExportersPage() {
 
  {/* CALL OVERLAY */}
  <AnimatePresence>
- {callController.phase !== "idle" && (
- <motion.div 
- initial={{ opacity: 0 }}
- animate={{ opacity: 1 }}
- exit={{ opacity: 0 }}
- className="fixed inset-0 z-[100] bg-black backdrop-blur-2xl flex flex-col items-center justify-center p-10"
- >
- {/* Status Label */}
- <div className="absolute top-20 flex flex-col items-center gap-4">
- <div className="flex items-center gap-2 px-6 py-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-[0.3em] animate-pulse">
- <Waves className="w-3 h-3" />
- {callController.phase === "calling" ? "Initiating Uplink..." : "Secure Transmission Active"}
- </div>
- <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-white">{callController.activeCall?.peerName}</h2>
- {callController.phase === "in-call" && <SessionTimer endTime={new Date(Date.now() + 3600000).toISOString()} onTimeExpired={() => {}} />}
- </div>
-
- {/* Video Grid */}
- <div className="w-full max-w-6xl aspect-video grid grid-cols-1 md:grid-cols-2 gap-10 mt-20 relative">
- <div className="relative group rounded-lg overflow-hidden border border-white/5 bg-white/5 shadow-2xl">
- <VideoPlayer stream={callController.remoteStream} name={callController.activeCall?.peerName || "Remote Node"} />
- <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-10 flex items-end">
- <div className="flex items-center gap-4">
- <div className="size-3 rounded-full bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
- <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">Live Intelligence Feed</span>
- </div>
- </div>
- </div>
- <div className="relative group rounded-lg overflow-hidden border border-white/5 bg-white/5 shadow-2xl">
- <VideoPlayer stream={callController.localStream} name="Self Node (Supplier)" isLocal />
- <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-10 flex items-end">
- <div className="flex items-center gap-4">
- <div className="size-3 rounded-full bg-primary shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
- <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">Local Feed</span>
- </div>
- </div>
- </div>
- </div>
-
- {/* Controls */}
- <div className="absolute bottom-20 flex items-center gap-10">
- <button 
- onClick={callController.toggleMute}
- className={`rounded-full size-20 flex items-center justify-center border-white/10 ${callController.isMuted ? "bg-red-500/20 text-red-500 border-red-500/20 hover:bg-red-500/30" : "bg-white/5 text-white hover:bg-white/10"}`}
- >
- {callController.isMuted ? <MicOff className="w-8 h-8" /> : <Mic className="w-8 h-8" />}
- </button>
- <Button 
- variant="destructive" 
- onClick={callController.endCall}
- className="rounded-full size-24 bg-red-600 hover:bg-red-700 shadow-2xl shadow-red-600/40"
- >
- <PhoneOff className="w-10 h-10" />
- </Button>
- <button 
- onClick={callController.toggleCamera}
- className={`rounded-full size-20 flex items-center justify-center border-white/10 ${!callController.isCameraEnabled ? "bg-red-500/20 text-red-500 border-red-500/20 hover:bg-red-500/30" : "bg-white/5 text-white hover:bg-white/10"}`}
- >
- {callController.isCameraEnabled ? <Video className="w-8 h-8" /> : <VideoOff className="w-8 h-8" />}
- </button>
- </div>
- </motion.div>
- )}
- </AnimatePresence>
+  {/* Call UI is now rendered globally by DashboardCallWrapper */}
+  </AnimatePresence>
 
  <ScheduleCallModal 
  open={isScheduleModalOpen}

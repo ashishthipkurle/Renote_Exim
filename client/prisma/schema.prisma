@@ -280,16 +280,20 @@ model MessageAttachment {
 model Notification {
   id             String           @id @default(uuid())
   userId         String
+  ownerId        String?
   type           NotificationType
+  title          String
   message        String
-  isRead         Boolean          @default(false)
+  read           Boolean          @default(false)
   linkedEntityId String?
-  title          String?
   link           String?
   createdAt      DateTime         @default(now())
   readAt         DateTime?
   user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId, read, createdAt])
+  @@index([ownerId, read, createdAt])
+  @@index([createdAt])
   @@map("notifications")
 }
 

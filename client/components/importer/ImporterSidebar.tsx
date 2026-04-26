@@ -24,20 +24,23 @@ import {
  SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
+import { useUnreadCategories } from "@/hooks/useUnreadCategories";
 
 
 interface NavItem {
   href: string;
   label: string;
   icon: ComponentType<{ className?: string }>;
+  badgeCount?: number;
 }
 
 export default function ImporterSidebar({ basePath, children }: { basePath: string; children?: React.ReactNode }) {
  const pathname = usePathname();
+ const { counts } = useUnreadCategories();
 
  const nav: NavItem[] = [
     { href: basePath, label: "Dashboard", icon: Home },
-    { href: `${basePath}/directory`, label: "Sellers", icon: Users },
+    { href: `${basePath}/directory`, label: "Sellers", icon: Users, badgeCount: counts.sellers },
     { href: `${basePath}/orders`, label: "Orders", icon: Truck },
     { href: `${basePath}/inventory`, label: "Inventory", icon: Boxes },
     { href: `${basePath}/analytics`, label: "Analytics", icon: LineChart },
@@ -61,7 +64,7 @@ export default function ImporterSidebar({ basePath, children }: { basePath: stri
  isActive={isActive(item.href)}
  tooltip={item.label}
  className={cn(
- "rounded-xl transition-all duration-300",
+ "rounded-xl transition-all duration-300 relative",
  isActive(item.href)
  ? "bg-black/10 dark:bg-white/10 text-[#D4AF37] dark:text-[#D4AF37] hover:bg-black/15 dark:hover:bg-white/15"
  : "text-slate-500 dark:text-muted-foreground hover:bg-slate-100 dark:hover:bg-white/5 hover:text-[#D4AF37] dark:hover:text-[#D4AF37]"
@@ -69,7 +72,12 @@ export default function ImporterSidebar({ basePath, children }: { basePath: stri
  >
  <Link href={item.href} className="flex items-center gap-3 w-full">
  <item.icon className="size-5 transition-colors" />
- <span className="font-semibold text-sm">{item.label}</span>
+ <span className="font-semibold text-sm flex-1">{item.label}</span>
+ {item.badgeCount && item.badgeCount > 0 ? (
+   <span className="bg-[#D4AF37] text-black text-[10px] font-black px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
+     {item.badgeCount > 9 ? "9+" : item.badgeCount}
+   </span>
+ ) : null}
  </Link>
  </SidebarMenuButton>
  </SidebarMenuItem>

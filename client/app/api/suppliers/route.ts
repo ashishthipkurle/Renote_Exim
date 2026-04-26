@@ -5,97 +5,120 @@ import { getApiAuthContext } from '@/lib/auth-server';
 import { z } from 'zod';
 
 const supplierSchema = z.object({
- name: z.string().min(1, 'Name is required'),
- contactPerson: z.string().optional().nullable(),
- email: z.string().email('Invalid email').optional().nullable().or(z.literal('')),
- phone: z.string().optional().nullable(),
- address: z.string().optional().nullable(),
- country: z.string().optional().nullable(),
- category: z.string().optional().nullable(),
- notes: z.string().optional().nullable(),
- importerId: z.string().optional().nullable(),
+  name: z.string().min(1, 'Name is required'),
+  contactPerson: z.string().optional().nullable(),
+  email: z.string().email('Invalid email').optional().nullable().or(z.literal('')),
+  phone: z.string().optional().nullable(),
+  address: z.string().optional().nullable(),
+  country: z.string().optional().nullable(),
+  category: z.string().optional().nullable(),
+  notes: z.string().optional().nullable(),
+  importerId: z.string().optional().nullable(),
 });
 
 // GET /api/suppliers - List all suppliers for the exporter
 export async function GET(request: NextRequest) {
- try {
- const { auth, error: authError } = await getApiAuthContext(request);
- if (authError || !auth) {
- return authError || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
- }
+  try {
+    const { auth, error: authError } = await getApiAuthContext(request);
+    if (authError || !auth) {
+      return authError || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
- const role = auth.role as any;
- const isExporter = role === 'EXPORTER' || role === 'ADMIN';
- const isSupplier = role === 'SUPPLIER';
+    const role = auth.role as any;
+    const isExporter = role === 'EXPORTER' || role === 'ADMIN';
+    const isSupplier = role === 'SUPPLIER';
 
- if (!isExporter && !isSupplier) {
- return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
- }
+    if (!isExporter && !isSupplier) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    }
 
- const suppliers = await prisma.supplier.findMany({
- where: isExporter 
- ? { exporterId: auth.userId }
- : isSupplier
- ? { sourceId: auth.userId }
- : { id: 'none' }, // Fallback
- orderBy: { createdAt: 'desc' },
- include: isSupplier ? {
- exporter: {
- select: {
- id: true,
- name: true,
- businessName: true,
- email: true,
- phone: true,
- }
- }
- } : undefined
- });
+    const suppliers = await prisma.supplier.findMany({
+      where: isExporter 
+        ? { exporterId: auth.userId }
+        : isSupplier
+        ? { importerId: auth.userId }
+        : { id: 'none' },
+      orderBy: { createdAt: 'desc' },
+      include: isSupplier ? {
+        exporter: {
+          select: {
+            id: true,
+            name: true,
+            businessName: true,
+            email: true,
+            phone: true,
+          }
+        }
+      } : undefined
+    });
 
- // If user is a supplier, we want to map the exporter details into the response
- const formattedSuppliers = isSupplier ? suppliers.map((s: any) => ({
- ...s,
- name: s.exporter?.businessName || s.exporter?.name || s.name,
- email: s.exporter?.email || s.email,
- phone: s.exporter?.phone || s.phone,
- })) : suppliers;
+    // Fetch unread counts for each partner user
+    const partnerIds = suppliers.map(s => s.importerId).filter(Boolean) as string[];
+    const unreadCounts = await prisma.message.groupBy({
+      by: ['senderId'],
+      where: {
+        receiverId: auth.userId,
+        isRead: false,
+        senderId: { in: partnerIds }
+      },
+      _count: true
+    });
+    const unreadMap = new Map(unreadCounts.map(c => [c.senderId, c._count]));
 
- return NextResponse.json({ suppliers: formattedSuppliers });
- } catch (error) {
- console.error('Get suppliers error:', error);
- return NextResponse.json({ error: 'Failed to fetch suppliers' }, { status: 500 });
- }
+    const formattedSuppliers = suppliers.map((s: any) => {
+      const partnerId = s.importerId;
+      const unreadCount = partnerId ? (unreadMap.get(partnerId) || 0) : 0;
+
+      if (isSupplier) {
+        return {
+          ...s,
+          name: s.exporter?.businessName || s.exporter?.name || s.name,
+          email: s.exporter?.email || s.email,
+          phone: s.exporter?.phone || s.phone,
+          unreadCount
+        };
+      }
+      return {
+        ...s,
+        unreadCount
+      };
+    });
+
+    return NextResponse.json({ suppliers: formattedSuppliers });
+  } catch (error) {
+    console.error('Get suppliers error:', error);
+    return NextResponse.json({ error: 'Failed to fetch suppliers' }, { status: 500 });
+  }
 }
 
 // POST /api/suppliers - Create a new supplier
 export async function POST(request: NextRequest) {
- try {
- const { auth, error: authError } = await getApiAuthContext(request);
- if (authError || !auth) {
- return authError || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
- }
- const role = auth.role as any;
- if (role !== 'EXPORTER' && role !== 'ADMIN') {
- return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
- }
+  try {
+    const { auth, error: authError } = await getApiAuthContext(request);
+    if (authError || !auth) {
+      return authError || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const role = auth.role as any;
+    if (role !== 'EXPORTER' && role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    }
 
- const body = await request.json();
- const validated = supplierSchema.parse(body);
+    const body = await request.json();
+    const validated = supplierSchema.parse(body);
 
- const supplier = await prisma.supplier.create({
- data: {
- ...validated,
- exporterId: auth.userId,
- },
- });
+    const supplier = await prisma.supplier.create({
+      data: {
+        ...validated,
+        exporterId: auth.userId,
+      },
+    });
 
- return NextResponse.json({ supplier }, { status: 201 });
- } catch (error) {
- console.error('Create supplier error:', error);
- if (error instanceof z.ZodError) {
- return NextResponse.json({ error: 'Validation failed', details: error.flatten() }, { status: 400 });
- }
- return NextResponse.json({ error: 'Failed to create supplier' }, { status: 500 });
- }
+    return NextResponse.json({ supplier }, { status: 201 });
+  } catch (error) {
+    console.error('Create supplier error:', error);
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: 'Validation failed', details: error.flatten() }, { status: 400 });
+    }
+    return NextResponse.json({ error: 'Failed to create supplier' }, { status: 500 });
+  }
 }
-

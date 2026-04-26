@@ -16,7 +16,7 @@ type Conversation = {
  role: string;
  };
  lastMessage: {
- content: string;
+ body: string;
  createdAt: string;
  senderId: string;
  } | null;
@@ -141,7 +141,7 @@ export default function ConversationList({ selectedUserId, onSelect }: Conversat
  {conv.otherUser.role}
  </p>
  <p className={`text-xs truncate ${conv.unreadCount > 0 ? "font-bold text-foreground" : "text-muted-foreground"}`}>
- {lastMsg ? lastMsg.content : "Start a conversation"}
+ {lastMsg ? lastMsg.body : "Start a conversation"}
  </p>
  </div>
  </button>

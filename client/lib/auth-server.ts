@@ -121,6 +121,15 @@ export async function getApiAuthContext(
     }
 
     if (!verifyRes.ok) {
+      // 2a. Handle rate limits gracefully to avoid refresh loops
+      if (verifyRes.status === 429) {
+        console.warn("[Auth Server] Rate limited by Nhost. Returning 503.");
+        return {
+          auth: null,
+          error: NextResponse.json({ error: "Authentication service rate limited", retryAfter: 30 }, { status: 503 }),
+        };
+      }
+
       console.warn("[Auth Server] Token invalid (Status:", verifyRes.status, "). Attempting refresh...");
       
       // 2b. If invalid/expired, try to refresh using the refresh token
@@ -134,6 +143,14 @@ export async function getApiAuthContext(
             body: JSON.stringify({ refreshToken }),
             cache: "no-store",
           }, 5000); // 5s timeout
+
+          if (refreshRes && refreshRes.status === 429) {
+            console.warn("[Auth Server] Refresh call also rate limited.");
+            return {
+              auth: null,
+              error: NextResponse.json({ error: "Authentication service rate limited", retryAfter: 60 }, { status: 503 })
+            };
+          }
         } catch (e: any) {
           console.error("[Auth Server] Refresh call timed out:", e.message);
           return { 
@@ -340,3 +357,5 @@ export function clearServerAuthCookie() {
     cookieStore.delete(REFRESH_COOKIE_NAME);
     cookieStore.delete('nhost-session'); // Clear old ones too
 }
+
+

@@ -156,7 +156,7 @@ export default function ChatWindow({ otherUserId, orderId, onBack }: ChatWindowP
  : "bg-card border border-border text-foreground rounded-lg rounded-tl-none"
  }`}
  >
- {msg.content}
+ {msg.body}
  </div>
  </div>
  );

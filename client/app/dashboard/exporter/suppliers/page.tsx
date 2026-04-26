@@ -6,7 +6,6 @@ import {
  Search,
  Handshake,
  Plus,
-
  ChevronLeft,
  Waves,
  Video,
@@ -30,22 +29,23 @@ import {
  Tag,
  FileText,
  MessageCircle,
- Globe
+ Globe,
+ Loader2
 } from "lucide-react";
 import GifLoader from "@/components/ui/GifLoader";
 
 import { authFetch, formatCurrency, getInitials } from "@/lib/api-utils";
-import { useRealtimeCall } from "@/hooks/useRealtimeCall";
+import { useCallController } from "@/components/session/GlobalCallProvider";
 import { useChat } from "@/hooks/useChat";
+import { useAuth } from "@/components/auth/AuthProvider";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 
-// Session components for call overlay
+// Session components
 import { VideoPlayer } from "@/components/session/VideoPlayer";
-import { SessionTimer } from "@/components/session/SessionTimer";
 import ScheduleCallModal from "@/components/calls/ScheduleCallModal";
 
 interface Supplier {
@@ -59,6 +59,7 @@ interface Supplier {
  category: string | null;
  notes: string | null;
  importerId?: string | null;
+ unreadCount: number;
  createdAt: string;
 }
 
@@ -81,7 +82,8 @@ interface TradeHistoryOrder {
 
 export default function ExporterSuppliersPage() {
  // 1. Data Hooks
- const callController = useRealtimeCall();
+ const callController = useCallController();
+ const { user: currentUser } = useAuth();
  
  // 2. Local State
  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
@@ -166,24 +168,30 @@ export default function ExporterSuppliersPage() {
 
  // Update selected user profile
  useEffect(() => {
- if (activePartner) {
- setSelectedUser({
- id: activePartner.importerId || selectedId,
- name: activePartner.name,
- avatar: null,
- role: "Verified Supplier",
- address: activePartner.address || activePartner.country
- });
- if (activePartner.importerId) {
- void fetchHistory(activePartner.importerId);
- } else {
- setTradeHistory([]);
- }
- } else {
- setSelectedUser(null);
- setTradeHistory([]);
- }
- }, [selectedId, activePartner]);
+  if (activePartner) {
+  setSelectedUser({
+  id: activePartner.importerId || selectedId,
+  name: activePartner.name,
+  avatar: null,
+  role: "Verified Supplier",
+  address: activePartner.address || activePartner.country
+  });
+
+  // Clear unread count locally when selected
+  if (activePartner.unreadCount > 0) {
+    setSuppliers(prev => prev.map(s => s.id === selectedId ? { ...s, unreadCount: 0 } : s));
+  }
+
+  if (activePartner.importerId) {
+  void fetchHistory(activePartner.importerId);
+  } else {
+  setTradeHistory([]);
+  }
+  } else {
+  setSelectedUser(null);
+  setTradeHistory([]);
+  }
+  }, [selectedId, activePartner?.id, activePartner?.unreadCount]);
 
  // Auto-scroll chat
  useEffect(() => {
@@ -291,9 +299,16 @@ export default function ExporterSuppliersPage() {
  className={`w-full group relative bg-card/40 border transition-all duration-500 rounded-lg overflow-hidden p-6 text-left ${isSelected ? "border-primary ring-1 ring-primary/20 shadow-2xl shadow-primary/10" : "border-border hover:border-primary/40 hover:bg-muted/30"}`}
  >
  <div className="flex items-center gap-5">
- <div className="size-16 rounded-lg bg-gradient-to-br from-primary to-blue-600/10 flex shrink-0 items-center justify-center text-white font-black text-2xl shadow-lg shadow-primary/10 group-hover:scale-105 transition-transform">
- {node.name.charAt(0).toUpperCase()}
- </div>
+<div className="relative">
+<div className="size-16 rounded-lg bg-gradient-to-br from-primary to-blue-600/10 flex shrink-0 items-center justify-center text-white font-black text-2xl shadow-lg shadow-primary/10 group-hover:scale-105 transition-transform">
+{node.name.charAt(0).toUpperCase()}
+</div>
+{node.unreadCount > 0 && (
+<span className="absolute -top-2 -right-2 size-6 rounded-full bg-primary text-white text-[10px] font-black flex items-center justify-center shadow-lg animate-bounce-subtle border-2 border-background">
+{node.unreadCount > 9 ? "9+" : node.unreadCount}
+</span>
+)}
+</div>
  <div className="flex-1 min-w-0">
  <div className="flex justify-between items-start mb-1">
  <h3 className="font-black text-sm uppercase tracking-tight truncate group-hover:text-primary transition-colors">{node.name}</h3>
@@ -393,7 +408,7 @@ export default function ExporterSuppliersPage() {
  </div>
  ) : (
  messages.map((msg) => {
- const isMe = msg.senderId !== selectedId;
+ const isMe = msg.senderId !== targetUserId;
  return (
  <div key={msg.id} className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}>
  <div className={`max-w-[85%] lg:max-w-[70%] px-8 py-6 rounded-lg shadow-2xl text-[13px] leading-relaxed transition-all duration-500 animate-in fade-in slide-in-from-bottom-2 ${isMe ? "bg-primary text-white rounded-tr-none shadow-primary/20" : "bg-card border border-border text-foreground rounded-tl-none shadow-black/5"}`}>
@@ -437,8 +452,7 @@ export default function ExporterSuppliersPage() {
  >
  <Send className="w-8 h-8 text-white rotate-12 group-hover:rotate-0 transition-transform" />
  </Button>
- </form>
- </footer>
+ </form> </footer>
  </div>
 
  {/* Right Panel: Intelligence Manifest (Trade History) */}
@@ -543,116 +557,14 @@ export default function ExporterSuppliersPage() {
  </div>
  )}
 
- {/* ACTIVE CALL OVERLAY */}
- {callController.phase !== "idle" && callController.phase !== "ended" && (
- <div className="absolute inset-0 z-[100] bg-black/95 backdrop-blur-3xl flex flex-col animate-in fade-in duration-500">
- {/* Call UI Header */}
- <header className="p-10 flex items-center justify-between">
- <div className="flex items-center gap-6">
- <div className="size-20 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center text-primary font-black text-3xl shadow-2xl shadow-primary/20">
- {(callController.activeCall?.peerName || callController.incomingCall?.fromName || "X").charAt(0)}
- </div>
- <div>
- <h2 className="text-3xl font-black text-white uppercase tracking-tighter">
- {callController.activeCall?.peerName || callController.incomingCall?.fromName || "Connecting..."}
- </h2>
- <div className="flex items-center gap-3 mt-2">
- <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30">
- <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
- <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">
- {callController.phase.replace("-", " ")}
- </span>
- </div>
- </div>
- </div>
- </div>
-
- {callController.phase === "in-call" && (
- <SessionTimer 
- endTime={null} 
- onTimeExpired={() => {}} 
- />
- )}
- </header>
-
- {/* Call Canvas */}
- <div className="flex-1 p-10 grid grid-cols-1 md:grid-cols-2 gap-12 items-center max-w-7xl mx-auto w-full">
- <VideoPlayer 
- stream={callController.remoteStream}
- name={callController.activeCall?.peerName || "Remote Partner"}
- image={null}
- isLocal={false}
- className="h-[500px] md:h-[600px] border border-white/10 rounded-lg shadow-2xl"
- />
-
- <VideoPlayer 
- stream={callController.localStream}
- name="You"
- image={null}
- isLocal={true}
- isMuted={callController.isMuted}
- isVideoOff={!callController.isCameraEnabled}
- className="h-[500px] md:h-[600px] border border-white/10 rounded-lg shadow-2xl"
- />
- </div>
-
- {/* Call Controls */}
- <footer className="p-16 flex justify-center">
- <div className="flex items-center gap-10 p-6 bg-white/[0.03] border border-white/10 rounded-lg backdrop-blur-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
- <Button 
- variant="ghost" 
- size="icon" 
- className={`size-20 rounded-full transition-all ${!callController.isMuted ? "bg-white/10 text-white hover:bg-white/20" : "bg-red-500 text-white shadow-xl shadow-red-500/20"}`}
- onClick={() => callController.toggleMute()}
- >
- {callController.isMuted ? <MicOff className="w-8 h-8" /> : <Mic className="w-8 h-8" />}
- </Button>
- 
- {callController.phase === "ringing" ? (
- <>
- <Button 
- className="size-24 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-2xl shadow-emerald-500/40 animate-bounce"
- onClick={() => void callController.acceptCall()}
- >
- <Phone className="w-10 h-10" />
- </Button>
- <Button 
- variant="destructive"
- className="size-20 rounded-full bg-red-600 hover:bg-red-500"
- onClick={() => void callController.declineCall()}
- >
- <PhoneOff className="w-8 h-8" />
- </Button>
- </>
- ) : (
- <Button 
- variant="destructive"
- className="size-24 rounded-full shadow-2xl shadow-red-500/40 bg-red-600 hover:bg-red-500 transition-all active:scale-90"
- onClick={() => void callController.endCall()}
- >
- <PhoneOff className="w-10 h-10" />
- </Button>
- )}
-
- <Button 
- variant="ghost" 
- size="icon" 
- className={`size-20 rounded-full transition-all ${callController.isCameraEnabled ? "bg-white/10 text-white hover:bg-white/20" : "bg-red-500 text-white shadow-xl shadow-red-500/20"}`}
- onClick={() => callController.toggleCamera()}
- >
- {!callController.isCameraEnabled ? <VideoOff className="w-8 h-8" /> : <Video className="w-8 h-8" />}
- </Button>
- </div>
- </footer>
- </div>
- )}
+ {/* Live Session Overlay is now rendered globally by DashboardCallWrapper */}
  </div>
 
  {/* MODALS */}
  <ScheduleCallModal
  open={isScheduleModalOpen}
  onOpenChange={setIsScheduleModalOpen}
- receiver={selectedUser ? { id: selectedId!, name: selectedUser.name } : null}
+ receiver={selectedUser ? { id: selectedUser.id, name: selectedUser.name } : null}
  onScheduled={() => toast.success("Negotiation session requested.")}
  />
 

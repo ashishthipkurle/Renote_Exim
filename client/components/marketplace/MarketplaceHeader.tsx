@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
- Bell,
  LayoutDashboard,
  ListOrdered,
  PackageSearch,
@@ -16,6 +15,7 @@ import {
 
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { useAuth } from "@/components/auth/AuthProvider";
+import NotificationBell from "@/components/notifications/NotificationBell";
 
 function NavLink({
  href,
@@ -95,14 +95,7 @@ export default function MarketplaceHeader() {
  <div className="flex items-center gap-3">
 
 
- <button
- type="button"
- className="relative h-10 w-10 inline-flex items-center justify-center rounded-xl border border-border bg-background/60 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
- aria-label="Notifications"
- >
- <Bell className="h-4 w-4" />
- <span className="absolute top-2 right-2 size-2 bg-primary rounded-full" />
- </button>
+ <NotificationBell />
  <Link
  href="/cart"
  className="h-10 w-10 inline-flex items-center justify-center rounded-xl border border-border bg-background/60 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"

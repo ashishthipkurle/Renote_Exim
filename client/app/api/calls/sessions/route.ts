@@ -17,9 +17,9 @@ const createSessionSchema = z.object({
 
 export async function GET(request: NextRequest) {
  try {
- const auth = await getApiAuthContext(request);
- if (!auth) {
- return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+ const { auth, error: authError } = await getApiAuthContext(request);
+ if (!auth || authError) {
+  return authError || NextResponse.json({ error: "Unauthorized" }, { status: 401 });
  }
 
  const { searchParams } = new URL(request.url);
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
  const status = searchParams.get("status")?.toUpperCase();
 
  const where: Record<string, unknown> = {
- OR: [{ callerId: auth.userId }, { calleeId: auth.userId }],
+  OR: [{ callerId: auth.userId }, { calleeId: auth.userId }],
  };
 
  if (status && (CALL_SESSION_STATUSES as readonly string[]).includes(status)) {
@@ -75,22 +75,22 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
  try {
- const auth = await getApiAuthContext(request);
- if (!auth) {
- return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+ const { auth, error: authError } = await getApiAuthContext(request);
+ if (!auth || authError) {
+  return authError || NextResponse.json({ error: "Unauthorized" }, { status: 401 });
  }
 
  const parsed = createSessionSchema.safeParse(await request.json());
  if (!parsed.success) {
- return NextResponse.json(
- { error: "Validation failed", details: parsed.error.flatten() },
- { status: 400 }
- );
+  return NextResponse.json(
+  { error: "Validation failed", details: parsed.error.flatten() },
+  { status: 400 }
+  );
  }
 
  const payload = parsed.data;
  if (payload.calleeId === auth.userId) {
- return NextResponse.json({ error: "You cannot call yourself" }, { status: 400 });
+  return NextResponse.json({ error: "You cannot call yourself" }, { status: 400 });
  }
 
  const callee = await prisma.user.findUnique({

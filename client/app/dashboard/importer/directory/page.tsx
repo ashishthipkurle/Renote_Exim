@@ -12,31 +12,32 @@ import {
  ShieldCheck,
  TrendingUp,
  ChevronLeft,
-  Send,
-  Waves,
-  History,
-  X,
-  Package,
-  ArrowRight,
-  Mic,
-  MicOff,
-  VideoOff,
-  PhoneOff
+ Send,
+ Waves,
+ History,
+ X,
+ Package,
+ ArrowRight,
+ Mic,
+ MicOff,
+ VideoOff,
+ PhoneOff,
+ Loader2
 } from "lucide-react";
 import GifLoader from "@/components/ui/GifLoader";
 
 import { authFetch, formatCurrency, getInitials } from "@/lib/api-utils";
-import { useRealtimeCall } from "@/hooks/useRealtimeCall";
+import { useCallController } from "@/components/session/GlobalCallProvider";
 import { useChat } from "@/hooks/useChat";
+import { useAuth } from "@/components/auth/AuthProvider";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 
-// Session components for call overlay
+// Session components
 import { VideoPlayer } from "@/components/session/VideoPlayer";
-import { SessionTimer } from "@/components/session/SessionTimer";
 import ScheduleCallModal from "@/components/calls/ScheduleCallModal";
 
 interface Exporter {
@@ -47,6 +48,7 @@ interface Exporter {
  country: string | null;
  orderCount: number;
  totalValue: number;
+ unreadCount: number;
 }
 
 interface TradeHistoryOrder {
@@ -69,7 +71,8 @@ interface TradeHistoryOrder {
 
 export default function ImporterDirectoryPage() {
  // 1. Data Hooks
- const callController = useRealtimeCall();
+ const callController = useCallController();
+ const { user: currentUser } = useAuth();
  
  // 2. Local State
  const [exporters, setExporters] = useState<Exporter[]>([]);
@@ -79,6 +82,14 @@ export default function ImporterDirectoryPage() {
  // Selection state (The target for Chat and Call)
  const [selectedId, setSelectedId] = useState<string | null>(null);
  const [selectedUser, setSelectedUser] = useState<any>(null);
+
+ useEffect(() => {
+   if (typeof window !== "undefined") {
+     const params = new URLSearchParams(window.location.search);
+     const partnerId = params.get("partnerId");
+     if (partnerId) setSelectedId(partnerId);
+   }
+ }, []);
 
  // History state
  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
@@ -137,20 +148,38 @@ export default function ImporterDirectoryPage() {
  return exporters.find(e => e.id === selectedId);
  }, [selectedId, exporters]);
 
+ // 4. Update selected user info and clear unread counts locally
  useEffect(() => {
- if (activeExporter) {
- setSelectedUser({
- id: selectedId,
- name: activeExporter.businessName || activeExporter.name,
- avatar: activeExporter.avatar,
- role: "Verified Exporter",
- });
- void fetchHistory(activeExporter.id);
- } else {
- setSelectedUser(null);
- setTradeHistory([]);
- }
+  if (!selectedId) {
+  setSelectedUser(null);
+  return;
+  }
+
+  if (activeExporter) {
+  setSelectedUser({
+  id: selectedId,
+  name: activeExporter.businessName || activeExporter.name,
+  avatar: activeExporter.avatar,
+  role: "Verified Exporter",
+  });
+
+  // CRITICAL: Only clear unread count if it's actually > 0.
+  // This prevents an infinite loop where setExporters updates the exporters list,
+  // which recomputes activeExporter (new reference), which re-triggers this effect.
+  if (activeExporter.unreadCount > 0) {
+  setExporters(prev => prev.map(e => e.id === selectedId ? { ...e, unreadCount: 0 } : e));
+  }
+  }
  }, [selectedId, activeExporter]);
+
+ // 5. Fetch history when selectedId changes (independent of exporter list updates)
+ useEffect(() => {
+  if (selectedId) {
+  void fetchHistory(selectedId);
+  } else {
+  setTradeHistory([]);
+  }
+ }, [selectedId]);
 
  // Auto-scroll chat
  useEffect(() => {
@@ -231,11 +260,18 @@ export default function ImporterDirectoryPage() {
  className={`w-full group relative bg-card/30 border transition-all duration-500 rounded-lg p-6 text-left ${isSelected ? "border-primary ring-1 ring-primary/20 shadow-2xl shadow-primary/10" : "border-border hover:border-primary/40 hover:bg-muted/30"}`}
  >
  <div className="flex items-center gap-5">
+ <div className="relative">
  <div className="size-16 rounded-lg bg-gradient-to-br from-primary to-blue-600/10 flex shrink-0 items-center justify-center text-white font-black text-2xl shadow-lg shadow-primary/10 group-hover:scale-105 transition-transform overflow-hidden">
  {exporter.avatar ? (
  <img src={exporter.avatar} alt={exporter.name} className="w-full h-full object-cover" />
  ) : (
  getInitials(exporter.businessName || exporter.name)
+ )}
+ </div>
+ {exporter.unreadCount > 0 && (
+ <span className="absolute -top-2 -right-2 size-6 rounded-full bg-primary text-white text-[10px] font-black flex items-center justify-center shadow-lg animate-bounce-subtle border-2 border-background">
+ {exporter.unreadCount > 9 ? "9+" : exporter.unreadCount}
+ </span>
  )}
  </div>
  <div className="flex-1 min-w-0">
@@ -503,58 +539,7 @@ export default function ImporterDirectoryPage() {
  </div>
  )}
 
- {/* Call Overlay */}
- {callController.phase !== "idle" && callController.phase !== "ended" && (
- <div className="absolute inset-0 z-[100] bg-black/95 backdrop-blur-3xl flex flex-col animate-in fade-in duration-500">
- <header className="p-10 flex items-center justify-between">
- <div className="flex items-center gap-6">
- <div className="size-20 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center text-primary font-black text-3xl">
- {(callController.activeCall?.peerName || callController.incomingCall?.fromName || "X").charAt(0)}
- </div>
- <div>
- <h2 className="text-3xl font-black text-white uppercase tracking-tighter">
- {callController.activeCall?.peerName || callController.incomingCall?.fromName || "Connecting..."}
- </h2>
- <div className="flex items-center gap-2 mt-2">
- <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
- <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">{callController.phase.replace("-", " ")}</span>
- </div>
- </div>
- </div>
- {callController.phase === "in-call" && <SessionTimer endTime={null} onTimeExpired={() => {}} />}
- </header>
-
- <div className="flex-1 p-10 grid grid-cols-1 md:grid-cols-2 gap-12 items-center max-w-7xl mx-auto w-full">
- <VideoPlayer stream={callController.remoteStream} name={callController.activeCall?.peerName || "Remote Partner"} image={null} isLocal={false} className="h-[500px] md:h-[600px] border border-white/10 rounded-lg shadow-2xl" />
- <VideoPlayer stream={callController.localStream} name="You" image={null} isLocal={true} isMuted={callController.isMuted} isVideoOff={!callController.isCameraEnabled} className="h-[500px] md:h-[600px] border border-white/10 rounded-lg shadow-2xl" />
- </div>
-
- <footer className="p-16 flex justify-center">
- <div className="flex items-center gap-10 p-6 bg-white/[0.03] border border-white/10 rounded-lg backdrop-blur-3xl">
- <Button variant="ghost" size="icon" className={`size-20 rounded-full ${!callController.isMuted ? "bg-white/10" : "bg-red-500"}`} onClick={() => callController.toggleMute()}>
- {callController.isMuted ? <MicOff className="w-8 h-8 text-white" /> : <Mic className="w-8 h-8 text-white" />}
- </Button>
- {callController.phase === "ringing" ? (
- <>
- <Button className="size-24 rounded-full bg-emerald-500" onClick={() => void callController.acceptCall()}>
- <Phone className="w-10 h-10 text-white" />
- </Button>
- <Button variant="destructive" className="size-20 rounded-full" onClick={() => void callController.declineCall()}>
- <PhoneOff className="w-8 h-8 text-white" />
- </Button>
- </>
- ) : (
- <Button variant="destructive" className="size-24 rounded-full" onClick={() => void callController.endCall()}>
- <PhoneOff className="w-10 h-10 text-white" />
- </Button>
- )}
- <Button variant="ghost" size="icon" className={`size-20 rounded-full ${callController.isCameraEnabled ? "bg-white/10" : "bg-red-500"}`} onClick={() => callController.toggleCamera()}>
- {!callController.isCameraEnabled ? <VideoOff className="w-8 h-8 text-white" /> : <Video className="w-8 h-8 text-white" />}
- </Button>
- </div>
- </footer>
- </div>
- )}
+  {/* Live Session Overlay is now rendered globally by DashboardCallWrapper */}
  </div>
 
  {/* MODALS */}

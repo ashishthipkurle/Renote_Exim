@@ -30,18 +30,21 @@ import {
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useTranslation } from "@/lib/i18n/client";
+import { useUnreadCategories } from "@/hooks/useUnreadCategories";
 
 interface NavItem {
  href: string;
  labelKey: string;
  defaultLabel: string;
  icon: ComponentType<{ className?: string }>;
+ badgeCount?: number;
 }
 
 export default function ExporterSidebar({ basePath }: { basePath: string }) {
  const { t } = useTranslation();
  const pathname = usePathname();
  const { user } = useAuth();
+ const { counts } = useUnreadCategories();
  const isMaster = user?.email === "exporter@gmail.com";
 
  const nav: NavItem[] = [
@@ -49,9 +52,9 @@ export default function ExporterSidebar({ basePath }: { basePath: string }) {
  { href: `${basePath}/inventory`, labelKey: "sidebar.inventory", defaultLabel: "Inventory", icon: Boxes },
  { href: `${basePath}/orders`, labelKey: "sidebar.orders", defaultLabel: "Orders", icon: FolderTree },
  { href: `${basePath}/feedback`, labelKey: "sidebar.feedback", defaultLabel: "Reviews", icon: MessageSquare },
- { href: `${basePath}/directory`, labelKey: "sidebar.buyers", defaultLabel: "Buyers", icon: Users },
+ { href: `${basePath}/directory`, labelKey: "sidebar.buyers", defaultLabel: "Buyers", icon: Users, badgeCount: counts.buyers },
  ...(isMaster ? [{ href: `${basePath}/users`, labelKey: "sidebar.registry", defaultLabel: "Registry", icon: ShieldCheck }] : []),
- { href: `${basePath}/suppliers`, labelKey: "sidebar.dealers", defaultLabel: "Dealers", icon: Handshake },
+ { href: `${basePath}/suppliers`, labelKey: "sidebar.dealers", defaultLabel: "Dealers", icon: Handshake, badgeCount: counts.dealers },
  { href: `${basePath}/analytics`, labelKey: "sidebar.analytics", defaultLabel: "Analytics", icon: LineChart },
  { href: `${basePath}/finance`, labelKey: "sidebar.finance", defaultLabel: "Finance", icon: CreditCard },
  ];
@@ -70,7 +73,7 @@ export default function ExporterSidebar({ basePath }: { basePath: string }) {
  isActive={isActive(item.href)}
  tooltip={t(item.labelKey, item.defaultLabel)}
  className={cn(
- "rounded-xl transition-all duration-300",
+ "rounded-xl transition-all duration-300 relative",
  isActive(item.href)
  ? "bg-black/10 dark:bg-white/10 text-[#D4AF37] dark:text-[#D4AF37] hover:bg-black/15 dark:hover:bg-white/15"
  : "text-slate-500 dark:text-muted-foreground hover:bg-slate-100 dark:hover:bg-white/5 hover:text-[#D4AF37] dark:hover:text-[#D4AF37]"
@@ -78,7 +81,12 @@ export default function ExporterSidebar({ basePath }: { basePath: string }) {
  >
  <Link href={item.href} className="flex items-center gap-3 w-full">
  <item.icon className="size-5 transition-colors" />
- <span className="font-semibold text-sm">{t(item.labelKey, item.defaultLabel)}</span>
+ <span className="font-semibold text-sm flex-1">{t(item.labelKey, item.defaultLabel)}</span>
+ {item.badgeCount && item.badgeCount > 0 ? (
+   <span className="bg-[#D4AF37] text-black text-[10px] font-black px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
+     {item.badgeCount > 9 ? "9+" : item.badgeCount}
+   </span>
+ ) : null}
  </Link>
  </SidebarMenuButton>
  </SidebarMenuItem>

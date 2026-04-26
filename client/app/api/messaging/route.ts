@@ -45,9 +45,9 @@ export async function GET(req: NextRequest) {
  // Otherwise, fetch inbox list with a single aggregate query.
  const rows = await prisma.$queryRaw<
  Array<{
- otherUserId: string;
- messageId: string;
- content: string;
+  otherUserId: string;
+  messageId: string;
+  body: string;
  createdAt: Date;
  senderId: string;
  unreadCount: bigint | number;
@@ -176,22 +176,27 @@ export async function POST(req: NextRequest) {
 
  const notificationLink =
  receiverUser?.role === "IMPORTER"
- ? "/dashboard/importer/messages"
+ ? `/dashboard/importer/directory?partnerId=${auth.userId}`
  : receiverUser?.role === "ADMIN"
  ? "/dashboard/admin/notifications"
- : "/dashboard/exporter/messages";
+ : `/dashboard/exporter/directory?partnerId=${auth.userId}`;
 
- await prisma.notification.create({
- data: {
- userId: receiverId,
- type: "MESSAGE_RECEIVED",
- title: "New message",
- message: "You have received a new trade message.",
- link: notificationLink,
- },
- }).catch(() => {
- // Notification should not block message delivery.
- });
+  const senderUser = await prisma.user.findUnique({
+    where: { id: auth.userId },
+    select: { name: true },
+  });
+
+  await prisma.notification.create({
+    data: {
+      userId: receiverId,
+      type: "MESSAGE_RECEIVED",
+      title: `New message from ${senderUser?.name || "Partner"}`,
+      message: messageText.substring(0, 60) + (messageText.length > 60 ? "..." : ""),
+      link: notificationLink,
+    },
+  }).catch(() => {
+    // Notification should not block message delivery.
+  });
 
  return NextResponse.json(newMessage);
 
@@ -200,4 +205,3 @@ export async function POST(req: NextRequest) {
  return NextResponse.json({ error: error.message }, { status: 500 });
  }
 }
-

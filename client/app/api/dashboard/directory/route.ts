@@ -28,7 +28,8 @@ export async function GET(request: NextRequest) {
  u."verificationStatus",
  u.avatar,
  COUNT(DISTINCT o.id) as "orderCount",
- COALESCE(SUM(o."totalPrice"), 0) as "totalValue"
+ COALESCE(SUM(o."totalPrice"), 0) as "totalValue",
+ (SELECT COUNT(*)::int FROM messages m WHERE m."senderId" = u.id AND m."receiverId" = ${auth.userId} AND m."isRead" = false) as "unreadCount"
  FROM users u
  LEFT JOIN orders o ON o."buyerId" = u.id AND o."sellerId" = ${auth.userId}
  WHERE u.role = 'IMPORTER'
@@ -50,6 +51,7 @@ export async function GET(request: NextRequest) {
  avatar: string | null;
  orderCount: bigint;
  totalValue: number;
+ unreadCount: number;
  }>;
 
  const totalResult = await prisma.$queryRaw`
@@ -74,6 +76,7 @@ export async function GET(request: NextRequest) {
  avatar: p.avatar,
  orderCount: Number(p.orderCount),
  totalValue: Number(p.totalValue),
+ unreadCount: p.unreadCount,
  })),
  pagination: {
  page,
@@ -94,7 +97,8 @@ export async function GET(request: NextRequest) {
  u."verificationStatus",
  u.avatar,
  COUNT(DISTINCT o.id) as "orderCount",
- COALESCE(SUM(o."totalPrice"), 0) as "totalValue"
+ COALESCE(SUM(o."totalPrice"), 0) as "totalValue",
+ (SELECT COUNT(*)::int FROM messages m WHERE m."senderId" = u.id AND m."receiverId" = ${auth.userId} AND m."isRead" = false) as "unreadCount"
  FROM users u
  LEFT JOIN orders o ON o."sellerId" = u.id AND o."buyerId" = ${auth.userId}
  WHERE u.role = 'EXPORTER'
@@ -116,6 +120,7 @@ export async function GET(request: NextRequest) {
  avatar: string | null;
  orderCount: bigint;
  totalValue: number;
+ unreadCount: number;
  }>;
 
  const totalResult = await prisma.$queryRaw`
@@ -140,6 +145,7 @@ export async function GET(request: NextRequest) {
  avatar: p.avatar,
  orderCount: Number(p.orderCount),
  totalValue: Number(p.totalValue),
+ unreadCount: p.unreadCount,
  })),
  pagination: {
  page,
@@ -160,7 +166,8 @@ export async function GET(request: NextRequest) {
  u."verificationStatus",
  u.avatar,
  0 as "orderCount",
- 0 as "totalValue"
+ 0 as "totalValue",
+ (SELECT COUNT(*)::int FROM messages m WHERE m."senderId" = u.id AND m."receiverId" = ${auth.userId} AND m."isRead" = false) as "unreadCount"
  FROM users u
  WHERE u.role = 'EXPORTER'
  AND (
@@ -180,6 +187,7 @@ export async function GET(request: NextRequest) {
  avatar: string | null;
  orderCount: number;
  totalValue: number;
+ unreadCount: number;
  }>;
 
  const totalResult = await prisma.$queryRaw`
@@ -198,6 +206,7 @@ export async function GET(request: NextRequest) {
  avatar: p.avatar,
  orderCount: Number(p.orderCount),
  totalValue: Number(p.totalValue),
+ unreadCount: p.unreadCount,
  })),
  pagination: {
  page,

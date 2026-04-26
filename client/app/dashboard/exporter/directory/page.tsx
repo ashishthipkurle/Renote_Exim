@@ -26,15 +26,15 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { useRealtimeCall } from "@/hooks/useRealtimeCall";
+import { useCallController } from "@/components/session/GlobalCallProvider";
 import { useChat } from "@/hooks/useChat";
+import { useAuth } from "@/components/auth/AuthProvider";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 
-// Session components for call overlay
+// Session components
 import { VideoPlayer } from "@/components/session/VideoPlayer";
-import { SessionTimer } from "@/components/session/SessionTimer";
 import ScheduleCallModal from "@/components/calls/ScheduleCallModal";
 
 interface Partner {
@@ -45,6 +45,7 @@ interface Partner {
  orderCount: number;
  totalValue: number;
  avatar?: string | null;
+ unreadCount: number;
 }
 
 interface DirectoryResponse {
@@ -72,7 +73,8 @@ interface TradeHistoryOrder {
 
 export default function ExporterBuyersPage() {
  // 1. Data Hooks
- const callController = useRealtimeCall();
+ const callController = useCallController();
+ const { user: currentUser } = useAuth();
  
  // 2. Local State
  const [data, setData] = useState<DirectoryResponse | null>(null);
@@ -83,6 +85,14 @@ export default function ExporterBuyersPage() {
  // Selection state
  const [selectedId, setSelectedId] = useState<string | null>(null);
  const [selectedUser, setSelectedUser] = useState<any>(null);
+
+ useEffect(() => {
+   if (typeof window !== "undefined") {
+     const params = new URLSearchParams(window.location.search);
+     const partnerId = params.get("partnerId");
+     if (partnerId) setSelectedId(partnerId);
+   }
+ }, []);
  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
  const [historyLoading, setHistoryLoading] = useState(false);
  const [tradeHistory, setTradeHistory] = useState<TradeHistoryOrder[]>([]);
@@ -124,24 +134,44 @@ export default function ExporterBuyersPage() {
  }
  };
 
+ // 4. Selection Management
  useEffect(() => {
- if (selectedId) {
- const partner = data?.partners.find(p => p.id === selectedId);
- if (partner) {
- setSelectedUser({
- id: partner.id,
- name: partner.name,
- avatar: partner.avatar,
- role: "Verified Importer",
- address: partner.country || "Global"
- });
- void fetchHistory(partner.id);
- }
- } else {
- setSelectedUser(null);
- setTradeHistory([]);
- }
+  if (!selectedId) {
+  setSelectedUser(null);
+  return;
+  }
+
+  const partner = data?.partners.find(p => p.id === selectedId);
+  if (partner) {
+  setSelectedUser({
+  id: partner.id,
+  name: partner.name,
+  avatar: partner.avatar,
+  role: "Verified Importer",
+  address: partner.country || "Global"
+  });
+  
+  // CRITICAL: Only clear unread count if it's > 0 to avoid infinite loops
+  if (partner.unreadCount > 0) {
+  setData(prev => {
+    if (!prev) return null;
+    return {
+      ...prev,
+      partners: prev.partners.map(p => p.id === selectedId ? { ...p, unreadCount: 0 } : p)
+    };
+  });
+  }
+  }
  }, [selectedId, data?.partners]);
+
+ // 5. History Fetching (Separate effect to break loop)
+ useEffect(() => {
+  if (selectedId) {
+  void fetchHistory(selectedId);
+  } else {
+  setTradeHistory([]);
+  }
+ }, [selectedId]);
 
  // Auto-scroll chat
  useEffect(() => {
@@ -223,8 +253,15 @@ export default function ExporterBuyersPage() {
  className={`w-full group relative bg-card/30 border transition-all duration-500 rounded-lg p-6 text-left ${isSelected ? "border-primary ring-1 ring-primary/20 shadow-2xl shadow-primary/10" : "border-border hover:border-primary/40 hover:bg-muted/30"}`}
  >
  <div className="flex items-center gap-5">
+ <div className="relative">
  <div className="size-16 rounded-lg bg-gradient-to-br from-primary to-blue-600/10 flex shrink-0 items-center justify-center text-white font-black text-2xl shadow-lg shadow-primary/10 group-hover:scale-105 transition-transform">
  {getInitials(p.name)}
+ </div>
+ {p.unreadCount > 0 && (
+ <span className="absolute -top-2 -right-2 size-6 rounded-full bg-primary text-white text-[10px] font-black flex items-center justify-center shadow-lg animate-bounce-subtle border-2 border-background">
+ {p.unreadCount > 9 ? "9+" : p.unreadCount}
+ </span>
+ )}
  </div>
  <div className="flex-1 min-w-0">
  <div className="flex justify-between items-start mb-1">
@@ -325,7 +362,7 @@ export default function ExporterBuyersPage() {
  <Loader2 className="w-8 h-8 animate-spin" />
  </div>
  ) : messages.length === 0 ? (
- <div className="flex-1 flex flex-col items-center justify-center text-center max-w-sm mx-auto opacity-30 space-y-8">
+ <div className="flex-1 flex flex-col items-center justify-center text-center max-sm mx-auto opacity-30 space-y-8">
  <div className="p-8 rounded-lg bg-primary/10 border border-primary/10 rotate-6">
  <MessageCircle className="w-16 h-16 text-primary" />
  </div>
@@ -485,58 +522,7 @@ export default function ExporterBuyersPage() {
  </div>
  )}
 
- {/* Call Overlay */}
- {callController.phase !== "idle" && callController.phase !== "ended" && (
- <div className="absolute inset-0 z-[100] bg-black/95 backdrop-blur-3xl flex flex-col animate-in fade-in duration-500">
- <header className="p-10 flex items-center justify-between">
- <div className="flex items-center gap-6">
- <div className="size-20 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center text-primary font-black text-3xl">
- {(callController.activeCall?.peerName || callController.incomingCall?.fromName || "X").charAt(0)}
- </div>
- <div>
- <h2 className="text-3xl font-black text-white uppercase tracking-tighter">
- {callController.activeCall?.peerName || callController.incomingCall?.fromName || "Connecting..."}
- </h2>
- <div className="flex items-center gap-2 mt-2">
- <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
- <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">{callController.phase.replace("-", " ")}</span>
- </div>
- </div>
- </div>
- {callController.phase === "in-call" && <SessionTimer endTime={null} onTimeExpired={() => {}} />}
- </header>
-
- <div className="flex-1 p-10 grid grid-cols-1 md:grid-cols-2 gap-12 items-center max-w-7xl mx-auto w-full">
- <VideoPlayer stream={callController.remoteStream} name={callController.activeCall?.peerName || "Remote Partner"} image={null} isLocal={false} className="h-[500px] md:h-[600px] border border-white/10 rounded-lg shadow-2xl" />
- <VideoPlayer stream={callController.localStream} name="You" image={null} isLocal={true} isMuted={callController.isMuted} isVideoOff={!callController.isCameraEnabled} className="h-[500px] md:h-[600px] border border-white/10 rounded-lg shadow-2xl" />
- </div>
-
- <footer className="p-16 flex justify-center">
- <div className="flex items-center gap-10 p-6 bg-white/[0.03] border border-white/10 rounded-lg backdrop-blur-3xl">
- <Button variant="ghost" size="icon" className={`size-20 rounded-full ${!callController.isMuted ? "bg-white/10" : "bg-red-500"}`} onClick={() => callController.toggleMute()}>
- {callController.isMuted ? <MicOff className="w-8 h-8 text-white" /> : <Mic className="w-8 h-8 text-white" />}
- </Button>
- {callController.phase === "ringing" ? (
- <>
- <Button className="size-24 rounded-full bg-emerald-500" onClick={() => void callController.acceptCall()}>
- <Phone className="w-10 h-10 text-white" />
- </Button>
- <Button variant="destructive" className="size-20 rounded-full" onClick={() => void callController.declineCall()}>
- <PhoneOff className="w-8 h-8 text-white" />
- </Button>
- </>
- ) : (
- <Button variant="destructive" className="size-24 rounded-full" onClick={() => void callController.endCall()}>
- <PhoneOff className="w-10 h-10 text-white" />
- </Button>
- )}
- <Button variant="ghost" size="icon" className={`size-20 rounded-full ${callController.isCameraEnabled ? "bg-white/10" : "bg-red-500"}`} onClick={() => callController.toggleCamera()}>
- {!callController.isCameraEnabled ? <VideoOff className="w-8 h-8 text-white" /> : <Video className="w-8 h-8 text-white" />}
- </Button>
- </div>
- </footer>
- </div>
- )}
+ {/* Live Session Overlay is now rendered globally by DashboardCallWrapper */}
  </div>
 
  {/* MODALS */}
@@ -549,5 +535,3 @@ export default function ExporterBuyersPage() {
  </div>
  );
 }
-
-
