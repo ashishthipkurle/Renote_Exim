@@ -364,6 +364,21 @@ enum ProductCategory {
   Agri
   RawMaterials
   ConsumerGoods
+  Handicrafts
+  Food
+  Automotive
+  Construction
+  Cosmetics
+  Plastics
+  Energy
+  Logistics
+  Packaging
+  Metals
+  Leather
+  Furniture
+  Toys
+  Sports
+  Other
 }
 
 enum OrderType {

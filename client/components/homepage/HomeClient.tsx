@@ -73,10 +73,10 @@ export default function HomeClient() {
   return (
     <div className="bg-background text-foreground font-display selection:bg-primary selection:text-white w-full">
       <ScrollVideoSection />
-      
+
       {/* ─── Marketplace Content Reveal Wrapper ─── */}
-      <div 
-        id="home-content-reveal" 
+      <div
+        id="home-content-reveal"
         className="relative z-10 bg-background shadow-[0_-20px_50px_rgba(0,0,0,0.3)]"
       >
         <HomeNavbar />
@@ -87,7 +87,7 @@ export default function HomeClient() {
         {/* ─── Scroll-Linked Video Scene Boundary ─── */}
         <div className="relative w-full z-10">
           <FeaturesSection />
-          
+
           <InlineScrollVideo
             videoSrc="/videos/new_ui_video.mp4"
             previousSectionId="features-section"
@@ -95,7 +95,7 @@ export default function HomeClient() {
             scrollDistance={2500}
           />
         </div>
-        
+
         <div id="post-video-content" style={{ display: 'block' }}>
           <GlobalHubsSection />
           <ReverseMarquee />

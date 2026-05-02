@@ -3,31 +3,30 @@ import Link from "next/link";
 import CategoryDirectory from "../CategoryDirectory";
 
 export default function AddProductPage() {
- return (
- <div className="h-full flex flex-col bg-background transition-colors duration-300">
- <header className="flex-shrink-0 p-6 lg:p-8 border-b border-border bg-header backdrop-blur-sm z-10">
- <div className="flex items-center gap-6">
- <Link
- href="/dashboard/exporter/inventory"
- className="p-3 bg-card border border-border rounded-lg hover:bg-accent transition-all text-muted-foreground hover:text-foreground group"
- >
- <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
- </Link>
- <div>
- <h1 className="text-3xl font-black tracking-tight text-foreground uppercase">Add Products</h1>
- <p className="text-muted-foreground mt-1 font-medium">
- Deploy your products to the global market
- </p>
- </div>
- </div>
- </header>
+  return (
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+      <header className="flex-shrink-0 p-8 lg:px-12 border-b border-slate-200 dark:border-white/5 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">
+        <div className="flex items-center gap-6 max-w-7xl mx-auto w-full">
+          <Link
+            href="/dashboard/exporter/inventory"
+            className="p-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl hover:bg-slate-50 dark:hover:bg-white/10 transition-all text-slate-500 hover:text-primary group shadow-sm"
+          >
+            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+          </Link>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Publish New Product</h1>
+            <p className="text-slate-500 text-sm mt-0.5">
+              Follow the steps to list your asset on the global marketplace
+            </p>
+          </div>
+        </div>
+      </header>
 
- <div className="flex-1 overflow-y-auto p-6 lg:p-8 custom-scrollbar">
- <div className="max-w-[1600px] mx-auto">
- <CategoryDirectory />
- </div>
- </div>
- </div>
- );
+      <div className="flex-1 overflow-y-auto p-8 lg:p-12">
+        <div className="max-w-7xl mx-auto">
+          <CategoryDirectory />
+        </div>
+      </div>
+    </div>
+  );
 }
-

@@ -1,248 +1,244 @@
+export const dynamic = 'force-dynamic';
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Plus, Package, TrendingUp, BarChart2, Globe, ArrowRight, ArrowLeft, Layers, ShieldCheck, ShoppingCart } from "lucide-react";
-
 import { prisma } from "@/lib/prisma";
 import { getServerAuthContext } from "@/lib/auth-server";
 import { Prisma } from "@prisma/client";
 import InventoryTable from "./InventoryTable";
 
+const CATEGORY_MAP: Record<string, string> = {
+  'CHEMICALS': 'Chemicals',
+  'MACHINES': 'Machines',
+  'TEXTILES': 'Textiles',
+  'MEDICAL': 'Medical',
+  'ELECTRONICS': 'Electronics',
+  'AGRICULTURE': 'Agri',
+  'CONSTRUCTION': 'Construction',
+  'HANDICRAFTS': 'Handicrafts',
+  'FOOD': 'Food',
+  'AUTOMOTIVE': 'Automotive',
+  'COSMETICS': 'Cosmetics',
+  'PLASTICS': 'Plastics',
+  'ENERGY': 'Energy',
+  'LOGISTICS': 'Logistics',
+  'PACKAGING': 'Packaging',
+  'METALS': 'Metals',
+  'LEATHER': 'Leather',
+  'FURNITURE': 'Furniture',
+  'TOYS': 'Toys',
+  'SPORTS': 'Sports',
+  'OTHER': 'Other',
+};
+
 function formatNumber(n: number) {
- if (n >= 1000000) return (n / 1000000).toFixed(1) + "M";
- if (n >= 1000) return (n / 1000).toFixed(1) + "K";
- return n.toString();
+  if (n >= 1000000) return (n / 1000000).toFixed(1) + "M";
+  if (n >= 1000) return (n / 1000).toFixed(1) + "K";
+  return n.toString();
 }
 
 function formatMoney(n: number) {
- return new Intl.NumberFormat("en-US", {
- style: "currency",
- currency: "USD",
- maximumFractionDigits: 0
- }).format(n);
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0
+  }).format(n);
 }
 
-const CATEGORY_COLORS: Record<string, string> = {
- CHEMICALS: "bg-primary text-primary-foreground",
- MACHINES: "bg-black/10 dark:bg-white/15 border-border dark:border-white/20 text-foreground dark:text-white",
- TEXTILES: "bg-black/5 dark:bg-white/10 border-border dark:border-white/10 text-muted-foreground",
- MEDICAL: "bg-black/5 dark:bg-white/10 border-border dark:border-white/10 text-muted-foreground/60",
- HANDICRAFTS: "bg-black/5 dark:bg-white/10 border-border dark:border-white/10 text-muted-foreground/40",
- FOOD: "bg-black/5 dark:bg-white/10 border-border dark:border-white/10 text-muted-foreground/30",
- ELECTRONICS: "bg-primary text-primary-foreground dark:shadow-md shadow-none",
- AUTOMOTIVE: "bg-black/10 dark:bg-white/15 border-border dark:border-white/20 text-foreground dark:text-white",
- CONSTRUCTION: "bg-black/5 dark:bg-white/10 border-border dark:border-white/10 text-muted-foreground",
- AGRICULTURE: "bg-black/5 dark:bg-white/10 border-border dark:border-white/10 text-muted-foreground/60",
- OTHER: "bg-black/5 dark:bg-white/10 border-border dark:border-white/10 text-muted-foreground/40",
-};
-
 export default async function ExporterInventoryPage({
- searchParams,
+  searchParams,
 }: {
- searchParams: { search?: string; category?: string; status?: string; page?: string };
+  searchParams: { search?: string; category?: string; status?: string; page?: string };
 }) {
- const auth = await getServerAuthContext();
- if (!auth) redirect("/login");
- if (auth.role !== "EXPORTER" && auth.role !== "ADMIN") {
- redirect(`/dashboard/${auth.role.toLowerCase()}`);
- }
+  const auth = await getServerAuthContext();
+  if (!auth) redirect("/login");
+  if (auth.role !== "EXPORTER" && auth.role !== "ADMIN") {
+    redirect(`/dashboard/${auth.role.toLowerCase()}`);
+  }
 
- const page = parseInt(searchParams.page || "1");
- const limit = 10;
- const skip = (page - 1) * limit;
+  const page = parseInt(searchParams.page || "1");
+  const limit = 10;
+  const skip = (page - 1) * limit;
 
- // Build where clause based on searchParams
- const where: Prisma.ProductWhereInput = { exporterId: auth.userId };
+  // Build where clause based on searchParams
+  const where: Prisma.ProductWhereInput = { exporterId: auth.userId };
 
- if (searchParams.search) {
- where.OR = [
- { name: { contains: searchParams.search, mode: "insensitive" } },
- { description: { contains: searchParams.search, mode: "insensitive" } },
- ];
- }
+  if (searchParams.search) {
+    where.OR = [
+      { name: { contains: searchParams.search, mode: "insensitive" } },
+      { description: { contains: searchParams.search, mode: "insensitive" } },
+    ];
+  }
 
- if (searchParams.category) {
- where.category = searchParams.category as any;
- }
+  if (searchParams.category) {
+    const prismaCat = CATEGORY_MAP[searchParams.category] || searchParams.category;
+    where.category = prismaCat as any;
+  }
 
- if (searchParams.status === "ACTIVE") {
- where.available = true;
- } else if (searchParams.status === "INACTIVE") {
- where.available = false;
- }
+  if (searchParams.status === "ACTIVE") {
+    where.available = true;
+  } else if (searchParams.status === "INACTIVE") {
+    where.available = false;
+  }
 
- let products: any[] = [];
- let total = 0;
- let categoriesData: Array<{ name: string; productCount: number; revenue: number }> = [];
+  let products: any[] = [];
+  let total = 0;
+  let categoriesData: Array<{ name: string; productCount: number; revenue: number }> = [];
 
- try {
- [products, total] = await Promise.all([
- prisma.product.findMany({
- where,
- orderBy: { createdAt: "desc" },
- skip,
- take: limit,
- }),
- prisma.product.count({ where }),
- ]);
+  try {
+    [products, total] = await Promise.all([
+      prisma.product.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        skip,
+        take: limit,
+      }),
+      prisma.product.count({ where }),
+    ]);
 
- // Fetch Category Stats
- const rawCategories = await prisma.product.groupBy({
- by: ['category'],
- where: { exporterId: auth.userId },
- _count: { id: true },
- });
+    // Fetch Category Stats
+    const rawCategories = await prisma.product.groupBy({
+      by: ['category'],
+      where: { exporterId: auth.userId },
+      _count: { id: true },
+    });
 
- const revenueData = await prisma.$queryRaw`
- SELECT p.category, COALESCE(SUM(o."totalPrice"), 0) as revenue
- FROM products p
- LEFT JOIN orders o ON o."productId" = p.id
- WHERE p."exporterId" = ${auth.userId}
- GROUP BY p.category
- ORDER BY revenue DESC
- ` as Array<{ category: string; revenue: number }>;
+    // We can't easily join in groupBy in Prisma, so we'll fetch revenue separately or keep it simple
+    categoriesData = rawCategories.map((c: any) => ({
+      name: c.category,
+      productCount: c._count.id,
+      revenue: 0, // Simplified for now to avoid complex raw queries in this redesign pass
+    }));
 
- const revenueMap = new Map(revenueData.map((r) => [r.category, Number(r.revenue)]));
+  } catch (e) {
+    console.warn("Failed to fetch inventory data:", e);
+  }
 
- categoriesData = rawCategories.map((c: any) => ({
- name: c.category,
- productCount: c._count.id,
- revenue: revenueMap.get(c.category) ?? 0,
- })).sort((a: any, b: any) => b.revenue - a.revenue);
+  // Get total stats (ignoring filters for the summary cards)
+  let totalListed = 0;
+  let totalAvailable = 0;
+  let totalValue = 0;
 
- } catch (e) {
- console.warn("Failed to fetch inventory data:", e);
- }
+  try {
+    const allProducts = await prisma.product.findMany({
+      where: { exporterId: auth.userId },
+      select: { available: true, price: true, minOrderQty: true },
+    });
+    totalListed = allProducts.length;
+    totalAvailable = allProducts.filter((p: any) => p.available).length;
+    totalValue = allProducts.reduce((acc: number, p: any) => acc + p.price * (p.minOrderQty ?? 1), 0);
+  } catch (e) {
+    console.warn("Failed to fetch summary stats:", e);
+  }
 
- // Get total stats (ignoring filters for the summary cards)
- let totalListed = 0;
- let totalAvailable = 0;
- let totalValue = 0;
+  const totalPages = Math.ceil(total / limit);
 
- try {
- const allProducts = await prisma.product.findMany({
- where: { exporterId: auth.userId },
- select: { available: true, price: true, minOrderQty: true },
- });
- totalListed = allProducts.length;
- totalAvailable = allProducts.filter((p: any) => p.available).length;
- totalValue = allProducts.reduce((acc: number, p: any) => acc + p.price * (p.minOrderQty ?? 1), 0);
- } catch (e) {
- console.warn("Failed to fetch summary stats:", e);
- }
+  return (
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+      {/* Header */}
+      <header className="flex-shrink-0 px-8 py-8 lg:px-12 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-white/5 sticky top-0 z-40">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 max-w-7xl mx-auto w-full">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Inventory Management</h1>
+            <p className="text-slate-500 text-sm mt-1">
+              Manage your product listings, stock levels, and marketplace presence
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/dashboard/exporter/inventory/add"
+              className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-semibold text-sm py-3 px-6 rounded-xl shadow-lg shadow-primary/20 transition-all active:scale-95"
+            >
+              <Plus className="w-5 h-5" />
+              Add New Product
+            </Link>
+          </div>
+        </div>
+      </header>
 
- const totalPages = Math.ceil(total / limit);
- const maxCategoryRev = Math.max(...(categoriesData.map((c) => c.revenue) ?? [1]), 1);
+      <div className="flex-1 p-8 lg:p-12 max-w-7xl mx-auto w-full space-y-12">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[
+            { label: "Total Products", value: String(totalListed), icon: Package, color: "text-blue-500", bg: "bg-blue-50" },
+            { label: "Active Listings", value: String(totalAvailable), icon: ShieldCheck, color: "text-emerald-500", bg: "bg-emerald-50" },
+            { label: "Inventory Value", value: formatMoney(totalValue), icon: TrendingUp, color: "text-orange-500", bg: "bg-orange-50" },
+          ].map((s) => (
+            <div key={s.label} className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-white/5 p-6 rounded-2xl shadow-sm hover:shadow-md transition-all flex items-center gap-6">
+              <div className={`w-14 h-14 ${s.bg} dark:bg-white/5 rounded-xl flex items-center justify-center ${s.color}`}>
+                <s.icon className="w-7 h-7" />
+              </div>
+              <div>
+                <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{s.label}</div>
+                <div className="text-2xl font-bold text-slate-900 dark:text-white mt-1">{s.value}</div>
+              </div>
+            </div>
+          ))}
+        </div>
 
- return (
- <div className="h-full overflow-hidden flex flex-col bg-background selection:bg-primary selection:text-primary-foreground">
- {/* ── Header ── */}
- <header className="flex-shrink-0 px-10 py-10 border-b border-border dark:border-white/5 bg-background/40 backdrop-blur-3xl z-40">
- <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-10">
- <div>
- <h1 className="text-5xl font-black tracking-tighter text-foreground dark:text-white uppercase ">Inventory Intelligence</h1>
- <p className="text-muted-foreground/40 mt-3 text-[10px] font-black uppercase tracking-[0.3em] ">
- System Node Override: Managing {totalListed} primary assets across {categoriesData.length} sectors
- </p>
- </div>
- <div className="flex items-center gap-5">
- <Link
- href="/dashboard/exporter/inventory/add"
- className="inline-flex items-center gap-3 bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] uppercase tracking-[0.2em] py-4 px-8 rounded-lg shadow-2xl shadow-white/5 transition-all active:scale-95 group"
- >
- <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-500" />
- Initialize Asset
- </Link>
- </div>
- </div>
- </header>
+        {/* Main Content Area */}
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+              <Package className="w-5 h-5 text-primary" />
+              Product Catalog
+            </h2>
+          </div>
 
- <div className="flex-1 overflow-y-auto p-10 space-y-16 custom-scrollbar animate-in fade-in slide-in-from-bottom-4 duration-1000">
- {/* Summary cards */}
- <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-[1700px] mx-auto">
- {[
- { k: "Total Listed Assets", v: String(totalListed), sub: "System Registry Count", icon: Package },
- { k: "Active Telemetry", v: String(totalAvailable), sub: "Signal Verified Link", icon: ShieldCheck },
- { k: "Max Potential Yield", v: formatMoney(totalValue), sub: "Portfolio Index Val", icon: TrendingUp },
- ].map((s) => (
- <div key={s.k} className="bg-card/40 dark:bg-white/5 backdrop-blur-3xl border border-border dark:border-white/5 p-6 relative overflow-hidden group rounded-lg transition-all hover:border-border dark:border-white/10 shadow-xl dark:shadow-2xl">
- <div className="absolute top-0 right-0 w-24 h-24 bg-black/5 dark:bg-white/10 blur-3xl rounded-full -mr-12 -mt-12 group-hover:bg-black/10 dark:bg-white/15 transition-colors pointer-events-none" />
- <div className="flex items-start justify-between relative z-10 mb-6">
- <div>
- <div className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-[0.3em] ">{s.k}</div>
- <div className="text-[9px] font-black text-muted-foreground/20 uppercase tracking-widest mt-1">{s.sub}</div>
- </div>
- <div className="p-2.5 rounded-lg bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 text-foreground dark:text-white transition-all group-hover:scale-110">
- <s.icon className="w-4 h-4" />
- </div>
- </div>
- <div className="text-3xl font-black text-foreground dark:text-white tracking-tighter uppercase group-hover:translate-x-1 transition-transform">{s.v}</div>
- <div className="mt-6 h-1 w-full bg-black/5 dark:bg-white/10 rounded-full overflow-hidden">
- <div className="h-full bg-primary w-3/4 dark:shadow-md shadow-none transition-all duration-1000 delay-300" />
- </div>
- </div>
- ))}
- </div>
+          <InventoryTable
+            products={products}
+            availableCategories={categoriesData.map(c => c.name)}
+          />
 
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-3 mt-12 pb-10">
+              <Link
+                href={`?${new URLSearchParams({ ...searchParams, page: (page - 1).toString() })}`}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg border border-slate-200 dark:border-white/10 text-sm font-medium transition-all ${
+                  page <= 1 ? "opacity-30 pointer-events-none" : "hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200"
+                }`}
+              >
+                <ArrowLeft className="w-4 h-4" /> Previous
+              </Link>
+              
+              <div className="flex items-center gap-2">
+                {Array.from({ length: totalPages }).map((_, i) => {
+                  const p = i + 1;
+                  if (p === 1 || p === totalPages || (p >= page - 1 && p <= page + 1)) {
+                    return (
+                      <Link
+                        key={p}
+                        href={`?${new URLSearchParams({ ...searchParams, page: p.toString() })}`}
+                        className={`w-10 h-10 flex items-center justify-center rounded-lg border text-sm font-bold transition-all ${
+                          page === p
+                            ? "bg-primary border-primary text-white shadow-lg shadow-primary/20 scale-110"
+                            : "border-slate-200 dark:border-white/10 text-slate-500 hover:border-primary/50 hover:text-primary"
+                        }`}
+                      >
+                        {p}
+                      </Link>
+                    );
+                  }
+                  if (p === page - 2 || p === page + 2) {
+                    return <span key={p} className="text-slate-300 px-1">...</span>;
+                  }
+                  return null;
+                })}
+              </div>
 
-
- {/* Global Asset Registry */}
- <div className="max-w-[1700px] mx-auto space-y-10 pb-20">
- <div className="flex items-center gap-5 border-b border-border dark:border-white/5 pb-6">
- <ShoppingCart className="w-5 h-5 text-foreground dark:text-white" />
- <h2 className="text-[10px] font-black text-foreground dark:text-white uppercase tracking-[0.4em] ">
- Global Asset Registry Grid
- </h2>
- </div>
-
- <InventoryTable
- products={products}
- availableCategories={categoriesData.map(c => c.name)}
- />
-
- {/* Pagination */}
- {totalPages > 1 && (
- <div className="flex items-center justify-center gap-4 mt-20">
- <Link
- href={`?${new URLSearchParams({ ...searchParams, page: (page - 1).toString() })}`}
- className={`px-8 py-4 rounded-lg bg-card/40 dark:bg-white/5 border border-border dark:border-white/5 text-[10px] uppercase font-black tracking-widest transition-all backdrop-blur-3xl ${page <= 1 ? "opacity-20 pointer-events-none" : "hover:bg-black/10 dark:bg-white/15 hover:border-border dark:border-white/20 text-foreground dark:text-white"
- }`}
- >
- <ArrowLeft className="w-4 h-4 inline-block mr-2" /> Previous Signal
- </Link>
- <div className="flex items-center gap-3">
- {Array.from({ length: totalPages }).map((_, i) => {
- const p = i + 1;
- if (p === 1 || p === totalPages || (p >= page - 1 && p <= page + 1)) {
- return (
- <Link
- key={p}
- href={`?${new URLSearchParams({ ...searchParams, page: p.toString() })}`}
- className={`w-14 h-14 flex items-center justify-center rounded-lg border text-[10px] font-black transition-all backdrop-blur-3xl ${page === p
- ? "bg-primary border-transparent text-primary-foreground shadow-2xl shadow-white/10 scale-110"
- : "bg-card/40 dark:bg-white/5 border-border dark:border-white/5 text-muted-foreground hover:bg-black/10 dark:bg-white/15 hover:border-border dark:border-white/20 hover:text-foreground dark:text-white"
- }`}
- >
- {p < 10 ? `0${p}` : p}
- </Link>
- );
- }
- if (p === page - 2 || p === page + 2) {
- return <span key={p} className="text-white/20 px-2 font-black ">...</span>;
- }
- return null;
- })}
- </div>
- <Link
- href={`?${new URLSearchParams({ ...searchParams, page: (page + 1).toString() })}`}
- className={`px-8 py-4 rounded-lg bg-card/40 dark:bg-white/5 border border-border dark:border-white/5 text-[10px] uppercase font-black tracking-widest transition-all backdrop-blur-3xl ${page >= totalPages ? "opacity-20 pointer-events-none" : "hover:bg-black/10 dark:bg-white/15 hover:border-border dark:border-white/20 text-foreground dark:text-white"
- }`}
- >
- Next Signal <ArrowRight className="w-4 h-4 inline-block ml-2" />
- </Link>
- </div>
- )}
- </div>
- </div>
- </div>
- );
+              <Link
+                href={`?${new URLSearchParams({ ...searchParams, page: (page + 1).toString() })}`}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg border border-slate-200 dark:border-white/10 text-sm font-medium transition-all ${
+                  page >= totalPages ? "opacity-30 pointer-events-none" : "hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200"
+                }`}
+              >
+                Next <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
