@@ -134,29 +134,29 @@ export default async function ExporterInventoryPage({
   const totalPages = Math.ceil(total / limit);
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
-      {/* Header */}
-      <header className="flex-shrink-0 px-8 py-8 lg:px-12 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-white/5 sticky top-0 z-40">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 max-w-7xl mx-auto w-full">
+    <div className="min-h-screen bg-white dark:bg-slate-950 transition-colors duration-300">
+      {/* Unified Content Area */}
+      <div className="px-8 py-12 lg:px-12 space-y-12">
+        {/* Header */}
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Inventory Management</h1>
-            <p className="text-slate-500 text-sm mt-1">
-              Manage your product listings, stock levels, and marketplace presence
+            <h1 className="text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">Inventory Management</h1>
+            <p className="text-slate-500 text-lg mt-2 max-w-2xl">
+              Manage your product listings, stock levels, and marketplace presence from a single dashboard.
             </p>
           </div>
           <div className="flex items-center gap-3">
             <Link
               href="/dashboard/exporter/inventory/add"
-              className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-semibold text-sm py-3 px-6 rounded-xl shadow-lg shadow-primary/20 transition-all active:scale-95"
+              className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold text-sm py-3.5 px-8 rounded-2xl shadow-xl shadow-primary/20 transition-all active:scale-95 whitespace-nowrap"
             >
               <Plus className="w-5 h-5" />
               Add New Product
             </Link>
           </div>
-        </div>
-      </header>
+        </header>
 
-      <div className="flex-1 p-8 lg:p-12 max-w-7xl mx-auto w-full space-y-12">
+        {/* Stats Cards */}
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[

@@ -62,8 +62,18 @@ export default function CinematicPreloader() {
       let texts = ["ENTERING", "RANOTE EXIM", "PORTAL"];
       if (isHome) texts = ["ENTERING", "RANOTE EXIM", "YOUR TRADING PARTNER"];
       else if (isMarketplace) texts = ["ENTERING", "RANOTE EXIM", "MARKET PLACER"];
-      else if (pathname?.startsWith("/dashboard/exporter")) texts = ["ENTERING", "RANOTE EXIM", "EXPORTER DASHBOARD"];
-      else if (pathname?.startsWith("/dashboard/importer")) texts = ["ENTERING", "RANOTE EXIM", "IMPORTER DASHBOARD"];
+      else if (pathname?.startsWith("/dashboard/exporter")) {
+        const parts = pathname.split("/");
+        const subPage = parts.length > 3 ? parts[parts.length - 1] : "Dashboard";
+        const pageTitle = subPage.replace(/-/g, " ").toUpperCase();
+        texts = ["ENTERING", "RANOTE EXIM", pageTitle];
+      }
+      else if (pathname?.startsWith("/dashboard/importer")) {
+        const parts = pathname.split("/");
+        const subPage = parts.length > 3 ? parts[parts.length - 1] : "Dashboard";
+        const pageTitle = subPage.replace(/-/g, " ").toUpperCase();
+        texts = ["ENTERING", "RANOTE EXIM", pageTitle];
+      }
       else if (isAuth) texts = ["ENTERING", "RANOTE EXIM", "AUTHENTICATION"];
 
       setActiveTexts(texts);
