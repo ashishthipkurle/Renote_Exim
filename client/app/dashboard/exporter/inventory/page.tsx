@@ -195,13 +195,12 @@ export default async function ExporterInventoryPage({
             <div className="flex items-center justify-center gap-3 mt-12 pb-10">
               <Link
                 href={`?${new URLSearchParams({ ...searchParams, page: (page - 1).toString() })}`}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg border border-slate-200 dark:border-white/10 text-sm font-medium transition-all ${
-                  page <= 1 ? "opacity-30 pointer-events-none" : "hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200"
-                }`}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg border border-slate-200 dark:border-white/10 text-sm font-medium transition-all ${page <= 1 ? "opacity-30 pointer-events-none" : "hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200"
+                  }`}
               >
                 <ArrowLeft className="w-4 h-4" /> Previous
               </Link>
-              
+
               <div className="flex items-center gap-2">
                 {Array.from({ length: totalPages }).map((_, i) => {
                   const p = i + 1;
@@ -210,11 +209,10 @@ export default async function ExporterInventoryPage({
                       <Link
                         key={p}
                         href={`?${new URLSearchParams({ ...searchParams, page: p.toString() })}`}
-                        className={`w-10 h-10 flex items-center justify-center rounded-lg border text-sm font-bold transition-all ${
-                          page === p
+                        className={`w-10 h-10 flex items-center justify-center rounded-lg border text-sm font-bold transition-all ${page === p
                             ? "bg-primary border-primary text-white shadow-lg shadow-primary/20 scale-110"
                             : "border-slate-200 dark:border-white/10 text-slate-500 hover:border-primary/50 hover:text-primary"
-                        }`}
+                          }`}
                       >
                         {p}
                       </Link>
@@ -229,9 +227,8 @@ export default async function ExporterInventoryPage({
 
               <Link
                 href={`?${new URLSearchParams({ ...searchParams, page: (page + 1).toString() })}`}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg border border-slate-200 dark:border-white/10 text-sm font-medium transition-all ${
-                  page >= totalPages ? "opacity-30 pointer-events-none" : "hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200"
-                }`}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-lg border border-slate-200 dark:border-white/10 text-sm font-medium transition-all ${page >= totalPages ? "opacity-30 pointer-events-none" : "hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200"
+                  }`}
               >
                 Next <ArrowRight className="w-4 h-4" />
               </Link>

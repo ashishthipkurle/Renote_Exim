@@ -9,8 +9,8 @@ export async function POST(req: NextRequest) {
  if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
  
  // Exact V3 role check, NO VERIFICATION REQUIRED FOR CONSUMERS
- if (auth.role !== 'CONSUMER') {
- return NextResponse.json({ error: 'Access denied. Retail checkouts strictly for Consumers.' }, { status: 403 });
+ if (auth.role !== 'CONSUMER' && auth.role !== 'IMPORTER') {
+ return NextResponse.json({ error: 'Access denied. Retail checkouts strictly for Consumers or Importers (retail mode).' }, { status: 403 });
  }
 
  const { productId, quantity } = await req.json();
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
  if (!product) return NextResponse.json({ error: 'Product not found' }, { status: 404 });
  
  // Retail pricing fallback 
- const unitPrice = product.b2cPrice || product.b2bPrice;
+ const unitPrice = product.b2cPrice || product.price;
  const totalPrice = unitPrice * quantity;
  const orderNumber = `B2C-${Date.now()}`;
 
@@ -39,11 +39,8 @@ export async function POST(req: NextRequest) {
  }
  });
 
- // Note: Payment Intent or Stripe Session creation would follow here.
-
  return NextResponse.json({ order }, { status: 201 });
  } catch (error: any) {
  return NextResponse.json({ error: error.message }, { status: 500 });
  }
 }
-

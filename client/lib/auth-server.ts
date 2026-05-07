@@ -65,7 +65,7 @@ export async function getApiAuthContext(
     // 1. Get token — Priority: middleware-refreshed header > cookies > Authorization header
     const cookieStore = cookies();
     let accessToken: string | undefined;
-    
+
     // Check if middleware already refreshed the token for this request
     if (request) {
       const refreshedToken = request.headers.get("x-refreshed-access-token");
@@ -74,7 +74,7 @@ export async function getApiAuthContext(
         accessToken = refreshedToken;
       }
     }
-    
+
     // Fall back to cookie
     if (!accessToken) {
       accessToken = cookieStore.get(AUTH_COOKIE_NAME)?.value;
@@ -131,7 +131,7 @@ export async function getApiAuthContext(
       }
 
       console.warn("[Auth Server] Token invalid (Status:", verifyRes.status, "). Attempting refresh...");
-      
+
       // 2b. If invalid/expired, try to refresh using the refresh token
       const refreshToken = cookieStore.get(REFRESH_COOKIE_NAME)?.value;
       if (refreshToken) {
@@ -153,9 +153,9 @@ export async function getApiAuthContext(
           }
         } catch (e: any) {
           console.error("[Auth Server] Refresh call timed out:", e.message);
-          return { 
-            auth: null, 
-            error: NextResponse.json({ error: "Auth refresh timeout", isTimeout: true }, { status: 503 }) 
+          return {
+            auth: null,
+            error: NextResponse.json({ error: "Auth refresh timeout", isTimeout: true }, { status: 503 })
           };
         }
 
@@ -166,7 +166,7 @@ export async function getApiAuthContext(
 
           if (newAccessToken) {
             console.log("[Auth Server] Token refreshed successfully. Persisting new cookies...");
-            
+
             // CRITICAL: Immediately persist the refreshed tokens to cookies
             // This ensures that even server component callers (layouts) that can't
             // set response headers will still have the new tokens available for
@@ -181,18 +181,18 @@ export async function getApiAuthContext(
             } catch (cookieErr) {
               console.warn("[Auth Server] Could not set cookies directly (may be in a read-only context):", cookieErr);
             }
-            
+
             // Return user data from the refresh response
             const userData = refreshData.user || refreshData.session?.user;
             if (userData?.id) {
-               const context = await getContextForUser(userData.id, allowedRoles);
-               if (context.auth) {
-                 return {
-                   ...context,
-                   newAccessToken,
-                   newRefreshToken,
-                 };
-               }
+              const context = await getContextForUser(userData.id, allowedRoles);
+              if (context.auth) {
+                return {
+                  ...context,
+                  newAccessToken,
+                  newRefreshToken,
+                };
+              }
             }
           }
         } else {
@@ -330,13 +330,13 @@ export async function getServerAuthContext(req?: NextRequest): Promise<AuthConte
       // Fallback if headers() isn't available
     }
   }
-  
+
   const { auth, error } = await getApiAuthContext(effectiveReq as NextRequest);
-  
+
   if (!auth && error) {
     console.log("[getServerAuthContext] Auth failed, returning null.");
   }
-  
+
   return auth;
 }
 
@@ -352,10 +352,10 @@ export function setServerAuthCookie(accessToken: string) {
  * Clears the auth cookies
  */
 export function clearServerAuthCookie() {
-    const cookieStore = cookies();
-    cookieStore.delete(AUTH_COOKIE_NAME);
-    cookieStore.delete(REFRESH_COOKIE_NAME);
-    cookieStore.delete('nhost-session'); // Clear old ones too
+  const cookieStore = cookies();
+  cookieStore.delete(AUTH_COOKIE_NAME);
+  cookieStore.delete(REFRESH_COOKIE_NAME);
+  cookieStore.delete('nhost-session'); // Clear old ones too
 }
 
 

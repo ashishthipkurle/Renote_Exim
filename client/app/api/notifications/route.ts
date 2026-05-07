@@ -18,6 +18,7 @@ export async function GET(request: NextRequest) {
         const { searchParams } = new URL(request.url);
         const unreadOnly = searchParams.get('unread') === 'true';
         const type = searchParams.get('type');
+        const entityId = searchParams.get('entityId');
         const page = parseInt(searchParams.get('page') || '1');
         const limit = parseInt(searchParams.get('limit') || '20');
         const countOnly = searchParams.get('countOnly') === 'true';
@@ -28,6 +29,7 @@ export async function GET(request: NextRequest) {
                 where: {
                     OR: [{ userId: auth.userId }, { ownerId: auth.userId }],
                     read: false,
+                    ...(entityId ? { linkedEntityId: entityId } : {}),
                 },
             });
             return NextResponse.json({ unreadCount });
@@ -39,6 +41,9 @@ export async function GET(request: NextRequest) {
         };
         if (unreadOnly) {
             where.read = false;
+        }
+        if (entityId) {
+            where.linkedEntityId = entityId;
         }
         const validTypes = [
             'ORDER_UPDATE', 'SHIPMENT_UPDATE', 'MESSAGE_RECEIVED', 

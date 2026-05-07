@@ -7,12 +7,12 @@ import { z } from 'zod';
 import { Prisma } from '@prisma/client';
 
 export async function GET(
- request: NextRequest,
- { params }: { params: Promise<{ id: string }> }
+ request,
+ { params }
 ) {
  try {
  const { id } = await params;
- const { auth, error: authError } = await getApiAuthContext(request);
+ const auth = await getApiAuthContext(request).then(res => res.auth);
  const role = auth?.role || 'USER';
 
  const product = await prisma.product.findUnique({
@@ -42,7 +42,7 @@ export async function GET(
 
  const displayProduct = {
  ...product,
- price: role === 'IMPORTER' ? product.price : (product.regularPrice || product.price)
+ price: role === 'IMPORTER' ? (product.b2bPrice || product.price) : (product.b2cPrice || product.price)
  };
 
  return NextResponse.json({ product: displayProduct });
@@ -56,8 +56,8 @@ export async function GET(
 }
 
 export async function PUT(
- request: NextRequest,
- { params }: { params: Promise<{ id: string }> }
+ request,
+ { params }
 ) {
  try {
  const { id } = await params;
@@ -67,7 +67,6 @@ export async function PUT(
  return authError || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
  }
 
- // Check if product exists and belongs to user
  const existingProduct = await prisma.product.findUnique({
  where: { id },
  });
@@ -105,7 +104,6 @@ export async function PUT(
  },
  });
 
- // If price was updated, record in history
  if (validatedData.price !== undefined && validatedData.price !== existingProduct.price) {
  await tx.priceHistory.create({
  data: {
@@ -114,9 +112,6 @@ export async function PUT(
  },
  });
  }
-
- // If regularPrice was updated, we could also record history if needed, 
- // but the user only mentioned 'price' (FOB) for existing history.
 
  return updatedProduct;
  });
@@ -140,8 +135,8 @@ export async function PUT(
 }
 
 export async function DELETE(
- request: NextRequest,
- { params }: { params: Promise<{ id: string }> }
+ request,
+ { params }
 ) {
  try {
  const { id } = await params;
@@ -151,7 +146,6 @@ export async function DELETE(
  return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
  }
 
- // Check if product exists and belongs to user
  const existingProduct = await prisma.product.findUnique({
  where: { id },
  });

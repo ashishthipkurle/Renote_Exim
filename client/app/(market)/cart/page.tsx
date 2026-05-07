@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import axios from "axios";
 import { Heart, Minus, Plus, Trash2, Lock } from "lucide-react";
@@ -31,6 +32,7 @@ export default function CartPage() {
  const [items, setItems] = useState<CartItem[]>([]);
  const [productsById, setProductsById] = useState<Record<string, Product>>({});
  const [loading, setLoading] = useState(true);
+ const router = useRouter();
 
  useEffect(() => {
  setItems(getCart());
@@ -166,18 +168,23 @@ export default function CartPage() {
  <div className="flex items-center justify-between mt-6">
  <div className="flex items-center gap-3">
  <div className="flex items-center bg-background/40 border border-border rounded-xl p-1">
- <button
- type="button"
- className="size-8 flex items-center justify-center hover:bg-accent rounded-lg transition-colors"
- onClick={() => {
- const nextQty = Math.max(1, item.quantity - 1);
- updateQuantity(product.id, nextQty);
- setItems(getCart());
- }}
- aria-label="Decrease quantity"
- >
- <Minus className="h-4 w-4" />
- </button>
+                          <button
+                            type="button"
+                            className="size-8 flex items-center justify-center hover:bg-accent rounded-lg transition-colors"
+                            onClick={() => {
+                              const moq = product.minOrderQty || 1;
+                              const nextQty = Math.max(moq, item.quantity - 1);
+                              if (nextQty === item.quantity && item.quantity === moq) {
+                                toast.error(`Minimum order for this item is ${moq}`);
+                                return;
+                              }
+                              updateQuantity(product.id, nextQty);
+                              setItems(getCart());
+                            }}
+                            aria-label="Decrease quantity"
+                          >
+                            <Minus className="h-4 w-4" />
+                          </button>
  <div className="w-10 text-center text-sm font-black">{item.quantity}</div>
  <button
  type="button"
@@ -261,13 +268,21 @@ export default function CartPage() {
  </div>
  </div>
 
- <Link
- href="/checkout"
- className="w-full inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-black py-4 rounded-lg shadow-xl shadow-primary/20 transition-all active:scale-[0.98]"
- >
- <Lock className="h-4 w-4" />
- Proceed to Secure Checkout
- </Link>
+  <button
+  onClick={(e) => {
+    const invalidItems = rows.filter(r => r.item.quantity < (r.product?.minOrderQty || 1));
+    if (invalidItems.length > 0) {
+      e.preventDefault();
+      toast.error(`Some items do not meet the Minimum Order Quantity (MOQ). Please check your cart.`);
+    } else {
+      router.push("/checkout");
+    }
+  }}
+  className="w-full inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-black py-4 rounded-lg shadow-xl shadow-primary/20 transition-all active:scale-[0.98]"
+  >
+  <Lock className="h-4 w-4" />
+  Proceed to Secure Checkout
+  </button>
 
  <p className="mt-4 text-xs text-muted-foreground text-center">
  Checkout flow is UI-first; order creation runs on submit.

@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { 
-  authRateLimit, 
-  orderRateLimit, 
-  documentRateLimit, 
-  searchRateLimit, 
-  defaultRateLimit 
+import {
+  authRateLimit,
+  orderRateLimit,
+  documentRateLimit,
+  searchRateLimit,
+  defaultRateLimit
 } from '@/lib/redis';
 
 import { fallbackLng, languages, cookieName } from './lib/i18n/config';
@@ -24,30 +24,30 @@ async function refreshAccessToken(refreshToken: string): Promise<{ accessToken: 
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 5000);
-    
+
     const res = await fetch(`https://${NHOST_SUBDOMAIN}.auth.${NHOST_REGION}.nhost.run/v1/token`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refreshToken }),
       signal: controller.signal,
     });
-    
+
     clearTimeout(timeout);
-    
+
     if (!res.ok) {
       console.log("[Middleware] Token refresh failed, status:", res.status);
       return null;
     }
-    
+
     const data = await res.json();
     const newAccessToken = data.accessToken || data.session?.accessToken;
     const newRefreshToken = data.refreshToken || data.session?.refreshToken;
-    
+
     if (newAccessToken) {
       console.log("[Middleware] Token refreshed successfully.");
       return { accessToken: newAccessToken, refreshToken: newRefreshToken || refreshToken };
     }
-    
+
     return null;
   } catch (e: any) {
     console.error("[Middleware] Token refresh error:", e.message);
@@ -65,13 +65,13 @@ function isTokenValid(accessToken: string): boolean {
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     // Using Buffer since atob might not be reliable in all Edge environments, but atob is generally fine.
     // However, for NextJS middleware, atob is available.
-    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
     }).join(''));
-    
+
     const payload = JSON.parse(jsonPayload);
     if (!payload || !payload.exp) return false;
-    
+
     // Add a 30-second buffer. If it expires in less than 30s, treat it as expired to proactively refresh.
     const currentTime = Math.floor(Date.now() / 1000);
     return payload.exp > (currentTime + 30);
@@ -115,13 +115,13 @@ export async function middleware(request: NextRequest) {
     if (limitResult && !limitResult.success) {
       return NextResponse.json(
         { error: 'Too many requests. Please slow down.' },
-        { 
-          status: 429, 
-          headers: { 
+        {
+          status: 429,
+          headers: {
             'Retry-After': limitResult.reset.toString(),
             'X-RateLimit-Limit': limitResult.limit.toString(),
             'X-RateLimit-Remaining': limitResult.remaining.toString()
-          } 
+          }
         }
       );
     }
@@ -189,7 +189,7 @@ export async function middleware(request: NextRequest) {
         sameSite: "lax" as const,
         maxAge: 60 * 60 * 24 * 7, // 1 week
       });
-      
+
       response.cookies.set(REFRESH_COOKIE_NAME, newTokens.refreshToken, {
         path: "/",
         httpOnly: true,

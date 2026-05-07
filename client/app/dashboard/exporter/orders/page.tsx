@@ -1,6 +1,8 @@
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ShoppingCart, ArrowRight, ArrowLeft } from "lucide-react";
+import { ShoppingCart, ArrowRight, ArrowLeft, Package, User, Truck, Clock, CheckCircle2, XCircle, Layers, Star, Globe, Search, ChevronDown } from "lucide-react";
 
 import { prisma } from "@/lib/prisma";
 import { getServerAuthContext } from "@/lib/auth-server";
@@ -8,94 +10,119 @@ import { OrderStatus } from "@prisma/client";
 import OrdersTable from "./OrdersTable";
 
 export default async function ExporterOrdersPage({
- searchParams,
+  searchParams,
 }: {
- searchParams?: { [key: string]: string | string[] | undefined } | Promise<{ [key: string]: string | string[] | undefined }>;
+  searchParams?:
+    | { [key: string]: string | string[] | undefined }
+    | Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
- const resolvedSearchParams = (await searchParams) ?? {};
- const auth = await getServerAuthContext();
- if (!auth) redirect("/login");
- if (auth.role !== "EXPORTER" && auth.role !== "ADMIN") {
- redirect(`/dashboard/${auth.role.toLowerCase()}`);
- }
+  const resolvedSearchParams = (await searchParams) ?? {};
+  const auth = await getServerAuthContext();
+  if (!auth) redirect("/login");
+  if (auth.role !== "EXPORTER" && auth.role !== "ADMIN") {
+    redirect(`/dashboard/${auth.role.toLowerCase()}`);
+  }
 
- const page = parseInt(typeof resolvedSearchParams.page === 'string' ? resolvedSearchParams.page : "1");
- const limit = 10;
- const skip = (page - 1) * limit;
+  const page = parseInt(
+    typeof resolvedSearchParams.page === "string"
+      ? resolvedSearchParams.page
+      : "1"
+  );
+  const limit = 10;
+  const skip = (page - 1) * limit;
 
- // Build where clause
- const where: any = {
- product: { is: { exporterId: auth.userId } },
- };
+  // Build where clause - use sellerId directly as it's the exporter's ID
+  const where: any = {
+    sellerId: auth.userId,
+  };
 
   if (resolvedSearchParams.status && resolvedSearchParams.status !== "ALL") {
-    const s = Array.isArray(resolvedSearchParams.status) ? resolvedSearchParams.status[0] : resolvedSearchParams.status;
-    const status = (s || "").toUpperCase();
+    const s = Array.isArray(resolvedSearchParams.status)
+      ? resolvedSearchParams.status[0]
+      : resolvedSearchParams.status;
+    let status = (s || "").toUpperCase();
+    
+    // Map UI statuses to DB OrderStatus enum
+    if (status === "PENDING") status = "QUOTE_REQUESTED";
+    
     if (Object.values(OrderStatus).includes(status as any)) {
       where.orderStatus = status as OrderStatus;
     }
   }
 
+  if (
+    typeof resolvedSearchParams.search === "string" &&
+    resolvedSearchParams.search
+  ) {
+    const search = resolvedSearchParams.search;
+    where.OR = [
+      { orderNumber: { contains: search, mode: "insensitive" } },
+      { id: { contains: search, mode: "insensitive" } },
+      { product: { name: { contains: search, mode: "insensitive" } } },
+      { buyer: { name: { contains: search, mode: "insensitive" } } },
+      { buyer: { businessName: { contains: search, mode: "insensitive" } } },
+    ];
+  }
 
- if (typeof resolvedSearchParams.search === 'string' && resolvedSearchParams.search) {
- const search = resolvedSearchParams.search;
- where.OR = [
- { id: { contains: search, mode: "insensitive" } },
- { product: { is: { name: { contains: search, mode: "insensitive" } } } },
- { buyer: { is: { name: { contains: search, mode: "insensitive" } } } },
- { buyer: { is: { businessName: { contains: search, mode: "insensitive" } } } },
- ];
- }
+  let orders: any[] = [];
+  let total = 0;
+  let statusCounts = {
+    all: 0,
+    pending: 0,
+    processing: 0,
+    shipped: 0,
+    delivered: 0,
+  };
 
- let orders: any[] = [];
- let total = 0;
- let statusCounts = {
- all: 0,
- pending: 0,
- processing: 0,
- shipped: 0,
- delivered: 0,
- };
+  try {
+    // Get orders with pagination
+    [orders, total] = await Promise.all([
+      prisma.order.findMany({
+        where,
+        include: {
+          product: { select: { id: true, name: true, category: true, images: true } },
+          buyer: { select: { id: true, name: true, businessName: true, country: true, email: true } },
+          shipment: true,
+        },
+        orderBy: { createdAt: "desc" },
+        skip,
+        take: limit,
+      }),
+      prisma.order.count({ where }),
+    ]);
 
- try {
- // Get orders with pagination
- [orders, total] = await Promise.all([
- prisma.order.findMany({
- where,
- include: {
- product: { select: { name: true, category: true, images: true } },
- buyer: { select: { name: true, businessName: true, country: true } },
- shipment: true,
- },
- orderBy: { createdAt: "desc" },
- skip,
- take: limit,
- }),
- prisma.order.count({ where }),
- ]);
+    // Get specific status counts (filtered by exporter)
+    const baseWhere = { sellerId: auth.userId };
+    const [allCount, pendingCount, procCount, shippedCount, delivCount] =
+      await Promise.all([
+        prisma.order.count({ where: baseWhere }),
+        prisma.order.count({
+          where: { ...baseWhere, orderStatus: { in: ["QUOTE_REQUESTED", "CHECKOUT"] } },
+        }),
+        prisma.order.count({
+          where: {
+            ...baseWhere,
+            orderStatus: { in: ["QUOTE_CONFIRMED", "PROCESSING"] },
+          },
+        }),
+        prisma.order.count({ where: { ...baseWhere, orderStatus: "SHIPPED" } }),
+        prisma.order.count({
+          where: { ...baseWhere, orderStatus: "DELIVERED" },
+        }),
+      ]);
 
- // Get specific status counts (unfiltered by search/status, but filtered by exporter)
- const baseWhere = { product: { exporterId: auth.userId } };
- const [allCount, pendingCount, procCount, shippedCount, delivCount] = await Promise.all([
- prisma.order.count({ where: baseWhere }),
- prisma.order.count({ where: { ...baseWhere, orderStatus: "QUOTE_REQUESTED" } }),
- prisma.order.count({ where: { ...baseWhere, orderStatus: { in: ["QUOTE_CONFIRMED", "PROCESSING"] } } }),
- prisma.order.count({ where: { ...baseWhere, orderStatus: "SHIPPED" } }),
- prisma.order.count({ where: { ...baseWhere, orderStatus: "DELIVERED" } }),
- ]);
+    statusCounts = {
+      all: allCount,
+      pending: pendingCount,
+      processing: procCount,
+      shipped: shippedCount,
+      delivered: delivCount,
+    };
+  } catch (e: any) {
+    console.error("Failed to fetch exporter orders:", e);
+  }
 
- statusCounts = {
- all: allCount,
- pending: pendingCount,
- processing: procCount,
- shipped: shippedCount,
- delivered: delivCount,
- };
- } catch (e) {
- console.warn("Failed to fetch exporter orders:", e);
- }
-
- const totalPages = Math.ceil(total / limit);
+  const totalPages = Math.ceil(total / limit);
 
  return (
  <div className="h-full overflow-hidden flex flex-col bg-background selection:bg-primary selection:text-primary-foreground">
@@ -105,14 +132,14 @@ export default async function ExporterOrdersPage({
  <div>
  <h1 className="text-5xl font-black tracking-tighter text-foreground dark:text-white uppercase ">Order Intelligence</h1>
  <p className="text-muted-foreground/40 mt-3 text-[10px] font-black uppercase tracking-[0.3em] ">
- Registry Node Index: {statusCounts.all} Active Signal Nodes Identified
+ Registry Node Index: {statusCounts.all < 10 ? `0${statusCounts.all}` : statusCounts.all} Active Signal Nodes Identified
  </p>
  </div>
- <div className="flex items-center gap-5">
- <div className="px-6 py-4 rounded-lg bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 text-foreground dark:text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-xl dark:shadow-2xl">
- Node: Exporter_Alpha
- </div>
- </div>
+  <div className="flex items-center gap-5">
+  <div className="px-6 py-4 rounded-lg bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 text-foreground dark:text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-xl dark:shadow-2xl">
+  Node: {auth.user?.businessName || auth.user?.name || "EXPORTER_NODE"}
+  </div>
+  </div>
  </div>
  </header>
 

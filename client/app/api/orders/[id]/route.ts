@@ -3,17 +3,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getApiAuthContext } from '@/lib/auth-server';
 import { z } from 'zod';
+import { OrderStatus } from '@prisma/client';
 
 const statusUpdateSchema = z.object({
-  status: z.enum([
-    'PENDING',
-    'CONFIRMED',
-    'PROCESSING',
-    'SHIPPED',
-    'DELIVERED',
-    'CANCELLED',
-    'DISPUTED',
-  ]),
+  status: z.nativeEnum(OrderStatus),
 });
 
 // GET /api/orders/[id] - Get single order details
@@ -22,20 +15,17 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { auth, error: authError } = await getApiAuthContext(request);
-    if (authError || !auth) return authError || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const auth = await getApiAuthContext(request).then(res => res.auth);
+    if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const order = await prisma.order.findUnique({
       where: { id: params.id },
       include: {
-        product: {
-          include: {
-            exporter: {
-              select: { id: true, name: true, businessName: true, country: true, email: true }
-            }
-          }
+        product: true,
+        buyer: {
+          select: { id: true, name: true, businessName: true, country: true, email: true }
         },
-        importer: {
+        seller: {
           select: { id: true, name: true, businessName: true, country: true, email: true }
         },
         shipment: true
@@ -45,11 +35,11 @@ export async function GET(
     if (!order) return NextResponse.json({ error: 'Order not found' }, { status: 404 });
 
     // Authorization check
-    const isOwner = auth.role === 'ADMIN' ||
-      (auth.role === 'IMPORTER' && order.importerId === auth.userId) ||
-      (auth.role === 'EXPORTER' && order.products.exporterId === auth.userId);
+    const isRelated = auth.role === 'ADMIN' ||
+      order.buyerId === auth.userId ||
+      order.sellerId === auth.userId;
 
-    if (!isOwner) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    if (!isRelated) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
     return NextResponse.json({ order });
   } catch (error) {
@@ -64,7 +54,7 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    const auth = await getApiAuthContext(request);
+    const auth = await getApiAuthContext(request).then(res => res.auth);
     if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await request.json();
@@ -72,47 +62,48 @@ export async function PATCH(
 
     const order = await prisma.order.findUnique({
       where: { id: params.id },
-      include: { products: true }
     });
 
     if (!order) return NextResponse.json({ error: 'Order not found' }, { status: 404 });
 
-    // Authorization check: Only exporter or admin can update status
+    // Authorization check: Only exporter (seller) or admin can update status
     const canUpdate = auth.role === 'ADMIN' ||
-      (auth.role === 'EXPORTER' && order.products.exporterId === auth.userId);
+      (auth.role === 'EXPORTER' && order.sellerId === auth.userId);
 
     if (!canUpdate) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-    // Status transition validation (simplified)
-    const currentStatus = order.status;
-
-    // Logic for notifications
-    let notificationTitle = 'Order Status Updated';
-    let notificationMessage = `Your order ${order.orderNumber} is now ${status}`;
-
-    if (status === 'CONFIRMED') {
-      notificationTitle = 'Order Confirmed';
-      notificationMessage = `Exporter has confirmed your order ${order.orderNumber}`;
-    } else if (status === 'SHIPPED') {
-      notificationTitle = 'Order Shipped';
-      notificationMessage = `Your order ${order.orderNumber} has been shipped`;
-    }
-
     const updatedOrder = await prisma.order.update({
       where: { id: params.id },
-      data: { status },
+      data: { orderStatus: status },
     });
 
     // Notify Importer
-    await prisma.notification.create({
-      data: {
-        userId: order.importerId,
-        type: 'ORDER_UPDATE',
-        title: notificationTitle,
-        message: notificationMessage,
-        link: `/dashboard/importer/orders/${order.id}`,
+    try {
+      let notificationTitle = 'Order Status Updated';
+      let notificationMessage = `Your order ${order.orderNumber} is now ${status}`;
+
+      if (status === 'QUOTE_CONFIRMED') {
+        notificationTitle = 'Order Confirmed';
+        notificationMessage = `Exporter has confirmed your order ${order.orderNumber}`;
+      } else if (status === 'SHIPPED') {
+        notificationTitle = 'Order Shipped';
+        notificationMessage = `Your order ${order.orderNumber} has been shipped`;
       }
-    });
+
+      await prisma.notification.create({
+        data: {
+          userId: order.buyerId,
+          type: 'ORDER_UPDATE',
+          title: notificationTitle,
+          message: notificationMessage,
+          link: `/dashboard/importer/orders?orderId=${order.id}`,
+          linkedEntityId: order.id,
+        }
+      });
+    } catch (notifErr) {
+      console.warn("Failed to create notification:", notifErr);
+      // Don't fail the whole request if notification fails
+    }
 
     return NextResponse.json({ order: updatedOrder });
   } catch (error) {
