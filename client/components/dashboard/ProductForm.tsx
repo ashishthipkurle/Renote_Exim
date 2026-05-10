@@ -178,7 +178,15 @@ export default function ProductForm({
       router.push("/dashboard/exporter/inventory");
       router.refresh();
     } catch (e: any) {
-      toast.error(e.message || "Failed to save product");
+      if (e.details) {
+        const issues = e.details;
+        toast.error(`Validation failed: ${issues[0]?.message || 'Check form fields'}`);
+      } else if (e.response?.data?.details) {
+        const issues = e.response.data.details;
+        toast.error(`Validation failed: ${issues[0]?.message || 'Check form fields'}`);
+      } else {
+        toast.error(e.message || "Failed to save product");
+      }
     } finally {
       setIsSubmitting(false);
     }

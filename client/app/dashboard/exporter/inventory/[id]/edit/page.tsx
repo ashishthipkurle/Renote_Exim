@@ -25,21 +25,47 @@ export default async function EditProductPage({
  redirect("/dashboard/exporter/inventory");
  }
 
- const productData = {
- id: product.id,
- name: product.name,
- category: product.category,
- description: product.description,
- price: product.price,
- minOrderQty: product.minOrderQty,
- unit: product.unit,
- originCountry: product.originCountry,
- hsCode: product.hsCode || "",
- images: product.images,
- certifications: product.certifications,
- available: product.available,
- quantity: product.quantity,
- };
+  // Reverse map for Prisma Enum to Frontend Enum
+  const reverseCategoryMap: Record<string, string> = {
+    'Chemicals': 'CHEMICALS',
+    'Machines': 'MACHINES',
+    'Textiles': 'TEXTILES',
+    'Medical': 'MEDICAL',
+    'Electronics': 'ELECTRONICS',
+    'Agri': 'AGRICULTURE',
+    'Construction': 'CONSTRUCTION',
+    'Handicrafts': 'HANDICRAFTS',
+    'Food': 'FOOD',
+    'Automotive': 'AUTOMOTIVE',
+    'Cosmetics': 'COSMETICS',
+    'Plastics': 'PLASTICS',
+    'Energy': 'ENERGY',
+    'Logistics': 'LOGISTICS',
+    'Packaging': 'PACKAGING',
+    'Metals': 'METALS',
+    'Leather': 'LEATHER',
+    'Furniture': 'FURNITURE',
+    'Toys': 'TOYS',
+    'Sports': 'SPORTS',
+    'Other': 'OTHER',
+  };
 
- return <ProductForm initialData={productData} isEdit />;
+  const productData = {
+    id: product.id,
+    name: product.name,
+    category: reverseCategoryMap[product.category] || "OTHER",
+    description: product.description,
+    price: product.price,
+    regularPrice: product.regularPrice || 0,
+    minOrderQty: product.minOrderQty,
+    unit: product.unit,
+    originCountry: product.originCountry,
+    hsCode: product.hsCode || "",
+    images: product.images,
+    certifications: product.certifications,
+    available: product.available,
+    quantity: product.stockQty,
+  };
+
+  return <ProductForm initialData={productData} isEdit />;
 }

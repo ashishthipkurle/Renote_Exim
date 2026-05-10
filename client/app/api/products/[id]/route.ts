@@ -27,7 +27,6 @@ export async function GET(
  verificationStatus: true,
  email: true,
  phone: true,
- website: true,
  },
  },
  },
@@ -48,10 +47,10 @@ export async function GET(
  return NextResponse.json({ product: displayProduct });
  } catch (error) {
  console.error('Get product error:', error);
- return NextResponse.json(
- { error: 'Failed to fetch product' },
- { status: 500 }
- );
+  return NextResponse.json(
+  { error: 'Failed to fetch product', details: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined },
+  { status: 500 }
+  );
  }
 }
 
@@ -85,52 +84,95 @@ export async function PUT(
  );
  }
 
- const body = await request.json();
- const validatedData = productSchema.partial().parse(body);
+  const body = await request.json();
+  console.log("PUT /api/products/[id] received body:", JSON.stringify(body, null, 2));
 
- const product = await prisma.$transaction(async (tx) => {
- const updatedProduct = await tx.product.update({
- where: { id },
- data: validatedData as any,
- include: {
- exporter: {
- select: {
- id: true,
- name: true,
- businessName: true,
- country: true,
- },
- },
- },
- });
+  let validatedData;
+  try {
+    validatedData = productSchema.partial().parse(body);
+  } catch (parseError: any) {
+    console.error("Zod Parsing Error:", parseError);
+    return NextResponse.json(
+      { 
+        error: `Validation failed: ${parseError.errors?.[0]?.message || parseError.message}`, 
+        details: parseError.errors 
+      },
+      { status: 400 }
+    );
+  }
 
- if (validatedData.price !== undefined && validatedData.price !== existingProduct.price) {
- await tx.priceHistory.create({
- data: {
- productId: updatedProduct.id,
- price: validatedData.price,
- },
- });
- }
+  // Map frontend 'quantity' field to Prisma 'stockQty'
+  const prismaData: any = { ...validatedData };
+  if (prismaData.quantity !== undefined) {
+    prismaData.stockQty = prismaData.quantity;
+    delete prismaData.quantity;
+  }
 
- return updatedProduct;
- });
+  // Map frontend uppercase categories to Prisma schema ENUM
+  const categoryMap: Record<string, string> = {
+    'CHEMICALS': 'Chemicals',
+    'MACHINES': 'Machines',
+    'TEXTILES': 'Textiles',
+    'MEDICAL': 'Medical',
+    'ELECTRONICS': 'Electronics',
+    'AGRICULTURE': 'Agri',
+    'CONSTRUCTION': 'Construction',
+    'HANDICRAFTS': 'Handicrafts',
+    'FOOD': 'Food',
+    'AUTOMOTIVE': 'Automotive',
+    'COSMETICS': 'Cosmetics',
+    'PLASTICS': 'Plastics',
+    'ENERGY': 'Energy',
+    'LOGISTICS': 'Logistics',
+    'PACKAGING': 'Packaging',
+    'METALS': 'Metals',
+    'LEATHER': 'Leather',
+    'FURNITURE': 'Furniture',
+    'TOYS': 'Toys',
+    'SPORTS': 'Sports',
+    'OTHER': 'Other',
+  };
 
- return NextResponse.json({ product });
+  if (prismaData.category) {
+    prismaData.category = categoryMap[prismaData.category] || "Other";
+  }
+
+  const product = await prisma.$transaction(async (tx) => {
+    const updatedProduct = await tx.product.update({
+      where: { id },
+      data: prismaData,
+      include: {
+        exporter: {
+          select: {
+            id: true,
+            name: true,
+            businessName: true,
+            country: true,
+          },
+        },
+      },
+    });
+
+    if (validatedData.price !== undefined && validatedData.price !== existingProduct.price) {
+      await tx.priceHistory.create({
+        data: {
+          productId: updatedProduct.id,
+          price: validatedData.price,
+          currency: existingProduct.currency || "USD",
+        },
+      });
+    }
+
+    return updatedProduct;
+  });
+
+  return NextResponse.json({ product });
  } catch (error: unknown) {
- console.error('Update product error:', error);
-
- if (error instanceof z.ZodError) {
- return NextResponse.json(
- { error: 'Validation failed', details: error.errors },
- { status: 400 }
- );
- }
-
- return NextResponse.json(
- { error: 'Failed to update product' },
- { status: 500 }
- );
+  console.error('Update product error:', error);
+  return NextResponse.json(
+    { error: 'Failed to update product', details: error instanceof Error ? error.message : String(error) },
+    { status: 500 }
+  );
  }
 }
 

@@ -5,8 +5,8 @@ import { getApiAuthContext } from '@/lib/auth-server';
 
 export async function POST(req: NextRequest) {
  try {
- const auth = await getApiAuthContext(req);
- if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+ const { auth, error: authError } = await getApiAuthContext(req);
+ if (authError || !auth) return authError || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
  
  // Exact V3 role check, NO VERIFICATION REQUIRED FOR CONSUMERS
  if (auth.role !== 'CONSUMER' && auth.role !== 'IMPORTER') {

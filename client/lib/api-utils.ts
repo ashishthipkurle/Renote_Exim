@@ -44,10 +44,14 @@ export async function authFetch<T = unknown>(
 
         // Don't retry client errors (4xx) except 429 Too Many Requests
         if (res.status >= 400 && res.status < 500 && res.status !== 429) {
-          throw new Error(errorData.error || `API request failed with status ${res.status}`);
+          const err: any = new Error(errorData.error || `API request failed with status ${res.status}`);
+          err.details = errorData.details;
+          throw err;
         }
 
-        throw new Error(`API error ${res.status}: ${errorData.error || "Unknown error"}`);
+        const err: any = new Error(`API error ${res.status}: ${errorData.error || "Unknown error"}`);
+        err.details = errorData.details;
+        throw err;
       }
 
       return res.json();

@@ -152,47 +152,10 @@ export default function CheckoutPage() {
     };
 
     const startPayment = async () => {
-        const BYPASS_PAYMENT_INIT = true;
-
         setSubmitting(true);
         try {
-            if (BYPASS_PAYMENT_INIT) {
-                // Sync with DB if possible
-                const token = await getAuthToken();
-                if (token && user) {
-                    try {
-                        for (const row of rows) {
-                            const apiPath = user.role === 'IMPORTER' ? '/api/orders/b2b' : '/api/orders/b2c';
-                            await axios.post(apiPath, {
-                                productId: row.item.productId,
-                                quantity: row.item.quantity
-                            }, {
-                                headers: { Authorization: `Bearer ${token}` }
-                            });
-                        }
-                        toast.success("Trade sequence synchronized with registry nodes");
-                    } catch (e: any) {
-                        console.error("DB Sync failed during bypass:", e);
-                        const errorMsg = e.response?.data?.error || e.message;
-                        toast.error(`Registry sync failed: ${errorMsg}. Using local cache only.`);
-                    }
-                }
-
-                const createdIds = saveLocalOrders();
-                toast.success("Order initialized locally");
-                const orderIdForNext = createdIds[0] ?? `BYPASS-${Date.now()}`;
-                router.push(`/dashboard/importer/orders?orderId=${orderIdForNext}`);
-                return;
-            }
-
-            const token = await getAuthToken();
-            if (!token || !user) {
+            if (!user) {
                 toast.error("Please login to place an order");
-                return;
-            }
-
-            if (user.role !== "IMPORTER") {
-                toast.error("Only IMPORTER accounts can place orders");
                 return;
             }
 
@@ -201,14 +164,23 @@ export default function CheckoutPage() {
                 quantity: r.item.quantity
             }));
 
-            const response = await axios.post(
-                "/api/checkout/create-intent",
-                { items: orderItems },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+            // Use fetch with credentials: "include" so HttpOnly cookies are sent automatically
+            const res = await fetch("/api/checkout/create-intent", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ items: orderItems }),
+            });
 
-            setClientSecret(response.data.clientSecret);
-            setOrderId(response.data.orderId);
+            const data = await res.json();
+
+            if (!res.ok) {
+                toast.error(data.error || "Failed to initialize payment");
+                return;
+            }
+
+            setClientSecret(data.clientSecret);
+            setOrderId(data.orderId);
             toast.success("Payment session initialized");
         } catch (error: unknown) {
             toast.error(getApiErrorMessage(error) ?? "Failed to initialize payment");
@@ -334,6 +306,25 @@ export default function CheckoutPage() {
                                                 </div>
                                             </div>
                                         </>
+                                    ) : clientSecret.startsWith('pi_mock_') ? (
+                                        <div className="rounded-lg border border-border bg-card p-8 text-center space-y-6">
+                                            <div className="w-16 h-16 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center mx-auto mb-4">
+                                                <Lock className="w-8 h-8" />
+                                            </div>
+                                            <h3 className="text-xl font-black uppercase tracking-tighter">Development Mode</h3>
+                                            <p className="text-sm font-medium text-muted-foreground">
+                                                No Stripe Secret Key found. Click the button below to mock a successful payment.
+                                            </p>
+                                            <Button
+                                                onClick={() => {
+                                                    saveLocalOrders();
+                                                    router.push('/dashboard/importer/orders');
+                                                }}
+                                                className="w-full h-12 bg-emerald-500 hover:bg-emerald-600 text-white font-black uppercase tracking-widest rounded-xl transition-all"
+                                            >
+                                                Simulate Payment Success
+                                            </Button>
+                                        </div>
                                     ) : (
                                         <div className="rounded-lg border border-border bg-card p-8">
                                             <Elements

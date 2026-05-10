@@ -6,64 +6,90 @@ import { getApiAuthContext } from '@/lib/auth-server';
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
- try {
- const auth = await getApiAuthContext(req);
- if (!auth) {
- return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
- }
+  try {
+    const { auth, error: authError } = await getApiAuthContext(req);
+    if (authError || !auth) {
+      return authError || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
- const body = await req.json();
- const items = body.items || [];
- 
- if (!items || !Array.isArray(items) || items.length === 0) {
- return NextResponse.json({ error: 'Items are required' }, { status: 400 });
- }
+    const body = await req.json();
+    const items = body.items || [];
+    
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return NextResponse.json({ error: 'Items are required' }, { status: 400 });
+    }
 
- const firstItem = items[0];
+    let totalAmount = 0;
+    const createdOrders = [];
+    const groupId = `GRP-${Date.now()}`;
 
- const product = await prisma.product.findUnique({
- where: { id: firstItem.productId },
- });
+    for (const item of items) {
+      const product = await prisma.product.findUnique({
+        where: { id: item.productId },
+      });
 
- if (!product) {
- return NextResponse.json({ error: `Product not found: ${firstItem.productId}` }, { status: 404 });
- }
+      if (!product) {
+        return NextResponse.json({ error: `Product not found: ${item.productId}` }, { status: 404 });
+      }
 
- const totalPrice = product.price * firstItem.quantity;
+      const unitPrice = product.price; // or b2bPrice/b2cPrice depending on logic
+      const itemTotal = unitPrice * item.quantity;
+      totalAmount += itemTotal;
 
- // 1. Create the Order in PENDING status
- const order = await prisma.order.create({
- data: {
- orderNumber: `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
- importerId: auth.userId,
- productId: product.id,
- quantity: firstItem.quantity,
- totalPrice: totalPrice,
- status: 'PENDING',
- paymentStatus: 'PENDING',
- },
- });
+      // 1. Create the Order in PENDING status
+      const order = await prisma.order.create({
+        data: {
+          orderNumber: `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+          orderType: auth.role === 'IMPORTER' ? 'B2B' : 'B2C',
+          buyerId: auth.userId,
+          sellerId: product.exporterId,
+          productId: product.id,
+          quantity: item.quantity,
+          unitPrice: unitPrice,
+          totalPrice: itemTotal,
+          currency: product.currency || 'USD',
+          orderStatus: 'CHECKOUT',
+          paymentStatus: 'PENDING',
+          stripePaymentIntentId: groupId, // Using this to group them temporarily
+        },
+      });
+      createdOrders.push(order);
+    }
 
- // 2. Create Stripe Payment Intent
- const paymentIntent = await stripe.paymentIntents.create({
- amount: Math.round(totalPrice * 100),
- currency: 'usd',
- metadata: {
- userId: auth.userId,
- orderId: order.id,
- },
- automatic_payment_methods: {
- enabled: true,
- },
- });
+    // 2. Create Stripe Payment Intent
+    let clientSecret = 'pi_mock_secret_dummy_123';
+    let paymentIntentId = `pi_mock_${Date.now()}`;
 
- return NextResponse.json({
- clientSecret: paymentIntent.client_secret,
- orderId: order.id,
- amount: totalPrice,
- });
- } catch (error: any) {
- console.error('Payment Intent Error:', error);
- return NextResponse.json({ error: error.message }, { status: 500 });
- }
+    // Only call Stripe API if a real secret key is configured
+    if (process.env.STRIPE_SECRET_KEY) {
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: Math.max(50, Math.round(totalAmount * 100)), // Stripe requires at least 50 cents
+        currency: 'usd',
+        metadata: {
+          userId: auth.userId,
+          orderGroupId: groupId,
+        },
+        automatic_payment_methods: {
+          enabled: true,
+        },
+      });
+      clientSecret = paymentIntent.client_secret as string;
+      paymentIntentId = paymentIntent.id;
+    }
+
+    // 3. Update orders with actual payment intent ID
+    await prisma.order.updateMany({
+      where: { stripePaymentIntentId: groupId },
+      data: { stripePaymentIntentId: paymentIntentId },
+    });
+
+    return NextResponse.json({
+      clientSecret: clientSecret,
+      orderId: groupId, // Pass group ID or comma separated
+      amount: totalAmount,
+    });
+  } catch (error: any) {
+    console.error('Payment Intent Error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 }
