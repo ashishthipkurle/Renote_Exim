@@ -30,16 +30,16 @@ export async function GET(request: NextRequest) {
     const where: Record<string, unknown> = {};
 
     if (auth.role === 'IMPORTER') {
-      where.order = { importerId: auth.userId };
+      where.order = { buyerId: auth.userId };
     } else if (auth.role === 'EXPORTER') {
-      where.order = { product: { exporterId: auth.userId } };
+      where.order = { sellerId: auth.userId };
     }
     // ADMIN sees all shipments
 
     if (status) {
       const parsed = shipmentStatusSchema.safeParse(status);
       if (parsed.success) {
-        where.status = parsed.data;
+        where.currentStatus = parsed.data;
       }
     }
 
@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
           order: {
             include: {
               product: { select: { name: true, category: true } },
-              importer: { select: { name: true, businessName: true, country: true } },
+              buyer: { select: { name: true, businessName: true, country: true } },
             },
           },
         },
@@ -125,34 +125,31 @@ export async function POST(request: NextRequest) {
     const shipment = await prisma.shipment.create({
       data: {
         orderId: parsed.data.orderId,
-        userId: auth.userId,
+        courierId: parsed.data.carrier,
         trackingNumber,
-        carrier: parsed.data.carrier,
         origin: parsed.data.origin,
         destination: parsed.data.destination,
         estimatedDelivery: new Date(parsed.data.estimatedDelivery),
-        status: 'PREPARING',
-        statusHistory: [
-          { status: 'PREPARING', timestamp: new Date().toISOString(), note: 'Shipment created' },
-        ],
+        currentStatus: 'PREPARING',
       },
     });
 
     // Update order status to PROCESSING
     await prisma.order.update({
       where: { id: parsed.data.orderId },
-      data: { status: 'PROCESSING' },
+      data: { orderStatus: 'PROCESSING' },
     });
 
     // Notify the importer
     try {
       await prisma.notification.create({
         data: {
-          userId: order.importerId,
-          type: 'ORDER_SHIPPED',
+          userId: order.buyerId,
+          type: 'SHIPMENT_UPDATE',
           title: 'Shipment Created',
           message: `Your order ${order.orderNumber} is being prepared for shipment. Tracking: ${trackingNumber}`,
-          link: `/orders`,
+          link: `/dashboard/importer/orders`,
+          linkedEntityId: order.id,
         },
       });
     } catch {

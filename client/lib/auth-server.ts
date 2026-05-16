@@ -53,6 +53,33 @@ async function fetchWithTimeout(url: string, options: any, timeout = 5000) {
 }
 
 /**
+ * Validates a JWT token offline by checking its expiration and extracting the user ID.
+ * This avoids hitting the Nhost API on every request, preventing rate limits and timeouts
+ * that cause false redirects to the login page.
+ */
+function validateTokenOffline(accessToken: string): { userId: string } | null {
+  try {
+    const parts = accessToken.split('.');
+    if (parts.length !== 3) return null;
+
+    const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = Buffer.from(base64, 'base64').toString('utf-8');
+    const payload = JSON.parse(jsonPayload);
+
+    if (!payload || !payload.exp || !payload.sub) return null;
+
+    // Check expiration with a 30-second buffer (same as middleware)
+    const currentTime = Math.floor(Date.now() / 1000);
+    if (payload.exp <= (currentTime + 30)) return null;
+
+    return { userId: payload.sub };
+  } catch (e) {
+    console.error("[Auth Server] Offline JWT validation error:", e);
+    return null;
+  }
+}
+
+/**
  * Gets the current authenticated user context on the server side.
  * This matches the legacy getApiAuthContext signature from lib/supabase/auth.ts
  * to make refactoring easier.
@@ -96,7 +123,20 @@ export async function getApiAuthContext(
       };
     }
 
-    // 2. Verify with Nhost via direct API call (most robust way in Server context)
+    // 2. FAST PATH: Validate the JWT offline to skip Nhost API calls entirely.
+    //    This prevents rate-limiting and timeouts that cause false login redirects.
+    const offlineResult = validateTokenOffline(accessToken);
+    if (offlineResult) {
+      console.log("[Auth Server] Token validated offline for user:", offlineResult.userId);
+      const fastContext = await getContextForUser(offlineResult.userId, allowedRoles);
+      if (fastContext.auth) {
+        return { ...fastContext, newAccessToken: undefined, newRefreshToken: undefined };
+      }
+      // User not in Prisma DB despite valid JWT — fall through to Nhost API
+      console.warn("[Auth Server] Offline-validated user not found in DB. Falling back to Nhost API.");
+    }
+
+    // 3. SLOW PATH: Verify with Nhost via direct API call (fallback for expired/invalid JWTs)
     const subdomain = process.env.NEXT_PUBLIC_NHOST_SUBDOMAIN;
     const region = process.env.NEXT_PUBLIC_NHOST_REGION;
     const verifyUrl = `https://${subdomain}.auth.${region}.nhost.run/v1/user`;

@@ -27,9 +27,10 @@ interface ExporterStats {
 }
 interface OrderItem {
  id: string; orderNumber: string; totalPrice: number;
- status: string; createdAt: string;
+ orderStatus: string; status?: string; createdAt: string;
  product: { name: string; category?: string };
- importer: { name: string; businessName: string | null; country: string | null };
+ buyer?: { name: string; businessName: string | null; country: string | null };
+ importer?: { name: string; businessName: string | null; country: string | null };
 }
 interface CategoryRevenue { category: string; revenue: number; orderCount: number }
 interface Partner {
@@ -183,9 +184,9 @@ export default function ExporterDashboard() {
  return allOrders.filter(o =>
  o.product.name.toLowerCase().includes(q) ||
  o.orderNumber.toLowerCase().includes(q) ||
- o.status.toLowerCase().includes(q) ||
- (o.importer.businessName || o.importer.name).toLowerCase().includes(q) ||
- (o.importer.country || "").toLowerCase().includes(q)
+ (o.orderStatus || o.status || '').toLowerCase().includes(q) ||
+ ((o.buyer || o.importer)?.businessName || (o.buyer || o.importer)?.name || '').toLowerCase().includes(q) ||
+ ((o.buyer || o.importer)?.country || '').toLowerCase().includes(q)
  ).slice(0, 8);
  }, [search, allOrders]);
 
@@ -442,12 +443,12 @@ export default function ExporterDashboard() {
  <div className={`w-12 h-12 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center font-black text-[10px] border border-border dark:border-white/10 flex-shrink-0 group-hover:scale-110 transition-transform`}>{getInitials(order.product.name)}</div>
  <div className="min-w-0">
  <h4 className="text-xs font-black text-foreground dark:text-white uppercase tracking-wider truncate">{order.product.name}</h4>
- <p className="text-[9px] text-muted-foreground uppercase tracking-widest mt-1 opacity-60 font-black">{order.importer.businessName || order.importer.name} · {timeAgo(order.createdAt)}</p>
+ <p className="text-[9px] text-muted-foreground uppercase tracking-widest mt-1 opacity-60 font-black">{(order.buyer || order.importer)?.businessName || (order.buyer || order.importer)?.name || 'Customer'} · {timeAgo(order.createdAt)}</p>
  </div>
  </div>
  <div className="text-right flex-shrink-0 ml-4">
  <p className="text-sm font-black text-foreground dark:text-white ">{formatCurrency(order.totalPrice)}</p>
- <span className={`text-[8px] font-black uppercase tracking-tighter px-2 py-0.5 rounded border mt-2 inline-block ${STATUS_BG[order.status] || ""} ${STATUS_COLORS[order.status] || ""}`}>{order.status}</span>
+ <span className={`text-[8px] font-black uppercase tracking-tighter px-2 py-0.5 rounded border mt-2 inline-block ${STATUS_BG[order.orderStatus || order.status || ''] || ''} ${STATUS_COLORS[order.orderStatus || order.status || ''] || ''}`}>{order.orderStatus || order.status}</span>
  </div>
  </Link>
  ))}

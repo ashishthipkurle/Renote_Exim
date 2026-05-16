@@ -39,6 +39,7 @@ export default function DashboardHeader() {
 
   const pathname = usePathname();
   const isMarketplace = pathname === "/products" || pathname.startsWith("/products/");
+  const isExporter = pathname.startsWith("/dashboard/exporter");
 
 
 
@@ -123,10 +124,12 @@ export default function DashboardHeader() {
                 </Link>
               )}
 
-              {/* Cart */}
-              <div className="size-9 flex items-center justify-center rounded-full hover:bg-primary/10 transition-all border border-transparent hover:border-primary/20 group">
-                <CartSheet />
-              </div>
+              {/* Cart — hidden for exporters */}
+              {!isExporter && (
+                <div className="size-9 flex items-center justify-center rounded-full hover:bg-primary/10 transition-all border border-transparent hover:border-primary/20 group">
+                  <CartSheet />
+                </div>
+              )}
 
               {/* Notifications */}
               <NotificationBell />

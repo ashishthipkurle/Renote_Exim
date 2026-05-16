@@ -130,81 +130,75 @@ export async function middleware(request: NextRequest) {
     // Fail open if Redis is down
   }
 
-  // 3. Authentication & Route Guarding for Dashboard pages
-  if (path.startsWith('/dashboard')) {
-    const accessToken = request.cookies.get(AUTH_COOKIE_NAME)?.value;
-    const refreshToken = request.cookies.get(REFRESH_COOKIE_NAME)?.value;
+  // 3. Global Token Refresh — applies to ALL routes with auth cookies.
+  //    This ensures /api/auth/me and other API routes also get fresh tokens,
+  //    preventing 122-second hangs when expired JWTs hit the Nhost API directly.
+  const accessToken = request.cookies.get(AUTH_COOKIE_NAME)?.value;
+  const refreshToken = request.cookies.get(REFRESH_COOKIE_NAME)?.value;
 
-    // Case 1: No tokens at all → redirect to login
-    if (!accessToken && !refreshToken) {
-      console.log("[Middleware] No auth cookies at all, redirecting to /login");
-      return NextResponse.redirect(new URL('/login', request.url));
-    }
-
-    // Case 2: Access token exists → verify it. If expired, try to refresh.
-    // Case 3: No access token but refresh token exists → refresh immediately.
+  if (accessToken || refreshToken) {
     let needsRefresh = false;
 
     if (accessToken) {
-      // Verify the access token offline
-      const valid = isTokenValid(accessToken);
-      if (!valid) {
-        console.log("[Middleware] Access token expired locally, will attempt refresh.");
+      if (!isTokenValid(accessToken)) {
+        console.log("[Middleware] Access token expired, will attempt refresh.");
         needsRefresh = true;
       }
     } else {
-      // No access token, but we have a refresh token
       needsRefresh = true;
     }
 
     if (needsRefresh) {
       if (!refreshToken) {
-        console.log("[Middleware] No refresh token available, redirecting to /login");
-        return NextResponse.redirect(new URL('/login', request.url));
+        // No refresh token — only block dashboard access
+        if (path.startsWith('/dashboard')) {
+          return NextResponse.redirect(new URL('/login', request.url));
+        }
+      } else {
+        const newTokens = await refreshAccessToken(refreshToken);
+        if (newTokens) {
+          // SUCCESS: Forward fresh token to downstream server code
+          const requestHeaders = new Headers(request.headers);
+          requestHeaders.set('x-refreshed-access-token', newTokens.accessToken);
+
+          const response = NextResponse.next({
+            request: { headers: requestHeaders },
+          });
+
+          response.cookies.set(AUTH_COOKIE_NAME, newTokens.accessToken, {
+            path: "/",
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax" as const,
+            maxAge: 60 * 60 * 24 * 7,
+          });
+
+          response.cookies.set(REFRESH_COOKIE_NAME, newTokens.refreshToken, {
+            path: "/",
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax" as const,
+            maxAge: 60 * 60 * 24 * 30,
+          });
+
+          if (request.cookies.get(cookieName)?.value !== lng) {
+            response.cookies.set(cookieName, lng, { path: '/' });
+          }
+
+          return response;
+        } else {
+          // Refresh failed — only block dashboard access
+          if (path.startsWith('/dashboard')) {
+            console.log("[Middleware] Refresh failed, redirecting to /login");
+            return NextResponse.redirect(new URL('/login', request.url));
+          }
+        }
       }
-
-      const newTokens = await refreshAccessToken(refreshToken);
-      if (!newTokens) {
-        console.log("[Middleware] Refresh failed, redirecting to /login");
-        return NextResponse.redirect(new URL('/login', request.url));
-      }
-
-      // SUCCESS: Forward the fresh access token as a request header so the
-      // downstream server component can read it immediately.
-      const requestHeaders = new Headers(request.headers);
-      requestHeaders.set('x-refreshed-access-token', newTokens.accessToken);
-
-      // Create the outgoing response with the modified request headers
-      const response = NextResponse.next({
-        request: {
-          headers: requestHeaders,
-        },
-      });
-
-      // Set the fresh tokens on the response cookies
-      response.cookies.set(AUTH_COOKIE_NAME, newTokens.accessToken, {
-        path: "/",
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax" as const,
-        maxAge: 60 * 60 * 24 * 7, // 1 week
-      });
-
-      response.cookies.set(REFRESH_COOKIE_NAME, newTokens.refreshToken, {
-        path: "/",
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax" as const,
-        maxAge: 60 * 60 * 24 * 30, // 30 days
-      });
-
-      // Set language cookie if needed
-      if (request.cookies.get(cookieName)?.value !== lng) {
-        response.cookies.set(cookieName, lng, { path: '/' });
-      }
-
-      return response;
     }
+  } else if (path.startsWith('/dashboard')) {
+    // No tokens at all trying to access dashboard
+    console.log("[Middleware] No auth cookies, redirecting to /login");
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 
   const response = NextResponse.next();

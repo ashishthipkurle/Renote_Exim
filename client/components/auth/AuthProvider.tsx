@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from "react";
 import axios from "axios";
 import { nhost } from "@/lib/nhost";
 import type { StoredUser } from "@/lib/auth-client";
@@ -34,7 +34,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     return null;
   });
-  const [loading, setLoading] = useState(true);
+  // Only show loading spinner if there's no cached user.
+  // If we have a cached user, show them immediately and refresh silently in the background.
+  const [loading, setLoading] = useState(() => {
+    if (typeof window !== "undefined") {
+      return !window.localStorage.getItem("user_profile");
+    }
+    return true;
+  });
 
   /**
    * Syncs the Nhost session to server-side cookies via our sync API.
@@ -52,11 +59,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const fetchUser = useCallback(async () => {
+  // Prevent multiple concurrent fetchUser calls (e.g., visibility change + periodic timer firing together)
+  const fetchInProgress = useRef(false);
+
+  const fetchUser = useCallback(async (silent = false) => {
+    if (fetchInProgress.current) {
+      console.log("[AuthProvider] Fetch already in progress, skipping.");
+      return;
+    }
+    fetchInProgress.current = true;
     try {
-      setLoading(true);
-      // Add cache buster to ensure we get fresh data after redirect
-      const res = await axios.get(`/api/auth/me?t=${Date.now()}`);
+      if (!silent) setLoading(true);
+      const res = await axios.get(`/api/auth/me?t=${Date.now()}`, { timeout: 15000 });
       console.log("[AuthProvider] User fetch result:", !!res.data.user);
       
       if (res.data.user) {
@@ -99,12 +113,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
     } finally {
+      fetchInProgress.current = false;
       setLoading(false);
     }
   }, [syncSession]);
 
   const refreshUser = useCallback(async () => {
-    await fetchUser();
+    await fetchUser(true); // Silent refresh — calling component has its own loading state
   }, [fetchUser]);
 
   const logout = async () => {
@@ -135,22 +150,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     console.log("[AuthProvider] Provider mounted. Current user state:", !!user);
     
-    // 1. Initial Data Fetch
-    fetchUser();
+    // 1. Initial Data Fetch — silent if we have a cached user (prevents profile circle flicker)
+    const hasCachedUser = typeof window !== "undefined" && !!window.localStorage.getItem("user_profile");
+    fetchUser(hasCachedUser);
     
     // 2. Proactive Token Refresh
     // Nhost tokens expire in 15 mins. Refresh every 10 mins.
     const REFRESH_INTERVAL_MS = 10 * 60 * 1000;
     const intervalId = setInterval(() => {
       console.log("[AuthProvider] Periodic token refresh triggered.");
-      fetchUser();
+      fetchUser(true); // Always silent — don't disrupt the UI
     }, REFRESH_INTERVAL_MS);
 
     // 3. Visibility Change Handler
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
         console.log("[AuthProvider] Tab became visible. Refreshing session...");
-        fetchUser();
+        fetchUser(true); // Always silent — don't disrupt the UI
       }
     };
     document.addEventListener("visibilitychange", handleVisibilityChange);

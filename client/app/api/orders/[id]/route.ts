@@ -12,14 +12,15 @@ const statusUpdateSchema = z.object({
 // GET /api/orders/[id] - Get single order details
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const auth = await getApiAuthContext(request).then(res => res.auth);
     if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const order = await prisma.order.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         product: true,
         buyer: {
@@ -51,9 +52,10 @@ export async function GET(
 // PATCH /api/orders/[id] - Update order status
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const auth = await getApiAuthContext(request).then(res => res.auth);
     if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -61,7 +63,7 @@ export async function PATCH(
     const { status } = statusUpdateSchema.parse(body);
 
     const order = await prisma.order.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!order) return NextResponse.json({ error: 'Order not found' }, { status: 404 });
@@ -73,7 +75,7 @@ export async function PATCH(
     if (!canUpdate) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
     const updatedOrder = await prisma.order.update({
-      where: { id: params.id },
+      where: { id },
       data: { orderStatus: status },
     });
 

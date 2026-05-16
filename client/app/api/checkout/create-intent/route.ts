@@ -14,6 +14,8 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     const items = body.items || [];
+    const shippingAddress = body.shippingAddress || '';
+    const phone = body.phone || '';
     
     if (!items || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json({ error: 'Items are required' }, { status: 400 });
@@ -32,11 +34,11 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: `Product not found: ${item.productId}` }, { status: 404 });
       }
 
-      const unitPrice = product.price; // or b2bPrice/b2cPrice depending on logic
+      const unitPrice = product.price;
       const itemTotal = unitPrice * item.quantity;
       totalAmount += itemTotal;
 
-      // 1. Create the Order in PENDING status
+      // 1. Create the Order with shipping details in notes
       const order = await prisma.order.create({
         data: {
           orderNumber: `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
@@ -50,7 +52,8 @@ export async function POST(req: NextRequest) {
           currency: product.currency || 'USD',
           orderStatus: 'CHECKOUT',
           paymentStatus: 'PENDING',
-          stripePaymentIntentId: groupId, // Using this to group them temporarily
+          stripePaymentIntentId: groupId,
+          notes: shippingAddress ? `Ship to: ${shippingAddress}${phone ? ` | Phone: ${phone}` : ''}` : null,
         },
       });
       createdOrders.push(order);

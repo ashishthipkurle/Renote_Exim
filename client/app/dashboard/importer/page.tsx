@@ -16,8 +16,10 @@ interface ImporterStats {
 interface Order {
  id: string;
  orderNumber: string;
- totalAmount: number;
- status: string;
+ totalPrice: number;
+ totalAmount?: number;
+ orderStatus: string;
+ status?: string;
  createdAt: string;
  product?: { name: string };
 }
@@ -46,8 +48,8 @@ const insightStyle: Record<string, { color: string; bg: string; border: string }
 
 // Removed static bubbles array, using dynamic category data instead
 
-function feedColor(status: string) {
- switch (status.toUpperCase()) {
+function feedColor(status: string | undefined) {
+ switch ((status || '').toUpperCase()) {
  case "PENDING": return "bg-neutral-400";
  case "CONFIRMED": return "bg-white";
  case "PROCESSING": return "bg-neutral-500";
@@ -349,17 +351,17 @@ export default function ImporterDashboard() {
  ) : (
  orders.map((o) => (
  <div key={o.id} className="flex gap-4 items-start p-4 rounded-xl bg-muted/40 border border-border hover:bg-muted/60 hover:border-primary/20 transition-all cursor-pointer shadow-xl">
- <div className={`mt-2 size-2 rounded-full ${feedColor(o.status)} flex-shrink-0 shadow-[0_0_8px_rgba(212,175,55,0.2)]`} />
+ <div className={`mt-2 size-2 rounded-full ${feedColor(o.orderStatus || o.status)} flex-shrink-0 shadow-[0_0_8px_rgba(212,175,55,0.2)]`} />
  <div className="flex-1 min-w-0">
  <p className="text-[10px] font-black text-foreground uppercase tracking-tight ">TRANSACTION {o.orderNumber}</p>
- <p className="text-[9px] text-muted-foreground font-black uppercase tracking-widest truncate mt-0.5">{o.product?.name ?? "—"} · {formatCurrency(o.totalAmount)}</p>
+ <p className="text-[9px] text-muted-foreground font-black uppercase tracking-widest truncate mt-0.5">{o.product?.name ?? "—"} · {formatCurrency(o.totalPrice ?? o.totalAmount ?? 0)}</p>
  <p className="text-[8px] text-muted-foreground/30 mt-1.5 font-black uppercase tracking-widest">{timeAgo(o.createdAt)}</p>
  </div>
- <span className={`text-[9px] font-black px-2 py-1 rounded-lg border uppercase tracking-widest ${o.status === "DELIVERED" ? "bg-muted/30 text-foreground border-border" :
- o.status === "SHIPPED" ? "bg-muted/30 text-foreground border-border" :
- o.status === "PENDING" ? "bg-muted/20 text-muted-foreground border-border" :
+ <span className={`text-[9px] font-black px-2 py-1 rounded-lg border uppercase tracking-widest ${(o.orderStatus || o.status) === "DELIVERED" ? "bg-muted/30 text-foreground border-border" :
+ (o.orderStatus || o.status) === "SHIPPED" ? "bg-muted/30 text-foreground border-border" :
+ (o.orderStatus || o.status) === "PENDING" ? "bg-muted/20 text-muted-foreground border-border" :
  "bg-neutral-900 text-muted-foreground border-neutral-800"
- }`}>{o.status}</span>
+ }`}>{o.orderStatus || o.status}</span>
  </div>
  ))
  )}
