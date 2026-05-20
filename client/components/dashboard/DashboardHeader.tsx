@@ -207,10 +207,12 @@ export default function DashboardHeader() {
                             <HomeIcon className="mr-3 h-4 w-4 text-muted-foreground" />
                             <span className="text-sm font-medium">{t("home", "Home")}</span>
                           </Link>
-                          <Link href="/dashboard" className="flex items-center rounded-xl cursor-pointer py-2.5 px-3 hover:bg-secondary/80 transition-colors" onClick={() => setIsProfileOpen(false)}>
-                            <LayoutDashboard className="mr-3 h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm font-medium">{t("dashboard", "Dashboard")}</span>
-                          </Link>
+                          {user.role !== "USER" && (
+                            <Link href="/dashboard" className="flex items-center rounded-xl cursor-pointer py-2.5 px-3 hover:bg-secondary/80 transition-colors" onClick={() => setIsProfileOpen(false)}>
+                              <LayoutDashboard className="mr-3 h-4 w-4 text-muted-foreground" />
+                              <span className="text-sm font-medium">{t("dashboard", "Dashboard")}</span>
+                            </Link>
+                          )}
                           <Link href="/profile" className="flex items-center rounded-xl cursor-pointer py-2.5 px-3 hover:bg-secondary/80 transition-colors" onClick={() => setIsProfileOpen(false)}>
                             <Settings className="mr-3 h-4 w-4 text-muted-foreground" />
                             <span className="text-sm font-medium">Profile & Settings</span>
