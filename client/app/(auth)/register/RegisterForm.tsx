@@ -95,14 +95,61 @@ function RegisterFormContent() {
     form.setValue("country", val);
   };
 
+  const [showOtpStep, setShowOtpStep] = useState(false);
+  const [registerData, setRegisterData] = useState<RegisterInput | null>(null);
+  const [mfaCode, setMfaCode] = useState("");
+
   const onSubmit = async (data: RegisterInput) => {
+    // Check if phone number is valid before showing OTP
+    if (!data.phone) {
+      toast.error("Please enter a valid phone number.");
+      return;
+    }
+    
+    // Send a real OTP to the user's email
+    setIsLoading(true);
+    try {
+      const res = await axios.post("/api/auth/send-otp", {
+        email: data.email,
+        purpose: "REGISTER",
+      });
+      setRegisterData(data);
+      setShowOtpStep(true);
+      setMfaCode("");
+      toast.success("Verification code sent to your email!");
+      if (res.data.devCode) {
+        console.log("[Dev] OTP Code:", res.data.devCode);
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || "Failed to send verification code");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const verifyOtpAndRegister = async () => {
+    if (!registerData) return;
     setIsLoading(true);
 
     try {
-      const fullPhone = data.phone ? `+${dialCode} ${data.phone}` : "";
+      // 1. Verify OTP
+      const verifyRes = await axios.post("/api/auth/verify-otp", {
+        email: registerData.email,
+        code: mfaCode,
+        purpose: "REGISTER",
+      });
+
+      if (!verifyRes.data.verified) {
+        toast.error("Invalid verification code.");
+        setIsLoading(false);
+        return;
+      }
+
+      // 2. Proceed with registration
+      const fullPhone = registerData.phone ? `+${dialCode} ${registerData.phone}` : "";
 
       const response = await axios.post("/api/auth/register", {
-        ...data,
+        ...registerData,
         phone: fullPhone,
       });
 
@@ -126,6 +173,7 @@ function RegisterFormContent() {
       } else {
         toast.error(resp?.data?.error || "Registration failed");
       }
+      setShowOtpStep(false);
     } finally {
       setIsLoading(false);
     }
@@ -201,46 +249,91 @@ function RegisterFormContent() {
               <p className="text-muted-foreground text-sm">Join the Renote Exim global trade network.</p>
             </div>
 
-            <div className="mb-8 w-full">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  disabled={!!oauthLoading}
-                  onClick={() => handleOAuthSignIn("google")}
-                  className="h-[46px] font-medium text-foreground bg-background dark:bg-card border border-border hover:bg-muted transition-all rounded-lg shadow-sm text-sm"
+            {showOtpStep ? (
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <h1 className="text-3xl font-extrabold tracking-tight">Email & Phone Verification</h1>
+                  <p className="text-muted-foreground">Enter the 6-digit code sent to your email and phone number.</p>
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground">Verification Code</label>
+                  <Input
+                    type="text"
+                    placeholder="123456"
+                    value={mfaCode}
+                    onChange={(e) => setMfaCode(e.target.value)}
+                    className="h-14 text-center text-2xl font-black tracking-widest rounded-lg bg-slate-100/50 dark:bg-muted/30 border-border"
+                  />
+                </div>
+                <Button 
+                  onClick={verifyOtpAndRegister} 
+                  disabled={isLoading || mfaCode.length < 6}
+                  size="lg" 
+                  className="h-14 w-full rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-black text-xs uppercase tracking-[0.2em] shadow-xl transition-all"
                 >
-                  {oauthLoading === "google" ? (
-                    <Loader2 className="size-5 mr-3 animate-spin" />
-                  ) : (
-                    <FcGoogle className="size-5 mr-3" />
-                  )}
-                  Sign up with Google
+                  {isLoading ? <Loader2 className="animate-spin size-5" /> : "Verify & Complete Registration"}
                 </Button>
-
-                <Button
-                  type="button"
-                  disabled={!!oauthLoading}
-                  onClick={() => handleOAuthSignIn("linkedin")}
-                  className="h-[46px] font-medium text-white bg-[#0A66C2] hover:bg-[#0A66C2]/90 border-0 transition-all rounded-lg shadow-sm text-sm"
-                >
-                  {oauthLoading === "linkedin" ? (
-                    <Loader2 className="size-5 mr-3 animate-spin" />
-                  ) : (
-                    <FaLinkedin className="size-5 mr-3" />
-                  )}
-                  Sign up with LinkedIn
-                </Button>
+                
+                <div className="flex flex-col gap-2 pt-2">
+                  <Button
+                    variant="outline"
+                    disabled={isLoading}
+                    onClick={() => registerData && onSubmit(registerData)}
+                    className="w-full h-12 text-xs font-bold uppercase tracking-wider"
+                  >
+                    Resend Verification Code
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => setShowOtpStep(false)}
+                    className="w-full text-xs font-bold uppercase tracking-wider text-muted-foreground"
+                  >
+                    Back to Registration
+                  </Button>
+                </div>
               </div>
+            ) : (
+              <>
+                <div className="mb-8 w-full">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      disabled={!!oauthLoading}
+                      onClick={() => handleOAuthSignIn("google")}
+                      className="h-[46px] font-medium text-foreground bg-background dark:bg-card border border-border hover:bg-muted transition-all rounded-lg shadow-sm text-sm"
+                    >
+                      {oauthLoading === "google" ? (
+                        <Loader2 className="size-5 mr-3 animate-spin" />
+                      ) : (
+                        <FcGoogle className="size-5 mr-3" />
+                      )}
+                      Sign up with Google
+                    </Button>
 
-              <div className="flex items-center gap-3 mb-8 w-full">
-                <hr className="flex-1 border-border" />
-                <span className="text-muted-foreground text-[11px] font-bold uppercase tracking-wider">Or email registration</span>
-                <hr className="flex-1 border-border" />
-              </div>
-            </div>
+                    <Button
+                      type="button"
+                      disabled={!!oauthLoading}
+                      onClick={() => handleOAuthSignIn("linkedin")}
+                      className="h-[46px] font-medium text-white bg-[#0A66C2] hover:bg-[#0A66C2]/90 border-0 transition-all rounded-lg shadow-sm text-sm"
+                    >
+                      {oauthLoading === "linkedin" ? (
+                        <Loader2 className="size-5 mr-3 animate-spin" />
+                      ) : (
+                        <FaLinkedin className="size-5 mr-3" />
+                      )}
+                      Sign up with LinkedIn
+                    </Button>
+                  </div>
 
-            <Form {...form}>
+                  <div className="flex items-center gap-3 mb-8 w-full">
+                    <hr className="flex-1 border-border" />
+                    <span className="text-muted-foreground text-[11px] font-bold uppercase tracking-wider">Or email registration</span>
+                    <hr className="flex-1 border-border" />
+                  </div>
+                </div>
+
+                <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-x-6 gap-y-4">
                   <FormField
@@ -430,6 +523,8 @@ function RegisterFormContent() {
                 </p>
               </form>
             </Form>
+            </>
+            )}
           </div>
         </div>
       </div>

@@ -23,10 +23,18 @@ export default function CartSheet() {
  // For now we'll just show the IDs or mock data if we had it
  
  useEffect(() => {
- if (isOpen) {
- setItems(getCart());
- }
+   if (isOpen) {
+     setItems(getCart());
+   }
  }, [isOpen]);
+
+ useEffect(() => {
+   const updateCart = () => setItems(getCart());
+   window.addEventListener("renote-cart-updated", updateCart);
+   // Also initialize cart on mount so badge is correct
+   updateCart();
+   return () => window.removeEventListener("renote-cart-updated", updateCart);
+ }, []);
 
  const handleUpdateQuantity = (id: string, q: number) => {
  updateQuantity(id, q);
@@ -133,11 +141,18 @@ export default function CartSheet() {
  <p className="text-[10px] text-muted-foreground/60 font-black uppercase tracking-[0.2em] text-center">
  Transit logistics calculated at port departure
  </p>
- <Button asChild className="w-full bg-primary hover:bg-primary/90 text-primary-foreground h-14 rounded-lg font-black text-xs uppercase tracking-widest shadow-2xl shadow-primary/20 hover:-translate-y-1 transition-all">
- <Link href="/checkout" onClick={() => setIsOpen(false)}>
- Proceed to Checkout
- </Link>
- </Button>
+ <div className="flex gap-2">
+   <Button asChild variant="outline" className="flex-1 h-12 rounded-lg font-black text-[10px] sm:text-xs uppercase tracking-widest hover:bg-accent transition-all">
+     <Link href="/cart" onClick={() => setIsOpen(false)}>
+       View Cart
+     </Link>
+   </Button>
+   <Button asChild className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground h-12 rounded-lg font-black text-[10px] sm:text-xs uppercase tracking-widest shadow-xl shadow-primary/20 hover:-translate-y-1 transition-all">
+     <Link href="/checkout" onClick={() => setIsOpen(false)}>
+       Checkout
+     </Link>
+   </Button>
+ </div>
  </div>
  </SheetFooter>
  )}

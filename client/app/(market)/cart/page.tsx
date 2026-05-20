@@ -5,15 +5,21 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import axios from "axios";
-import { Heart, Minus, Plus, Trash2, Lock } from "lucide-react";
+import { Heart, Minus, Plus, Trash2, Lock, ChevronLeft } from "lucide-react";
 import { toast } from "sonner";
+import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import { SidebarProvider } from "@/components/ui/sidebar";
 
 import { getCart, removeFromCart, updateQuantity, type CartItem } from "@/lib/cart";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 type Product = {
  id: string;
  name: string;
  price: number;
+ b2bPrice?: number;
+ b2cPrice?: number;
+ regularPrice?: number;
  originCountry: string;
  images: string[];
  minOrderQty: number;
@@ -29,6 +35,7 @@ function formatMoney(amount: number) {
 }
 
 export default function CartPage() {
+ const { user } = useAuth();
  const [items, setItems] = useState<CartItem[]>([]);
  const [productsById, setProductsById] = useState<Record<string, Product>>({});
  const [loading, setLoading] = useState(true);
@@ -69,13 +76,27 @@ export default function CartPage() {
  .filter((r) => r.product);
  }, [items, productsById]);
 
- const subtotal = rows.reduce((sum, r) => sum + (r.product?.price ?? 0) * r.item.quantity, 0);
+ const getPrice = (product: Product | null) => {
+   if (!product) return 0;
+   const isImporter = (user as any)?.defaultRole === "importer" || (user as any)?.role === "IMPORTER";
+   return isImporter ? (product.b2bPrice ?? product.price) : (product.regularPrice ?? product.price);
+ };
+
+ const subtotal = rows.reduce((sum, r) => sum + getPrice(r.product) * r.item.quantity, 0);
  const tax = subtotal * 0.08;
  const total = subtotal + tax;
 
  return (
- <div className="min-h-[calc(100dvh-5rem)] bg-background">
- <div className="mx-auto w-full max-w-7xl px-4 md:px-8 py-8">
+  <SidebarProvider>
+    <div className="flex flex-col min-h-[100dvh] w-full bg-background">
+      <DashboardHeader />
+      <div className="flex-1 overflow-y-auto bg-background">
+        <div className="mx-auto w-full max-w-7xl px-4 md:px-8 py-8">
+          <div className="mb-6">
+            <Link href="/products" className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+                <ChevronLeft className="w-4 h-4" /> Back to Marketplace
+            </Link>
+          </div>
  <div className="flex items-center justify-between mb-8 border-b border-border">
  <div className="flex gap-8">
  <button
@@ -85,15 +106,6 @@ export default function CartPage() {
  My Shopping Cart
  <span className="ml-2 px-2 py-0.5 text-xs bg-primary/15 text-primary rounded-full border border-primary/20">
  {items.length}
- </span>
- </button>
- <button
- type="button"
- className="pb-4 text-lg font-semibold text-muted-foreground/70 hover:text-foreground transition-colors"
- >
- Saved Wishlist
- <span className="ml-2 px-2 py-0.5 text-xs bg-muted text-muted-foreground rounded-full border border-border">
- 0
  </span>
  </button>
  </div>
@@ -158,7 +170,7 @@ export default function CartPage() {
  <span className="text-emerald-500">In Stock</span>
  </p>
  </div>
- <p className="text-xl font-extrabold">{formatMoney(product.price)}</p>
+ <p className="text-xl font-extrabold">{formatMoney(getPrice(product))}</p>
  </div>
  <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
  Origin {product.originCountry} • MOQ {product.minOrderQty} {product.unit}
@@ -199,13 +211,6 @@ export default function CartPage() {
  </button>
  </div>
 
- <button
- type="button"
- className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors ml-2"
- >
- <Heart className="h-4 w-4" />
- Save for later
- </button>
  </div>
 
  <button
@@ -293,5 +298,7 @@ export default function CartPage() {
  )}
  </div>
  </div>
+ </div>
+ </SidebarProvider>
  );
 }

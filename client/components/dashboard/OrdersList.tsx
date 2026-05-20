@@ -265,14 +265,36 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
                   <div className="p-6 space-y-6">
                     {/* Progress Steps */}
                     <div className="relative flex items-center justify-between gap-2 py-4">
-                      <div className="absolute left-4 right-4 top-1/2 -translate-y-1/2 h-0.5 bg-border" />
                       {STEP_LABELS.map((label, idx) => {
                         const stepNum = idx + 1;
                         const isActive = cfg.step >= stepNum;
                         const isCurrent = cfg.step === stepNum;
+                        const isLast = idx === STEP_LABELS.length - 1;
+                        const isLineActive = cfg.step > stepNum;
+                        
                         return (
                           <div key={label} className="relative flex flex-col items-center gap-2 flex-1">
-                            <div className={`w-9 h-9 rounded-full border-2 flex items-center justify-center transition-all ${
+                            {/* Background Line */}
+                            {!isLast && (
+                              <div 
+                                className="absolute h-[2px] bg-border z-0" 
+                                style={{ top: '18px', left: '50%', width: 'calc(100% + 8px)', transform: 'translateY(-50%)' }}
+                              />
+                            )}
+                            {/* Active Line */}
+                            {!isLast && (
+                              <div 
+                                className="absolute h-[2px] bg-primary z-0 transition-all duration-700 ease-in-out origin-left" 
+                                style={{ 
+                                  top: '18px',
+                                  left: '50%', 
+                                  width: 'calc(100% + 8px)', 
+                                  transform: `translateY(-50%) scaleX(${isLineActive ? 1 : 0})` 
+                                }}
+                              />
+                            )}
+                            
+                            <div className={`relative z-10 w-9 h-9 rounded-full border-2 flex items-center justify-center transition-all ${
                               isActive
                                 ? "bg-primary border-primary text-primary-foreground"
                                 : "bg-card border-border text-muted-foreground"

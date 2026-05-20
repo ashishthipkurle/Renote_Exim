@@ -14,6 +14,8 @@ import { getCart, type CartItem } from "@/lib/cart";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { getStripe } from "@/lib/stripe-client";
 import CheckoutForm from "@/components/checkout/CheckoutForm";
+import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import { SidebarProvider } from "@/components/ui/sidebar";
 
 function getApiErrorMessage(error: unknown): string | null {
     if (!error || typeof error !== "object") return null;
@@ -31,6 +33,7 @@ type Product = {
     price: number;
     b2bPrice?: number;
     b2cPrice?: number;
+    regularPrice?: number;
     minOrderQty: number;
     unit: string;
     category?: string;
@@ -112,7 +115,13 @@ export default function CheckoutPage() {
             .filter((r) => r.product);
     }, [items, productsById]);
 
-    const total = rows.reduce((sum, r) => sum + (r.product?.price ?? 0) * r.item.quantity, 0);
+    const getPrice = (product: Product | null) => {
+        if (!product) return 0;
+        const isImporter = (user as any)?.defaultRole === "importer" || (user as any)?.role === "IMPORTER";
+        return isImporter ? (product.b2bPrice ?? product.price) : (product.regularPrice ?? product.price);
+    };
+
+    const total = rows.reduce((sum, r) => sum + getPrice(r.product) * r.item.quantity, 0);
 
     const fullAddress = [shippingAddress, shippingCity, shippingZip, shippingCountry].filter(Boolean).join(", ");
 
@@ -133,7 +142,7 @@ export default function CheckoutPage() {
                 id,
                 orderNumber: `ORD-${new Date().getFullYear()}-${String(now + index).slice(-6)}`,
                 importerId: (user as any)?.id ?? "local-importer",
-                totalPrice: (row.product?.price ?? 0) * row.item.quantity,
+                totalPrice: getPrice(row.product) * row.item.quantity,
                 currency: "USD",
                 orderStatus: "QUOTE_REQUESTED",
                 paymentStatus: "PENDING",
@@ -199,9 +208,12 @@ export default function CheckoutPage() {
     };
 
     return (
-        <div className="min-h-[calc(100dvh-5rem)] bg-background">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 py-6 lg:py-8 space-y-6">
-                <div className="flex items-center justify-between gap-4">
+        <SidebarProvider>
+            <div className="flex flex-col min-h-[100dvh] w-full bg-background">
+                <DashboardHeader />
+                <div className="flex-1 bg-background">
+                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 py-6 lg:py-8 space-y-6">
+                    <div className="flex items-center justify-between gap-4">
                     <div>
                         <h1 className="text-3xl font-bold tracking-tight">Checkout</h1>
                         <p className="text-sm text-muted-foreground mt-1">
@@ -229,24 +241,53 @@ export default function CheckoutPage() {
                         {/* Main Content */}
                         <div className="lg:col-span-8 space-y-6">
                             {/* Step Indicator */}
-                            <div className="flex items-center justify-between relative px-4 py-4">
-                                <div className="absolute top-1/2 left-4 right-4 h-0.5 bg-border -translate-y-1/2 z-0" />
-                                <div className="absolute top-1/2 left-4 h-0.5 bg-primary -translate-y-1/2 z-0 transition-all duration-500"
-                                     style={{ width: step === 0 ? '0%' : step === 1 ? '45%' : '90%' }} />
-                                {STEPS.map((s, idx) => (
-                                    <div key={s.label} className="relative z-10 flex flex-col items-center gap-2">
-                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all border-2 ${
-                                            idx <= step
-                                                ? "bg-primary border-primary text-primary-foreground shadow-lg"
-                                                : "bg-card border-border text-muted-foreground"
-                                        }`}>
-                                            <s.icon className="w-4 h-4" />
+                            <div className="relative flex items-center justify-between gap-2 py-4">
+                                {STEPS.map((s, idx) => {
+                                    const isLast = idx === STEPS.length - 1;
+                                    const isLineActive = step > idx;
+                                    
+                                    return (
+                                        <div key={s.label} className="relative flex flex-col items-center gap-2 flex-1">
+                                            {/* Background Line */}
+                                            {!isLast && (
+                                                <div 
+                                                    className="absolute h-[2px] bg-border z-0" 
+                                                    style={{ top: '20px', left: '50%', width: 'calc(100% + 8px)', transform: 'translateY(-50%)' }}
+                                                />
+                                            )}
+                                            {/* Active Line */}
+                                            {!isLast && (
+                                                <div 
+                                                    className="absolute h-[2px] bg-primary z-0 transition-all duration-700 ease-in-out origin-left" 
+                                                    style={{ 
+                                                        top: '20px',
+                                                        left: '50%', 
+                                                        width: 'calc(100% + 8px)', 
+                                                        transform: `translateY(-50%) scaleX(${isLineActive ? 1 : 0})` 
+                                                    }}
+                                                />
+                                            )}
+                                            
+                                            <button 
+                                                onClick={() => {
+                                                    if (idx === 0) setStep(0);
+                                                    if (idx === 1 && clientSecret) setStep(1);
+                                                }}
+                                                disabled={idx === 1 && !clientSecret}
+                                                className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center transition-all border-2 outline-none ${
+                                                    idx <= step
+                                                        ? "bg-primary border-primary text-primary-foreground shadow-lg"
+                                                        : "bg-card border-border text-muted-foreground"
+                                                } ${(idx === 0 || (idx === 1 && clientSecret)) ? "cursor-pointer hover:scale-105 active:scale-95 hover:ring-4 ring-primary/20" : "cursor-default"}`}
+                                            >
+                                                <s.icon className="w-4 h-4" />
+                                            </button>
+                                            <span className={`text-xs font-medium ${idx <= step ? "text-primary" : "text-muted-foreground"}`}>
+                                                {s.label}
+                                            </span>
                                         </div>
-                                        <span className={`text-xs font-medium ${idx <= step ? "text-primary" : "text-muted-foreground"}`}>
-                                            {s.label}
-                                        </span>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
 
                             {/* Step 0: Shipping Address */}
@@ -465,7 +506,7 @@ export default function CheckoutPage() {
                                                     <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
                                                 </div>
                                                 <p className="text-sm font-semibold">
-                                                    {formatMoney((product?.price ?? 0) * item.quantity)}
+                                                    {formatMoney(getPrice(product) * item.quantity)}
                                                 </p>
                                             </div>
                                         );
@@ -499,5 +540,7 @@ export default function CheckoutPage() {
                 )}
             </div>
         </div>
+        </div>
+        </SidebarProvider>
     );
 }

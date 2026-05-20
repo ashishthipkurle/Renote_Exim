@@ -34,7 +34,9 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: `Product not found: ${item.productId}` }, { status: 404 });
       }
 
-      const unitPrice = product.price;
+      const unitPrice = auth.role === 'IMPORTER' 
+        ? (product.b2bPrice ?? product.price) 
+        : (product.regularPrice ?? product.price);
       const itemTotal = unitPrice * item.quantity;
       totalAmount += itemTotal;
 

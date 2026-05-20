@@ -63,15 +63,57 @@ export default function LoginForm() {
     mode: "onChange",
   });
 
+  const [showOtpStep, setShowOtpStep] = useState(false);
+  const [loginData, setLoginData] = useState<LoginInput | null>(null);
+
   const onSubmit = async (data: LoginInput) => {
+    // Send a real OTP to the user's email
+    setIsLoading(true);
+    try {
+      const res = await axios.post("/api/auth/send-otp", {
+        email: data.email,
+        purpose: "LOGIN",
+      });
+      setLoginData(data);
+      setShowOtpStep(true);
+      setMfaCode("");
+      toast.success("Verification code sent to your email!");
+      // In dev mode, show the code from response if SMTP isn't configured
+      if (res.data.devCode) {
+        console.log("[Dev] OTP Code:", res.data.devCode);
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || "Failed to send verification code");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const verifyOtpAndLogin = async () => {
+    if (!loginData) return;
     setIsLoading(true);
 
     try {
-      const response = await axios.post("/api/auth/login", data);
+      // 1. Verify the OTP code against the database
+      const verifyRes = await axios.post("/api/auth/verify-otp", {
+        email: loginData.email,
+        code: mfaCode,
+        purpose: "LOGIN",
+      });
+
+      if (!verifyRes.data.verified) {
+        toast.error("Invalid verification code.");
+        setIsLoading(false);
+        return;
+      }
+
+      // 2. Proceed with actual login
+      const response = await axios.post("/api/auth/login", loginData);
 
       if (response.data.mfaRequired) {
         setMfaData(response.data);
         setIsLoading(false);
+        setShowOtpStep(false);
         toast.info("Multi-Factor Authentication required");
         return;
       }
@@ -86,7 +128,7 @@ export default function LoginForm() {
         router.push(`/dashboard/${role.toLowerCase()}`);
       }
     } catch (error: any) {
-      toast.error(error.response?.data?.error || "Login failed");
+      toast.error(error.response?.data?.error || "Verification failed");
     } finally {
       setIsLoading(false);
     }
@@ -218,61 +260,103 @@ export default function LoginForm() {
               </Link>
             </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.35 }}
-              className="space-y-6"
-            >
-              {!mfaData ? (
-                <>
-                  <div className="space-y-2">
-                    <h1 className="text-3xl font-extrabold tracking-tight">Access Terminal</h1>
-                    <p className="text-muted-foreground">
-                      Welcome back. Enter your credentials to continue.
-                    </p>
-                  </div>
-
-                  <div className="w-full">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+            <Form {...form}>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35 }}
+                className="space-y-6"
+              >
+                {showOtpStep ? (
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <h1 className="text-3xl font-extrabold tracking-tight">Email Verification</h1>
+                      <p className="text-muted-foreground">Enter the 6-digit code sent to your email.</p>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground">OTP Code</label>
+                      <Input
+                        type="text"
+                        placeholder="123456"
+                        value={mfaCode}
+                        onChange={(e) => setMfaCode(e.target.value)}
+                        className="h-14 text-center text-2xl font-black tracking-widest rounded-lg bg-slate-100/50 dark:bg-muted/30 border-border"
+                      />
+                    </div>
+                    <Button 
+                      onClick={verifyOtpAndLogin} 
+                      disabled={isLoading || mfaCode.length < 6}
+                      size="lg" 
+                      className="h-14 w-full rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-black text-xs uppercase tracking-[0.2em] shadow-xl transition-all"
+                    >
+                      {isLoading ? <Loader2 className="animate-spin size-5" /> : "Verify & Login"}
+                    </Button>
+                    <div className="flex flex-col gap-2 pt-2">
                       <Button
-                        type="button"
+                        variant="outline"
+                        disabled={isLoading}
+                        onClick={() => loginData && onSubmit(loginData)}
+                        className="w-full h-12 text-xs font-bold uppercase tracking-wider"
+                      >
+                        Resend Verification Code
+                      </Button>
+                      <Button
                         variant="ghost"
-                        disabled={!!oauthLoading}
-                        onClick={() => handleOAuthSignIn("google")}
-                        className="h-[46px] font-medium text-foreground bg-background dark:bg-card border border-border hover:bg-muted transition-all rounded-lg shadow-sm text-sm"
+                        onClick={() => setShowOtpStep(false)}
+                        className="w-full text-xs font-bold uppercase tracking-wider text-muted-foreground"
                       >
-                        {oauthLoading === "google" ? (
-                          <Loader2 className="size-5 mr-3 animate-spin" />
-                        ) : (
-                          <FcGoogle className="size-5 mr-3" />
-                        )}
-                        Sign in with Google
+                        Cancel
                       </Button>
-
-                      <Button
-                        type="button"
-                        disabled={!!oauthLoading}
-                        onClick={() => handleOAuthSignIn("linkedin")}
-                        className="h-[46px] font-medium text-white bg-[#0A66C2] hover:bg-[#0A66C2]/90 border-0 transition-all rounded-lg shadow-sm text-sm"
-                      >
-                        {oauthLoading === "linkedin" ? (
-                          <Loader2 className="size-5 mr-3 animate-spin" />
-                        ) : (
-                          <FaLinkedin className="size-5 mr-3" />
-                        )}
-                        Sign in with LinkedIn
-                      </Button>
-                    </div>
-
-                    <div className="flex items-center gap-3 mb-6 w-full">
-                      <hr className="flex-1 border-border" />
-                      <span className="text-muted-foreground text-[11px] font-bold uppercase tracking-wider">Or continue with email</span>
-                      <hr className="flex-1 border-border" />
                     </div>
                   </div>
+                ) : !mfaData ? (
+                  <>
+                    <div className="space-y-2">
+                      <h1 className="text-3xl font-extrabold tracking-tight">Access Terminal</h1>
+                      <p className="text-muted-foreground">
+                        Welcome back. Enter your credentials to continue.
+                      </p>
+                    </div>
 
-                  <Form {...form}>
+                    <div className="w-full">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          disabled={!!oauthLoading}
+                          onClick={() => handleOAuthSignIn("google")}
+                          className="h-[46px] font-medium text-foreground bg-background dark:bg-card border border-border hover:bg-muted transition-all rounded-lg shadow-sm text-sm"
+                        >
+                          {oauthLoading === "google" ? (
+                            <Loader2 className="size-5 mr-3 animate-spin" />
+                          ) : (
+                            <FcGoogle className="size-5 mr-3" />
+                          )}
+                          Sign in with Google
+                        </Button>
+
+                        <Button
+                          type="button"
+                          disabled={!!oauthLoading}
+                          onClick={() => handleOAuthSignIn("linkedin")}
+                          className="h-[46px] font-medium text-white bg-[#0A66C2] hover:bg-[#0A66C2]/90 border-0 transition-all rounded-lg shadow-sm text-sm"
+                        >
+                          {oauthLoading === "linkedin" ? (
+                            <Loader2 className="size-5 mr-3 animate-spin" />
+                          ) : (
+                            <FaLinkedin className="size-5 mr-3" />
+                          )}
+                          Sign in with LinkedIn
+                        </Button>
+                      </div>
+
+                      <div className="flex items-center gap-3 mb-6 w-full">
+                        <hr className="flex-1 border-border" />
+                        <span className="text-muted-foreground text-[11px] font-bold uppercase tracking-wider">Or continue with email</span>
+                        <hr className="flex-1 border-border" />
+                      </div>
+                    </div>
+
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
                       <FormField
                         control={form.control}
@@ -334,9 +418,8 @@ export default function LoginForm() {
                         )}
                       </Button>
                     </form>
-                  </Form>
-                </>
-              ) : (
+                  </>
+                ) : (
                 <>
                   <div className="space-y-2">
                     <h1 className="text-3xl font-extrabold tracking-tight">Security Check</h1>
@@ -394,6 +477,7 @@ export default function LoginForm() {
                 .
               </p>
             </motion.div>
+            </Form>
           </div>
         </div>
       </div>

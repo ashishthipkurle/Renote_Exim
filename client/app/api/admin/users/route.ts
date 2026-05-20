@@ -67,6 +67,8 @@ export async function GET(req: NextRequest) {
  verificationStatus: true,
  createdAt: true,
  phone: true,
+ phoneVerified: true,
+ address: true,
  },
  }),
  prisma.user.count({ where }),
@@ -105,11 +107,13 @@ export async function POST(req: NextRequest) {
 
  switch (action) {
  case "verify":
- updatedUser = await prisma.user.update({
- where: { id: userId },
- data: { verificationStatus: "VERIFIED" },
- });
- break;
+      updatedUser = await prisma.user.update({ where: { id: userId }, data: { verificationStatus: "VERIFIED" } });
+      await prisma.notification.create({ data: { userId, title: "KYC Verified", message: "Your verification documents have been approved.", type: "VERIFICATION_OUTCOME" } });
+      break;
+    case "reject":
+      updatedUser = await prisma.user.update({ where: { id: userId }, data: { verificationStatus: "REJECTED" } });
+      await prisma.notification.create({ data: { userId, title: "KYC Rejected", message: "Your verification documents were rejected.", type: "VERIFICATION_OUTCOME" } });
+      break;
  case "unverify":
  updatedUser = await prisma.user.update({
  where: { id: userId },

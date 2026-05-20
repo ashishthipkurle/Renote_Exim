@@ -12,7 +12,10 @@ import {
   HomeIcon,
   LogOut,
   LayoutDashboard,
-  ListOrdered
+  ListOrdered,
+  Package,
+  Heart,
+  Settings
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -23,9 +26,11 @@ import { useTranslation } from "@/lib/i18n/client";
 import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
 import { useTheme } from "next-themes";
 import CartSheet from "@/components/cart/CartSheet";
+import { toast } from "sonner";
 import NotificationBell from "@/components/notifications/NotificationBell";
 import LogoLight from "@/assests/LOGO_TEXT.png";
 import LogoDark from "@/assests/Logo-2-without-circle.png";
+import { getWishlist } from "@/lib/wishlist";
 
 export default function DashboardHeader() {
   const { t } = useTranslation();
@@ -38,13 +43,20 @@ export default function DashboardHeader() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const pathname = usePathname();
-  const isMarketplace = pathname === "/products" || pathname.startsWith("/products/");
+  const isMarketplace = pathname === "/products" || pathname.startsWith("/products/") || ["/cart", "/checkout", "/wishlist", "/orders", "/profile"].includes(pathname);
+  const isProductDetails = pathname.startsWith("/products/") && pathname !== "/products";
   const isExporter = pathname.startsWith("/dashboard/exporter");
 
-
+  const [wishlistCount, setWishlistCount] = useState(0);
 
   React.useEffect(() => {
     setMounted(true);
+    
+    const updateWishlist = () => {
+      setWishlistCount(getWishlist().length);
+    };
+    updateWishlist();
+    window.addEventListener("renote-wishlist-updated", updateWishlist);
 
     // Handle clicks outside dropdown
     const handleClickOutside = (event: MouseEvent) => {
@@ -52,15 +64,20 @@ export default function DashboardHeader() {
         setIsProfileOpen(false);
       }
     };
+    
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      window.removeEventListener("renote-wishlist-updated", updateWishlist);
+    };
   }, []);
 
   const LogoImg = mounted && theme === "dark" ? LogoDark : LogoLight;
 
   return (
     <>
-      <header className="sticky top-0 z-40 h-14 border-b border-border/50 dark:border-white/10 bg-background/20 backdrop-blur-xl transition-all duration-300 w-full">
+      <header className={`sticky top-0 z-40 border-b border-border/50 dark:border-white/10 bg-background/20 backdrop-blur-xl transition-all duration-300 w-full ${isMarketplace ? "h-20" : "h-14"}`}>
         <div className="flex h-full items-center px-4 md:px-6">
 
           {/* LEFT SECTION */}
@@ -76,13 +93,15 @@ export default function DashboardHeader() {
             </Link>
 
             {/* Sidebar Toggle */}
-            <button
-              onClick={toggleSidebar}
-              className="h-10 w-10 ml-4 lg:ml-8 rounded-xl flex items-center justify-center hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors border border-transparent hover:border-primary/20"
-              title={open ? "Collapse Sidebar" : "Expand Sidebar"}
-            >
-              {open ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
-            </button>
+            {!isProductDetails && pathname !== "/cart" && pathname !== "/checkout" && pathname !== "/wishlist" && pathname !== "/orders" && pathname !== "/profile" && (
+              <button
+                onClick={toggleSidebar}
+                className="h-10 w-10 ml-4 lg:ml-8 rounded-xl flex items-center justify-center hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors border border-transparent hover:border-primary/20"
+                title={open ? "Collapse Sidebar" : "Expand Sidebar"}
+              >
+                {open ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+              </button>
+            )}
           </div>
 
           {/* SPACER */}
@@ -120,7 +139,23 @@ export default function DashboardHeader() {
                   className="size-9 flex items-center justify-center rounded-full hover:bg-primary/10 transition-all border border-transparent hover:border-primary/20 group text-muted-foreground hover:text-primary"
                   title="Orders"
                 >
-                  <ListOrdered className="w-4 h-4" />
+                  <Package className="w-4 h-4" />
+                </Link>
+              )}
+
+              {/* Wishlist — hidden for exporters */}
+              {!isExporter && (
+                <Link
+                  href="/wishlist"
+                  className="size-9 flex items-center justify-center rounded-full hover:bg-primary/10 transition-all border border-transparent hover:border-primary/20 group text-muted-foreground hover:text-primary relative"
+                  title="Wishlist"
+                >
+                  <Heart className="w-4 h-4" />
+                  {mounted && wishlistCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-primary-foreground font-black text-[10px] flex items-center justify-center rounded-full animate-in zoom-in shadow-lg">
+                      {wishlistCount}
+                    </span>
+                  )}
                 </Link>
               )}
 
@@ -175,6 +210,10 @@ export default function DashboardHeader() {
                           <Link href="/dashboard" className="flex items-center rounded-xl cursor-pointer py-2.5 px-3 hover:bg-secondary/80 transition-colors" onClick={() => setIsProfileOpen(false)}>
                             <LayoutDashboard className="mr-3 h-4 w-4 text-muted-foreground" />
                             <span className="text-sm font-medium">{t("dashboard", "Dashboard")}</span>
+                          </Link>
+                          <Link href="/profile" className="flex items-center rounded-xl cursor-pointer py-2.5 px-3 hover:bg-secondary/80 transition-colors" onClick={() => setIsProfileOpen(false)}>
+                            <Settings className="mr-3 h-4 w-4 text-muted-foreground" />
+                            <span className="text-sm font-medium">Profile & Settings</span>
                           </Link>
                         </div>
 

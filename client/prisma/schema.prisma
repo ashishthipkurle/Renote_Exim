@@ -27,6 +27,7 @@ model User {
   avatar              String?
   country             String?
   phone               String?
+  phoneVerified       Boolean            @default(false)
   deletedAt           DateTime?
   address             String?
   receivedCalls       CallSchedule[]     @relation("CallReceiver")
@@ -479,4 +480,17 @@ enum CallSessionStatus {
   MISSED
   DECLINED
   FAILED
+}
+
+model OtpCode {
+  id        String   @id @default(uuid())
+  email     String
+  code      String
+  purpose   String   @default("LOGIN") // LOGIN, REGISTER, PHONE_VERIFY
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([email, purpose])
+  @@map("otp_codes")
 }

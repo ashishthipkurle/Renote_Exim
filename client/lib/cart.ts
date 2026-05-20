@@ -41,6 +41,7 @@ export function getCart(): CartItem[] {
 export function setCart(items: CartItem[]) {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  window.dispatchEvent(new Event("renote-cart-updated"));
 }
 
 export function addToCart(productId: string, quantity = 1) {
@@ -70,4 +71,5 @@ export function removeFromCart(productId: string) {
 export function clearCart() {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(STORAGE_KEY);
+  window.dispatchEvent(new Event("renote-cart-updated"));
 }

@@ -31,7 +31,12 @@ export async function GET(request: NextRequest) {
     const redirectTo = `${appUrl}/auth/callback`;
 
     // Nhost v4 OAuth sign-in URL
-    const providerUrl = `https://${subdomain}.auth.${region}.nhost.run/v1/signin/provider/${provider}?redirectTo=${encodeURIComponent(redirectTo)}`;
+    let providerUrl = `https://${subdomain}.auth.${region}.nhost.run/v1/signin/provider/${provider}?redirectTo=${encodeURIComponent(redirectTo)}`;
+
+    // Force Google to always show the account picker instead of auto-selecting previous account
+    if (provider === "google") {
+      providerUrl += "&prompt=consent";
+    }
 
     return NextResponse.json({ providerUrl });
   } catch (error: any) {
@@ -42,4 +47,3 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-

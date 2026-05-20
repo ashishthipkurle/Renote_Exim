@@ -61,6 +61,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Prevent multiple concurrent fetchUser calls (e.g., visibility change + periodic timer firing together)
   const fetchInProgress = useRef(false);
+  // Track consecutive failures to avoid logout on temporary blips
+  const consecutiveFailures = useRef(0);
+  const MAX_FAILURES_BEFORE_LOGOUT = 3;
 
   const fetchUser = useCallback(async (silent = false) => {
     if (fetchInProgress.current) {
@@ -74,10 +77,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log("[AuthProvider] User fetch result:", !!res.data.user);
       
       if (res.data.user) {
+        // Reset failure counter on success
+        consecutiveFailures.current = 0;
         setUser(res.data.user);
         // Persist to localStorage for fast re-mount
         if (typeof window !== "undefined") {
           window.localStorage.setItem("user_profile", JSON.stringify(res.data.user));
+          // Also store the last successful auth timestamp
+          window.localStorage.setItem("last_auth_success", Date.now().toString());
         }
         
         // If the server-side refreshed the token, sync it back
@@ -98,19 +105,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           } catch (e) {}
         }
       } else {
-        setUser(null);
-        if (typeof window !== "undefined") {
-          window.localStorage.removeItem("user_profile");
+        // Server returned no user — but only logout if we've had multiple consecutive failures
+        consecutiveFailures.current++;
+        console.warn(`[AuthProvider] No user returned. Failure count: ${consecutiveFailures.current}/${MAX_FAILURES_BEFORE_LOGOUT}`);
+        if (consecutiveFailures.current >= MAX_FAILURES_BEFORE_LOGOUT) {
+          setUser(null);
+          if (typeof window !== "undefined") {
+            window.localStorage.removeItem("user_profile");
+            window.localStorage.removeItem("last_auth_success");
+          }
         }
       }
     } catch (error: any) {
-      console.error("[AuthProvider] User fetch error:", error.response?.status || error.message);
-      // Only clear if it's a 401
-      if (error.response?.status === 401) {
-        setUser(null);
-        if (typeof window !== "undefined") {
-          window.localStorage.removeItem("user_profile");
+      const status = error.response?.status;
+      console.error("[AuthProvider] User fetch error:", status || error.message);
+      
+      // Only clear user on explicit 401 (unauthorized) — NOT on network errors, timeouts, or 503
+      if (status === 401) {
+        consecutiveFailures.current++;
+        console.warn(`[AuthProvider] 401 received. Failure count: ${consecutiveFailures.current}/${MAX_FAILURES_BEFORE_LOGOUT}`);
+        // Require multiple consecutive 401s before actually logging out
+        // This prevents a single flaky response from killing the session
+        if (consecutiveFailures.current >= MAX_FAILURES_BEFORE_LOGOUT) {
+          setUser(null);
+          if (typeof window !== "undefined") {
+            window.localStorage.removeItem("user_profile");
+            window.localStorage.removeItem("last_auth_success");
+          }
         }
+      } else {
+        // Network error, timeout, 503, etc. — keep the cached user, don't logout
+        console.log("[AuthProvider] Non-auth error, keeping cached user.");
       }
     } finally {
       fetchInProgress.current = false;

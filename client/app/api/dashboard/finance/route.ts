@@ -151,9 +151,9 @@ export async function GET(request: NextRequest) {
 // PUT /api/dashboard/finance — Update monthly budget
 export async function PUT(request: NextRequest) {
  try {
- const auth = await getApiAuthContext(request);
- if (authError || !auth || auth.role !== 'IMPORTER') {
- return authError || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { auth, error: authError } = await getApiAuthContext(request);
+  if (authError || !auth || auth.role !== 'IMPORTER') {
+   return authError || NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
  }
 
  const { monthlyBudget } = await request.json();

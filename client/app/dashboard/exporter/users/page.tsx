@@ -13,6 +13,8 @@ import {
  Users,
  Activity,
  X,
+ Eye,
+ XCircle,
 } from "lucide-react";
 import { useAuthFetch } from "@/lib/hooks/useAuthFetch";
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -32,6 +34,16 @@ type User = {
  createdAt: string;
 };
 
+type UserDocument = {
+ id: string;
+ docType: string;
+ fileUrl: string;
+ fileName: string | null;
+ mimeType: string;
+ verificationStatus: string;
+ createdAt: string;
+};
+
 export default function ExporterUsersPage() {
  const { user, loading: authLoading } = useAuth();
  const authFetch = useAuthFetch();
@@ -43,6 +55,9 @@ export default function ExporterUsersPage() {
  const [search, setSearch] = useState("");
  const [roleFilter, setRoleFilter] = useState("");
  const [verifiedFilter, setVerifiedFilter] = useState("");
+ const [selectedUserForDocs, setSelectedUserForDocs] = useState<User | null>(null);
+ const [userDocuments, setUserDocuments] = useState<UserDocument[]>([]);
+ const [docsLoading, setDocsLoading] = useState(false);
 
  const fetchUsers = async () => {
  if (user?.email !== "exporter@gmail.com") return;
@@ -98,6 +113,42 @@ export default function ExporterUsersPage() {
  fetchUsers();
  } catch (error) {
  toast.error(`Protocol update failed`);
+ }
+ };
+
+ const fetchUserDocuments = async (targetUserId: string) => {
+ setDocsLoading(true);
+ setUserDocuments([]);
+ try {
+ const data = await authFetch<{ documents: UserDocument[] }>(
+ `/api/admin/users/documents?userId=${targetUserId}`
+ );
+ setUserDocuments(data.documents || []);
+ } catch (error) {
+ console.error("Failed to fetch user documents:", error);
+ } finally {
+ setDocsLoading(false);
+ }
+ };
+
+ const openDocReview = (u: User) => {
+ setSelectedUserForDocs(u);
+ fetchUserDocuments(u.id);
+ };
+
+ const handleApproveDocs = () => {
+ if (selectedUserForDocs) {
+ handleAction(selectedUserForDocs.id, "verify");
+ setSelectedUserForDocs(null);
+ setUserDocuments([]);
+ }
+ };
+
+ const handleRejectDocs = () => {
+ if (selectedUserForDocs) {
+ handleAction(selectedUserForDocs.id, "reject");
+ setSelectedUserForDocs(null);
+ setUserDocuments([]);
  }
  };
 
@@ -242,7 +293,15 @@ export default function ExporterUsersPage() {
  </div>
  </td>
  <td className="px-8 py-6">
- <div className="flex items-center justify-end gap-3 translate-x-2 group-hover:translate-x-0 transition-transform opacity-0 group-hover:opacity-100 duration-300">
+ <div className="flex items-center justify-end gap-3 transition-transform duration-300">
+ <button
+ title="View Documents"
+ onClick={() => openDocReview(u)}
+ className="w-10 h-10 flex items-center justify-center rounded-xl bg-black/5 dark:bg-white/5 border border-border text-muted-foreground hover:border-[#D4AF37] hover:text-[#D4AF37] transition-all duration-300 shadow-xl"
+ >
+ <Eye className="w-4 h-4" />
+ </button>
+
  <button
  title={u.verificationStatus === "VERIFIED" ? "Revoke Protocol" : "Authorize Subject"}
  onClick={() => handleAction(u.id, u.verificationStatus === "VERIFIED" ? "unverify" : "verify")}
@@ -314,6 +373,143 @@ export default function ExporterUsersPage() {
  </div>
  </div>
  </div>
+
+ {selectedUserForDocs && (
+ <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm px-4">
+ <div className="bg-card w-full max-w-3xl rounded-2xl shadow-xl border border-border overflow-hidden max-h-[90vh] overflow-y-auto">
+ <div className="p-6 border-b border-border flex items-center justify-between sticky top-0 bg-card z-10">
+ <div>
+ <h3 className="text-lg font-bold text-foreground">KYC Document Review</h3>
+ <p className="text-sm text-muted-foreground">Subject: {selectedUserForDocs.name || selectedUserForDocs.email}</p>
+ </div>
+ <button onClick={() => setSelectedUserForDocs(null)} className="text-muted-foreground hover:text-foreground transition-colors">
+ <X className="w-5 h-5" />
+ </button>
+ </div>
+ <div className="p-6 space-y-6">
+ {/* User Details Panel */}
+ <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+ <div className="p-3 rounded-xl bg-muted/30 border border-border">
+ <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Email</p>
+ <p className="text-xs font-medium text-foreground mt-1 truncate">{selectedUserForDocs.email}</p>
+ </div>
+ <div className="p-3 rounded-xl bg-muted/30 border border-border">
+ <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Phone</p>
+ <p className="text-xs font-medium text-foreground mt-1">{selectedUserForDocs.phone || "Not provided"}</p>
+ </div>
+ <div className="p-3 rounded-xl bg-muted/30 border border-border">
+ <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Business</p>
+ <p className="text-xs font-medium text-foreground mt-1 truncate">{selectedUserForDocs.businessName || "Not provided"}</p>
+ </div>
+ <div className="p-3 rounded-xl bg-muted/30 border border-border">
+ <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Status</p>
+ <p className={clsx("text-xs font-bold mt-1", selectedUserForDocs.verificationStatus === "VERIFIED" ? "text-emerald-600" : selectedUserForDocs.verificationStatus === "REJECTED" ? "text-red-500" : "text-amber-500")}>{selectedUserForDocs.verificationStatus}</p>
+ </div>
+ </div>
+
+ {/* Documents Grid */}
+ <div>
+ <h4 className="text-sm font-bold text-foreground mb-3">Submitted Documents</h4>
+ {docsLoading ? (
+ <div className="grid grid-cols-2 gap-4">
+ {[1, 2].map((i) => (
+ <div key={i} className="rounded-xl border border-border bg-muted/20 p-4 animate-pulse">
+ <div className="w-full h-40 bg-muted rounded-lg mb-3" />
+ <div className="h-3 bg-muted rounded w-2/3 mx-auto" />
+ </div>
+ ))}
+ </div>
+ ) : userDocuments.length === 0 ? (
+ <div className="rounded-xl border border-dashed border-border bg-muted/10 p-8 text-center">
+ <div className="w-16 h-16 rounded-full bg-muted/30 flex items-center justify-center mx-auto mb-4">
+ <Eye className="w-7 h-7 text-muted-foreground/40" />
+ </div>
+ <p className="text-sm font-bold text-muted-foreground">No Documents Submitted</p>
+ <p className="text-xs text-muted-foreground/60 mt-1">This user has not uploaded any verification documents yet.</p>
+ </div>
+ ) : (
+ <div className="grid grid-cols-2 gap-4">
+ {userDocuments.map((doc) => {
+ const isImage = doc.mimeType?.startsWith("image/");
+ const isPdf = doc.mimeType === "application/pdf";
+ const docTypeLabels: Record<string, string> = {
+ GOVERNMENT_ID: "Government ID",
+ TRADE_LICENSE: "Trade License",
+ BUSINESS_REGISTRATION: "Business Registration",
+ TAX_CERTIFICATE: "Tax Certificate",
+ INVOICE: "Invoice",
+ BILL_OF_LADING: "Bill of Lading",
+ CUSTOMS_DECLARATION: "Customs Declaration",
+ INSURANCE: "Insurance Certificate",
+ OTHER: "Other Document",
+ };
+ return (
+ <a
+ key={doc.id}
+ href={doc.fileUrl}
+ target="_blank"
+ rel="noopener noreferrer"
+ className="rounded-xl border border-border bg-muted/20 p-4 text-center cursor-pointer group hover:bg-muted/40 transition-all block"
+ >
+ <div className="w-full h-40 bg-muted rounded-lg flex items-center justify-center mb-3 border border-dashed border-border overflow-hidden relative">
+ {isImage ? (
+ <img
+ src={doc.fileUrl}
+ alt={doc.fileName || doc.docType}
+ className="object-cover w-full h-full opacity-80 group-hover:opacity-100 transition-opacity"
+ />
+ ) : (
+ <div className="flex flex-col items-center justify-center text-muted-foreground">
+ <svg className="w-10 h-10 mb-2 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+ <span className="text-[10px] font-bold uppercase">{isPdf ? "PDF" : doc.mimeType?.split("/")[1] || "File"}</span>
+ </div>
+ )}
+ <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+ <Eye className="w-8 h-8 text-white mb-2" />
+ <span className="text-xs text-white font-bold">View Document</span>
+ </div>
+ </div>
+ <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+ {docTypeLabels[doc.docType] || doc.docType}
+ </p>
+ {doc.fileName && (
+ <p className="text-[9px] text-muted-foreground/50 mt-1 truncate">{doc.fileName}</p>
+ )}
+ </a>
+ );
+ })}
+ </div>
+ )}
+ </div>
+
+ {/* Action Buttons */}
+ <div className="pt-4 border-t border-border flex items-center justify-between">
+ <p className="text-xs text-muted-foreground">
+ {selectedUserForDocs.verificationStatus === "VERIFIED" 
+   ? "This user is currently verified." 
+   : selectedUserForDocs.verificationStatus === "REJECTED"
+   ? "This user's documents were previously rejected."
+   : "Review the documents above and approve or reject."}
+ </p>
+ <div className="flex items-center gap-3">
+ <button 
+ onClick={handleRejectDocs}
+ className="px-6 py-2.5 rounded-xl border border-red-500/20 text-red-500 hover:bg-red-500/10 text-sm font-bold uppercase tracking-wider transition-colors flex items-center gap-2"
+ >
+ <XCircle className="w-4 h-4" /> Reject
+ </button>
+ <button 
+ onClick={handleApproveDocs}
+ className="px-6 py-2.5 rounded-xl bg-[#D4AF37] text-white hover:bg-[#D4AF37]/90 text-sm font-bold uppercase tracking-wider transition-colors shadow-lg flex items-center gap-2"
+ >
+ <ShieldCheck className="w-4 h-4" /> Approve
+ </button>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ )}
  </main>
  );
 }

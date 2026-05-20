@@ -16,11 +16,13 @@ import {
   ShieldCheck,
   ChevronLeft,
   ChevronRight,
+  Heart,
 } from "lucide-react";
 
 import { prisma } from "@/lib/prisma";
 import AddToCartButton from "@/components/marketplace/AddToCartButton";
 import BuyNowButton from "@/components/marketplace/BuyNowButton";
+import WishlistButton from "@/components/marketplace/WishlistButton";
 import { getServerAuthContext } from "@/lib/auth-server";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
@@ -81,9 +83,9 @@ export default async function ProductDetailPage({
     take: 4,
   });
 
-  // Dynamic price calculation
-  const currentPrice = role === "IMPORTER" ? (product.b2bPrice || product.price) : (product.b2cPrice || product.price);
-  const oldPrice = product.regularPrice || currentPrice * 1.12;
+  // Dynamic price calculation matching the marketplace list page
+  const currentPrice = role === "IMPORTER" ? (product.b2bPrice || product.price) : (product.regularPrice || product.price);
+  const oldPrice = role === "IMPORTER" ? (product.regularPrice || currentPrice * 1.12) : (product.regularPrice ? product.regularPrice * 1.12 : currentPrice * 1.12);
 
   const heroImage = product.images?.[0] ?? null;
   const nameParts = product.name.split(" ").filter(Boolean);
@@ -119,24 +121,11 @@ export default async function ProductDetailPage({
             <div className="flex-1 overflow-y-auto custom-scrollbar bg-surface h-[calc(100vh-60px)]">
               <PageTransition>
                 <div className="bg-background min-h-screen">
-                  {/* Breadcrumb */}
+                  {/* Back Button */}
                   <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-6 pb-2">
-                    <nav className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Link href="/" className="hover:text-primary transition-colors">
-                        Home
-                      </Link>
-                      <span className="opacity-40">/</span>
-                      <Link
-                        href="/products"
-                        className="hover:text-primary transition-colors"
-                      >
-                        Marketplace
-                      </Link>
-                      <span className="opacity-40">/</span>
-                      <span className="text-foreground font-semibold line-clamp-1">
-                        {product.name}
-                      </span>
-                    </nav>
+                    <Link href="/products" className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary transition-colors w-fit">
+                        <ChevronLeft className="w-4 h-4" /> Back to Marketplace
+                    </Link>
                   </div>
 
                   {/* ── Hero Section ── */}
@@ -287,11 +276,17 @@ export default async function ProductDetailPage({
                             className="w-full h-14 rounded-xl bg-primary px-6 text-base font-bold text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98]"
                           />
 
-                          <AddToCartButton
-                            productId={product.id}
-                            quantity={product.minOrderQty || 1}
-                            className="w-full h-12 rounded-xl border border-border bg-background text-foreground hover:bg-accent font-medium"
-                          />
+                          <div className="grid grid-cols-2 gap-3">
+                            <AddToCartButton
+                              productId={product.id}
+                              quantity={product.minOrderQty || 1}
+                              className="w-full h-12 rounded-xl border border-border bg-background text-foreground hover:bg-accent font-medium"
+                            />
+                            <WishlistButton
+                              productId={product.id}
+                              className="w-full h-12 rounded-xl border border-border bg-background font-medium"
+                            />
+                          </div>
                         </div>
 
                         {product.trustDocumentUrl && (
@@ -410,7 +405,7 @@ export default async function ProductDetailPage({
                               <div className="flex items-baseline justify-between mb-1">
                                 <p className="text-sm font-bold text-foreground line-clamp-1">{item.name}</p>
                                 <span className="text-sm font-extrabold text-primary ml-2 whitespace-nowrap">
-                                  {formatMoney(role === "IMPORTER" ? (item.b2bPrice || item.price) : (item.b2cPrice || item.price))}
+                                  {formatMoney(role === "IMPORTER" ? (item.b2bPrice || item.price) : (item.regularPrice || item.price))}
                                 </span>
                               </div>
                               <p className="text-[11px] text-muted-foreground line-clamp-2 mb-3">
