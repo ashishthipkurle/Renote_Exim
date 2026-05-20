@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
  where: {
  product: { exporterId: auth.userId },
  paymentStatus: { in: ['PENDING', 'PARTIAL'] },
- status: { in: ['CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED'] },
+ orderStatus: { in: ['CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED'] },
  },
  _sum: { totalPrice: true },
  }),
@@ -49,10 +49,11 @@ export async function GET(request: NextRequest) {
  lastPayout: lastPaidOrder?.totalPrice ?? 0,
  lastPayoutDate: lastPaidOrder?.updatedAt ?? null,
  recentInvoices: recentOrders.map((o) => ({
- id: o.orderNumber,
+ id: o.id,
+ orderNumber: o.orderNumber,
  amount: o.totalPrice,
  status: o.paymentStatus,
- orderStatus: o.status,
+ orderStatus: o.orderStatus,
  product: o.product.name,
  buyer: o.importer.businessName || o.importer.name,
  date: o.createdAt,
@@ -85,7 +86,7 @@ export async function GET(request: NextRequest) {
  }),
  prisma.user.findUnique({
  where: { id: auth.userId },
- select: { monthlyBudget: true },
+ select: { budgetLimit: true },
  }),
  ]);
 
@@ -126,14 +127,15 @@ export async function GET(request: NextRequest) {
  totalBalance: totalSpentVal,
  pendingPayouts: pendingPayments._sum.totalPrice ?? 0,
  estTaxLiability: totalSpentVal * 0.1,
- monthlyBudget: (user as any)?.monthlyBudget ?? 0,
+ monthlyBudget: user?.budgetLimit ?? 0,
  currentMonthSpending,
  spendingHistory: Object.entries(spendingByMonth).reverse().map(([month, amount]) => ({ month, amount })),
  recentInvoices: recentOrders.map((o) => ({
- id: o.orderNumber,
+ id: o.id,
+ orderNumber: o.orderNumber,
  amount: o.totalPrice,
  status: o.paymentStatus,
- orderStatus: o.status,
+ orderStatus: o.orderStatus,
  product: o.product.name,
  seller: o.product.exporter.businessName || o.product.exporter.name,
  date: o.createdAt,
@@ -161,9 +163,9 @@ export async function PUT(request: NextRequest) {
  return NextResponse.json({ error: 'Invalid budget amount' }, { status: 400 });
  }
 
- await (prisma.user as any).update({
+ await prisma.user.update({
  where: { id: auth.userId },
- data: { monthlyBudget },
+ data: { budgetLimit: monthlyBudget },
  });
 
  return NextResponse.json({ message: 'Budget updated successfully' });

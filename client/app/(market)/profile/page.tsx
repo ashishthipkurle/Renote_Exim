@@ -165,13 +165,14 @@ export default function ProfilePage() {
     try {
       setSaving(true);
       const res = await axios.post("/api/auth/send-otp", {
-        email: form.phone, // using the email field for phone number for now, as our API currently supports single contact identifier
+        email: profile?.email,
         purpose: "PHONE_VERIFY",
       });
       setShowOTP(true);
-      toast.success("Verification code sent to your phone!");
+      toast.success("Verification code sent to your email!");
       if (res.data.devCode) {
         console.log("[Dev] Phone OTP Code:", res.data.devCode);
+        setOtpValue(res.data.devCode);
       }
     } catch (error: any) {
       toast.error(error.response?.data?.error || "Failed to send verification code");
@@ -185,7 +186,7 @@ export default function ProfilePage() {
     try {
       // 1. Verify OTP
       const verifyRes = await axios.post("/api/auth/verify-otp", {
-        email: form.phone,
+        email: profile?.email,
         code: otpValue,
         purpose: "PHONE_VERIFY",
       });
@@ -739,13 +740,13 @@ export default function ProfilePage() {
         </div>
       </div>
       
-      {/* Mock OTP Modal */}
+      {/* Verify OTP Modal */}
       {showOTP && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm px-4">
           <div className="bg-card w-full max-w-sm rounded-2xl shadow-xl border border-border overflow-hidden">
             <div className="p-6">
               <h3 className="text-lg font-bold mb-2">Verify Phone Number</h3>
-              <p className="text-sm text-muted-foreground mb-6">Enter the 6-digit OTP sent to {form.phone}.</p>
+              <p className="text-sm text-muted-foreground mb-6">Enter the 6-digit OTP code sent to your email ({profile?.email}) to verify your phone number.</p>
               
               <div className="space-y-4">
                 <div>

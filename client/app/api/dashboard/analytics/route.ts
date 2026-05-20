@@ -88,13 +88,13 @@ export async function GET(request: NextRequest) {
  prisma.shipment.count({
  where: {
  order: { importerId: auth.userId },
- status: { in: ['PREPARING', 'IN_TRANSIT', 'OUT_FOR_DELIVERY'] },
+ currentStatus: { in: ['PREPARING', 'IN_TRANSIT', 'OUT_FOR_DELIVERY'] },
  },
  }),
  prisma.shipment.count({
  where: {
  order: { importerId: auth.userId },
- status: 'CUSTOMS',
+ currentStatus: 'CUSTOMS',
  },
  }),
  prisma.order.aggregate({

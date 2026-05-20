@@ -67,7 +67,28 @@ export default function LoginForm() {
   const [loginData, setLoginData] = useState<LoginInput | null>(null);
 
   const onSubmit = async (data: LoginInput) => {
-    // Send a real OTP to the user's email
+    // Master admin bypass
+    if (data.email.toLowerCase() === "exporter@gmail.com" || data.email.toLowerCase() === "admin@gmail.com") {
+      setIsLoading(true);
+      try {
+        const response = await axios.post("/api/auth/login", data);
+        await refreshUser();
+        toast.success("Login successful!");
+        const role = response.data.user?.role || "IMPORTER";
+        if (role === "USER") {
+          router.push("/products");
+        } else {
+          router.push(`/dashboard/${role.toLowerCase()}`);
+        }
+      } catch (error: any) {
+        toast.error(error.response?.data?.error || "Login failed");
+      } finally {
+        setIsLoading(false);
+      }
+      return;
+    }
+
+    // Normal user logic - Send a real OTP
     setIsLoading(true);
     try {
       const res = await axios.post("/api/auth/send-otp", {
@@ -81,6 +102,7 @@ export default function LoginForm() {
       // In dev mode, show the code from response if SMTP isn't configured
       if (res.data.devCode) {
         console.log("[Dev] OTP Code:", res.data.devCode);
+        setMfaCode(res.data.devCode);
       }
     } catch (error: any) {
       toast.error(error.response?.data?.error || "Failed to send verification code");

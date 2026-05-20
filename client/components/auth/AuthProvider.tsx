@@ -144,27 +144,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [syncSession]);
 
   const refreshUser = useCallback(async () => {
-    await fetchUser(true); // Silent refresh — calling component has its own loading state
+    await fetchUser(true);
   }, [fetchUser]);
 
   const logout = async () => {
     try {
       setLoading(true);
-      
-      // 1. ALWAYS clear server cookies first. If this fails, we still want to try to clear client state.
       await axios.post("/api/auth/logout").catch(() => { });
-      
-      // 2. Clear local storage immediately so the UI updates
       if (typeof window !== "undefined") {
         window.localStorage.removeItem("user_profile");
         window.localStorage.removeItem("user");
+        window.localStorage.removeItem("last_auth_success");
       }
       setUser(null);
-
-      // 3. Finally, tell Nhost to sign out. This might throw if the session has already expired 
-      // locally, which is why it's carefully wrapped in a catch to avoid breaking the function.
       await nhost.auth.signOut().catch((e) => console.log("Nhost signout skipped:", e.message));
-      
     } catch (error) {
       console.error("Logout failed", error);
     } finally {
@@ -174,24 +167,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     console.log("[AuthProvider] Provider mounted. Current user state:", !!user);
-    
-    // 1. Initial Data Fetch — silent if we have a cached user (prevents profile circle flicker)
     const hasCachedUser = typeof window !== "undefined" && !!window.localStorage.getItem("user_profile");
     fetchUser(hasCachedUser);
     
-    // 2. Proactive Token Refresh
-    // Nhost tokens expire in 15 mins. Refresh every 10 mins.
     const REFRESH_INTERVAL_MS = 10 * 60 * 1000;
     const intervalId = setInterval(() => {
+      if (document.hidden) {
+        console.log("[AuthProvider] Periodic token refresh skipped because tab is hidden.");
+        return;
+      }
       console.log("[AuthProvider] Periodic token refresh triggered.");
-      fetchUser(true); // Always silent — don't disrupt the UI
+      fetchUser(true);
     }, REFRESH_INTERVAL_MS);
 
-    // 3. Visibility Change Handler
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
         console.log("[AuthProvider] Tab became visible. Refreshing session...");
-        fetchUser(true); // Always silent — don't disrupt the UI
+        fetchUser(true);
       }
     };
     document.addEventListener("visibilitychange", handleVisibilityChange);
@@ -200,7 +192,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       clearInterval(intervalId);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [fetchUser, syncSession]);
+  }, [fetchUser, user]);
 
   return (
     <AuthContext.Provider value={{ user, loading, refreshUser, logout }}>

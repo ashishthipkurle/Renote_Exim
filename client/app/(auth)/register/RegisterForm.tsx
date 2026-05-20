@@ -119,6 +119,7 @@ function RegisterFormContent() {
       toast.success("Verification code sent to your email!");
       if (res.data.devCode) {
         console.log("[Dev] OTP Code:", res.data.devCode);
+        setMfaCode(res.data.devCode);
       }
     } catch (error: any) {
       toast.error(error.response?.data?.error || "Failed to send verification code");
@@ -252,8 +253,8 @@ function RegisterFormContent() {
             {showOtpStep ? (
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <h1 className="text-3xl font-extrabold tracking-tight">Email & Phone Verification</h1>
-                  <p className="text-muted-foreground">Enter the 6-digit code sent to your email and phone number.</p>
+                  <h1 className="text-3xl font-extrabold tracking-tight">Email Verification</h1>
+                  <p className="text-muted-foreground">Enter the 6-digit code sent to your email.</p>
                 </div>
                 <div className="space-y-2">
                   <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground">Verification Code</label>
