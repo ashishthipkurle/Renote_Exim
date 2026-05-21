@@ -302,8 +302,26 @@ export async function getApiAuthContext(
       },
       error: null,
     };
-  } catch (e) {
+  } catch (e: any) {
     console.error("[Auth] Fatal error in getApiAuthContext:", e);
+    
+    const errMsg = e?.message?.toLowerCase() || "";
+    if (
+      errMsg.includes("fetch") || 
+      errMsg.includes("network") || 
+      errMsg.includes("connect") || 
+      errMsg.includes("reach database") || 
+      errMsg.includes("database server") ||
+      e?.code === "ECONNREFUSED" ||
+      e?.code === "P1001" ||
+      e?.name === "PrismaClientInitializationError"
+    ) {
+      return {
+        auth: null,
+        error: NextResponse.json({ error: "Network error: Unable to connect to the database. Please check your internet connection." }, { status: 503 }),
+      };
+    }
+
     return {
       auth: null,
       error: NextResponse.json({ error: "Internal server error during authentication" }, { status: 500 }),
@@ -374,6 +392,10 @@ export async function getServerAuthContext(req?: NextRequest): Promise<AuthConte
   const { auth, error } = await getApiAuthContext(effectiveReq as NextRequest);
 
   if (!auth && error) {
+    if (error.status === 503 || error.status === 500) {
+      console.error("[getServerAuthContext] Network or Database error. Throwing NETWORK_ERROR to prevent false logout.");
+      throw new Error("NETWORK_ERROR");
+    }
     console.log("[getServerAuthContext] Auth failed, returning null.");
   }
 

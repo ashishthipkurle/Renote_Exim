@@ -44,6 +44,7 @@ model User {
   products            Product[]          @relation("ExporterProducts")
   suppliersAsExporter Supplier[]         @relation("ExporterSuppliers")
   suppliersAsImporter Supplier[]         @relation("ImporterSuppliers")
+  transportMethods    TransportMethod[]  @relation("ExporterTransportMethods")
 
   @@map("users")
 }
@@ -162,8 +163,27 @@ model Shipment {
   updatedAt             DateTime        @updatedAt
   statusHistory         ShipmentEvent[]
   order                 Order           @relation(fields: [orderId], references: [id])
+  transportMethodId     String?
+  transportMethod       TransportMethod? @relation(fields: [transportMethodId], references: [id])
 
   @@map("shipments")
+}
+
+model TransportMethod {
+  id          String     @id @default(uuid())
+  name        String
+  type        String     // e.g., "OCEAN", "AIR", "LAND"
+  exporterId  String
+  capacity          String?
+  trackingUrl       String?
+  originRegion      String?
+  destinationRegion String?
+  createdAt         DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  exporter    User       @relation("ExporterTransportMethods", fields: [exporterId], references: [id], onDelete: Cascade)
+  shipments   Shipment[]
+
+  @@map("transport_methods")
 }
 
 model ShipmentEvent {

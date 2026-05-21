@@ -59,23 +59,28 @@ export default async function ExporterOrdersPage({
   }
 
   let orders: any[] = [];
+  let transportMethods: any[] = [];
   let total = 0;
   let statusCounts = { all: 0, pending: 0, processing: 0, shipped: 0, delivered: 0 };
 
   try {
-    [orders, total] = await Promise.all([
+    [orders, total, transportMethods] = await Promise.all([
       prisma.order.findMany({
         where,
         include: {
           product: { select: { id: true, name: true, category: true, images: true } },
           buyer: { select: { id: true, name: true, businessName: true, country: true, email: true } },
-          shipment: true,
+          shipment: { include: { transportMethod: true } },
         },
         orderBy: { createdAt: "desc" },
         skip,
         take: limit,
       }),
       prisma.order.count({ where }),
+      prisma.transportMethod.findMany({
+        where: { exporterId: auth.userId },
+        orderBy: { createdAt: 'desc' }
+      })
     ]);
 
     const baseWhere = { sellerId: auth.userId };
@@ -115,7 +120,7 @@ export default async function ExporterOrdersPage({
 
       <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
         <div className="max-w-[1400px] mx-auto space-y-8">
-          <OrdersTable orders={orders} counts={statusCounts} />
+          <OrdersTable orders={orders} counts={statusCounts} transportMethods={transportMethods} />
 
           {/* Pagination */}
           {totalPages > 1 && (

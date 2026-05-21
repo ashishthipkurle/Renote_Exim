@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const schema = z.object({
       orderId: z.string().uuid(),
-      carrier: z.string().min(1),
+      transportMethodId: z.string().min(1),
       origin: z.string().min(1),
       destination: z.string().min(1),
       estimatedDelivery: z.string().datetime(),
@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
     const shipment = await prisma.shipment.create({
       data: {
         orderId: parsed.data.orderId,
-        courierId: parsed.data.carrier,
+        transportMethodId: parsed.data.transportMethodId,
         trackingNumber,
         origin: parsed.data.origin,
         destination: parsed.data.destination,

@@ -171,10 +171,10 @@ export default function ExporterDashboard() {
  setRegionCounts(counts);
  setMapIsDemo(false);
  } else {
- setMapIsDemo(true);
+ setMapIsDemo(false);
  }
  })
- .catch(() => setMapIsDemo(true))
+ .catch(() => setMapIsDemo(false))
  .finally(() => setMapLoading(false));
  }, [mapRefresh]);
 
@@ -341,9 +341,9 @@ export default function ExporterDashboard() {
  <div>
  <div className="flex items-center gap-2">
  <h2 className="text-[14px] font-black text-foreground dark:text-white tracking-tight">India Global Trade Network</h2>
- <span className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase border ${mapIsDemo ? "bg-amber-500/12 border-amber-500/30 text-amber-500" : "bg-primary/10 border-primary/20 text-primary"}`}>
- <span className={`w-1.5 h-1.5 rounded-full inline-block animate-pulse ${mapIsDemo ? "bg-amber-500" : "bg-primary"}`} />
- {mapIsDemo ? "Demo" : "Live"}
+ <span className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase border bg-primary/10 border-primary/20 text-primary`}>
+ <span className={`w-1.5 h-1.5 rounded-full inline-block animate-pulse bg-primary`} />
+ Live
  </span>
  </div>
  <p className="text-[10px] text-slate-500 mt-0.5">{activeCount} {t("dashboard_main.active_routes", "active routes")}{lastUpdate && <span> · {lastUpdate.toLocaleTimeString()}</span>}</p>
@@ -371,7 +371,7 @@ export default function ExporterDashboard() {
  </div>
 
  <div className="flex-1 relative overflow-hidden">
- <ShipTrackingMap filter={mapFilter} routes={mapIsDemo ? DEMO_ROUTES : apiRoutes} />
+ <ShipTrackingMap filter={mapFilter} routes={apiRoutes} />
  {mapLoading && (
  <div className="absolute inset-0 flex items-center justify-center z-30" style={{ background: "rgba(3,8,16,0.55)", backdropFilter: "blur(4px)" }}>
  <div className="flex flex-col items-center gap-2">
@@ -407,9 +407,9 @@ export default function ExporterDashboard() {
 
  {/* Map footer */}
  <div className="flex-shrink-0 flex items-center gap-5 px-5 py-2.5 z-20" style={{ borderTop: "1px solid rgba(255,255,255,0.04)" }}>
- <div className="flex items-center gap-1.5"><Wind className="w-3 h-3 text-indigo-400" /><span className="text-[10px] text-slate-500">Air</span><span className="text-[10px] font-bold text-indigo-400">{(mapIsDemo ? DEMO_ROUTES : apiRoutes).filter(r => r.type === "air").length}</span></div>
- <div className="flex items-center gap-1.5"><Anchor className="w-3 h-3 text-cyan-400" /><span className="text-[10px] text-slate-500">Ocean</span><span className="text-[10px] font-bold text-cyan-400">{(mapIsDemo ? DEMO_ROUTES : apiRoutes).filter(r => r.type === "ocean").length}</span></div>
- <div className="flex items-center gap-1.5"><Layers className="w-3 h-3 text-slate-400" /><span className="text-[10px] text-slate-500">Ports</span><span className="text-[10px] font-bold text-slate-300">{new Set((mapIsDemo ? DEMO_ROUTES : apiRoutes).flatMap(r => [r.fromPort, r.toPort])).size}</span></div>
+ <div className="flex items-center gap-1.5"><Wind className="w-3 h-3 text-indigo-400" /><span className="text-[10px] text-slate-500">Air</span><span className="text-[10px] font-bold text-indigo-400">{apiRoutes.filter(r => r.type === "air").length}</span></div>
+ <div className="flex items-center gap-1.5"><Anchor className="w-3 h-3 text-cyan-400" /><span className="text-[10px] text-slate-500">Ocean</span><span className="text-[10px] font-bold text-cyan-400">{apiRoutes.filter(r => r.type === "ocean").length}</span></div>
+ <div className="flex items-center gap-1.5"><Layers className="w-3 h-3 text-slate-400" /><span className="text-[10px] text-slate-500">Ports</span><span className="text-[10px] font-bold text-slate-300">{new Set(apiRoutes.flatMap(r => [r.fromPort, r.toPort])).size}</span></div>
  <div className="ml-auto"><Link href="/dashboard/exporter/orders" className="flex items-center gap-1 text-[10px] text-primary hover:text-blue-300 font-medium transition-colors">{t("dashboard_main.all_shipments", "All shipments")}<ChevronRight className="w-3 h-3" /></Link></div>
  </div>
  </div>

@@ -17,6 +17,7 @@ import {
  FileText,
  Globe,
  ShieldCheck,
+ Ship,
 } from "lucide-react";
 import {
  Sidebar,
@@ -51,6 +52,7 @@ export default function ExporterSidebar({ basePath }: { basePath: string }) {
  { href: basePath, labelKey: "sidebar.dashboard", defaultLabel: "Dashboard", icon: LayoutDashboard },
  { href: `${basePath}/inventory`, labelKey: "sidebar.inventory", defaultLabel: "Inventory", icon: Boxes },
  { href: `${basePath}/orders`, labelKey: "sidebar.orders", defaultLabel: "Orders", icon: FolderTree },
+ { href: `${basePath}/ships`, labelKey: "sidebar.ships", defaultLabel: "Ships", icon: Ship },
  { href: `${basePath}/feedback`, labelKey: "sidebar.feedback", defaultLabel: "Reviews", icon: MessageSquare },
  { href: `${basePath}/directory`, labelKey: "sidebar.buyers", defaultLabel: "Buyers", icon: Users, badgeCount: counts.buyers },
  ...(isMaster ? [{ href: `${basePath}/users`, labelKey: "sidebar.registry", defaultLabel: "Registry", icon: ShieldCheck }] : []),

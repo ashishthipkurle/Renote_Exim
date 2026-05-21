@@ -65,19 +65,30 @@ interface OrdersTableProps {
     shipped: number;
     delivered: number;
   };
+  transportMethods?: any[];
 }
 
-export default function OrdersTable({ orders, counts }: OrdersTableProps) {
+export default function OrdersTable({ orders, counts, transportMethods = [] }: OrdersTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
+  
+  // Quick ship state
+  const [quickShipMethodId, setQuickShipMethodId] = useState<string>("");
+  const [creatingShipmentId, setCreatingShipmentId] = useState<string | null>(null);
 
   const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
   const currentStatus = searchParams.get("status") || "ALL";
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get("category") || "ALL");
 
   const [optimisticOrders, setOptimisticOrders] = useState<any[]>(orders);
+
+  const categories = useMemo(() => {
+    const cats = new Set(orders.map((o: any) => o.product?.category).filter(Boolean));
+    return Array.from(cats) as string[];
+  }, [orders]);
 
   useEffect(() => {
     setOptimisticOrders(orders);
@@ -94,25 +105,34 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
         return status === currentStatus;
       });
     }
+    if (selectedCategory !== "ALL") {
+      filtered = filtered.filter((order) => order.product?.category === selectedCategory);
+    }
     if (searchQuery.trim()) {
       const query = searchQuery.trim().toLowerCase();
       filtered = filtered.filter((order) => {
-        const fields = [order.orderNumber, order.product?.name, order.buyer?.name, order.buyer?.businessName]
+        const fields = [order.orderNumber, order.product?.name, order.buyer?.name, order.buyer?.businessName, order.product?.category]
           .filter(Boolean).join(" ").toLowerCase();
         return fields.includes(query);
       });
     }
     return filtered;
-  }, [optimisticOrders, currentStatus, searchQuery]);
+  }, [optimisticOrders, currentStatus, searchQuery, selectedCategory]);
 
-  const updateFilters = (newStatus?: string) => {
+  const updateFilters = (newStatus?: string, newCategory?: string) => {
     const params = new URLSearchParams(searchParams);
+    
     if (searchQuery) params.set("search", searchQuery);
     else params.delete("search");
-    if (newStatus !== undefined) {
-      if (newStatus !== "ALL") params.set("status", newStatus);
-      else params.delete("status");
-    }
+    
+    const targetStatus = newStatus !== undefined ? newStatus : currentStatus;
+    if (targetStatus !== "ALL") params.set("status", targetStatus);
+    else params.delete("status");
+
+    const targetCategory = newCategory !== undefined ? newCategory : selectedCategory;
+    if (targetCategory !== "ALL") params.set("category", targetCategory);
+    else params.delete("category");
+
     params.delete("page");
     startTransition(() => {
       router.push(`?${params.toString()}`);
@@ -133,6 +153,37 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
       toast.error(err.response?.data?.error || "Failed to update status");
     } finally {
       setUpdatingStatusId(null);
+    }
+  };
+
+  const handleQuickShip = async (orderId: string, order: any) => {
+    if (!quickShipMethodId) {
+      toast.error("Please select a transport method");
+      return;
+    }
+    
+    setCreatingShipmentId(orderId);
+    try {
+      const selectedMethod = transportMethods.find(m => m.id === quickShipMethodId);
+      
+      // Default dates for quick ship (7 days from now)
+      const estimatedDeliveryDate = new Date();
+      estimatedDeliveryDate.setDate(estimatedDeliveryDate.getDate() + 7);
+      
+      await axios.post("/api/shipments", {
+        orderId: orderId,
+        transportMethodId: quickShipMethodId,
+        origin: selectedMethod?.originRegion || "N/A",
+        destination: order.buyer?.country || "N/A",
+        estimatedDelivery: estimatedDeliveryDate.toISOString(),
+      });
+      
+      toast.success("Shipment created successfully!");
+      router.refresh();
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || "Failed to create shipment");
+    } finally {
+      setCreatingShipmentId(null);
     }
   };
 
@@ -164,16 +215,34 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
           ))}
         </div>
 
-        <div className="relative w-full xl:w-80">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="Search orders..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && updateFilters()}
-            className="w-full pl-10 pr-4 py-2.5 bg-card border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
-          />
+        <div className="flex items-center gap-3 w-full xl:w-auto">
+          {categories.length > 0 && (
+            <select
+              value={selectedCategory}
+              onChange={(e) => {
+                setSelectedCategory(e.target.value);
+                updateFilters(undefined, e.target.value);
+              }}
+              className="px-4 py-2.5 bg-card border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all cursor-pointer"
+            >
+              <option value="ALL">All Categories</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+          )}
+
+          <div className="relative w-full xl:w-80">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Search orders..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && updateFilters()}
+              className="w-full pl-10 pr-4 py-2.5 bg-card border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
+            />
+          </div>
         </div>
       </div>
 
@@ -378,14 +447,33 @@ export default function OrdersTable({ orders, counts }: OrdersTableProps) {
                                     </Link>
                                   </div>
                                 ) : (
-                                  <div className="text-center py-3 space-y-3">
-                                    <p className="text-sm text-muted-foreground">No shipment created yet.</p>
-                                    <Link
-                                      href={`/dashboard/exporter/shipments/new?orderId=${order.id}`}
-                                      className="w-full py-2 bg-primary text-primary-foreground text-sm font-semibold flex items-center justify-center gap-2 rounded-lg transition-all hover:opacity-90"
-                                    >
-                                      Create Shipment
-                                    </Link>
+                                  <div className="text-center py-2 space-y-3">
+                                    {transportMethods && transportMethods.length > 0 ? (
+                                      <div className="space-y-3 text-left bg-background p-3 rounded-lg border border-border">
+                                        <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Quick Assign Ship</p>
+                                        <div className="flex gap-2">
+                                          <select 
+                                            className="flex-1 px-3 py-2 text-sm bg-muted/30 border border-border rounded-lg focus:outline-none"
+                                            value={quickShipMethodId}
+                                            onChange={(e) => setQuickShipMethodId(e.target.value)}
+                                          >
+                                            <option value="">Select a ship...</option>
+                                            {transportMethods.map(m => (
+                                              <option key={m.id} value={m.id}>{m.name} ({m.originRegion || 'Global'})</option>
+                                            ))}
+                                          </select>
+                                          <button
+                                            disabled={creatingShipmentId === order.id}
+                                            onClick={() => handleQuickShip(order.id, order)}
+                                            className="px-4 py-2 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:opacity-90 disabled:opacity-50"
+                                          >
+                                            {creatingShipmentId === order.id ? <Loader2 className="w-4 h-4 animate-spin" /> : "Ship It"}
+                                          </button>
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <p className="text-sm text-muted-foreground">No ships available. Please add a ship in the Ships tab first.</p>
+                                    )}
                                   </div>
                                 )}
                               </div>
