@@ -50,8 +50,8 @@ async function refreshAccessToken(refreshToken: string): Promise<{ accessToken: 
 
     return null;
   } catch (e: any) {
-    console.error("[Middleware] Token refresh error:", e.message);
-    return null;
+    console.error("[Middleware] Token refresh error (likely network/timeout):", e.message);
+    return "NETWORK_ERROR" as any;
   }
 }
 
@@ -156,7 +156,10 @@ export async function middleware(request: NextRequest) {
         }
       } else {
         const newTokens = await refreshAccessToken(refreshToken);
-        if (newTokens) {
+        if (newTokens === "NETWORK_ERROR" as any) {
+          console.log("[Middleware] Network error during token refresh. Bypassing strict logout.");
+          return NextResponse.next();
+        } else if (newTokens) {
           // SUCCESS: Forward fresh token to downstream server code
           const requestHeaders = new Headers(request.headers);
           requestHeaders.set('x-refreshed-access-token', newTokens.accessToken);

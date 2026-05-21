@@ -160,6 +160,8 @@ export default function ExporterUsersPage() {
       case "ADMIN": return "text-amber-500 bg-amber-500/10 border-amber-500/20";
       case "EXPORTER": return "text-blue-500 bg-blue-500/10 border-blue-500/20";
       case "IMPORTER": return "text-emerald-500 bg-emerald-500/10 border-emerald-500/20";
+      case "SUPPLIER": return "text-purple-500 bg-purple-500/10 border-purple-500/20";
+      case "CONSUMER": return "text-pink-500 bg-pink-500/10 border-pink-500/20";
       default: return "text-slate-500 bg-slate-500/10 border-slate-500/20";
     }
   };
@@ -508,6 +510,8 @@ export default function ExporterUsersPage() {
                   <option value="USER">User</option>
                   <option value="IMPORTER">Importer</option>
                   <option value="EXPORTER">Exporter</option>
+                  <option value="SUPPLIER">Dealer (Supplier)</option>
+                  <option value="CONSUMER">Consumer</option>
                   <option value="ADMIN">Admin</option>
                 </select>
               </div>

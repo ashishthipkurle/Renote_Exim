@@ -46,6 +46,7 @@ export default function DashboardHeader() {
   const isMarketplace = pathname === "/products" || pathname.startsWith("/products/") || ["/cart", "/checkout", "/wishlist", "/orders", "/profile"].includes(pathname);
   const isProductDetails = pathname.startsWith("/products/") && pathname !== "/products";
   const isExporter = pathname.startsWith("/dashboard/exporter");
+  const isImporter = pathname.startsWith("/dashboard/importer");
 
   const [wishlistCount, setWishlistCount] = useState(0);
 
@@ -132,8 +133,8 @@ export default function DashboardHeader() {
                 </button>
               )}
 
-              {/* Orders */}
-              {isMarketplace && (
+              {/* Orders — hidden for exporters and importers */}
+              {!isExporter && !isImporter && (
                 <Link
                   href="/orders"
                   className="size-9 flex items-center justify-center rounded-full hover:bg-primary/10 transition-all border border-transparent hover:border-primary/20 group text-muted-foreground hover:text-primary"
