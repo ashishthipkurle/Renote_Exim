@@ -29,7 +29,7 @@ export async function GET(
         seller: {
           select: { id: true, name: true, businessName: true, country: true, email: true }
         },
-        shipment: true
+        shipment: { include: { statusHistory: { orderBy: { createdAt: 'desc' } } } }
       }
     });
 
@@ -64,6 +64,7 @@ export async function PATCH(
 
     const order = await prisma.order.findUnique({
       where: { id },
+      include: { shipment: true },
     });
 
     if (!order) return NextResponse.json({ error: 'Order not found' }, { status: 404 });
@@ -78,6 +79,36 @@ export async function PATCH(
       where: { id },
       data: { orderStatus: status },
     });
+
+    if (order.shipment) {
+      if (status === 'SHIPPED' && order.shipment.currentStatus !== 'IN_TRANSIT') {
+        await prisma.shipment.update({
+          where: { id: order.shipment.id },
+          data: {
+            currentStatus: 'IN_TRANSIT',
+            statusHistory: {
+              create: {
+                status: 'IN_TRANSIT',
+                note: 'Shipment dispatched to delivery partner',
+              }
+            }
+          }
+        });
+      } else if (status === 'DELIVERED' && order.shipment.currentStatus !== 'DELIVERED') {
+        await prisma.shipment.update({
+          where: { id: order.shipment.id },
+          data: {
+            currentStatus: 'DELIVERED',
+            statusHistory: {
+              create: {
+                status: 'DELIVERED',
+                note: 'Shipment delivered successfully to the buyer',
+              }
+            }
+          }
+        });
+      }
+    }
 
     // Notify Importer
     try {

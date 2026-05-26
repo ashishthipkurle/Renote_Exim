@@ -21,6 +21,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
+import axios from 'axios';
 
 const STEPS = [
   { id: 'PREPARING', label: 'PREPARING', icon: Package },
@@ -34,20 +35,38 @@ export default function ShipmentDetailPage({ params }: { params: Promise<{ id: s
   const { id } = use(params);
   const [shipment, setShipment] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
+  const [newStatus, setNewStatus] = useState<string>('');
+
+  const fetchShipment = async () => {
+    try {
+      const res = await axios.get(`/api/shipments/${id}`);
+      setShipment(res.data);
+      setNewStatus(res.data.currentStatus || res.data.status || 'PREPARING');
+    } catch (error) {
+      toast.error('Failed to fetch shipment details');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchShipment = async () => {
-      try {
-        const res = await fetch(`/api/shipments/${id}`);
-        if (res.ok) setShipment(await res.json());
-      } catch (error) {
-        toast.error('Failed to bind logistics node');
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchShipment();
   }, [id]);
+
+  const handleUpdateStatus = async () => {
+    if (!newStatus) return;
+    setUpdating(true);
+    try {
+      await axios.post(`/api/shipments/${id}/events`, { status: newStatus });
+      toast.success('Tracking updated successfully');
+      fetchShipment();
+    } catch (error) {
+      toast.error('Failed to update tracking status');
+    } finally {
+      setUpdating(false);
+    }
+  };
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-card dark:bg-[#0a0a0a]">
@@ -71,7 +90,7 @@ export default function ShipmentDetailPage({ params }: { params: Promise<{ id: s
     </div>
   );
 
-  const currentStepIndex = STEPS.findIndex(s => s.id === shipment.status);
+  const currentStepIndex = STEPS.findIndex(s => s.id === (shipment.currentStatus || shipment.status));
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 pb-20 animate-in fade-in duration-700">
@@ -93,7 +112,7 @@ export default function ShipmentDetailPage({ params }: { params: Promise<{ id: s
             {shipment.carrier || 'Global Carrier'}
           </div>
           <div className="px-6 py-3 rounded-lg bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 text-muted-foreground text-[10px] font-black uppercase tracking-[0.2em] ">
-            {shipment.status?.replace('_', ' ') || 'INITIALIZING'}
+            {(shipment.currentStatus || shipment.status || 'INITIALIZING').replace('_', ' ')}
           </div>
         </div>
       </div>
@@ -227,9 +246,27 @@ export default function ShipmentDetailPage({ params }: { params: Promise<{ id: s
               </div>
             </div>
 
-            <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-black h-16 rounded-lg text-[10px] uppercase tracking-[0.3em] shadow-2xl shadow-white/5 active:scale-95 transition-all">
-              Initialize Support Loop
-            </Button>
+            <div className="pt-8 border-t border-border dark:border-white/5 space-y-4">
+              <h3 className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-[0.3em]">Update Tracking</h3>
+              <div className="flex flex-col gap-3">
+                <select 
+                  value={newStatus} 
+                  onChange={(e) => setNewStatus(e.target.value)}
+                  className="w-full bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 rounded-lg px-4 py-3 text-sm font-semibold text-foreground dark:text-white"
+                >
+                  {STEPS.map(s => (
+                    <option key={s.id} value={s.id}>{s.label}</option>
+                  ))}
+                </select>
+                <Button 
+                  onClick={handleUpdateStatus}
+                  disabled={updating}
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-black h-12 rounded-lg text-[10px] uppercase tracking-[0.3em] shadow-lg active:scale-95 transition-all"
+                >
+                  {updating ? "Updating..." : "Push Status Update"}
+                </Button>
+              </div>
+            </div>
           </div>
 
           <div className="p-8 rounded-lg bg-black/5 dark:bg-white/10 border border-border dark:border-white/10 flex items-center justify-between group cursor-default">

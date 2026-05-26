@@ -76,7 +76,9 @@ export default function OrdersTable({ orders, counts, transportMethods = [] }: O
   const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
   
   // Quick ship state
-  const [quickShipMethodId, setQuickShipMethodId] = useState<string>("");
+  const [quickOverseasId, setQuickOverseasId] = useState<string>("");
+  const [quickDomesticId, setQuickDomesticId] = useState<string>("");
+  const [activeShippingTab, setActiveShippingTab] = useState<'GLOBAL' | 'DOMESTIC'>('GLOBAL');
   const [creatingShipmentId, setCreatingShipmentId] = useState<string | null>(null);
 
   const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
@@ -129,9 +131,9 @@ export default function OrdersTable({ orders, counts, transportMethods = [] }: O
     if (targetStatus !== "ALL") params.set("status", targetStatus);
     else params.delete("status");
 
-    const targetCategory = newCategory !== undefined ? newCategory : selectedCategory;
-    if (targetCategory !== "ALL") params.set("category", targetCategory);
-    else params.delete("category");
+    // We DO NOT put category in URL anymore to prevent unnecessary server fetches
+    // which cause Nhost rate limits or NETWORK_ERRORs since the server doesn't filter by category.
+    params.delete("category");
 
     params.delete("page");
     startTransition(() => {
@@ -156,15 +158,15 @@ export default function OrdersTable({ orders, counts, transportMethods = [] }: O
     }
   };
 
-  const handleQuickShip = async (orderId: string, order: any) => {
-    if (!quickShipMethodId) {
+  const handleQuickShip = async (orderId: string, order: any, methodId: string) => {
+    if (!methodId) {
       toast.error("Please select a transport method");
       return;
     }
     
     setCreatingShipmentId(orderId);
     try {
-      const selectedMethod = transportMethods.find(m => m.id === quickShipMethodId);
+      const selectedMethod = transportMethods.find(m => m.id === methodId);
       
       // Default dates for quick ship (7 days from now)
       const estimatedDeliveryDate = new Date();
@@ -172,7 +174,7 @@ export default function OrdersTable({ orders, counts, transportMethods = [] }: O
       
       await axios.post("/api/shipments", {
         orderId: orderId,
-        transportMethodId: quickShipMethodId,
+        transportMethodId: methodId,
         origin: selectedMethod?.originRegion || "N/A",
         destination: order.buyer?.country || "N/A",
         estimatedDelivery: estimatedDeliveryDate.toISOString(),
@@ -221,7 +223,6 @@ export default function OrdersTable({ orders, counts, transportMethods = [] }: O
               value={selectedCategory}
               onChange={(e) => {
                 setSelectedCategory(e.target.value);
-                updateFilters(undefined, e.target.value);
               }}
               className="px-4 py-2.5 bg-card border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all cursor-pointer"
             >
@@ -449,28 +450,91 @@ export default function OrdersTable({ orders, counts, transportMethods = [] }: O
                                 ) : (
                                   <div className="text-center py-2 space-y-3">
                                     {transportMethods && transportMethods.length > 0 ? (
-                                      <div className="space-y-3 text-left bg-background p-3 rounded-lg border border-border">
-                                        <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Quick Assign Ship</p>
-                                        <div className="flex gap-2">
-                                          <select 
-                                            className="flex-1 px-3 py-2 text-sm bg-muted/30 border border-border rounded-lg focus:outline-none"
-                                            value={quickShipMethodId}
-                                            onChange={(e) => setQuickShipMethodId(e.target.value)}
-                                          >
-                                            <option value="">Select a ship...</option>
-                                            {transportMethods.map(m => (
-                                              <option key={m.id} value={m.id}>{m.name} ({m.originRegion || 'Global'})</option>
-                                            ))}
-                                          </select>
-                                          <button
-                                            disabled={creatingShipmentId === order.id}
-                                            onClick={() => handleQuickShip(order.id, order)}
-                                            className="px-4 py-2 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:opacity-90 disabled:opacity-50"
-                                          >
-                                            {creatingShipmentId === order.id ? <Loader2 className="w-4 h-4 animate-spin" /> : "Ship It"}
-                                          </button>
+                                        <div className="space-y-4">
+                                          {/* Tabs Navigation */}
+                                          <div className="flex items-center gap-2 border-b border-border pb-2">
+                                            <button
+                                              onClick={() => setActiveShippingTab('GLOBAL')}
+                                              className={`text-xs font-semibold px-2 py-1 transition-colors ${
+                                                activeShippingTab === 'GLOBAL' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground hover:text-foreground'
+                                              }`}
+                                            >
+                                              Overseas
+                                            </button>
+                                            <button
+                                              onClick={() => setActiveShippingTab('DOMESTIC')}
+                                              className={`text-xs font-semibold px-2 py-1 transition-colors ${
+                                                activeShippingTab === 'DOMESTIC' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground hover:text-foreground'
+                                              }`}
+                                            >
+                                              In-Country
+                                            </button>
+                                          </div>
+
+                                          {/* Overseas Section */}
+                                          {activeShippingTab === 'GLOBAL' && (
+                                            <div className="space-y-2 text-left bg-background rounded-lg border-transparent animate-in fade-in duration-200">
+                                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Global Shipping</p>
+                                              {transportMethods.filter(m => m.type === 'OCEAN' || m.type === 'AIR').length > 0 ? (
+                                                <div className="flex gap-2">
+                                                  <select 
+                                                    className="flex-1 px-3 py-2 text-sm bg-muted/30 border border-border rounded-lg focus:outline-none"
+                                                    value={quickOverseasId}
+                                                    onChange={(e) => setQuickOverseasId(e.target.value)}
+                                                  >
+                                                    <option value="">Select an overseas method...</option>
+                                                    {transportMethods.filter(m => m.type === 'OCEAN' || m.type === 'AIR').map(m => (
+                                                      <option key={m.id} value={m.id}>{m.name} ({m.originRegion || 'Global'})</option>
+                                                    ))}
+                                                  </select>
+                                                  <button
+                                                    disabled={creatingShipmentId === order.id}
+                                                    onClick={() => handleQuickShip(order.id, order, quickOverseasId)}
+                                                    className="px-4 py-2 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:opacity-90 disabled:opacity-50"
+                                                  >
+                                                    {creatingShipmentId === order.id ? <Loader2 className="w-4 h-4 animate-spin" /> : "Assign"}
+                                                  </button>
+                                                </div>
+                                              ) : (
+                                                <div className="bg-muted/20 p-3 rounded-lg border border-dashed border-border text-center">
+                                                  <p className="text-xs text-muted-foreground italic">No global ships added yet.</p>
+                                                </div>
+                                              )}
+                                            </div>
+                                          )}
+
+                                          {/* Domestic Section */}
+                                          {activeShippingTab === 'DOMESTIC' && (
+                                            <div className="space-y-2 text-left bg-background rounded-lg border-transparent animate-in fade-in duration-200">
+                                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Local Delivery Partners</p>
+                                              {transportMethods.filter(m => m.type === 'LAND').length > 0 ? (
+                                                <div className="flex gap-2">
+                                                  <select 
+                                                    className="flex-1 px-3 py-2 text-sm bg-muted/30 border border-border rounded-lg focus:outline-none"
+                                                    value={quickDomesticId}
+                                                    onChange={(e) => setQuickDomesticId(e.target.value)}
+                                                  >
+                                                    <option value="">Select a local courier...</option>
+                                                    {transportMethods.filter(m => m.type === 'LAND').map(m => (
+                                                      <option key={m.id} value={m.id}>{m.name} ({m.originRegion || 'Local'})</option>
+                                                    ))}
+                                                  </select>
+                                                  <button
+                                                    disabled={creatingShipmentId === order.id}
+                                                    onClick={() => handleQuickShip(order.id, order, quickDomesticId)}
+                                                    className="px-4 py-2 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:opacity-90 disabled:opacity-50"
+                                                  >
+                                                    {creatingShipmentId === order.id ? <Loader2 className="w-4 h-4 animate-spin" /> : "Assign"}
+                                                  </button>
+                                                </div>
+                                              ) : (
+                                                <div className="bg-muted/20 p-3 rounded-lg border border-dashed border-border text-center">
+                                                  <p className="text-xs text-muted-foreground italic">No local couriers added yet.</p>
+                                                </div>
+                                              )}
+                                            </div>
+                                          )}
                                         </div>
-                                      </div>
                                     ) : (
                                       <p className="text-sm text-muted-foreground">No ships available. Please add a ship in the Ships tab first.</p>
                                     )}

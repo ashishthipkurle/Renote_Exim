@@ -131,6 +131,13 @@ export async function POST(request: NextRequest) {
         destination: parsed.data.destination,
         estimatedDelivery: new Date(parsed.data.estimatedDelivery),
         currentStatus: 'PREPARING',
+        statusHistory: {
+          create: {
+            status: 'PREPARING',
+            location: parsed.data.origin,
+            note: 'Shipment created and preparing for dispatch'
+          }
+        }
       },
     });
 

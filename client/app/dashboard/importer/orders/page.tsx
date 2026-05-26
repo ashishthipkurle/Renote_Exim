@@ -31,7 +31,7 @@ export default async function ImporterOrdersPage({
           include: { exporter: { select: { id: true, name: true, businessName: true, country: true } } },
         },
         seller: { select: { id: true, name: true, businessName: true, country: true } },
-        shipment: true,
+        shipment: { include: { statusHistory: { orderBy: { createdAt: 'desc' } } } },
       },
       orderBy: { createdAt: "desc" },
       take: 50,

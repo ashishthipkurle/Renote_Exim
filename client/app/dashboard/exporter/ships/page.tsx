@@ -20,6 +20,7 @@ export default function ShipsPage() {
   const [loading, setLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [activeTab, setActiveTab] = useState<'GLOBAL' | 'DOMESTIC'>('GLOBAL');
 
   // New form state
   const [name, setName] = useState("");
@@ -95,9 +96,9 @@ export default function ShipsPage() {
       <div className="max-w-6xl mx-auto px-6 py-8 space-y-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Fleet & Delivery Methods</h1>
+            <h1 className="text-2xl font-bold text-foreground">Logistics & Fleet</h1>
             <p className="text-sm text-muted-foreground mt-0.5">
-              Manage your ships, airlines, and land transport partners.
+              Manage your global ships, airlines, and local delivery partners.
             </p>
           </div>
           <Button
@@ -132,7 +133,7 @@ export default function ShipsPage() {
                 >
                   <option value="OCEAN">Ocean (Ship)</option>
                   <option value="AIR">Air (Plane)</option>
-                  <option value="LAND">Land (Truck/Train)</option>
+                  <option value="LAND">Land / Local Courier (e.g. eKart)</option>
                 </select>
               </div>
               <div>
@@ -191,54 +192,144 @@ export default function ShipsPage() {
         ) : methods.length === 0 ? (
           <div className="text-center py-20 bg-card border border-border rounded-xl">
             <Ship className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-lg font-semibold">No Ships Added</p>
+            <p className="text-lg font-semibold">No Logistics Partners Added</p>
             <p className="text-sm text-muted-foreground">Add your delivery methods to assign them to orders.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {methods.map(method => (
-              <div key={method.id} className="bg-card border border-border rounded-xl p-5 hover:border-primary/30 transition-all flex flex-col">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                      {method.type === 'OCEAN' ? <Anchor className="w-5 h-5" /> : method.type === 'AIR' ? <Wind className="w-5 h-5" /> : <Truck className="w-5 h-5" />}
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-foreground text-sm">{method.name}</h3>
-                      <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">{method.type}</p>
-                    </div>
+          <div className="space-y-6">
+            {/* Tabs Navigation */}
+            <div className="flex items-center gap-4 border-b border-border">
+              <button
+                onClick={() => setActiveTab('GLOBAL')}
+                className={`pb-3 px-2 text-sm font-semibold transition-colors border-b-2 ${
+                  activeTab === 'GLOBAL' ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Overseas / Global Shipping
+              </button>
+              <button
+                onClick={() => setActiveTab('DOMESTIC')}
+                className={`pb-3 px-2 text-sm font-semibold transition-colors border-b-2 ${
+                  activeTab === 'DOMESTIC' ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                In-Country Delivery Partners
+              </button>
+            </div>
+
+            {/* Global Transport Section */}
+            {activeTab === 'GLOBAL' && (
+              <div className="animate-in fade-in duration-300">
+                {methods.filter(m => m.type === 'OCEAN' || m.type === 'AIR').length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {methods.filter(m => m.type === 'OCEAN' || m.type === 'AIR').map(method => (
+                      <div key={method.id} className="bg-card border border-border rounded-xl p-5 hover:border-primary/30 transition-all flex flex-col">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                              {method.type === 'OCEAN' ? <Anchor className="w-5 h-5" /> : <Wind className="w-5 h-5" />}
+                            </div>
+                            <div>
+                              <h3 className="font-semibold text-foreground text-sm">{method.name}</h3>
+                              <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">{method.type}</p>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => setMethodToDelete(method)}
+                            className="p-2 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                            title="Delete Method"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                        
+                        <div className="space-y-3 flex-1">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Active Shipments:</span>
+                            <span className="font-semibold text-foreground">{method._count?.shipments || 0}</span>
+                          </div>
+                          {(method.originRegion || method.destinationRegion) && (
+                            <div className="flex justify-between text-sm">
+                              <span className="text-muted-foreground">Route:</span>
+                              <span className="font-medium text-foreground text-right">
+                                {method.originRegion || "Anywhere"} → {method.destinationRegion || "Anywhere"}
+                              </span>
+                            </div>
+                          )}
+                          {method.capacity && (
+                            <div className="flex justify-between text-sm">
+                              <span className="text-muted-foreground">Details:</span>
+                              <span className="font-medium text-foreground text-right">{method.capacity}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <button
-                    onClick={() => setMethodToDelete(method)}
-                    className="p-2 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
-                    title="Delete Method"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-                
-                <div className="space-y-3 flex-1">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Active Shipments:</span>
-                    <span className="font-semibold text-foreground">{method._count?.shipments || 0}</span>
+                ) : (
+                  <div className="text-center py-10 bg-muted/20 border border-dashed border-border rounded-xl">
+                    <p className="text-sm text-muted-foreground">No overseas transport methods added yet.</p>
                   </div>
-                  {(method.originRegion || method.destinationRegion) && (
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Route:</span>
-                      <span className="font-medium text-foreground text-right">
-                        {method.originRegion || "Anywhere"} → {method.destinationRegion || "Anywhere"}
-                      </span>
-                    </div>
-                  )}
-                  {method.capacity && (
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Details:</span>
-                      <span className="font-medium text-foreground text-right">{method.capacity}</span>
-                    </div>
-                  )}
-                </div>
+                )}
               </div>
-            ))}
+            )}
+
+            {/* Domestic Transport Section */}
+            {activeTab === 'DOMESTIC' && (
+              <div className="animate-in fade-in duration-300">
+                {methods.filter(m => m.type === 'LAND').length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {methods.filter(m => m.type === 'LAND').map(method => (
+                      <div key={method.id} className="bg-card border border-border rounded-xl p-5 hover:border-primary/30 transition-all flex flex-col">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                              <Truck className="w-5 h-5" />
+                            </div>
+                            <div>
+                              <h3 className="font-semibold text-foreground text-sm">{method.name}</h3>
+                              <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">LOCAL COURIER</p>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => setMethodToDelete(method)}
+                            className="p-2 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                            title="Delete Method"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                        
+                        <div className="space-y-3 flex-1">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Active Deliveries:</span>
+                            <span className="font-semibold text-foreground">{method._count?.shipments || 0}</span>
+                          </div>
+                          {(method.originRegion || method.destinationRegion) && (
+                            <div className="flex justify-between text-sm">
+                              <span className="text-muted-foreground">Coverage:</span>
+                              <span className="font-medium text-foreground text-right">
+                                {method.originRegion || "Anywhere"} → {method.destinationRegion || "Anywhere"}
+                              </span>
+                            </div>
+                          )}
+                          {method.capacity && (
+                            <div className="flex justify-between text-sm">
+                              <span className="text-muted-foreground">Details:</span>
+                              <span className="font-medium text-foreground text-right">{method.capacity}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-10 bg-muted/20 border border-dashed border-border rounded-xl">
+                    <p className="text-sm text-muted-foreground">No local delivery partners added yet. Select 'Land / Local Courier' when adding a new method.</p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
