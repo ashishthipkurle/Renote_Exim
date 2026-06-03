@@ -2,163 +2,125 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { registerSchema } from "@/lib/validations";
-import { nhost } from "@/lib/nhost";
-import { AUTH_COOKIE_NAME, REFRESH_COOKIE_NAME, AUTH_COOKIE_OPTIONS, REFRESH_COOKIE_OPTIONS } from "@/lib/auth-server";
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
+import { prisma } from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
- try {
- const body = await request.json();
- const validatedData = registerSchema.parse(body);
+  try {
+    const body = await request.json();
+    const validatedData = registerSchema.parse(body);
 
- // Nhost v4 SDK throws on error, so we need try-catch here
- let result: any;
- try {
- result = await nhost.auth.signUpEmailPassword({
- email: validatedData.email,
- password: validatedData.password,
- options: {
- metadata: {
- name: validatedData.name,
- role: validatedData.role,
- businessName: validatedData.businessName,
- country: validatedData.country,
- phone: validatedData.phone,
- },
- },
- });
- } catch (signupError: any) {
- // SDK threw an error - extract the message
- const msg = signupError?.body?.message || signupError?.message || "Registration failed";
- console.error("Nhost signup threw:", msg);
- return NextResponse.json({ error: msg }, { status: 400 });
- }
+    const cookieStore = cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            )
+          },
+        },
+      }
+    )
 
- const error = result.error || result.body?.error;
- const session = result.session || result.body?.session;
- const mfa = result.mfa || result.body?.mfa;
+    console.log("[Register] Attempting Supabase sign-up for:", validatedData.email);
 
- const userId = session?.user?.id || result?.user?.id || result?.body?.user?.id;
- const userEmail = session?.user?.email || result?.user?.email || result?.body?.user?.email || validatedData.email;
+    const { data, error } = await supabase.auth.signUp({
+      email: validatedData.email,
+      password: validatedData.password,
+      options: {
+        data: {
+          name: validatedData.name,
+          role: validatedData.role,
+          businessName: validatedData.businessName,
+          country: validatedData.country,
+          phone: validatedData.phone,
+        },
+      },
+    });
 
+    if (error) {
+      console.error("[Register] Supabase threw:", error.message);
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
 
- if (error) {
- return NextResponse.json(
- { error: error?.message ?? "Registration failed" },
- { status: 400 }
- );
- }
+    const userId = data.user?.id;
+    if (!userId) {
+      return NextResponse.json({ error: "Registration failed, no user returned" }, { status: 400 });
+    }
 
- // Create the profile and auto-sync
- if (userId) {
- try {
- const prismaModule = await import("@/lib/prisma");
+    // Auto-sync with Prisma Database
+    try {
+      await prisma.user.upsert({
+        where: { email: validatedData.email },
+        update: {
+          name: validatedData.name,
+          role: validatedData.role,
+          businessName: validatedData.businessName || null,
+          country: validatedData.country,
+          phone: validatedData.phone || null,
+        },
+        create: {
+          id: userId,
+          email: validatedData.email,
+          name: validatedData.name,
+          role: validatedData.role,
+          businessName: validatedData.businessName || null,
+          country: validatedData.country,
+          phone: validatedData.phone || null,
+          verificationStatus: "VERIFIED", 
+        },
+      });
 
- // Create/update public profile
- await prismaModule.prisma.user.upsert({
- where: { id: userId },
- update: {
- name: validatedData.name,
- email: validatedData.email,
- role: validatedData.role,
- businessName: validatedData.businessName || null,
- country: validatedData.country,
- phone: validatedData.phone || null,
- },
- create: {
- id: userId,
- name: validatedData.name,
- email: validatedData.email,
- role: validatedData.role,
- businessName: validatedData.businessName || null,
- country: validatedData.country,
- phone: validatedData.phone || null,
- verificationStatus: "VERIFIED", 
- },
- });
+      // Welcome notification
+      await prisma.notification.create({
+        data: {
+          userId: userId,
+          type: "ORDER_UPDATE",
+          title: "Welcome to Renote Exim!",
+          message: `Welcome ${validatedData.name ?? ""}! Your account has been created successfully.`,
+        },
+      });
+    } catch (e: any) {
+      console.warn("Prisma sync failed during registration:", e.message);
+    }
 
- // Welcome notification
- try {
- await prismaModule.prisma.notification.create({
- data: {
- userId: userId,
- type: "ORDER_UPDATE",
- title: "Welcome to Renote Exim!",
- message: `Welcome ${validatedData.name ?? ""}! Your account has been created successfully.`,
- },
- });
- } catch (e) {
- console.warn("Welcome notification failed:", e);
- }
- } catch (e: any) {
- console.warn("Prisma sync failed during registration:", e.message);
- }
- }
+    // If auto login succeeded during signup
+    if (data.session?.access_token) {
+      return NextResponse.json(
+        {
+          message: "Registration successful",
+          user: { id: userId, name: validatedData.name, email: validatedData.email, role: validatedData.role },
+          token: data.session.access_token,
+        },
+        { status: 201 }
+      );
+    }
 
- // Return session or perform auto-login
- if (session?.accessToken) {
- const response = NextResponse.json(
- {
- message: "Registration successful",
- user: { id: userId, name: validatedData.name, email: userEmail, role: validatedData.role },
- token: session.accessToken,
- },
- { status: 201 }
- );
- 
- response.cookies.set(AUTH_COOKIE_NAME, session.accessToken, AUTH_COOKIE_OPTIONS);
- if (session.refreshToken) {
-   response.cookies.set(REFRESH_COOKIE_NAME, session.refreshToken, REFRESH_COOKIE_OPTIONS);
- }
- return response;
- }
+    // If require email verification was turned on
+    return NextResponse.json(
+      { message: "Registration successful. Please check your email to verify your account or log in." },
+      { status: 201 }
+    );
 
- if (userId) {
- try {
- const loginResult = await nhost.auth.signInEmailPassword({
- email: validatedData.email,
- password: validatedData.password,
- });
+  } catch (error: any) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: "Validation failed", details: error.errors },
+        { status: 400 }
+      );
+    }
 
- if (loginResult.session?.accessToken) {
- const response = NextResponse.json(
- {
- message: "Registration successful",
- user: { id: userId, name: validatedData.name, email: userEmail, role: validatedData.role },
- token: loginResult.session.accessToken,
- },
- { status: 201 }
- );
- 
- response.cookies.set(AUTH_COOKIE_NAME, loginResult.session.accessToken, AUTH_COOKIE_OPTIONS);
- if (loginResult.session.refreshToken) {
-   response.cookies.set(REFRESH_COOKIE_NAME, loginResult.session.refreshToken, REFRESH_COOKIE_OPTIONS);
- }
- return response;
- }
- } catch (e) {
- console.warn("Auto-login failed:", e);
- }
- }
-
- // Fallback: registration worked but no session
- return NextResponse.json(
- { message: "Registration successful. Please log in." },
- { status: 201 }
- );
-
- } catch (error: any) {
- if (error instanceof z.ZodError) {
- return NextResponse.json(
- { error: "Validation failed", details: error.errors },
- { status: 400 }
- );
- }
-
- console.error("Registration error:", error?.message || error);
- return NextResponse.json(
- { error: error?.message || "Internal server error" },
- { status: 500 }
- );
- }
+    console.error("Registration error:", error?.message || error);
+    return NextResponse.json(
+      { error: error?.message || "Internal server error" },
+      { status: 500 }
+    );
+  }
 }
-

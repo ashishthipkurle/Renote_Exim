@@ -2,12 +2,13 @@ export const dynamic = "force-dynamic";
 
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ShoppingCart, ArrowRight, ArrowLeft, Package } from "lucide-react";
+import { ArrowRight, ArrowLeft } from "lucide-react";
 
 import { prisma } from "@/lib/prisma";
 import { getServerAuthContext } from "@/lib/auth-server";
 import { OrderStatus } from "@prisma/client";
 import OrdersTable from "./OrdersTable";
+import { HeaderActions } from "./HeaderActions";
 
 export default async function ExporterOrdersPage({
   searchParams,
@@ -107,14 +108,15 @@ export default async function ExporterOrdersPage({
   return (
     <div className="h-full overflow-hidden flex flex-col bg-background">
       {/* Header */}
-      <header className="flex-shrink-0 px-8 py-8 border-b border-border bg-background/60 backdrop-blur-xl">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <header className="flex-shrink-0 px-8 py-6 border-b border-border bg-background/60 backdrop-blur-xl">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 max-w-[1400px] mx-auto">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">Orders</h1>
-            <p className="text-sm text-muted-foreground mt-1">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">Orders</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
               {statusCounts.all} total orders · {statusCounts.pending} pending · {statusCounts.processing} in progress
             </p>
           </div>
+          <HeaderActions />
         </div>
       </header>
 

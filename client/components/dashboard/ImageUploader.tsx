@@ -296,55 +296,76 @@ export default function ImageUploader({ images, onChange, maxFiles = 8 }: ImageU
  </div>
  </div>
 
- {/* In-flight and Pre-upload Gallery */}
- {uploadQueue.length > 0 && (
- <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
- {uploadQueue.map(item => (
- <div key={item.id} className="relative group rounded-xl overflow-hidden border border-white/10 aspect-square bg-card shadow-xl">
- <img src={item.previewUrl} alt="preview" className={`w-full h-full object-cover transition-transform duration-700 ${item.status === 'uploading' ? 'opacity-40 brightness-50' : ''}`} />
+  {/* In-flight and Pre-upload Gallery */}
+  {(images.length > 0 || uploadQueue.length > 0) && (
+  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+    {/* Already Uploaded Images */}
+    {images.map((url, idx) => (
+      <div key={`uploaded-${idx}`} className="relative group rounded-xl overflow-hidden border border-white/10 aspect-square bg-card shadow-xl">
+        <img src={url} alt={`product-image-${idx}`} className="w-full h-full object-cover transition-transform duration-700" />
+        <div className="absolute top-2 right-2 flex gap-1 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              onChange(images.filter((_, i) => i !== idx));
+            }}
+            className="p-1.5 bg-red-500/90 hover:bg-red-500 rounded-lg shadow-xl"
+            title="Remove Image"
+          >
+            <X className="w-3 h-3 text-white" />
+          </button>
+        </div>
+      </div>
+    ))}
 
- {item.status === "uploading" && (
- <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40">
- <Loader2 className="w-5 h-5 text-white animate-spin mb-2" />
- <div className="w-3/4 h-1.5 bg-white/20 rounded-full overflow-hidden">
- <div className="h-full bg-primary transition-all duration-300" style={{ width: `${item.progress}%` }} />
- </div>
- <p className="text-[10px] text-white font-bold mt-2">{item.progress}%</p>
- </div>
- )}
+    {/* Currently Uploading / Failed Images */}
+    {uploadQueue.map(item => (
+      <div key={item.id} className="relative group rounded-xl overflow-hidden border border-white/10 aspect-square bg-card shadow-xl">
+        <img src={item.previewUrl} alt="preview" className={`w-full h-full object-cover transition-transform duration-700 ${item.status === 'uploading' ? 'opacity-40 brightness-50' : ''}`} />
 
- {item.status === "error" && (
- <div className="absolute inset-0 flex flex-col items-center justify-center bg-red-900/80 p-2 text-center pointer-events-none">
- <AlertCircle className="w-6 h-6 text-red-200 mb-1" />
- <p className="text-[9px] text-red-100 font-bold leading-tight">{item.errorText}</p>
- </div>
- )}
+        {item.status === "uploading" && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40">
+            <Loader2 className="w-5 h-5 text-white animate-spin mb-2" />
+            <div className="w-3/4 h-1.5 bg-white/20 rounded-full overflow-hidden">
+              <div className="h-full bg-primary transition-all duration-300" style={{ width: `${item.progress}%` }} />
+            </div>
+            <p className="text-[10px] text-white font-bold mt-2">{item.progress}%</p>
+          </div>
+        )}
 
- {/* Actions overlay */}
- <div className="absolute top-2 right-2 flex gap-1 z-10">
- {item.status === "error" && item.errorText !== "File too large. Max 5MB." && item.errorText !== "Invalid file type. Need JPG, PNG, WEBP." && (
- <button
- type="button"
- onClick={(e) => { e.preventDefault(); updateItem(item.id, { status: "pending", retryCount: 0 }); }}
- className="p-1.5 bg-primary/90 hover:bg-primary rounded-lg shadow-xl"
- title="Retry manually"
- >
- <RefreshCw className="w-3 h-3 text-white" />
- </button>
- )}
- <button
- type="button"
- onClick={(e) => { e.preventDefault(); cancelOrRemoveUpload(item); }}
- className="p-1.5 bg-red-500/90 hover:bg-red-500 rounded-lg shadow-xl"
- title="Remove/Cancel"
- >
- {item.status === "uploading" ? <StopCircle className="w-3 h-3 text-white" /> : <X className="w-3 h-3 text-white" />}
- </button>
- </div>
- </div>
- ))}
- </div>
- )}
+        {item.status === "error" && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-red-900/80 p-2 text-center pointer-events-none">
+            <AlertCircle className="w-6 h-6 text-red-200 mb-1" />
+            <p className="text-[9px] text-red-100 font-bold leading-tight">{item.errorText}</p>
+          </div>
+        )}
+
+        {/* Actions overlay */}
+        <div className="absolute top-2 right-2 flex gap-1 z-10">
+          {item.status === "error" && item.errorText !== "File too large. Max 5MB." && item.errorText !== "Invalid file type. Need JPG, PNG, WEBP." && (
+            <button
+              type="button"
+              onClick={(e) => { e.preventDefault(); updateItem(item.id, { status: "pending", retryCount: 0 }); }}
+              className="p-1.5 bg-primary/90 hover:bg-primary rounded-lg shadow-xl"
+              title="Retry manually"
+            >
+              <RefreshCw className="w-3 h-3 text-white" />
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={(e) => { e.preventDefault(); cancelOrRemoveUpload(item); }}
+            className="p-1.5 bg-red-500/90 hover:bg-red-500 rounded-lg shadow-xl"
+            title="Remove/Cancel"
+          >
+            {item.status === "uploading" ? <StopCircle className="w-3 h-3 text-white" /> : <X className="w-3 h-3 text-white" />}
+          </button>
+        </div>
+      </div>
+    ))}
+  </div>
+  )}
 
  {batchToCrop && (
  <CropModal

@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition, useRef, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import Link from "next/link";
 import axios from "axios";
 import { toast } from "sonner";
 import {
@@ -14,27 +13,41 @@ import {
   Truck,
   Search,
   ChevronDown,
+  ChevronUp,
   ShoppingCart,
   Layers,
-  User,
-  Mail,
-  ExternalLink,
   Loader2,
-  Check
+  Check,
+  MoreHorizontal,
+  ArrowUpDown,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
-import ShipmentTrackingPanel from "@/components/dashboard/ShipmentTrackingPanel";
+import BulkActionsBar from "./BulkActionsBar";
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; bgColor: string; icon: any }> = {
-  QUOTE_REQUESTED: { label: "Quote Requested", color: "text-amber-600 dark:text-amber-400", bgColor: "bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20", icon: Clock },
-  CHECKOUT: { label: "Checkout", color: "text-amber-600 dark:text-amber-400", bgColor: "bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20", icon: ShoppingCart },
-  PENDING: { label: "Pending", color: "text-amber-600 dark:text-amber-400", bgColor: "bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20", icon: Clock },
-  QUOTE_CONFIRMED: { label: "Confirmed", color: "text-blue-600 dark:text-blue-400", bgColor: "bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/20", icon: CheckCircle2 },
-  CONFIRMED: { label: "Confirmed", color: "text-blue-600 dark:text-blue-400", bgColor: "bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/20", icon: CheckCircle2 },
-  PROCESSING: { label: "Processing", color: "text-purple-600 dark:text-purple-400", bgColor: "bg-purple-50 dark:bg-purple-500/10 border-purple-200 dark:border-purple-500/20", icon: Layers },
-  SHIPPED: { label: "Shipped", color: "text-sky-600 dark:text-sky-400", bgColor: "bg-sky-50 dark:bg-sky-500/10 border-sky-200 dark:border-sky-500/20", icon: Truck },
-  DELIVERED: { label: "Delivered", color: "text-emerald-600 dark:text-emerald-400", bgColor: "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20", icon: CheckCircle2 },
-  CANCELLED: { label: "Cancelled", color: "text-red-600 dark:text-red-400", bgColor: "bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/20", icon: XCircle },
+// ── Status config ──────────────────────────────────────────────────────────
+const STATUS_CONFIG: Record<string, { label: string; color: string; bgColor: string; dotColor: string; icon: any }> = {
+  QUOTE_REQUESTED: { label: "Quote Requested", color: "text-amber-700 dark:text-amber-300", bgColor: "bg-amber-50 dark:bg-amber-500/10", dotColor: "bg-amber-500", icon: Clock },
+  CHECKOUT:        { label: "Checkout",         color: "text-amber-700 dark:text-amber-300", bgColor: "bg-amber-50 dark:bg-amber-500/10", dotColor: "bg-amber-500", icon: ShoppingCart },
+  PENDING:         { label: "Pending",          color: "text-amber-700 dark:text-amber-300", bgColor: "bg-amber-50 dark:bg-amber-500/10", dotColor: "bg-amber-500", icon: Clock },
+  QUOTE_CONFIRMED: { label: "Confirmed",        color: "text-blue-700 dark:text-blue-300",   bgColor: "bg-blue-50 dark:bg-blue-500/10",   dotColor: "bg-blue-500", icon: CheckCircle2 },
+  CONFIRMED:       { label: "Confirmed",        color: "text-blue-700 dark:text-blue-300",   bgColor: "bg-blue-50 dark:bg-blue-500/10",   dotColor: "bg-blue-500", icon: CheckCircle2 },
+  PROCESSING:      { label: "Processing",       color: "text-purple-700 dark:text-purple-300", bgColor: "bg-purple-50 dark:bg-purple-500/10", dotColor: "bg-purple-500", icon: Layers },
+  SHIPPED:         { label: "Shipped",          color: "text-sky-700 dark:text-sky-300",     bgColor: "bg-sky-50 dark:bg-sky-500/10",     dotColor: "bg-sky-500", icon: Truck },
+  DELIVERED:       { label: "Delivered",        color: "text-emerald-700 dark:text-emerald-300", bgColor: "bg-emerald-50 dark:bg-emerald-500/10", dotColor: "bg-emerald-500", icon: CheckCircle2 },
+  CANCELLED:       { label: "Cancelled",        color: "text-red-700 dark:text-red-300",     bgColor: "bg-red-50 dark:bg-red-500/10",     dotColor: "bg-red-500", icon: XCircle },
+};
+
+const PAYMENT_DOT: Record<string, string> = {
+  PAID:     "bg-emerald-500",
+  PENDING:  "bg-amber-500",
+  FAILED:   "bg-red-500",
+  REFUNDED: "bg-gray-400",
+};
+
+const FULFILLMENT_DOT: Record<string, string> = {
+  FULFILLED:   "bg-emerald-500",
+  UNFULFILLED: "bg-amber-500",
+  PARTIAL:     "bg-yellow-500",
 };
 
 const STATUS_FLOW: Record<string, string> = {
@@ -50,12 +63,39 @@ const STATUS_LABELS: Record<string, string> = {
   PROCESSING: "Processing",
   SHIPPED: "Shipped",
   DELIVERED: "Delivered",
+  CANCELLED: "Cancelled",
 };
 
 function formatDate(d: Date | string) {
   return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(new Date(d));
 }
 
+function formatTime(d: Date | string) {
+  return new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit" }).format(new Date(d));
+}
+
+// ── Sorting ────────────────────────────────────────────────────────────────
+type SortField = "orderNumber" | "createdAt" | "customer" | "total" | "status";
+type SortDir = "asc" | "desc";
+
+function sortOrders(orders: any[], field: SortField, dir: SortDir) {
+  return [...orders].sort((a, b) => {
+    let va: any, vb: any;
+    switch (field) {
+      case "orderNumber": va = a.orderNumber || ""; vb = b.orderNumber || ""; break;
+      case "createdAt": va = new Date(a.createdAt).getTime(); vb = new Date(b.createdAt).getTime(); break;
+      case "customer": va = (a.buyer?.businessName || a.buyer?.name || "").toLowerCase(); vb = (b.buyer?.businessName || b.buyer?.name || "").toLowerCase(); break;
+      case "total": va = a.totalPrice || 0; vb = b.totalPrice || 0; break;
+      case "status": va = a.orderStatus || ""; vb = b.orderStatus || ""; break;
+      default: return 0;
+    }
+    if (va < vb) return dir === "asc" ? -1 : 1;
+    if (va > vb) return dir === "asc" ? 1 : -1;
+    return 0;
+  });
+}
+
+// ── Props ──────────────────────────────────────────────────────────────────
 interface OrdersTableProps {
   orders: any[];
   counts: {
@@ -72,18 +112,21 @@ export default function OrdersTable({ orders, counts, transportMethods = [] }: O
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
-  const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
-  
-  // Quick ship state
-  const [quickOverseasId, setQuickOverseasId] = useState<string>("");
-  const [quickDomesticId, setQuickDomesticId] = useState<string>("");
-  const [activeShippingTab, setActiveShippingTab] = useState<'GLOBAL' | 'DOMESTIC'>('GLOBAL');
-  const [creatingShipmentId, setCreatingShipmentId] = useState<string | null>(null);
+  const [actionMenuId, setActionMenuId] = useState<string | null>(null);
+  const actionMenuRef = useRef<HTMLDivElement>(null);
 
+  // Search & filter state
   const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
   const currentStatus = searchParams.get("status") || "ALL";
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get("category") || "ALL");
+
+  // Sorting
+  const [sortField, setSortField] = useState<SortField>("createdAt");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
+
+  // Selection
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const [optimisticOrders, setOptimisticOrders] = useState<any[]>(orders);
 
@@ -95,6 +138,17 @@ export default function OrdersTable({ orders, counts, transportMethods = [] }: O
   useEffect(() => {
     setOptimisticOrders(orders);
   }, [orders]);
+
+  // Close action menu on outside click
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (actionMenuRef.current && !actionMenuRef.current.contains(e.target as Node)) {
+        setActionMenuId(null);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const displayOrders = useMemo(() => {
     let filtered = optimisticOrders;
@@ -118,23 +172,17 @@ export default function OrdersTable({ orders, counts, transportMethods = [] }: O
         return fields.includes(query);
       });
     }
-    return filtered;
-  }, [optimisticOrders, currentStatus, searchQuery, selectedCategory]);
+    return sortOrders(filtered, sortField, sortDir);
+  }, [optimisticOrders, currentStatus, searchQuery, selectedCategory, sortField, sortDir]);
 
-  const updateFilters = (newStatus?: string, newCategory?: string) => {
+  const updateFilters = (newStatus?: string) => {
     const params = new URLSearchParams(searchParams);
-    
     if (searchQuery) params.set("search", searchQuery);
     else params.delete("search");
-    
     const targetStatus = newStatus !== undefined ? newStatus : currentStatus;
     if (targetStatus !== "ALL") params.set("status", targetStatus);
     else params.delete("status");
-
-    // We DO NOT put category in URL anymore to prevent unnecessary server fetches
-    // which cause Nhost rate limits or NETWORK_ERRORs since the server doesn't filter by category.
     params.delete("category");
-
     params.delete("page");
     startTransition(() => {
       router.push(`?${params.toString()}`);
@@ -145,7 +193,8 @@ export default function OrdersTable({ orders, counts, transportMethods = [] }: O
     const prevOrders = [...optimisticOrders];
     setOptimisticOrders(prev => prev.map(o => o.id === orderId ? { ...o, orderStatus: newStatus } : o));
     setUpdatingStatusId(orderId);
-    
+    setActionMenuId(null);
+
     try {
       await axios.patch(`/api/orders/${orderId}`, { status: newStatus });
       toast.success(`Order updated to ${STATUS_LABELS[newStatus] || newStatus}`);
@@ -158,39 +207,91 @@ export default function OrdersTable({ orders, counts, transportMethods = [] }: O
     }
   };
 
-  const handleQuickShip = async (orderId: string, order: any, methodId: string) => {
-    if (!methodId) {
-      toast.error("Please select a transport method");
-      return;
-    }
-    
-    setCreatingShipmentId(orderId);
+  const handleBulkStatusUpdate = async (status: string) => {
+    const ids = Array.from(selectedIds);
+    const prevOrders = [...optimisticOrders];
+    setOptimisticOrders(prev => prev.map(o => ids.includes(o.id) ? { ...o, orderStatus: status } : o));
     try {
-      const selectedMethod = transportMethods.find(m => m.id === methodId);
-      
-      // Default dates for quick ship (7 days from now)
-      const estimatedDeliveryDate = new Date();
-      estimatedDeliveryDate.setDate(estimatedDeliveryDate.getDate() + 7);
-      
-      await axios.post("/api/shipments", {
-        orderId: orderId,
-        transportMethodId: methodId,
-        origin: selectedMethod?.originRegion || "N/A",
-        destination: order.buyer?.country || "N/A",
-        estimatedDelivery: estimatedDeliveryDate.toISOString(),
-      });
-      
-      toast.success("Shipment created successfully!");
+      await Promise.all(ids.map(id => axios.patch(`/api/orders/${id}`, { status })));
+      toast.success(`${ids.length} orders updated to ${STATUS_LABELS[status] || status}`);
+      setSelectedIds(new Set());
       router.refresh();
     } catch (err: any) {
-      toast.error(err.response?.data?.error || "Failed to create shipment");
-    } finally {
-      setCreatingShipmentId(null);
+      setOptimisticOrders(prevOrders);
+      toast.error("Failed to update some orders");
     }
   };
 
-  const statusPills = [
-    { id: "ALL", label: "All Orders", count: counts.all },
+  const handleBulkExport = () => {
+    toast.success(`Exporting ${selectedIds.size} orders...`);
+    // Future: implement CSV export
+  };
+
+  // ── Selection helpers ──────────────────────────────────────────────────
+  const allSelected = displayOrders.length > 0 && displayOrders.every(o => selectedIds.has(o.id));
+  const someSelected = displayOrders.some(o => selectedIds.has(o.id));
+
+  const toggleAll = () => {
+    if (allSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(displayOrders.map(o => o.id)));
+    }
+  };
+
+  const toggleOne = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  // ── Sorting handler ────────────────────────────────────────────────────
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDir(d => d === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDir("asc");
+    }
+  };
+
+  const SortIcon = ({ field }: { field: SortField }) => {
+    if (sortField !== field) return <ArrowUpDown className="w-3 h-3 text-muted-foreground/40" />;
+    return sortDir === "asc"
+      ? <ChevronUp className="w-3 h-3 text-foreground" />
+      : <ChevronDown className="w-3 h-3 text-foreground" />;
+  };
+
+  // ── Derive payment/fulfillment from order status (since schema may not have separate fields)
+  const getPaymentStatus = (order: any) => {
+    if (order.paymentStatus) return order.paymentStatus;
+    const s = order.orderStatus || "";
+    if (["DELIVERED", "SHIPPED", "PROCESSING", "QUOTE_CONFIRMED", "CONFIRMED"].includes(s)) return "PAID";
+    if (["CANCELLED"].includes(s)) return "FAILED";
+    return "PENDING";
+  };
+
+  const getFulfillmentStatus = (order: any) => {
+    const s = order.orderStatus || "";
+    if (s === "DELIVERED") return "FULFILLED";
+    if (s === "SHIPPED" || s === "PROCESSING") return "PARTIAL";
+    return "UNFULFILLED";
+  };
+
+  const getDeliveryStatus = (order: any) => {
+    if (!order.shipment) return null;
+    const s = order.orderStatus || "";
+    if (s === "DELIVERED") return "Delivered";
+    if (s === "SHIPPED") return "In transit";
+    return "Pending";
+  };
+
+  // ── Tabs config ────────────────────────────────────────────────────────
+  const statusTabs = [
+    { id: "ALL", label: "All", count: counts.all },
     { id: "PENDING", label: "Pending", count: counts.pending },
     { id: "PROCESSING", label: "Processing", count: counts.processing },
     { id: "SHIPPED", label: "Shipped", count: counts.shipped },
@@ -198,42 +299,44 @@ export default function OrdersTable({ orders, counts, transportMethods = [] }: O
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Filters */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
-        <div className="flex flex-wrap gap-2">
-          {statusPills.map((pill) => (
+    <div className="space-y-0">
+      {/* ── Shopify-style tabs ──────────────────────────────────────────── */}
+      <div className="bg-card border border-border rounded-t-xl">
+        <div className="flex items-center border-b border-border">
+          {statusTabs.map((tab) => (
             <button
-              key={pill.id}
-              onClick={() => updateFilters(pill.id)}
-              className={`px-4 py-2 rounded-lg border text-sm font-medium transition-all ${
-                currentStatus === pill.id
-                  ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                  : "bg-card border-border text-muted-foreground hover:text-foreground hover:bg-muted"
+              key={tab.id}
+              onClick={() => updateFilters(tab.id)}
+              className={`relative px-4 py-3 text-sm font-medium transition-colors whitespace-nowrap ${
+                currentStatus === tab.id
+                  ? "text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              {pill.label} <span className="opacity-50 ml-1">{pill.count}</span>
+              {tab.label}
+              {tab.count > 0 && (
+                <span className={`ml-1.5 text-xs px-1.5 py-0.5 rounded-full ${
+                  currentStatus === tab.id
+                    ? "bg-muted text-foreground"
+                    : "bg-muted/50 text-muted-foreground"
+                }`}>
+                  {tab.count}
+                </span>
+              )}
+              {currentStatus === tab.id && (
+                <motion.div
+                  layoutId="activeTab"
+                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
+                  transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                />
+              )}
             </button>
           ))}
         </div>
 
-        <div className="flex items-center gap-3 w-full xl:w-auto">
-          {categories.length > 0 && (
-            <select
-              value={selectedCategory}
-              onChange={(e) => {
-                setSelectedCategory(e.target.value);
-              }}
-              className="px-4 py-2.5 bg-card border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all cursor-pointer"
-            >
-              <option value="ALL">All Categories</option>
-              {categories.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
-          )}
-
-          <div className="relative w-full xl:w-80">
+        {/* ── Search & category filter bar ───────────────────────────────── */}
+        <div className="px-4 py-3 flex items-center gap-3">
+          <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
               type="text"
@@ -241,318 +344,327 @@ export default function OrdersTable({ orders, counts, transportMethods = [] }: O
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && updateFilters()}
-              className="w-full pl-10 pr-4 py-2.5 bg-card border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
+              className="w-full pl-9 pr-4 py-2 bg-background border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
             />
           </div>
+
+          {categories.length > 0 && (
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all cursor-pointer"
+            >
+              <option value="ALL">All Categories</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+          )}
         </div>
       </div>
 
-      {/* Order Cards */}
-      <div className="space-y-3 relative">
+      {/* ── Data table ──────────────────────────────────────────────────── */}
+      <div className="bg-card border border-t-0 border-border rounded-b-xl overflow-hidden relative">
+        {/* Loading overlay */}
         <AnimatePresence>
           {isPending && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-background/60 backdrop-blur-sm z-50 flex items-center justify-center rounded-lg"
+              className="absolute inset-0 bg-background/60 backdrop-blur-sm z-40 flex items-center justify-center"
             >
-              <Loader2 className="w-8 h-8 text-primary animate-spin" />
+              <Loader2 className="w-7 h-7 text-primary animate-spin" />
             </motion.div>
           )}
         </AnimatePresence>
 
         {displayOrders.length === 0 ? (
-          <div className="bg-card border border-border rounded-xl p-16 text-center">
-            <Package className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-foreground">No Orders Found</h2>
+          <div className="py-20 text-center">
+            <Package className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
+            <h3 className="text-base font-semibold text-foreground">No orders found</h3>
             <p className="text-sm text-muted-foreground mt-1">No orders match your current filters.</p>
           </div>
         ) : (
-          <div className="space-y-3">
-            {displayOrders.map((order) => {
-              const cfg = STATUS_CONFIG[order.orderStatus] ?? STATUS_CONFIG.PENDING;
-              const isExpanded = expandedOrderId === order.id;
-              const StatusIcon = cfg.icon;
-              const rawNext = STATUS_FLOW[order.orderStatus];
-              // Block "Mark Shipped" if no shipment has been created yet
-              const nextStatus = (rawNext === 'SHIPPED' && !order.shipment) ? null : rawNext;
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              {/* ── Table head ─────────────────────────────────────────── */}
+              <thead>
+                <tr className="border-b border-border bg-muted/30">
+                  {/* Checkbox */}
+                  <th className="w-11 px-4 py-3">
+                    <input
+                      type="checkbox"
+                      checked={allSelected}
+                      ref={(el) => {
+                        if (el) el.indeterminate = someSelected && !allSelected;
+                      }}
+                      onChange={toggleAll}
+                      className="w-4 h-4 rounded border-border text-primary focus:ring-primary/20 cursor-pointer accent-primary"
+                    />
+                  </th>
+                  {/* Order # */}
+                  <th className="px-3 py-3 text-left">
+                    <button onClick={() => handleSort("orderNumber")} className="flex items-center gap-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide hover:text-foreground transition-colors">
+                      Order <SortIcon field="orderNumber" />
+                    </button>
+                  </th>
+                  {/* Date */}
+                  <th className="px-3 py-3 text-left">
+                    <button onClick={() => handleSort("createdAt")} className="flex items-center gap-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide hover:text-foreground transition-colors">
+                      Date <SortIcon field="createdAt" />
+                    </button>
+                  </th>
+                  {/* Customer */}
+                  <th className="px-3 py-3 text-left">
+                    <button onClick={() => handleSort("customer")} className="flex items-center gap-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide hover:text-foreground transition-colors">
+                      Customer <SortIcon field="customer" />
+                    </button>
+                  </th>
+                  {/* Channel */}
+                  <th className="px-3 py-3 text-left">
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Channel</span>
+                  </th>
+                  {/* Total */}
+                  <th className="px-3 py-3 text-right">
+                    <button onClick={() => handleSort("total")} className="flex items-center gap-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide hover:text-foreground transition-colors ml-auto">
+                      Total <SortIcon field="total" />
+                    </button>
+                  </th>
+                  {/* Payment status */}
+                  <th className="px-3 py-3 text-left">
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Payment</span>
+                  </th>
+                  {/* Fulfillment status */}
+                  <th className="px-3 py-3 text-left">
+                    <button onClick={() => handleSort("status")} className="flex items-center gap-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide hover:text-foreground transition-colors">
+                      Fulfillment <SortIcon field="status" />
+                    </button>
+                  </th>
+                  {/* Items */}
+                  <th className="px-3 py-3 text-center">
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Items</span>
+                  </th>
+                  {/* Delivery */}
+                  <th className="px-3 py-3 text-left">
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Delivery</span>
+                  </th>
+                  {/* Actions */}
+                  <th className="w-11 px-3 py-3" />
+                </tr>
+              </thead>
 
-              return (
-                <div
-                  key={order.id}
-                  className={`bg-card border border-border rounded-xl overflow-hidden transition-all duration-300 ${isExpanded ? "ring-2 ring-primary/20" : "hover:shadow-md"}`}
-                >
-                  {/* Order Row */}
-                  <div className="p-5">
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                      {/* Product Info */}
-                      <div className="flex items-center gap-4 flex-1 min-w-0">
-                        <div className="w-14 h-14 rounded-lg bg-muted border border-border flex-shrink-0 flex items-center justify-center overflow-hidden">
-                          {order.product?.images?.[0] ? (
-                            <img src={order.product.images[0]} alt="" className="w-full h-full object-cover" />
-                          ) : (
-                            <Package className="w-5 h-5 text-muted-foreground" />
-                          )}
-                        </div>
-                        <div className="min-w-0">
-                          <h3 className="text-sm font-semibold text-foreground truncate">{order.product?.name ?? "Unknown Product"}</h3>
-                          <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
-                            <User className="w-3 h-3" />
-                            {order.buyer?.businessName || order.buyer?.name || "Customer"}
-                          </p>
-                        </div>
-                      </div>
+              {/* ── Table body ─────────────────────────────────────────── */}
+              <tbody className="divide-y divide-border">
+                {displayOrders.map((order) => {
+                  const cfg = STATUS_CONFIG[order.orderStatus] ?? STATUS_CONFIG.PENDING;
+                  const isSelected = selectedIds.has(order.id);
+                  const paymentStatus = getPaymentStatus(order);
+                  const fulfillmentStatus = getFulfillmentStatus(order);
+                  const deliveryStatus = getDeliveryStatus(order);
+                  const rawNext = STATUS_FLOW[order.orderStatus];
+                  const nextStatus = (rawNext === "SHIPPED" && !order.shipment) ? null : rawNext;
 
-                      {/* Price */}
-                      <div className="sm:w-28 text-right sm:text-center">
-                        <div className="text-base font-bold text-foreground">{formatCurrency(order.totalPrice)}</div>
-                        <div className="text-xs text-muted-foreground">Qty: {order.quantity}</div>
-                      </div>
+                  return (
+                    <tr
+                      key={order.id}
+                      className={`group transition-colors cursor-pointer ${
+                        isSelected
+                          ? "bg-primary/5 dark:bg-primary/10"
+                          : "hover:bg-muted/40"
+                      }`}
+                      onClick={(e) => {
+                        // Don't navigate when clicking checkbox, action menu, or input
+                        const target = e.target as HTMLElement;
+                        if (target.closest('input[type="checkbox"]') || target.closest("[data-action-menu]") || target.closest("button")) return;
+                        router.push(`/dashboard/exporter/orders/${order.id}`);
+                      }}
+                    >
+                      {/* Checkbox */}
+                      <td className="px-4 py-3">
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => toggleOne(order.id)}
+                          className="w-4 h-4 rounded border-border text-primary focus:ring-primary/20 cursor-pointer accent-primary"
+                        />
+                      </td>
 
-                      {/* Status */}
-                      <div className="sm:w-36 flex sm:justify-center">
-                        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-semibold ${cfg.bgColor} ${cfg.color}`}>
-                          {updatingStatusId === order.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <StatusIcon className="w-3 h-3" />}
-                          {cfg.label}
+                      {/* Order # */}
+                      <td className="px-3 py-3">
+                        <span className="font-semibold text-primary hover:underline">
+                          {order.orderNumber || `#${order.id.slice(0, 8)}`}
                         </span>
-                      </div>
+                      </td>
 
                       {/* Date */}
-                      <div className="sm:w-32 text-right">
-                        <div className="text-sm text-muted-foreground">{formatDate(order.createdAt)}</div>
-                        <div className="text-xs text-muted-foreground/60">{order.orderNumber}</div>
-                      </div>
+                      <td className="px-3 py-3 whitespace-nowrap">
+                        <div className="text-foreground">{formatDate(order.createdAt)}</div>
+                        <div className="text-xs text-muted-foreground">{formatTime(order.createdAt)}</div>
+                      </td>
 
-                      {/* Actions */}
-                      <div className="flex items-center gap-2">
-                        {/* Quick action: advance to next status */}
-                        {nextStatus && (
+                      {/* Customer */}
+                      <td className="px-3 py-3">
+                        <div className="font-medium text-foreground truncate max-w-[180px]">
+                          {order.buyer?.businessName || order.buyer?.name || "—"}
+                        </div>
+                        {order.buyer?.country && (
+                          <div className="text-xs text-muted-foreground">{order.buyer.country}</div>
+                        )}
+                      </td>
+
+                      {/* Channel */}
+                      <td className="px-3 py-3">
+                        <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded bg-muted text-muted-foreground border border-border/50">
+                          {order.channel || "B2B"}
+                        </span>
+                      </td>
+
+                      {/* Total */}
+                      <td className="px-3 py-3 text-right font-semibold text-foreground whitespace-nowrap">
+                        {formatCurrency(order.totalPrice)}
+                      </td>
+
+                      {/* Payment status badge */}
+                      <td className="px-3 py-3">
+                        <span className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground">
+                          <span className={`w-2 h-2 rounded-full ${PAYMENT_DOT[paymentStatus] || "bg-gray-400"}`} />
+                          {paymentStatus === "PAID" ? "Paid" : paymentStatus === "PENDING" ? "Pending" : paymentStatus === "FAILED" ? "Failed" : paymentStatus === "REFUNDED" ? "Refunded" : paymentStatus}
+                        </span>
+                      </td>
+
+                      {/* Fulfillment status badge */}
+                      <td className="px-3 py-3">
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${cfg.bgColor} ${cfg.color}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${cfg.dotColor}`} />
+                          {cfg.label}
+                        </span>
+                      </td>
+
+                      {/* Items count */}
+                      <td className="px-3 py-3 text-center text-muted-foreground">
+                        {order.quantity || 1} {order.quantity === 1 ? "item" : "items"}
+                      </td>
+
+                      {/* Delivery status */}
+                      <td className="px-3 py-3">
+                        {deliveryStatus ? (
+                          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground">
+                            <Truck className="w-3 h-3 text-muted-foreground" />
+                            {deliveryStatus}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">—</span>
+                        )}
+                      </td>
+
+                      {/* Actions menu */}
+                      <td className="px-3 py-3" data-action-menu>
+                        <div className="relative" ref={actionMenuId === order.id ? actionMenuRef : undefined}>
                           <button
-                            disabled={updatingStatusId !== null}
-                            onClick={() => handleStatusUpdate(order.id, nextStatus)}
-                            className="px-3 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:opacity-90 transition-all disabled:opacity-50 whitespace-nowrap"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActionMenuId(actionMenuId === order.id ? null : order.id);
+                            }}
+                            className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
                           >
                             {updatingStatusId === order.id ? (
-                              <Loader2 className="w-3 h-3 animate-spin inline-block" />
+                              <Loader2 className="w-4 h-4 animate-spin" />
                             ) : (
-                              `Mark ${STATUS_LABELS[nextStatus]}`
+                              <MoreHorizontal className="w-4 h-4" />
                             )}
                           </button>
-                        )}
-                        <button
-                          onClick={() => setExpandedOrderId(isExpanded ? null : order.id)}
-                          className={`p-2 rounded-lg border transition-all ${
-                            isExpanded ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border text-muted-foreground hover:text-foreground"
-                          }`}
-                        >
-                          <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`} />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* Expanded Details */}
-                  <AnimatePresence>
-                    {isExpanded && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="overflow-hidden border-t border-border"
-                      >
-                        <div className="p-6">
-                          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            {/* Buyer Info */}
-                            <div className="space-y-3">
-                              <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
-                                <User className="w-4 h-4" /> Buyer Details
-                              </h4>
-                              <div className="p-4 rounded-lg bg-muted/30 border border-border space-y-3">
-                                <div>
-                                  <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Name</p>
-                                  <p className="text-sm font-semibold text-foreground">{order.buyer?.businessName || order.buyer?.name}</p>
+                          {/* Dropdown menu */}
+                          <AnimatePresence>
+                            {actionMenuId === order.id && (
+                              <motion.div
+                                initial={{ opacity: 0, scale: 0.95, y: -4 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.95, y: -4 }}
+                                transition={{ duration: 0.1 }}
+                                className="absolute right-0 top-full mt-1 w-52 bg-card border border-border rounded-xl shadow-xl z-50 overflow-hidden"
+                              >
+                                <div className="px-3 py-2 border-b border-border">
+                                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Update Status</p>
                                 </div>
-                                <div className="flex items-center justify-between">
-                                  <div>
-                                    <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Country</p>
-                                    <p className="text-sm font-semibold text-foreground">{order.buyer?.country || "N/A"}</p>
-                                  </div>
-                                  <Link
-                                    href={`mailto:${order.buyer?.email}`}
-                                    className="p-2.5 rounded-lg bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition-all"
-                                  >
-                                    <Mail className="w-4 h-4" />
-                                  </Link>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Status Controls */}
-                            <div className="space-y-3">
-                              <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
-                                <Layers className="w-4 h-4" /> Update Status
-                              </h4>
-                              <div className="p-4 rounded-lg bg-muted/30 border border-border space-y-3">
-                                <div className="flex flex-wrap gap-2">
+                                <div className="py-1">
                                   {Object.entries(STATUS_LABELS).map(([status, label]) => {
                                     const isCurrent = order.orderStatus === status;
-                                    const isNext = nextStatus === status;
-                                    // Block SHIPPED/DELIVERED if no shipment created
-                                    const needsShipment = (status === 'SHIPPED' || status === 'DELIVERED') && !order.shipment;
+                                    const needsShipment = (status === "SHIPPED" || status === "DELIVERED") && !order.shipment;
                                     return (
                                       <button
                                         key={status}
                                         disabled={isCurrent || updatingStatusId !== null || needsShipment}
-                                        onClick={() => handleStatusUpdate(order.id, status)}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleStatusUpdate(order.id, status);
+                                        }}
                                         title={needsShipment ? "Create a shipment first" : undefined}
-                                        className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${
+                                        className={`w-full text-left px-3 py-2 text-sm flex items-center gap-2 transition-colors ${
                                           isCurrent
-                                            ? "bg-primary/15 text-primary border-primary/30 cursor-default"
+                                            ? "text-primary bg-primary/5 font-medium"
                                             : needsShipment
-                                              ? "bg-card border-border text-muted-foreground/30 cursor-not-allowed opacity-50"
-                                              : isNext
-                                                ? "bg-card border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground"
-                                                : "bg-card border-border text-muted-foreground/50 hover:text-muted-foreground"
+                                              ? "text-muted-foreground/40 cursor-not-allowed"
+                                              : "text-foreground hover:bg-muted"
                                         }`}
                                       >
-                                        {isCurrent && <Check className="w-3 h-3 inline-block mr-1" />}
+                                        {isCurrent && <Check className="w-3.5 h-3.5 text-primary" />}
+                                        <span className={`w-2 h-2 rounded-full ${STATUS_CONFIG[status]?.dotColor || "bg-gray-400"}`} />
                                         {label}
+                                        {needsShipment && <span className="text-[10px] text-muted-foreground/40 ml-auto">needs shipment</span>}
                                       </button>
                                     );
                                   })}
                                 </div>
-                                <p className="text-xs text-muted-foreground">
-                                  Status changes will automatically notify the buyer.
-                                </p>
-                              </div>
-                            </div>
-
-                            {/* Shipping */}
-                            <div className="space-y-3">
-                              <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
-                                <Truck className="w-4 h-4" /> Shipping
-                              </h4>
-                              <div className="p-4 rounded-lg bg-muted/30 border border-border space-y-3">
-                                {order.shipment ? (
-                                  <div className="space-y-3">
-                                    <div className="flex justify-between items-center">
-                                      <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Tracking</p>
-                                      <p className="text-sm font-semibold text-foreground">{order.shipment.trackingNumber}</p>
-                                    </div>
-                                    <Link
-                                      href={`/dashboard/exporter/shipments/${order.shipment.id}`}
-                                      className="w-full py-2 bg-card border border-border hover:bg-muted text-sm font-medium flex items-center justify-center gap-2 rounded-lg transition-all"
-                                    >
-                                      Manage Shipment <ExternalLink className="w-3 h-3" />
-                                    </Link>
-                                  </div>
-                                ) : (
-                                  <div className="text-center py-2 space-y-3">
-                                    {transportMethods && transportMethods.length > 0 ? (
-                                        <div className="space-y-4">
-                                          {/* Tabs Navigation */}
-                                          <div className="flex items-center gap-2 border-b border-border pb-2">
-                                            <button
-                                              onClick={() => setActiveShippingTab('GLOBAL')}
-                                              className={`text-xs font-semibold px-2 py-1 transition-colors ${
-                                                activeShippingTab === 'GLOBAL' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground hover:text-foreground'
-                                              }`}
-                                            >
-                                              Overseas
-                                            </button>
-                                            <button
-                                              onClick={() => setActiveShippingTab('DOMESTIC')}
-                                              className={`text-xs font-semibold px-2 py-1 transition-colors ${
-                                                activeShippingTab === 'DOMESTIC' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground hover:text-foreground'
-                                              }`}
-                                            >
-                                              In-Country
-                                            </button>
-                                          </div>
-
-                                          {/* Overseas Section */}
-                                          {activeShippingTab === 'GLOBAL' && (
-                                            <div className="space-y-2 text-left bg-background rounded-lg border-transparent animate-in fade-in duration-200">
-                                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Global Shipping</p>
-                                              {transportMethods.filter(m => m.type === 'OCEAN' || m.type === 'AIR').length > 0 ? (
-                                                <div className="flex gap-2">
-                                                  <select 
-                                                    className="flex-1 px-3 py-2 text-sm bg-muted/30 border border-border rounded-lg focus:outline-none"
-                                                    value={quickOverseasId}
-                                                    onChange={(e) => setQuickOverseasId(e.target.value)}
-                                                  >
-                                                    <option value="">Select an overseas method...</option>
-                                                    {transportMethods.filter(m => m.type === 'OCEAN' || m.type === 'AIR').map(m => (
-                                                      <option key={m.id} value={m.id}>{m.name} ({m.originRegion || 'Global'})</option>
-                                                    ))}
-                                                  </select>
-                                                  <button
-                                                    disabled={creatingShipmentId === order.id}
-                                                    onClick={() => handleQuickShip(order.id, order, quickOverseasId)}
-                                                    className="px-4 py-2 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:opacity-90 disabled:opacity-50"
-                                                  >
-                                                    {creatingShipmentId === order.id ? <Loader2 className="w-4 h-4 animate-spin" /> : "Assign"}
-                                                  </button>
-                                                </div>
-                                              ) : (
-                                                <div className="bg-muted/20 p-3 rounded-lg border border-dashed border-border text-center">
-                                                  <p className="text-xs text-muted-foreground italic">No global ships added yet.</p>
-                                                </div>
-                                              )}
-                                            </div>
-                                          )}
-
-                                          {/* Domestic Section */}
-                                          {activeShippingTab === 'DOMESTIC' && (
-                                            <div className="space-y-2 text-left bg-background rounded-lg border-transparent animate-in fade-in duration-200">
-                                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Local Delivery Partners</p>
-                                              {transportMethods.filter(m => m.type === 'LAND').length > 0 ? (
-                                                <div className="flex gap-2">
-                                                  <select 
-                                                    className="flex-1 px-3 py-2 text-sm bg-muted/30 border border-border rounded-lg focus:outline-none"
-                                                    value={quickDomesticId}
-                                                    onChange={(e) => setQuickDomesticId(e.target.value)}
-                                                  >
-                                                    <option value="">Select a local courier...</option>
-                                                    {transportMethods.filter(m => m.type === 'LAND').map(m => (
-                                                      <option key={m.id} value={m.id}>{m.name} ({m.originRegion || 'Local'})</option>
-                                                    ))}
-                                                  </select>
-                                                  <button
-                                                    disabled={creatingShipmentId === order.id}
-                                                    onClick={() => handleQuickShip(order.id, order, quickDomesticId)}
-                                                    className="px-4 py-2 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:opacity-90 disabled:opacity-50"
-                                                  >
-                                                    {creatingShipmentId === order.id ? <Loader2 className="w-4 h-4 animate-spin" /> : "Assign"}
-                                                  </button>
-                                                </div>
-                                              ) : (
-                                                <div className="bg-muted/20 p-3 rounded-lg border border-dashed border-border text-center">
-                                                  <p className="text-xs text-muted-foreground italic">No local couriers added yet.</p>
-                                                </div>
-                                              )}
-                                            </div>
-                                          )}
-                                        </div>
-                                    ) : (
-                                      <p className="text-sm text-muted-foreground">No ships available. Please add a ship in the Ships tab first.</p>
-                                    )}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
+                                <div className="border-t border-border py-1">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setActionMenuId(null);
+                                      router.push(`/dashboard/exporter/orders/${order.id}`);
+                                    }}
+                                    className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors"
+                                  >
+                                    View details
+                                  </button>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
                         </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              );
-            })}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* ── Table footer ──────────────────────────────────────────────── */}
+        {displayOrders.length > 0 && (
+          <div className="px-4 py-3 border-t border-border bg-muted/20 flex items-center justify-between">
+            <p className="text-xs text-muted-foreground">
+              Showing <span className="font-medium text-foreground">{displayOrders.length}</span> of{" "}
+              <span className="font-medium text-foreground">{counts.all}</span> orders
+            </p>
+            {selectedIds.size > 0 && (
+              <p className="text-xs text-primary font-medium">
+                {selectedIds.size} selected
+              </p>
+            )}
           </div>
         )}
       </div>
+
+      {/* ── Bulk Actions Bar ────────────────────────────────────────────── */}
+      <BulkActionsBar
+        selectedCount={selectedIds.size}
+        onDeselectAll={() => setSelectedIds(new Set())}
+        onUpdateStatus={handleBulkStatusUpdate}
+        onExport={handleBulkExport}
+      />
     </div>
   );
 }

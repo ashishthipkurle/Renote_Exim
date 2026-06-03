@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { stripe } from '@/lib/stripe';
+import { getRazorpayClient } from '@/lib/razorpay';
 import { prisma } from '@/lib/prisma';
 import { getApiAuthContext } from '@/lib/auth-server';
 
@@ -51,50 +51,53 @@ export async function POST(req: NextRequest) {
           quantity: item.quantity,
           unitPrice: unitPrice,
           totalPrice: itemTotal,
-          currency: product.currency || 'USD',
+          currency: product.currency || 'INR',
           orderStatus: 'CHECKOUT',
           paymentStatus: 'PENDING',
-          stripePaymentIntentId: groupId,
+          stripePaymentIntentId: groupId, // Keep for backward compat / order grouping
+          razorpayOrderId: groupId, // Temporary, will be updated below
           notes: shippingAddress ? `Ship to: ${shippingAddress}${phone ? ` | Phone: ${phone}` : ''}` : null,
         },
       });
       createdOrders.push(order);
     }
 
-    // 2. Create Stripe Payment Intent
-    let clientSecret = 'pi_mock_secret_dummy_123';
-    let paymentIntentId = `pi_mock_${Date.now()}`;
+    // 2. Create Razorpay Order (amount in paise = multiply by 100)
+    const amountInPaise = Math.max(100, Math.round(totalAmount * 100)); // Razorpay min is ₹1 = 100 paise
+    let razorpayOrderId = `rz_mock_${Date.now()}`;
+    const isDev = !process.env.RAZORPAY_KEY_ID;
 
-    // Only call Stripe API if a real secret key is configured
-    if (process.env.STRIPE_SECRET_KEY) {
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: Math.max(50, Math.round(totalAmount * 100)), // Stripe requires at least 50 cents
-        currency: 'usd',
-        metadata: {
-          userId: auth.userId,
-          orderGroupId: groupId,
-        },
-        automatic_payment_methods: {
-          enabled: true,
-        },
+    if (!isDev) {
+      const razorpay = getRazorpayClient();
+      const rzOrder = await razorpay.orders.create({
+        amount: amountInPaise,
+        currency: 'INR',
+        receipt: groupId,
       });
-      clientSecret = paymentIntent.client_secret as string;
-      paymentIntentId = paymentIntent.id;
+      razorpayOrderId = rzOrder.id;
     }
 
-    // 3. Update orders with actual payment intent ID
+    // 3. Update orders with actual Razorpay order ID
     await prisma.order.updateMany({
       where: { stripePaymentIntentId: groupId },
-      data: { stripePaymentIntentId: paymentIntentId },
+      data: {
+        razorpayOrderId: razorpayOrderId,
+        stripePaymentIntentId: razorpayOrderId, // Also update group lookup field
+      },
     });
 
     return NextResponse.json({
-      clientSecret: clientSecret,
-      orderId: groupId, // Pass group ID or comma separated
-      amount: totalAmount,
+      razorpayOrderId,
+      amount: amountInPaise,
+      currency: 'INR',
+      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || '',
+      orderId: razorpayOrderId,
+      isDev,
     });
   } catch (error: any) {
-    console.error('Payment Intent Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Razorpay Order Creation Error:', error);
+    // Razorpay errors are often nested in error.error.description
+    const errorMsg = error?.error?.description || error?.message || 'Failed to communicate with payment gateway';
+    return NextResponse.json({ error: errorMsg }, { status: 500 });
   }
 }

@@ -6,14 +6,12 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { toast } from "sonner";
-import { CreditCard, Landmark, Lock, Wallet, Loader2, MapPin, Phone, ChevronRight, ArrowLeft, CheckCircle2 } from "lucide-react";
-import { Elements } from "@stripe/react-stripe-js";
+import { CreditCard, Landmark, Lock, Wallet, Loader2, MapPin, Phone, ChevronRight, ArrowLeft, CheckCircle2, Smartphone } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { getCart, type CartItem } from "@/lib/cart";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { getStripe } from "@/lib/stripe-client";
-import CheckoutForm from "@/components/checkout/CheckoutForm";
+import { openRazorpayCheckout, RAZORPAY_KEY_ID, type RazorpayPaymentResponse } from "@/lib/razorpay-client";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { SidebarProvider } from "@/components/ui/sidebar";
 
@@ -50,7 +48,7 @@ type Product = {
 function formatMoney(amount: number) {
     return new Intl.NumberFormat(undefined, {
         style: "currency",
-        currency: "USD",
+        currency: "INR",
         maximumFractionDigits: 0,
     }).format(amount);
 }
@@ -67,9 +65,9 @@ export default function CheckoutPage() {
     const [items, setItems] = useState<CartItem[]>([]);
     const [productsById, setProductsById] = useState<Record<string, Product>>({});
     const [submitting, setSubmitting] = useState(false);
-    const [paymentMethod, setPaymentMethod] = useState<"card" | "wallet" | "bank">("card");
-    const [clientSecret, setClientSecret] = useState<string | null>(null);
     const [orderId, setOrderId] = useState<string | null>(null);
+    const [paymentReady, setPaymentReady] = useState(false);
+    const [isDev, setIsDev] = useState(false);
 
     // Step management: 0 = address, 1 = payment
     const [step, setStep] = useState(0);
@@ -143,7 +141,7 @@ export default function CheckoutPage() {
                 orderNumber: `ORD-${new Date().getFullYear()}-${String(now + index).slice(-6)}`,
                 importerId: (user as any)?.id ?? "local-importer",
                 totalPrice: getPrice(row.product) * row.item.quantity,
-                currency: "USD",
+                currency: "INR",
                 orderStatus: "QUOTE_REQUESTED",
                 paymentStatus: "PENDING",
                 quantity: row.item.quantity,
@@ -197,9 +195,67 @@ export default function CheckoutPage() {
                 toast.error(data.error || "Failed to initialize payment");
                 return;
             }
-            setClientSecret(data.clientSecret);
+
             setOrderId(data.orderId);
+
+            // Dev mode: no Razorpay key configured
+            if (data.isDev) {
+                setIsDev(true);
+                setPaymentReady(true);
+                toast.success("Development mode — simulate payment");
+                return;
+            }
+
+            // Open Razorpay checkout popup
+            setPaymentReady(true);
             toast.success("Payment session ready");
+
+            await openRazorpayCheckout({
+                key: data.key,
+                amount: data.amount,
+                currency: data.currency,
+                name: "Ranote Exim",
+                description: `Order payment for ${orderItems.length} item(s)`,
+                order_id: data.razorpayOrderId,
+                handler: async (response: RazorpayPaymentResponse) => {
+                    // Payment succeeded — confirm on server
+                    try {
+                        await fetch("/api/checkout/confirm", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            credentials: "include",
+                            body: JSON.stringify({
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature,
+                                orderGroupId: data.orderId,
+                            }),
+                        });
+
+                        // Clear cart and redirect to success
+                        router.push(
+                            `/checkout/success?orderId=${encodeURIComponent(data.orderId)}&razorpay_payment_id=${encodeURIComponent(response.razorpay_payment_id)}`
+                        );
+                    } catch (err) {
+                        console.error("Confirm error:", err);
+                        toast.error("Payment received but confirmation failed. Contact support.");
+                    }
+                },
+                prefill: {
+                    email: (user as any)?.email || "",
+                    contact: phoneNumber || "",
+                    name: (user as any)?.name || (user as any)?.businessName || "",
+                },
+                theme: {
+                    color: "#6366f1", // Indigo to match app's primary
+                },
+                modal: {
+                    ondismiss: () => {
+                        toast.info("Payment cancelled");
+                        setSubmitting(false);
+                    },
+                },
+            });
         } catch (error: unknown) {
             toast.error(getApiErrorMessage(error) ?? "Failed to initialize payment");
         } finally {
@@ -271,14 +327,14 @@ export default function CheckoutPage() {
                                             <button 
                                                 onClick={() => {
                                                     if (idx === 0) setStep(0);
-                                                    if (idx === 1 && clientSecret) setStep(1);
+                                                    if (idx === 1 && paymentReady) setStep(1);
                                                 }}
-                                                disabled={idx === 1 && !clientSecret}
+                                                disabled={idx === 1 && !paymentReady}
                                                 className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center transition-all border-2 outline-none ${
                                                     idx <= step
                                                         ? "bg-primary border-primary text-primary-foreground shadow-lg"
                                                         : "bg-card border-border text-muted-foreground"
-                                                } ${(idx === 0 || (idx === 1 && clientSecret)) ? "cursor-pointer hover:scale-105 active:scale-95 hover:ring-4 ring-primary/20" : "cursor-default"}`}
+                                                } ${(idx === 0 || (idx === 1 && paymentReady)) ? "cursor-pointer hover:scale-105 active:scale-95 hover:ring-4 ring-primary/20" : "cursor-default"}`}
                                             >
                                                 <s.icon className="w-4 h-4" />
                                             </button>
@@ -391,37 +447,31 @@ export default function CheckoutPage() {
 
                                     <div>
                                         <h2 className="text-xl font-bold">Payment Method</h2>
-                                        <p className="text-sm text-muted-foreground mt-1">Choose how you'd like to pay.</p>
+                                        <p className="text-sm text-muted-foreground mt-1">All payment methods are handled securely by Razorpay.</p>
                                     </div>
 
-                                    {!clientSecret ? (
+                                    {!paymentReady ? (
                                         <>
-                                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                            {/* Payment method options — informational since Razorpay handles method selection natively */}
+                                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                                                 {[
-                                                    { id: "card", label: "Credit Card", sub: "Visa, Mastercard", icon: CreditCard },
-                                                    { id: "wallet", label: "Digital Wallet", sub: "Apple Pay, GPay", icon: Wallet },
-                                                    { id: "bank", label: "Bank Transfer", sub: "Direct Wire", icon: Landmark },
+                                                    { label: "UPI", sub: "Google Pay, PhonePe", icon: Smartphone },
+                                                    { label: "Cards", sub: "Visa, Mastercard, RuPay", icon: CreditCard },
+                                                    { label: "Net Banking", sub: "All major banks", icon: Landmark },
+                                                    { label: "Wallets", sub: "Paytm, Mobikwik", icon: Wallet },
                                                 ].map((method) => (
-                                                    <button
-                                                        key={method.id}
-                                                        type="button"
-                                                        onClick={() => setPaymentMethod(method.id as any)}
-                                                        className={`rounded-xl border p-5 flex flex-col items-start gap-3 transition-all ${
-                                                            paymentMethod === method.id
-                                                                ? "border-primary bg-primary/5 shadow-sm ring-1 ring-primary/20"
-                                                                : "border-border bg-card hover:border-primary/30"
-                                                        }`}
+                                                    <div
+                                                        key={method.label}
+                                                        className="rounded-xl border border-border bg-card p-4 flex flex-col items-center gap-2 text-center"
                                                     >
-                                                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                                                            paymentMethod === method.id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
-                                                        }`}>
+                                                        <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
                                                             <method.icon className="h-5 w-5" />
                                                         </div>
-                                                        <div className="text-left">
+                                                        <div>
                                                             <p className="text-sm font-semibold">{method.label}</p>
                                                             <p className="text-xs text-muted-foreground mt-0.5">{method.sub}</p>
                                                         </div>
-                                                    </button>
+                                                    </div>
                                                 ))}
                                             </div>
 
@@ -437,17 +487,28 @@ export default function CheckoutPage() {
                                                 )}
                                             </Button>
                                         </>
-                                    ) : clientSecret.startsWith('pi_mock_') ? (
+                                    ) : isDev ? (
                                         <div className="rounded-xl border border-border bg-card p-8 text-center space-y-4">
                                             <div className="w-14 h-14 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center mx-auto">
                                                 <Lock className="w-7 h-7" />
                                             </div>
                                             <h3 className="text-lg font-bold">Development Mode</h3>
                                             <p className="text-sm text-muted-foreground">
-                                                No Stripe key configured. Click below to simulate a successful payment.
+                                                No Razorpay key configured. Click below to simulate a successful payment.
                                             </p>
                                             <Button
-                                                onClick={() => {
+                                                onClick={async () => {
+                                                    // Simulate confirm API call in dev mode
+                                                    try {
+                                                        await fetch("/api/checkout/confirm", {
+                                                            method: "POST",
+                                                            headers: { "Content-Type": "application/json" },
+                                                            credentials: "include",
+                                                            body: JSON.stringify({ orderGroupId: orderId }),
+                                                        });
+                                                    } catch (e) {
+                                                        console.error("Dev confirm error:", e);
+                                                    }
                                                     saveLocalOrders();
                                                     router.push('/dashboard/importer/orders');
                                                 }}
@@ -457,13 +518,21 @@ export default function CheckoutPage() {
                                             </Button>
                                         </div>
                                     ) : (
-                                        <div className="rounded-xl border border-border bg-card p-6">
-                                            <Elements
-                                                stripe={getStripe()}
-                                                options={{ clientSecret, appearance: { theme: 'night' } }}
+                                        <div className="rounded-xl border border-border bg-card p-8 text-center space-y-4">
+                                            <div className="w-14 h-14 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto">
+                                                <Lock className="w-7 h-7" />
+                                            </div>
+                                            <h3 className="text-lg font-bold">Razorpay Checkout Opened</h3>
+                                            <p className="text-sm text-muted-foreground">
+                                                Complete your payment in the Razorpay popup window. If the popup didn't open, please disable your popup blocker and try again.
+                                            </p>
+                                            <Button
+                                                onClick={startPayment}
+                                                variant="outline"
+                                                className="w-full h-12 font-semibold rounded-xl"
                                             >
-                                                <CheckoutForm amount={total} orderId={orderId!} />
-                                            </Elements>
+                                                Retry Payment
+                                            </Button>
                                         </div>
                                     )}
 

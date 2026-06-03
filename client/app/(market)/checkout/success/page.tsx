@@ -6,11 +6,11 @@ import Link from "next/link";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { clearCart } from "@/lib/cart";
-import axios from "axios";
 
 export default function CheckoutSuccessPage() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get("orderId");
+  const razorpayPaymentId = searchParams.get("razorpay_payment_id");
   const [confirming, setConfirming] = useState(true);
 
   useEffect(() => {
@@ -19,7 +19,17 @@ export default function CheckoutSuccessPage() {
 
     // Confirm order and update inventory
     if (orderId) {
-      axios.post("/api/checkout/confirm", { orderGroupId: orderId })
+      fetch("/api/checkout/confirm", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          orderGroupId: orderId,
+          razorpay_order_id: orderId,
+          razorpay_payment_id: razorpayPaymentId || undefined,
+        }),
+      })
+        .then((res) => res.json())
         .then(() => {
           setConfirming(false);
           // Trigger global event so UI updates
@@ -34,7 +44,7 @@ export default function CheckoutSuccessPage() {
     } else {
       setConfirming(false);
     }
-  }, [orderId]);
+  }, [orderId, razorpayPaymentId]);
 
   return (
     <div className="min-h-[calc(100dvh-5rem)] bg-background flex items-center justify-center p-4">
@@ -54,6 +64,12 @@ export default function CheckoutSuccessPage() {
           {orderId && (
             <div className="mt-6 p-4 rounded-lg bg-muted/40 font-mono text-sm">
               Sequence ID: <span className="font-bold">{orderId}</span>
+            </div>
+          )}
+
+          {razorpayPaymentId && (
+            <div className="mt-3 p-3 rounded-lg bg-muted/40 font-mono text-xs text-muted-foreground">
+              Payment ID: <span className="font-semibold text-foreground">{razorpayPaymentId}</span>
             </div>
           )}
 

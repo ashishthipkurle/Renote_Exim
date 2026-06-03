@@ -1,64 +1,80 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { stripe } from '@/lib/stripe';
+import { verifyRazorpaySignature } from '@/lib/razorpay';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {
-    const { orderGroupId } = await req.json();
+    const body = await req.json();
+    const {
+      orderGroupId,
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+    } = body;
 
-    if (!orderGroupId) {
-      return NextResponse.json({ error: 'Order Group ID is required' }, { status: 400 });
+    // Support both old orderGroupId and new Razorpay params
+    const lookupId = razorpay_order_id || orderGroupId;
+
+    if (!lookupId) {
+      return NextResponse.json({ error: 'Order ID is required' }, { status: 400 });
     }
 
-    // Find all orders associated with this group ID (stripePaymentIntentId)
+    // Find all orders associated with this Razorpay order ID (or group ID)
     const orders = await prisma.order.findMany({
-      where: { stripePaymentIntentId: orderGroupId },
+      where: { razorpayOrderId: lookupId },
     });
 
-    if (!orders || orders.length === 0) {
+    // Fallback: also check stripePaymentIntentId for backward compatibility
+    const finalOrders = orders.length > 0
+      ? orders
+      : await prisma.order.findMany({
+          where: { stripePaymentIntentId: lookupId },
+        });
+
+    if (!finalOrders || finalOrders.length === 0) {
       return NextResponse.json({ error: 'Orders not found' }, { status: 404 });
     }
 
     // Check if they are already confirmed
-    if (orders[0].paymentStatus === 'PAID') {
+    if (finalOrders[0].paymentStatus === 'PAID') {
       return NextResponse.json({ success: true, message: 'Already confirmed' });
     }
 
-    // In a real app we'd verify the stripe payment intent via Stripe API.
-    // For this demonstration/portfolio, we'll confirm it if the intent exists on stripe.
-    // However, depending on the Stripe setup, we might bypass strict verification if no key is present.
-    let isPaid = true;
+    // Verify Razorpay signature (skip in dev mode when no secret is configured)
+    if (process.env.RAZORPAY_KEY_SECRET && razorpay_order_id && razorpay_payment_id && razorpay_signature) {
+      const isValid = verifyRazorpaySignature(
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature
+      );
 
-    // Verify via stripe if secret key is present
-    if (process.env.STRIPE_SECRET_KEY) {
-      try {
-        const intents = await stripe.paymentIntents.search({
-          query: `metadata['orderGroupId']:'${orderGroupId}'`,
-        });
-        if (intents.data.length > 0 && intents.data[0].status !== 'succeeded') {
-           // We might still allow it for test mode depending on setup, but let's just log it.
-           console.warn('Payment intent not fully succeeded on Stripe:', intents.data[0].status);
-        }
-      } catch(e) {
-        console.error('Stripe check failed', e);
+      if (!isValid) {
+        console.error('Razorpay signature verification failed');
+        return NextResponse.json({ error: 'Payment verification failed' }, { status: 400 });
       }
+    } else if (!process.env.RAZORPAY_KEY_SECRET) {
+      // Dev mode — no verification needed
+      console.warn('RAZORPAY_KEY_SECRET not set — skipping payment signature verification (dev mode)');
     }
 
     // Confirm orders and decrement inventory
     await prisma.$transaction(async (tx) => {
-      // 1. Update order statuses
-      await tx.order.updateMany({
-        where: { stripePaymentIntentId: orderGroupId },
-        data: {
-          paymentStatus: 'PAID',
-          orderStatus: 'QUOTE_CONFIRMED',
-        },
-      });
+      // 1. Update order statuses + store Razorpay payment ID
+      for (const order of finalOrders) {
+        await tx.order.update({
+          where: { id: order.id },
+          data: {
+            paymentStatus: 'PAID',
+            orderStatus: 'QUOTE_CONFIRMED',
+            razorpayPaymentId: razorpay_payment_id || null,
+          },
+        });
+      }
 
       // 2. Decrement inventory for each product
-      for (const order of orders) {
+      for (const order of finalOrders) {
         await tx.product.update({
           where: { id: order.productId },
           data: {

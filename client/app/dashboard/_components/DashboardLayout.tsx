@@ -74,6 +74,16 @@ export default function DashboardLayout({ children, role }: DashboardLayoutProps
  }
  document.cookie = "auth_token=; path=/; max-age=0";
  localStorage.removeItem("user");
+ localStorage.removeItem("user_profile");
+ localStorage.removeItem("renote_local_orders");
+ localStorage.removeItem("renote_product_reviews");
+ // Clear all user-scoped cart/wishlist keys
+ for (let i = localStorage.length - 1; i >= 0; i--) {
+   const key = localStorage.key(i);
+   if (key && (key.startsWith("ranote_cart_v1") || key.startsWith("ranote_wishlist_v1"))) {
+     localStorage.removeItem(key);
+   }
+ }
  router.push("/login");
  };
 

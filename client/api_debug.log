@@ -1624,3 +1624,19 @@ Unknown field `companyName` for select statement on model `User`. Available opti
   "certifications": [],
   "quantity": 23
 }
+[2026-06-03T12:39:48.616Z] [POST /api/products] Body: {
+  "name": "Samsung 120 inch Qled TV",
+  "category": "ELECTRONICS",
+  "description": "Samsung 120 inch Qled TV\nSamsung 120 inch Qled TVSamsung 120 inch Qled TVSamsung 120 inch Qled TVSamsung 120 inch Qled TVSamsung 120 inch Qled TVSamsung 120 inch Qled TVSamsung 120 inch Qled TVSamsung 120 inch Qled TVSamsung 120 inch Qled TV",
+  "price": 1,
+  "regularPrice": 1,
+  "minOrderQty": 1,
+  "unit": "pices",
+  "originCountry": "India",
+  "hsCode": "",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1780488558/renote-exim/products/dd3iu3qy16sfcpexxu8o.webp"
+  ],
+  "certifications": [],
+  "quantity": 100
+}

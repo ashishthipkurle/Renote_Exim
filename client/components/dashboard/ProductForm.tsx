@@ -496,22 +496,22 @@ export default function ProductForm({
         </div>
       </div>
       
-      {/* Sticky footer for mobile or small screens if not using header */}
       {hideHeader && (
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-white/10 z-50 flex items-center justify-end gap-3 lg:hidden">
+        <div className="mt-8 flex items-center justify-end gap-4 border-t border-slate-200 dark:border-white/10 pt-6">
             <button
               type="button"
               onClick={() => router.back()}
-              className="px-6 py-2 border border-slate-200 dark:border-white/10 rounded-lg text-sm font-medium"
+              className="px-6 py-3 border border-slate-200 dark:border-white/10 rounded-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-white/5 transition-all"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-8 py-2 bg-primary text-white rounded-lg text-sm font-semibold shadow-lg shadow-primary/20"
+              className="px-8 py-3 bg-primary text-white rounded-lg text-sm font-semibold shadow-lg shadow-primary/20 hover:bg-primary/90 disabled:opacity-50 transition-all flex items-center gap-2"
             >
-              {isEdit ? "Update" : "Publish"}
+              {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              {isEdit ? "Update Product" : "Publish Listing"}
             </button>
         </div>
       )}

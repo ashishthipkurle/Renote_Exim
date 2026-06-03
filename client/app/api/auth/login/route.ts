@@ -2,93 +2,87 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { loginSchema } from "@/lib/validations";
-import { nhost } from "@/lib/nhost";
-import { AUTH_COOKIE_NAME, REFRESH_COOKIE_NAME, AUTH_COOKIE_OPTIONS, REFRESH_COOKIE_OPTIONS } from "@/lib/auth-server";
-
-function isRecord(value: unknown): value is Record<string, unknown> {
- return typeof value === "object" && value !== null;
-}
-
-function getString(record: Record<string, unknown>, key: string): string | null {
- const value = record[key];
- return typeof value === "string" && value.length > 0 ? value : null;
-}
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
+import { prisma } from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
- try {
- const body = await request.json();
- const validatedData = loginSchema.parse(body);
+  try {
+    const body = await request.json();
+    const validatedData = loginSchema.parse(body);
 
- // Nhost v4 SDK throws on auth failure, so we must catch it
- let result: any;
- try {
- console.log("[Login] Attempting sign-in for:", validatedData.email);
- result = await nhost.auth.signInEmailPassword({
- email: validatedData.email,
- password: validatedData.password,
- });
- console.log("[Login] Nhost SDK raw result keys:", Object.keys(result));
- } catch (authError: any) {
- const msg = authError?.body?.message || authError?.message || "Invalid email or password";
- console.error("[Login] Nhost SDK threw error:", msg);
- return NextResponse.json({ error: msg }, { status: 401 });
- }
+    const cookieStore = cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            )
+          },
+        },
+      }
+    )
 
- const error = result.error || result.body?.error;
- const session = result.session || result.body?.session;
+    console.log("[Login] Attempting Supabase sign-in for:", validatedData.email);
+    
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: validatedData.email,
+      password: validatedData.password,
+    });
 
- if (error) {
- return NextResponse.json(
- { error: error.message ?? "Invalid email or password" },
- { status: 401 }
- );
- }
+    if (error || !data.user || !data.session) {
+      console.error("[Login] Supabase SDK threw error:", error?.message);
+      return NextResponse.json(
+        { error: error?.message || "Invalid email or password" }, 
+        { status: 401 }
+      );
+    }
 
- if (!session?.user || !session.accessToken) {
- return NextResponse.json(
- { error: "Authentication failed to establish session. Please try again." },
- { status: 500 }
- );
- }
+    // Fetch the user from our Prisma database to get their custom profile/role
+    const dbUser = await prisma.user.findUnique({
+      where: { email: validatedData.email }
+    });
 
- const meta = isRecord(session.user.metadata) ? session.user.metadata : {};
- const metaRole = getString(meta, "role");
+    if (!dbUser) {
+      return NextResponse.json(
+        { error: "User profile not found in database" },
+        { status: 404 }
+      );
+    }
 
- const profile = {
- id: session.user.id,
- email: session.user.email ?? "",
- role: metaRole ?? "IMPORTER",
- };
+    const profile = {
+      id: dbUser.id,
+      email: dbUser.email,
+      role: dbUser.role,
+    };
 
- const response = NextResponse.json({
- message: "Login successful",
- user: profile,
- token: session.accessToken,
- });
+    // The Supabase SSR client automatically sets the cookies in the response
+    // because we provided the setAll function using next/headers cookies()
 
- console.log("[Login] Setting auth cookies");
- response.cookies.set(AUTH_COOKIE_NAME, session.accessToken, AUTH_COOKIE_OPTIONS);
- 
- // Also set refresh token cookie
- if (session.refreshToken) {
- response.cookies.set(REFRESH_COOKIE_NAME, session.refreshToken, REFRESH_COOKIE_OPTIONS);
- }
+    return NextResponse.json({
+      message: "Login successful",
+      user: profile,
+      token: data.session.access_token,
+    });
 
- return response;
+  } catch (error: any) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: "Validation failed", details: error.errors },
+        { status: 400 }
+      );
+    }
 
- } catch (error: any) {
- if (error instanceof z.ZodError) {
- return NextResponse.json(
- { error: "Validation failed", details: error.errors },
- { status: 400 }
- );
- }
-
- console.error("Login error:", error?.message || error);
- return NextResponse.json(
- { error: error?.message || "Internal server error" },
- { status: 500 }
- );
- }
+    console.error("Login error:", error?.message || error);
+    return NextResponse.json(
+      { error: error?.message || "Internal server error" },
+      { status: 500 }
+    );
+  }
 }
-

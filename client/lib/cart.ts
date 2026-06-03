@@ -1,13 +1,29 @@
+import { createClient } from "./supabase/client";
+
 export type CartItem = {
   productId: string;
   quantity: number;
 };
 
-const STORAGE_KEY = "ranote_cart_v1";
+const BASE_KEY = "ranote_cart_v1";
+
+/** Get the user-scoped storage key. Falls back to a guest key. */
+function getStorageKey(): string {
+  if (typeof window === "undefined") return BASE_KEY;
+  // Check for a cached user profile to scope the key per user
+  try {
+    const cached = window.localStorage.getItem("user_profile");
+    if (cached) {
+      const user = JSON.parse(cached);
+      if (user?.id) return `${BASE_KEY}_${user.id}`;
+    }
+  } catch {}
+  return `${BASE_KEY}_guest`;
+}
 
 function readRaw(): unknown {
   if (typeof window === "undefined") return null;
-  const raw = window.localStorage.getItem(STORAGE_KEY);
+  const raw = window.localStorage.getItem(getStorageKey());
   if (!raw) return null;
   try {
     return JSON.parse(raw);
@@ -40,7 +56,7 @@ export function getCart(): CartItem[] {
 
 export function setCart(items: CartItem[]) {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  window.localStorage.setItem(getStorageKey(), JSON.stringify(items));
   window.dispatchEvent(new Event("renote-cart-updated"));
 }
 
@@ -70,6 +86,25 @@ export function removeFromCart(productId: string) {
 
 export function clearCart() {
   if (typeof window === "undefined") return;
-  window.localStorage.removeItem(STORAGE_KEY);
+  window.localStorage.removeItem(getStorageKey());
+  window.dispatchEvent(new Event("renote-cart-updated"));
+}
+
+/**
+ * Clears all cart data for ALL users from localStorage.
+ * Used during logout to ensure no stale data leaks between accounts.
+ */
+export function clearAllCartData() {
+  if (typeof window === "undefined") return;
+  const keysToRemove: string[] = [];
+  for (let i = 0; i < window.localStorage.length; i++) {
+    const key = window.localStorage.key(i);
+    if (key && key.startsWith(BASE_KEY)) {
+      keysToRemove.push(key);
+    }
+  }
+  keysToRemove.forEach((k) => window.localStorage.removeItem(k));
+  // Also remove the old un-scoped key from before this fix
+  window.localStorage.removeItem("ranote_cart_v1");
   window.dispatchEvent(new Event("renote-cart-updated"));
 }

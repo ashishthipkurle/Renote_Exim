@@ -1,4 +1,4 @@
-import { nhost } from "./nhost";
+import { createClient } from "./supabase/client";
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -14,8 +14,9 @@ export async function authFetch<T = unknown>(
   backoffMs = 500
 ): Promise<T> {
   // Securely get the token from memory/localStorage rather than HTTP-Only cookies
-  const session = nhost.getUserSession();
-  const token = session?.accessToken || null;
+  const supabase = createClient();
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token || null;
 
   const headers: Record<string, string> = {
     ...(options.headers as Record<string, string>),
