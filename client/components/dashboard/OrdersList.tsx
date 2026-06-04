@@ -65,21 +65,8 @@ export default function OrdersList({ initialOrders }: { initialOrders: any[] }) 
   const [notificationsByOrder, setNotificationsByOrder] = useState<Record<string, any[]>>({});
   const [loadingNotifications, setLoadingNotifications] = useState<Record<string, boolean>>({});
 
-  // Merge local + server orders
   const sync = useCallback(() => {
-    try {
-      const raw = localStorage.getItem(LOCAL_ORDERS_KEY);
-      const localOrders = raw ? (JSON.parse(raw) as any[]) : [];
-      const merged = [...initialOrders];
-      for (const local of localOrders) {
-        const exists = merged.find(m => m.id === local.id || m.orderNumber === local.orderNumber);
-        if (!exists) merged.push(local);
-      }
-      merged.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-      setOrders(merged);
-    } catch {
-      setOrders(initialOrders);
-    }
+    setOrders([...initialOrders].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
   }, [initialOrders]);
 
   // Real-time status polling — fetches fresh order data from the API every 20s

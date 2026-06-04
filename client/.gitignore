@@ -30,9 +30,9 @@ yarn-debug.log*
 yarn-error.log*
 
 # Local env files
+.env
 .env.local
-# NOTE: .env.local should be ignored in production.
-# Use .env.development.local instead for local overrides.
+.env.example
 .env.development.local
 .env.test.local
 .env.production.local

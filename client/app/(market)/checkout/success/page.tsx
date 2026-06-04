@@ -82,7 +82,7 @@ export default function CheckoutSuccessPage() {
           
           <div className="pt-8 flex flex-col gap-4">
             <Button asChild className="w-full h-12 text-lg font-bold rounded-lg">
-              <Link href="/dashboard/importer/orders">View My Orders</Link>
+              <Link href="/orders">View My Orders</Link>
             </Button>
             <Button asChild variant="outline" className="w-full h-12 text-lg font-bold rounded-lg">
               <Link href="/products">Continue Shopping</Link>

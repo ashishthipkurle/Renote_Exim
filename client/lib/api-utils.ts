@@ -70,11 +70,11 @@ export async function authFetch<T = unknown>(
   throw lastError instanceof Error ? lastError : new Error("API request failed after retries");
 }
 
-/** Format a number into shortened form like $1.2M, $45K etc */
+/** Format a number into shortened form like ₹1.2M, ₹45K etc */
 export function formatCurrency(n: number, decimals = 0): string {
-  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `$${(n / 1_000).toFixed(decimals)}K`;
-  return `$${n.toFixed(decimals)}`;
+  if (n >= 1_000_000) return `₹${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `₹${(n / 1_000).toFixed(decimals)}K`;
+  return `₹${n.toFixed(decimals)}`;
 }
 
 /** Format a number with commas */
