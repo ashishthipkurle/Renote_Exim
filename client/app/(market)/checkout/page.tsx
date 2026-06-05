@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { CreditCard, Landmark, Lock, Wallet, Loader2, MapPin, Phone, ChevronRight, ArrowLeft, CheckCircle2, Smartphone } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { getCart, type CartItem } from "@/lib/cart";
+import { getCart, clearCart, type CartItem } from "@/lib/cart";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { openRazorpayCheckout, RAZORPAY_KEY_ID, type RazorpayPaymentResponse } from "@/lib/razorpay-client";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
@@ -66,10 +66,11 @@ export default function CheckoutPage() {
     const [productsById, setProductsById] = useState<Record<string, Product>>({});
     const [submitting, setSubmitting] = useState(false);
     const [orderId, setOrderId] = useState<string | null>(null);
+    const [razorpayPaymentId, setRazorpayPaymentId] = useState<string | null>(null);
     const [paymentReady, setPaymentReady] = useState(false);
     const [isDev, setIsDev] = useState(false);
 
-    // Step management: 0 = address, 1 = payment
+    // Step management: 0 = address, 1 = payment, 2 = confirm
     const [step, setStep] = useState(0);
 
     // Address form state
@@ -78,14 +79,22 @@ export default function CheckoutPage() {
     const [shippingCountry, setShippingCountry] = useState("");
     const [shippingZip, setShippingZip] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
+    
+    const [useSavedAddress, setUseSavedAddress] = useState(false);
+    const hasSavedAddress = !!(user as any)?.address;
 
     // Pre-fill from user profile
     useEffect(() => {
         if (user) {
             const u = user as any;
-            if (u.address) setShippingAddress(u.address);
+            if (u.address) {
+                setShippingAddress(u.address);
+                setUseSavedAddress(true);
+            }
             if (u.country) setShippingCountry(u.country);
             if (u.phone) setPhoneNumber(u.phone);
+            if (u.city) setShippingCity(u.city);
+            if (u.zip) setShippingZip(u.zip);
         }
     }, [user]);
 
@@ -123,7 +132,13 @@ export default function CheckoutPage() {
 
     const fullAddress = [shippingAddress, shippingCity, shippingZip, shippingCountry].filter(Boolean).join(", ");
 
-    const isAddressValid = shippingAddress.trim().length > 0 && phoneNumber.trim().length > 0;
+    const isAddressValid = useSavedAddress ? true : (
+        shippingAddress.trim().length > 3 && 
+        shippingCity.trim().length > 1 && 
+        shippingZip.trim().length > 2 && 
+        shippingCountry.trim().length > 1 && 
+        phoneNumber.trim().length > 5
+    );
 
     const saveLocalOrders = () => {
         if (typeof window === "undefined") return [] as string[];
@@ -228,14 +243,17 @@ export default function CheckoutPage() {
                                 razorpay_order_id: response.razorpay_order_id,
                                 razorpay_payment_id: response.razorpay_payment_id,
                                 razorpay_signature: response.razorpay_signature,
-                                orderGroupId: data.orderId,
+                                validatedItems: data.validatedItems,
+                                shippingAddress: data.shippingAddress,
+                                phone: data.phone,
                             }),
                         });
 
-                        // Clear cart and redirect to success
-                        router.push(
-                            `/checkout/success?orderId=${encodeURIComponent(data.orderId)}&razorpay_payment_id=${encodeURIComponent(response.razorpay_payment_id)}`
-                        );
+                        // Clear cart and update step
+                        clearCart();
+                        if (typeof window !== 'undefined') window.dispatchEvent(new Event("renote-orders-updated"));
+                        setRazorpayPaymentId(response.razorpay_payment_id);
+                        setStep(2);
                     } catch (err) {
                         console.error("Confirm error:", err);
                         toast.error("Payment received but confirmation failed. Contact support.");
@@ -265,10 +283,10 @@ export default function CheckoutPage() {
 
     return (
         <SidebarProvider>
-            <div className="flex flex-col min-h-[100dvh] w-full bg-background">
+            <div className="flex flex-col h-dvh w-full bg-background overflow-hidden">
                 <DashboardHeader />
-                <div className="flex-1 bg-background">
-                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 py-6 lg:py-8 space-y-6">
+                <div className="flex-1 overflow-y-auto bg-background custom-scrollbar">
+                    <main className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-6 lg:py-8 space-y-6">
                     <div className="flex items-center justify-between gap-4">
                     <div>
                         <h1 className="text-3xl font-bold tracking-tight">Checkout</h1>
@@ -356,61 +374,86 @@ export default function CheckoutPage() {
                                         </p>
                                     </div>
 
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        <div className="sm:col-span-2">
-                                            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Street Address *</label>
-                                            <input
-                                                type="text"
-                                                value={shippingAddress}
-                                                onChange={(e) => setShippingAddress(e.target.value)}
-                                                placeholder="123 Main Street, Apt 4B"
-                                                className="mt-1.5 w-full px-4 py-3 bg-muted/30 border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">City</label>
-                                            <input
-                                                type="text"
-                                                value={shippingCity}
-                                                onChange={(e) => setShippingCity(e.target.value)}
-                                                placeholder="Mumbai"
-                                                className="mt-1.5 w-full px-4 py-3 bg-muted/30 border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">ZIP / Postal Code</label>
-                                            <input
-                                                type="text"
-                                                value={shippingZip}
-                                                onChange={(e) => setShippingZip(e.target.value)}
-                                                placeholder="400001"
-                                                className="mt-1.5 w-full px-4 py-3 bg-muted/30 border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Country</label>
-                                            <input
-                                                type="text"
-                                                value={shippingCountry}
-                                                onChange={(e) => setShippingCountry(e.target.value)}
-                                                placeholder="India"
-                                                className="mt-1.5 w-full px-4 py-3 bg-muted/30 border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Phone Number *</label>
-                                            <div className="relative mt-1.5">
-                                                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                                                <input
-                                                    type="tel"
-                                                    value={phoneNumber}
-                                                    onChange={(e) => setPhoneNumber(e.target.value)}
-                                                    placeholder="+91 98765 43210"
-                                                    className="w-full pl-10 pr-4 py-3 bg-muted/30 border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
-                                                />
+                                    {useSavedAddress && hasSavedAddress ? (
+                                        <div className="p-4 border border-border rounded-lg bg-muted/20">
+                                            <div className="flex justify-between items-start">
+                                                <div>
+                                                    <p className="font-semibold">{shippingAddress}</p>
+                                                    {[shippingCity, shippingZip].filter(Boolean).length > 0 && (
+                                                        <p className="text-sm text-muted-foreground">{[shippingCity, shippingZip].filter(Boolean).join(", ")}</p>
+                                                    )}
+                                                    <p className="text-sm text-muted-foreground">{shippingCountry}</p>
+                                                    <p className="text-sm text-muted-foreground mt-2">{phoneNumber}</p>
+                                                </div>
+                                                <Button variant="outline" size="sm" onClick={() => setUseSavedAddress(false)}>
+                                                    Enter New Address
+                                                </Button>
                                             </div>
                                         </div>
-                                    </div>
+                                    ) : (
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            <div className="sm:col-span-2">
+                                                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Street Address *</label>
+                                                <input
+                                                    type="text"
+                                                    value={shippingAddress}
+                                                    onChange={(e) => setShippingAddress(e.target.value)}
+                                                    placeholder="123 Main Street, Apt 4B"
+                                                    className="mt-1.5 w-full px-4 py-3 bg-muted/30 border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">City *</label>
+                                                <input
+                                                    type="text"
+                                                    value={shippingCity}
+                                                    onChange={(e) => setShippingCity(e.target.value.replace(/[^a-zA-Z\s\-.]/g, ""))}
+                                                    placeholder="Mumbai"
+                                                    className="mt-1.5 w-full px-4 py-3 bg-muted/30 border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">ZIP / Postal Code *</label>
+                                                <input
+                                                    type="text"
+                                                    value={shippingZip}
+                                                    onChange={(e) => setShippingZip(e.target.value.replace(/[^a-zA-Z0-9\s\-]/g, ""))}
+                                                    placeholder="400001"
+                                                    className="mt-1.5 w-full px-4 py-3 bg-muted/30 border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Country *</label>
+                                                <input
+                                                    type="text"
+                                                    value={shippingCountry}
+                                                    onChange={(e) => setShippingCountry(e.target.value.replace(/[^a-zA-Z\s\-.]/g, ""))}
+                                                    placeholder="India"
+                                                    className="mt-1.5 w-full px-4 py-3 bg-muted/30 border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Phone Number *</label>
+                                                <div className="relative mt-1.5">
+                                                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                                    <input
+                                                        type="tel"
+                                                        value={phoneNumber}
+                                                        onChange={(e) => setPhoneNumber(e.target.value.replace(/[^0-9+\-\s()]/g, ""))}
+                                                        placeholder="+91 98765 43210"
+                                                        className="w-full pl-10 pr-4 py-3 bg-muted/30 border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
+                                                    />
+                                                </div>
+                                            </div>
+                                            {hasSavedAddress && (
+                                                <div className="sm:col-span-2 flex justify-end mt-2">
+                                                    <Button variant="ghost" size="sm" onClick={() => setUseSavedAddress(true)}>
+                                                        Cancel
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
 
                                     <Button
                                         onClick={() => {
@@ -452,27 +495,17 @@ export default function CheckoutPage() {
 
                                     {!paymentReady ? (
                                         <>
-                                            {/* Payment method options — informational since Razorpay handles method selection natively */}
-                                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                                                {[
-                                                    { label: "UPI", sub: "Google Pay, PhonePe", icon: Smartphone },
-                                                    { label: "Cards", sub: "Visa, Mastercard, RuPay", icon: CreditCard },
-                                                    { label: "Net Banking", sub: "All major banks", icon: Landmark },
-                                                    { label: "Wallets", sub: "Paytm, Mobikwik", icon: Wallet },
-                                                ].map((method) => (
-                                                    <div
-                                                        key={method.label}
-                                                        className="rounded-xl border border-border bg-card p-4 flex flex-col items-center gap-2 text-center"
-                                                    >
-                                                        <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-                                                            <method.icon className="h-5 w-5" />
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-sm font-semibold">{method.label}</p>
-                                                            <p className="text-xs text-muted-foreground mt-0.5">{method.sub}</p>
-                                                        </div>
-                                                    </div>
-                                                ))}
+                                            {/* Payment method options — handled natively by Razorpay */}
+                                            <div className="rounded-xl border border-border bg-card p-6 flex flex-col items-center gap-4 text-center">
+                                                <div className="w-16 h-16 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                                                    <Lock className="h-8 w-8" />
+                                                </div>
+                                                <div>
+                                                    <h3 className="font-semibold text-lg">Razorpay Secure Checkout</h3>
+                                                    <p className="text-sm text-muted-foreground max-w-sm mt-1">
+                                                        You will be redirected to Razorpay to complete your payment securely using UPI, Cards, Net Banking, or Wallets.
+                                                    </p>
+                                                </div>
                                             </div>
 
                                             <Button
@@ -529,9 +562,14 @@ export default function CheckoutPage() {
                                             <Button
                                                 onClick={startPayment}
                                                 variant="outline"
+                                                disabled={submitting}
                                                 className="w-full h-12 font-semibold rounded-xl"
                                             >
-                                                Retry Payment
+                                                {submitting ? (
+                                                    <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Initializing...</>
+                                                ) : (
+                                                    "Retry Payment"
+                                                )}
                                             </Button>
                                         </div>
                                     )}
@@ -544,6 +582,45 @@ export default function CheckoutPage() {
                                         <div className="flex items-center gap-1.5">
                                             <Lock className="h-3 w-3" />
                                             <span className="text-xs">Secure Payment</span>
+                                        </div>
+                                    </div>
+                                </section>
+                            )}
+
+                            {/* Step 2: Confirm */}
+                            {step === 2 && (
+                                <section className="bg-card border border-border rounded-xl p-8 sm:p-12 space-y-6 text-center shadow-xl relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl -mr-16 -mt-16" />
+                                    
+                                    <div className="relative z-10">
+                                        <div className="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto text-emerald-500 mb-6">
+                                            <CheckCircle2 className="h-10 w-10" />
+                                        </div>
+                                        
+                                        <h2 className="text-3xl font-black tracking-tight mb-2">Payment Successful!</h2>
+                                        <p className="text-muted-foreground">
+                                            Your order has been placed and is being processed.
+                                        </p>
+                                        
+                                        {orderId && (
+                                            <div className="mt-6 p-4 rounded-lg bg-muted/40 font-mono text-sm max-w-sm mx-auto text-left flex justify-between">
+                                                <span className="text-muted-foreground">Sequence ID:</span> <span className="font-bold">{orderId}</span>
+                                            </div>
+                                        )}
+
+                                        {razorpayPaymentId && (
+                                            <div className="mt-3 p-3 rounded-lg bg-muted/40 font-mono text-xs text-muted-foreground max-w-sm mx-auto text-left flex justify-between">
+                                                <span>Payment ID:</span> <span className="font-semibold text-foreground">{razorpayPaymentId}</span>
+                                            </div>
+                                        )}
+                                        
+                                        <div className="pt-8 flex flex-col gap-4 max-w-sm mx-auto">
+                                            <Button onClick={() => router.push('/dashboard/importer/orders')} className="w-full h-12 text-lg font-bold rounded-lg">
+                                                View My Orders
+                                            </Button>
+                                            <Button onClick={() => router.push('/products')} variant="outline" className="w-full h-12 text-lg font-bold rounded-lg">
+                                                Continue Shopping
+                                            </Button>
                                         </div>
                                     </div>
                                 </section>
@@ -607,7 +684,7 @@ export default function CheckoutPage() {
                         </div>
                     </div>
                 )}
-            </div>
+            </main>
         </div>
         </div>
         </SidebarProvider>

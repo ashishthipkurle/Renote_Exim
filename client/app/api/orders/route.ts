@@ -20,6 +20,8 @@ export async function GET(request: NextRequest) {
     // Scope orders based on role
     if (auth.role === 'EXPORTER') {
       where.sellerId = auth.userId;
+      // Exclude incomplete checkout orders — only show paid/confirmed orders
+      where.orderStatus = { not: 'CHECKOUT' };
     } else if (auth.role === 'IMPORTER' || auth.role === 'CONSUMER' || auth.role === 'USER') {
       where.buyerId = auth.userId;
     }

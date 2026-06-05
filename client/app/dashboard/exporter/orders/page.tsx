@@ -32,7 +32,7 @@ export default async function ExporterOrdersPage({
   const limit = 10;
   const skip = (page - 1) * limit;
 
-  const where: any = { sellerId: auth.userId };
+  const where: any = { sellerId: auth.userId, orderStatus: { not: 'CHECKOUT' } };
 
   if (resolvedSearchParams.status && resolvedSearchParams.status !== "ALL") {
     const s = Array.isArray(resolvedSearchParams.status)
@@ -84,12 +84,12 @@ export default async function ExporterOrdersPage({
       })
     ]);
 
-    const baseWhere = { sellerId: auth.userId };
+    const baseWhere = { sellerId: auth.userId, orderStatus: { not: 'CHECKOUT' as const } };
     const [allCount, pendingCount, procCount, shippedCount, delivCount] =
       await Promise.all([
         prisma.order.count({ where: baseWhere }),
         prisma.order.count({
-          where: { ...baseWhere, orderStatus: { in: ["QUOTE_REQUESTED", "CHECKOUT"] } },
+          where: { ...baseWhere, orderStatus: { in: ["QUOTE_REQUESTED"] } },
         }),
         prisma.order.count({
           where: { ...baseWhere, orderStatus: { in: ["QUOTE_CONFIRMED", "PROCESSING"] } },

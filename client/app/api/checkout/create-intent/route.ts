@@ -21,9 +21,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Items are required' }, { status: 400 });
     }
 
+    // Calculate total amount without creating orders
     let totalAmount = 0;
-    const createdOrders = [];
-    const groupId = `GRP-${Date.now()}`;
+    const validatedItems: Array<{
+      productId: string;
+      quantity: number;
+      unitPrice: number;
+      itemTotal: number;
+      sellerId: string;
+      currency: string;
+    }> = [];
 
     for (const item of items) {
       const product = await prisma.product.findUnique({
@@ -40,30 +47,18 @@ export async function POST(req: NextRequest) {
       const itemTotal = unitPrice * item.quantity;
       totalAmount += itemTotal;
 
-      // 1. Create the Order with shipping details in notes
-      const order = await prisma.order.create({
-        data: {
-          orderNumber: `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-          orderType: auth.role === 'IMPORTER' ? 'B2B' : 'B2C',
-          buyerId: auth.userId,
-          sellerId: product.exporterId,
-          productId: product.id,
-          quantity: item.quantity,
-          unitPrice: unitPrice,
-          totalPrice: itemTotal,
-          currency: product.currency || 'INR',
-          orderStatus: 'CHECKOUT',
-          paymentStatus: 'PENDING',
-          stripePaymentIntentId: groupId, // Keep for backward compat / order grouping
-          razorpayOrderId: groupId, // Temporary, will be updated below
-          notes: shippingAddress ? `Ship to: ${shippingAddress}${phone ? ` | Phone: ${phone}` : ''}` : null,
-        },
+      validatedItems.push({
+        productId: product.id,
+        quantity: item.quantity,
+        unitPrice,
+        itemTotal,
+        sellerId: product.exporterId,
+        currency: product.currency || 'INR',
       });
-      createdOrders.push(order);
     }
 
-    // 2. Create Razorpay Order (amount in paise = multiply by 100)
-    const amountInPaise = Math.max(100, Math.round(totalAmount * 100)); // Razorpay min is ₹1 = 100 paise
+    // Create Razorpay Order only (no DB orders yet)
+    const amountInPaise = Math.max(100, Math.round(totalAmount * 100));
     let razorpayOrderId = `rz_mock_${Date.now()}`;
     const isDev = !process.env.RAZORPAY_KEY_ID;
 
@@ -72,19 +67,10 @@ export async function POST(req: NextRequest) {
       const rzOrder = await razorpay.orders.create({
         amount: amountInPaise,
         currency: 'INR',
-        receipt: groupId,
+        receipt: `rcpt_${Date.now()}`,
       });
       razorpayOrderId = rzOrder.id;
     }
-
-    // 3. Update orders with actual Razorpay order ID
-    await prisma.order.updateMany({
-      where: { stripePaymentIntentId: groupId },
-      data: {
-        razorpayOrderId: razorpayOrderId,
-        stripePaymentIntentId: razorpayOrderId, // Also update group lookup field
-      },
-    });
 
     return NextResponse.json({
       razorpayOrderId,
@@ -93,10 +79,15 @@ export async function POST(req: NextRequest) {
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || '',
       orderId: razorpayOrderId,
       isDev,
+      // Pass validated items back so the confirm endpoint can create orders
+      validatedItems,
+      buyerId: auth.userId,
+      buyerRole: auth.role,
+      shippingAddress,
+      phone,
     });
   } catch (error: any) {
     console.error('Razorpay Order Creation Error:', error);
-    // Razorpay errors are often nested in error.error.description
     const errorMsg = error?.error?.description || error?.message || 'Failed to communicate with payment gateway';
     return NextResponse.json({ error: errorMsg }, { status: 500 });
   }

@@ -147,3 +147,48 @@ export async function PATCH(
     return NextResponse.json({ error: 'Failed to update order' }, { status: 500 });
   }
 }
+
+// DELETE /api/orders/[id] - Delete an order
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const auth = await getApiAuthContext(request).then(res => res.auth);
+    if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    const order = await prisma.order.findUnique({
+      where: { id },
+      include: { shipment: { include: { statusHistory: true } } },
+    });
+
+    if (!order) return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+
+    // Authorization: Only the seller (exporter) or admin can delete
+    const canDelete = auth.role === 'ADMIN' ||
+      (auth.role === 'EXPORTER' && order.sellerId === auth.userId);
+
+    if (!canDelete) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
+    // Delete in transaction (shipment events -> shipment -> order documents/messages -> order)
+    await prisma.$transaction(async (tx) => {
+      // Delete shipment events first
+      if (order.shipment) {
+        await tx.shipmentEvent.deleteMany({ where: { shipmentId: order.shipment.id } });
+        await tx.shipment.delete({ where: { id: order.shipment.id } });
+      }
+      // Delete related documents
+      await tx.document.deleteMany({ where: { orderId: id } });
+      // Delete related messages
+      await tx.message.deleteMany({ where: { orderId: id } });
+      // Finally delete the order
+      await tx.order.delete({ where: { id } });
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Delete order error:', error);
+    return NextResponse.json({ error: 'Failed to delete order' }, { status: 500 });
+  }
+}

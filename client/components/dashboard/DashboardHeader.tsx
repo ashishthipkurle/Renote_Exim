@@ -78,7 +78,7 @@ export default function DashboardHeader() {
 
   return (
     <>
-      <header className={`sticky top-0 z-40 border-b border-border/50 dark:border-white/10 bg-background/20 backdrop-blur-xl transition-all duration-300 w-full ${isMarketplace ? "h-20" : "h-14"}`}>
+      <header className={`sticky top-0 z-40 border-b border-border/50 dark:border-white/10 bg-background/20 backdrop-blur-xl transition-all duration-300 w-full h-14`}>
         <div className="flex h-full items-center px-4 md:px-6">
 
           {/* LEFT SECTION */}
@@ -88,7 +88,7 @@ export default function DashboardHeader() {
               <Image
                 src={LogoImg}
                 alt="Ranote Exim Logo"
-                className={mounted && theme === "dark" ? "h-14 md:h-[75px] w-auto object-contain transition-all" : "h-8 md:h-10 w-auto object-contain transition-all"}
+                className={mounted && theme === "dark" ? "h-10 md:h-12 w-auto object-contain transition-all" : "h-8 md:h-10 w-auto object-contain transition-all"}
                 unoptimized
               />
             </Link>

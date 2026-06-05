@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, useTransition, useRef, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import axios from "axios";
 import { toast } from "sonner";
 import {
@@ -20,6 +21,7 @@ import {
   Check,
   MoreHorizontal,
   ArrowUpDown,
+  Trash2,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import BulkActionsBar from "./BulkActionsBar";
@@ -95,6 +97,75 @@ function sortOrders(orders: any[], field: SortField, dir: SortDir) {
   });
 }
 
+// ── Sub-components ──────────────────────────────────────────────────────────
+function DeliveryDropdown({ transportMethods, onSelect, currentMethod }: { transportMethods: any[], onSelect: (id: string) => void, currentMethod?: any }) {
+  const [search, setSearch] = useState("");
+  
+  const filtered = transportMethods.filter(tm => 
+    tm.name.toLowerCase().includes(search.toLowerCase()) || 
+    (tm.originRegion || "").toLowerCase().includes(search.toLowerCase()) || 
+    (tm.destinationRegion || "").toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <DropdownMenu.Root onOpenChange={(open) => { if (!open) setSearch(""); }}>
+      <DropdownMenu.Trigger asChild>
+        {currentMethod ? (
+          <button className="text-[10px] text-muted-foreground hover:text-foreground font-semibold px-1">Edit Delivery</button>
+        ) : (
+          <button className="inline-flex items-center gap-1 text-[10px] uppercase font-bold text-primary bg-primary/10 hover:bg-primary/20 px-2 py-1 rounded border border-primary/20 transition-colors">
+            + Add Delivery
+          </button>
+        )}
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content align="start" className="w-64 bg-card border border-border rounded-xl shadow-xl z-[100] p-1 flex flex-col gap-1">
+          <div className="px-2 py-1.5 border-b border-border">
+            <div className="flex items-center gap-2 bg-muted/50 rounded-md px-2 py-1 border border-border">
+              <Search className="w-3.5 h-3.5 text-muted-foreground" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search partner or location..."
+                className="bg-transparent text-sm text-foreground outline-none w-full"
+                onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()}
+                autoFocus
+              />
+            </div>
+          </div>
+          <div className="max-h-[200px] overflow-y-auto custom-scrollbar p-1">
+            {transportMethods.length === 0 ? (
+              <div className="p-2 text-xs text-muted-foreground">No partners found. Add in Logistics page.</div>
+            ) : filtered.length === 0 ? (
+              <div className="p-2 text-xs text-muted-foreground">No results found.</div>
+            ) : (
+              filtered.map((tm: any) => (
+                <DropdownMenu.Item
+                  key={tm.id}
+                  onSelect={() => onSelect(tm.id)}
+                  className="px-2 py-2 text-sm outline-none hover:bg-muted rounded-md cursor-pointer flex flex-col gap-0.5"
+                >
+                  <div className="flex items-center gap-2 font-medium">
+                    <Truck className="w-3.5 h-3.5 text-muted-foreground" />
+                    {tm.name}
+                  </div>
+                  {(tm.originRegion || tm.destinationRegion) && (
+                    <div className="text-[10px] text-muted-foreground pl-5 opacity-70">
+                      {tm.originRegion || "Anywhere"} → {tm.destinationRegion || "Anywhere"}
+                    </div>
+                  )}
+                </DropdownMenu.Item>
+              ))
+            )}
+          </div>
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Root>
+  );
+}
+
 // ── Props ──────────────────────────────────────────────────────────────────
 interface OrdersTableProps {
   orders: any[];
@@ -139,17 +210,6 @@ export default function OrdersTable({ orders, counts, transportMethods = [] }: O
     setOptimisticOrders(orders);
   }, [orders]);
 
-  // Close action menu on outside click
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (actionMenuRef.current && !actionMenuRef.current.contains(e.target as Node)) {
-        setActionMenuId(null);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
   const displayOrders = useMemo(() => {
     let filtered = optimisticOrders;
     if (currentStatus !== "ALL") {
@@ -193,7 +253,6 @@ export default function OrdersTable({ orders, counts, transportMethods = [] }: O
     const prevOrders = [...optimisticOrders];
     setOptimisticOrders(prev => prev.map(o => o.id === orderId ? { ...o, orderStatus: newStatus } : o));
     setUpdatingStatusId(orderId);
-    setActionMenuId(null);
 
     try {
       await axios.patch(`/api/orders/${orderId}`, { status: newStatus });
@@ -225,6 +284,51 @@ export default function OrdersTable({ orders, counts, transportMethods = [] }: O
   const handleBulkExport = () => {
     toast.success(`Exporting ${selectedIds.size} orders...`);
     // Future: implement CSV export
+  };
+
+  const handleDelete = async (orderId: string, orderNumber: string) => {
+    const confirmed = window.confirm(`Are you sure you want to delete order ${orderNumber}? This action cannot be undone.`);
+    if (!confirmed) return;
+
+    setUpdatingStatusId(orderId);
+    try {
+      await axios.delete(`/api/orders/${orderId}`);
+      setOptimisticOrders(prev => prev.filter(o => o.id !== orderId));
+      toast.success("Order deleted successfully");
+    } catch (e) {
+      toast.error("Failed to delete order");
+    } finally {
+      setUpdatingStatusId(null);
+    }
+  };
+
+  const handleAssignTransport = async (orderId: string, transportMethodId: string) => {
+    setUpdatingStatusId(orderId);
+    try {
+      const res = await axios.patch(`/api/orders/${orderId}/transport-method`, { transportMethodId });
+      if (res.data.success) {
+        setOptimisticOrders(prev => prev.map(o => {
+          if (o.id === orderId) {
+            return {
+              ...o,
+              shipment: {
+                ...res.data.shipment,
+                transportMethod: transportMethods.find((t: any) => t.id === transportMethodId)
+              },
+              orderStatus: (o.orderStatus === "PENDING" || o.orderStatus === "QUOTE_CONFIRMED" || o.orderStatus === "QUOTE_REQUESTED" || o.orderStatus === "CONFIRMED") ? "PROCESSING" : o.orderStatus
+            };
+          }
+          return o;
+        }));
+        toast.success("Delivery partner assigned successfully!");
+      } else {
+        toast.error("Failed to assign partner");
+      }
+    } catch (e: any) {
+      toast.error(e.response?.data?.error || "Error assigning partner");
+    } finally {
+      setUpdatingStatusId(null);
+    }
   };
 
   // ── Selection helpers ──────────────────────────────────────────────────
@@ -516,7 +620,7 @@ export default function OrdersTable({ orders, counts, transportMethods = [] }: O
                       {/* Channel */}
                       <td className="px-3 py-3">
                         <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded bg-muted text-muted-foreground border border-border/50">
-                          {order.channel || "B2B"}
+                          {order.orderType || "B2C"}
                         </span>
                       </td>
 
@@ -547,92 +651,93 @@ export default function OrdersTable({ orders, counts, transportMethods = [] }: O
                       </td>
 
                       {/* Delivery status */}
-                      <td className="px-3 py-3">
-                        {deliveryStatus ? (
-                          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground">
-                            <Truck className="w-3 h-3 text-muted-foreground" />
-                            {deliveryStatus}
-                          </span>
+                      <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
+                        {order.shipment?.transportMethod ? (
+                          <div className="flex flex-col items-start gap-1">
+                            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-foreground bg-muted px-2 py-1 rounded border border-border">
+                              <Truck className="w-3 h-3 text-muted-foreground" />
+                              {order.shipment.transportMethod.name}
+                            </span>
+                            <DeliveryDropdown 
+                              transportMethods={transportMethods} 
+                              onSelect={(id) => handleAssignTransport(order.id, id)} 
+                              currentMethod={order.shipment.transportMethod} 
+                            />
+                          </div>
                         ) : (
-                          <span className="text-xs text-muted-foreground">—</span>
+                          <DeliveryDropdown 
+                            transportMethods={transportMethods} 
+                            onSelect={(id) => handleAssignTransport(order.id, id)} 
+                          />
                         )}
                       </td>
 
                       {/* Actions menu */}
-                      <td className="px-3 py-3" data-action-menu>
-                        <div className="relative" ref={actionMenuId === order.id ? actionMenuRef : undefined}>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setActionMenuId(actionMenuId === order.id ? null : order.id);
-                            }}
-                            className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
-                          >
-                            {updatingStatusId === order.id ? (
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                            ) : (
-                              <MoreHorizontal className="w-4 h-4" />
-                            )}
-                          </button>
+                      <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
+                        <DropdownMenu.Root>
+                          <DropdownMenu.Trigger asChild>
+                            <button
+                              className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100 outline-none"
+                            >
+                              {updatingStatusId === order.id ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                <MoreHorizontal className="w-4 h-4" />
+                              )}
+                            </button>
+                          </DropdownMenu.Trigger>
 
-                          {/* Dropdown menu */}
-                          <AnimatePresence>
-                            {actionMenuId === order.id && (
-                              <motion.div
-                                initial={{ opacity: 0, scale: 0.95, y: -4 }}
-                                animate={{ opacity: 1, scale: 1, y: 0 }}
-                                exit={{ opacity: 0, scale: 0.95, y: -4 }}
-                                transition={{ duration: 0.1 }}
-                                className="absolute right-0 top-full mt-1 w-52 bg-card border border-border rounded-xl shadow-xl z-50 overflow-hidden"
-                              >
-                                <div className="px-3 py-2 border-b border-border">
-                                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Update Status</p>
-                                </div>
-                                <div className="py-1">
-                                  {Object.entries(STATUS_LABELS).map(([status, label]) => {
-                                    const isCurrent = order.orderStatus === status;
-                                    const needsShipment = (status === "SHIPPED" || status === "DELIVERED") && !order.shipment;
-                                    return (
-                                      <button
-                                        key={status}
-                                        disabled={isCurrent || updatingStatusId !== null || needsShipment}
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleStatusUpdate(order.id, status);
-                                        }}
-                                        title={needsShipment ? "Create a shipment first" : undefined}
-                                        className={`w-full text-left px-3 py-2 text-sm flex items-center gap-2 transition-colors ${
-                                          isCurrent
-                                            ? "text-primary bg-primary/5 font-medium"
-                                            : needsShipment
-                                              ? "text-muted-foreground/40 cursor-not-allowed"
-                                              : "text-foreground hover:bg-muted"
-                                        }`}
-                                      >
-                                        {isCurrent && <Check className="w-3.5 h-3.5 text-primary" />}
-                                        <span className={`w-2 h-2 rounded-full ${STATUS_CONFIG[status]?.dotColor || "bg-gray-400"}`} />
-                                        {label}
-                                        {needsShipment && <span className="text-[10px] text-muted-foreground/40 ml-auto">needs shipment</span>}
-                                      </button>
-                                    );
-                                  })}
-                                </div>
-                                <div className="border-t border-border py-1">
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setActionMenuId(null);
-                                      router.push(`/dashboard/exporter/orders/${order.id}`);
-                                    }}
-                                    className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors"
-                                  >
-                                    View details
-                                  </button>
-                                </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </div>
+                          <DropdownMenu.Portal>
+                            <DropdownMenu.Content
+                              align="end"
+                              className="w-52 bg-card border border-border rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=closed]:zoom-out-95"
+                            >
+                              <div className="px-3 py-2 border-b border-border">
+                                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Update Status</p>
+                              </div>
+                              <div className="py-1">
+                                {Object.entries(STATUS_LABELS).map(([status, label]) => {
+                                  const isCurrent = order.orderStatus === status;
+                                  const needsShipment = (status === "SHIPPED" || status === "DELIVERED") && !order.shipment;
+                                  return (
+                                    <DropdownMenu.Item
+                                      key={status}
+                                      disabled={isCurrent || updatingStatusId !== null || needsShipment}
+                                      onSelect={() => handleStatusUpdate(order.id, status)}
+                                      className={`w-full text-left px-3 py-2 text-sm flex items-center gap-2 transition-colors outline-none cursor-pointer data-[disabled]:pointer-events-none ${
+                                        isCurrent
+                                          ? "text-primary bg-primary/5 font-medium"
+                                          : needsShipment
+                                            ? "text-muted-foreground/40"
+                                            : "text-foreground hover:bg-muted focus:bg-muted"
+                                      }`}
+                                    >
+                                      {isCurrent && <Check className="w-3.5 h-3.5 text-primary" />}
+                                      <span className={`w-2 h-2 rounded-full ${STATUS_CONFIG[status]?.dotColor || "bg-gray-400"}`} />
+                                      {label}
+                                      {needsShipment && <span className="text-[10px] text-muted-foreground/40 ml-auto">needs shipment</span>}
+                                    </DropdownMenu.Item>
+                                  );
+                                })}
+                              </div>
+                              <div className="border-t border-border py-1">
+                                <DropdownMenu.Item
+                                  onSelect={() => router.push(`/dashboard/exporter/orders/${order.id}`)}
+                                  className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-muted focus:bg-muted transition-colors outline-none cursor-pointer"
+                                >
+                                  View details
+                                </DropdownMenu.Item>
+                                <DropdownMenu.Item
+                                  onSelect={() => handleDelete(order.id, order.orderNumber)}
+                                  className="w-full text-left px-3 py-2 text-sm text-red-500 hover:bg-red-50 focus:bg-red-50 dark:hover:bg-red-500/10 dark:focus:bg-red-500/10 transition-colors flex items-center gap-2 outline-none cursor-pointer"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                  Delete Order
+                                </DropdownMenu.Item>
+                              </div>
+                            </DropdownMenu.Content>
+                          </DropdownMenu.Portal>
+                        </DropdownMenu.Root>
                       </td>
                     </tr>
                   );
