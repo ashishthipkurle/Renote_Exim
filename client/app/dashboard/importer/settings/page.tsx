@@ -16,7 +16,6 @@ import {
  Briefcase,
  FileText,
  Save,
- Save,
  CheckCircle2
 } from "lucide-react";
 import GifLoader from "@/components/ui/GifLoader";

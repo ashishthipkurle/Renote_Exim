@@ -114,6 +114,9 @@ export async function getApiAuthContext(
       error: null,
     };
   } catch (e: any) {
+    if (e?.digest === 'DYNAMIC_SERVER_USAGE' || e?.message?.includes('Dynamic server usage')) {
+      throw e;
+    }
     console.error("[Auth] Fatal error in getApiAuthContext:", e);
     
     const errMsg = e?.message?.toLowerCase() || "";

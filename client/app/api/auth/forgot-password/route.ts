@@ -2,7 +2,8 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { forgotPasswordSchema } from "@/lib/validations";
-import { nhost } from "@/lib/nhost";
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 
 export async function POST(request: NextRequest) {
  try {
@@ -13,12 +14,24 @@ export async function POST(request: NextRequest) {
  const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
  const appUrl = process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`;
 
- // v4 SDK: sendPasswordResetEmail (not resetPassword)
- const { error } = await nhost.auth.sendPasswordResetEmail({
- email: validatedData.email,
- options: {
- redirectTo: `${appUrl}/reset-password`,
- }
+ const cookieStore = cookies();
+ const supabase = createServerClient(
+   process.env.NEXT_PUBLIC_SUPABASE_URL!,
+   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+   {
+     cookies: {
+       getAll() { return cookieStore.getAll() },
+       setAll(cookiesToSet) {
+         cookiesToSet.forEach(({ name, value, options }) =>
+           cookieStore.set(name, value, options)
+         )
+       },
+     },
+   }
+ )
+
+ const { error } = await supabase.auth.resetPasswordForEmail(validatedData.email, {
+   redirectTo: `${appUrl}/reset-password`,
  });
 
  if (error) {

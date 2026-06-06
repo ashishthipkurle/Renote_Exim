@@ -1,7 +1,23 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
-import { AUTH_COOKIE_NAME, REFRESH_COOKIE_NAME, AUTH_COOKIE_OPTIONS, REFRESH_COOKIE_OPTIONS } from "@/lib/auth-server";
+import { AUTH_COOKIE_NAME, REFRESH_COOKIE_NAME } from "@/lib/auth-server";
 import { cookies } from "next/headers";
+
+const AUTH_COOKIE_OPTIONS = {
+  path: "/",
+  httpOnly: false,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax" as const,
+  maxAge: 60 * 60 * 24 * 7,
+};
+
+const REFRESH_COOKIE_OPTIONS = {
+  path: "/",
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax" as const,
+  maxAge: 60 * 60 * 24 * 30,
+};
 
 /**
  * POST /api/auth/sync

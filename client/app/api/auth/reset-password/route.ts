@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
-import { nhost } from "@/lib/nhost";
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import { getApiAuthContext } from "@/lib/auth-server";
 
 /**
@@ -25,12 +26,29 @@ export async function POST(request: NextRequest) {
  );
  }
 
- // In Nhost v4 SDK, we use changePassword which works for the currently authenticated user
- const result = await nhost.auth.changePassword({ newPassword: password });
+ // In Supabase, if the user clicked the reset link, they have an active session
+ // so we can update their password.
+ const cookieStore = cookies();
+ const supabase = createServerClient(
+   process.env.NEXT_PUBLIC_SUPABASE_URL!,
+   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+   {
+     cookies: {
+       getAll() { return cookieStore.getAll() },
+       setAll(cookiesToSet) {
+         cookiesToSet.forEach(({ name, value, options }) =>
+           cookieStore.set(name, value, options)
+         )
+       },
+     },
+   }
+ )
 
- if (result.error) {
+ const { error } = await supabase.auth.updateUser({ password });
+
+ if (error) {
  return NextResponse.json(
- { error: result.error.message },
+ { error: error.message },
  { status: 400 }
  );
  }
