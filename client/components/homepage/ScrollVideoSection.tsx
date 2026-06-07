@@ -22,7 +22,7 @@ import ThumbnailImg from "@/assests/4k Video frame 2/1.png";
  * Animated text overlays appear and disappear at different scroll positions.
  */
 
-const TOTAL_FRAMES = 150;
+const TOTAL_FRAMES = 75;
 const SCROLL_DISTANCE = 3000; // px of scroll for full video playback
 
 // Global cache to persist frames across navigation within the same session (SPA navigation)
@@ -375,17 +375,8 @@ export default function ScrollVideoSection() {
             video.style.height = "1px";
             document.body.appendChild(video);
 
-            // Fetch video securely into RAM first to bypass extreme rate-limiting on typical browser range-request seeking
-            let finalSrc = "/videos/Continuous_Shot_Company_Video_Generation.mp4";
-            try {
-                const response = await fetch(finalSrc);
-                if (response.ok) {
-                    const blob = await response.blob();
-                    finalSrc = URL.createObjectURL(blob);
-                }
-            } catch (e) {
-                console.warn("[ScrollVideo] Failed to fetch blob, using origin src", e);
-            }
+            // Cloudinary's CDN handles range requests properly and is very fast, so we don't need to blob-fetch into RAM first!
+            let finalSrc = "https://res.cloudinary.com/dpy7s0cbs/video/upload/f_auto,q_auto/v1780753542/Continuous_Shot_Company_Video_Generation.mp4";
 
             video.src = finalSrc;
             video.muted = true;
@@ -427,7 +418,7 @@ export default function ScrollVideoSection() {
                             // Resize frames to 1080p maximum to save memory (prevents browser crashes/reclaims)
                             const vw = video.videoWidth || 1920;
                             const vh = video.videoHeight || 1080;
-                            const targetW = Math.min(1920, vw);
+                            const targetW = Math.min(1280, vw);
                             const targetH = Math.round((targetW / vw) * vh);
 
                             const bitmap = await createImageBitmap(video, {
@@ -443,7 +434,7 @@ export default function ScrollVideoSection() {
                             const tmpCanvas = document.createElement("canvas");
                             const vw = video.videoWidth || 1920;
                             const vh = video.videoHeight || 1080;
-                            const targetW = Math.min(1920, vw);
+                            const targetW = Math.min(1280, vw);
                             const targetH = Math.round((targetW / vw) * vh);
 
                             tmpCanvas.width = targetW;
@@ -591,15 +582,21 @@ export default function ScrollVideoSection() {
                 <div className="w-full h-full relative overflow-hidden pointer-events-none">
 
                     {loaded && progress < 100 && (
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 flex flex-col items-center gap-3 w-48 transition-opacity duration-300">
-                            <span className="text-white/40 text-[10px] uppercase tracking-[0.2em] font-medium">
-                                Buffering...
+                        <div className="absolute bottom-16 md:bottom-24 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-4 w-64 md:w-80 transition-opacity duration-300">
+                            <span className="text-white text-sm uppercase tracking-[0.3em] font-bold animate-pulse">
+                                Loading Experience
                             </span>
-                            <div className="w-full h-[2px] bg-white/10 rounded-full overflow-hidden">
+                            <div className="w-full flex items-center justify-between text-amber-400/80 text-[10px] font-bold tracking-wider mb-[-8px]">
+                                <span>{progress}%</span>
+                                <span>READY</span>
+                            </div>
+                            <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden relative">
                                 <div
-                                    className="h-full bg-white/80 rounded-full transition-all duration-300 ease-out"
+                                    className="h-full bg-amber-400 rounded-full transition-all duration-300 ease-out shadow-[0_0_15px_rgba(251,191,36,0.8)] relative"
                                     style={{ width: `${progress}%` }}
-                                />
+                                >
+                                    <div className="absolute inset-0 bg-white/30 animate-pulse-glow" />
+                                </div>
                             </div>
                         </div>
                     )}

@@ -122,8 +122,11 @@ export default function InlineScrollVideo({
                 
                 if (!hasFinished) {
                     if (scrollIconRef.current) gsap.set(scrollIconRef.current, { opacity: 0 });
-                    video.play().catch(() => {});
                     lockScroll();
+                    video.play().catch((e) => {
+                        console.warn("Autoplay failed:", e);
+                        handleVideoEnded(); // Fail gracefully and unlock scroll
+                    });
                 }
             },
             onLeave: () => {
@@ -135,7 +138,11 @@ export default function InlineScrollVideo({
                     gsap.to(prevSection, { opacity: 0, pointerEvents: "none", duration: 0.3 });
                 }
                 if (!hasFinished) {
-                    video.play().catch(() => {});
+                    lockScroll();
+                    video.play().catch((e) => {
+                        console.warn("Autoplay failed:", e);
+                        handleVideoEnded();
+                    });
                 }
             },
             onLeaveBack: () => {
@@ -216,6 +223,7 @@ export default function InlineScrollVideo({
                     className="w-full h-full object-cover pointer-events-auto"
                     muted
                     playsInline
+                    preload="auto"
                 />
                 
                 {/* Scroll Indicator Prompt */}

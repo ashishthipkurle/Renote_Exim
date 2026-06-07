@@ -89,7 +89,7 @@ export default function HomeClient() {
           <FeaturesSection />
 
           <InlineScrollVideo
-            videoSrc="/videos/new_ui_video.mp4"
+            videoSrc="https://res.cloudinary.com/dpy7s0cbs/video/upload/f_auto,q_auto/v1780753573/new_ui_video.mp4"
             previousSectionId="features-section"
             totalFrames={120}
             scrollDistance={2500}
