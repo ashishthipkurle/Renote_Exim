@@ -16,7 +16,7 @@ import ComplianceSection from "@/components/homepage/ComplianceSection";
 import CTASection from "@/components/homepage/CTASection";
 import HomeFooter from "@/components/homepage/HomeFooter";
 import ScrollVideoSection from "@/components/homepage/ScrollVideoSection";
-import InlineScrollVideo from "@/components/homepage/InlineScrollVideo";
+import MissionScrollSection from "@/components/homepage/MissionScrollSection";
 
 export default function HomeClient() {
   const { user, loading } = useAuth();
@@ -88,12 +88,7 @@ export default function HomeClient() {
         <div className="relative w-full z-10">
           <FeaturesSection />
 
-          <InlineScrollVideo
-            videoSrc="https://res.cloudinary.com/dpy7s0cbs/video/upload/f_auto,q_auto/v1780753573/new_ui_video.mp4"
-            previousSectionId="features-section"
-            totalFrames={120}
-            scrollDistance={2500}
-          />
+          <MissionScrollSection />
         </div>
 
         <div id="post-video-content" style={{ display: 'block' }}>
