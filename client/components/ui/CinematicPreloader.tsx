@@ -236,11 +236,11 @@ export default function CinematicPreloader() {
       {status === "cinematic" && (
         <div className="absolute inset-0 z-[10002] flex flex-col items-center justify-center p-4">
           <div className="relative z-[10002] text-center">
-            <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8 w-full max-w-full px-4">
+            <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8 w-full max-w-[100vw] px-4 overflow-hidden">
               {activeTexts.map((text, i) => (
-                <div key={i} className="text-reveal-mask text-center">
-                  <h1 className={`text-reveal-item font-sans font-black tracking-tight opacity-0 uppercase ${i === 1 ? 'text-2xl md:text-5xl lg:text-6xl text-[#D4AF37] md:border-x-4 border-y-4 md:border-y-0 border-[#D4AF37] px-4 md:px-6 py-2 md:py-0' :
-                    'text-xl md:text-3xl lg:text-4xl text-foreground/40'
+                <div key={i} className="text-reveal-mask text-center max-w-full">
+                  <h1 className={`text-reveal-item font-sans font-black tracking-tight opacity-0 uppercase whitespace-normal break-words max-w-[90vw] ${i === 1 ? 'text-xl sm:text-2xl md:text-5xl lg:text-6xl text-[#D4AF37] md:border-x-4 border-y-4 md:border-y-0 border-[#D4AF37] px-2 md:px-6 py-2 md:py-0' :
+                    'text-lg sm:text-xl md:text-3xl lg:text-4xl text-foreground/40'
                     }`}>
                     {text}
                   </h1>
