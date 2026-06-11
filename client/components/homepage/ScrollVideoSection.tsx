@@ -631,12 +631,12 @@ export default function ScrollVideoSection() {
 
                     {/* ─── Immersive Glassmorphism Navigation Bar ─── */}
                     <nav
-                        className="absolute top-6 left-1/2 -translate-x-1/2 z-[60] pointer-events-auto cursor-auto"
+                        className="hidden md:block absolute top-6 left-1/2 -translate-x-1/2 z-[60] pointer-events-auto cursor-auto"
                         onMouseEnter={() => gsap.to(cursorRef.current, { scale: 0, opacity: 0, duration: 0.2, ease: "power2.out" })}
                         onMouseLeave={() => gsap.to(cursorRef.current, { scale: 1, opacity: 1, duration: 0.2, ease: "back.out(1.7)" })}
                     >
                         <div
-                            className="flex items-center gap-2 px-4 md:px-10 py-1.5"
+                            className="flex items-center gap-2 px-4 lg:px-10 py-1.5"
                             style={{
                                 background: "rgba(255, 255, 255, 0.03)",
                                 backdropFilter: "blur(24px) saturate(180%)",
@@ -650,7 +650,7 @@ export default function ScrollVideoSection() {
                             }}
                         >
                             {/* Left Side: Navigation Links */}
-                            <div className="flex items-center gap-8">
+                            <div className="flex items-center gap-4 lg:gap-8">
                                 <Link href="/" className="flex items-center gap-2 group text-white/70 hover:text-white transition-all duration-300">
                                     <Home className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                                     <span className="text-[10px] font-black uppercase tracking-[0.2em]">Home</span>
@@ -664,14 +664,14 @@ export default function ScrollVideoSection() {
                             {/* Centerpiece: Marketplace */}
                             <Link
                                 href="/products"
-                                className="flex items-center gap-2.5 px-8 py-2.5 rounded-xl hover:bg-white/10 text-white text-sm font-black uppercase tracking-[0.3em] transition-all duration-500 hover:scale-105 group"
+                                className="flex items-center gap-2.5 px-4 lg:px-8 py-2.5 rounded-xl hover:bg-white/10 text-white text-sm font-black uppercase tracking-[0.3em] transition-all duration-500 hover:scale-105 group"
                             >
                                 <ShoppingBag className="w-4 h-4 group-hover:rotate-12 transition-transform" />
                                 Marketplace
                             </Link>
 
                             {/* Right Side: Contact & Auth */}
-                            <div className="flex items-center gap-8">
+                            <div className="flex items-center gap-4 lg:gap-8">
                                 <Link href="/faq" className="flex items-center gap-2 group text-white/70 hover:text-white transition-all duration-300">
                                     <Phone className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                                     <span className="text-[10px] font-black uppercase tracking-[0.2em]">Contact</span>
