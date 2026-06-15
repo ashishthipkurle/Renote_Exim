@@ -5,6 +5,10 @@
 @tailwind utilities;
 
 @layer base {
+  html, body {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
  :root {
  /* --- 1. PRIMITIVE COLORS --- */
  --white: #ffffff;

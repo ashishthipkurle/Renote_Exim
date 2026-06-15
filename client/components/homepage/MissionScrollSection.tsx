@@ -24,7 +24,7 @@ export default function MissionScrollSection() {
                 <div className="w-full md:w-7/12 p-8 md:p-16 lg:p-24 min-h-screen">
                     <div className="max-w-3xl space-y-16 pb-32">
                         <div>
-                            <h2 className="text-4xl md:text-5xl font-light tracking-tight text-foreground mb-8 leading-tight">
+                            <h2 className="text-4xl sm:text-5xl font-light tracking-tight text-foreground mb-8 leading-tight">
                                 RANOTE EXIM: Building India’s Sustainable Export Future
                             </h2>
                             <p className="text-muted-foreground leading-relaxed text-lg mb-6">
