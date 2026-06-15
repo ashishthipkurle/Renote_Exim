@@ -4,24 +4,20 @@ import Image from "next/image";
 
 export default function MissionScrollSection() {
     return (
-        <section className="relative w-full z-40 bg-background shadow-[0_-20px_50px_rgba(0,0,0,0.3)]">
-            <div className="w-full flex flex-col md:flex-row">
-                {/* Left side Image (Sticky) */}
-                <div className="w-full md:w-5/12 shrink-0">
-                    <div className="sticky top-0 h-[40vh] md:h-screen w-full">
-                        <Image 
-                            src="/assets/UserImage.png" 
-                            alt="Managing Director"
-                            layout="fill"
-                            objectFit="cover"
-                            objectPosition="center top"
-                            className="object-cover"
-                        />
-                    </div>
+        <section className="relative w-full z-40 bg-background shadow-[0_-20px_50px_rgba(0,0,0,0.3)] h-screen">
+            <div className="w-full h-full flex flex-col md:flex-row">
+                {/* Left side Image */}
+                <div className="w-full h-[40vh] md:h-full md:w-5/12 shrink-0 relative">
+                    <Image 
+                        src="/assets/UserImage.png" 
+                        alt="Managing Director"
+                        fill
+                        className="object-cover object-top"
+                    />
                 </div>
 
-                {/* Right side Text Content (Native Scroll) */}
-                <div className="w-full md:w-7/12 p-8 md:p-16 lg:p-24 min-h-screen">
+                {/* Right side Text Content (Internal Scroll) */}
+                <div className="w-full h-[60vh] md:h-full md:w-7/12 p-5 md:p-16 lg:p-24 overflow-y-auto relative scroll-smooth scrollbar-thin scrollbar-thumb-primary/50 scrollbar-track-transparent">
                     <div className="max-w-3xl space-y-16 pb-32">
                         <div>
                             <h2 className="text-4xl sm:text-5xl font-light tracking-tight text-foreground mb-8 leading-tight">
