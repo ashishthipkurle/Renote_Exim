@@ -74,7 +74,7 @@ export default function HomeHero() {
       <div className="relative z-10 container mx-auto px-6 text-center flex flex-col items-center justify-center h-full mt-10">
 
 
-        <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-bold text-foreground mb-8 tracking-tight leading-none drop-shadow-2xl transition-colors duration-500">
+        <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-foreground mb-8 tracking-tight leading-none drop-shadow-2xl transition-colors duration-500">
           {t("hero.title_part1", "TRADE WITHOUT")} <br />
           <span className="gradient-text-gold text-glow relative inline-block">
             {t("hero.title_part2", "BORDERS")}

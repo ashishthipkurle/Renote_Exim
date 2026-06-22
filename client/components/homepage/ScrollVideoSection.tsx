@@ -368,11 +368,16 @@ export default function ScrollVideoSection() {
             isExtractionRunning = true;
 
             const video = document.createElement("video");
-            video.style.position = "absolute";
-            video.style.opacity = "0";
+            // Fix for iOS Safari: Videos that are 1px or opacity: 0 are often 
+            // optimized out of the hardware decoder, yielding black frames.
+            video.style.position = "fixed";
+            video.style.top = "0";
+            video.style.left = "0";
+            video.style.width = "200px";
+            video.style.height = "200px";
+            video.style.opacity = "0.01";
             video.style.pointerEvents = "none";
-            video.style.width = "1px";
-            video.style.height = "1px";
+            video.style.zIndex = "-9999";
             document.body.appendChild(video);
 
             // Cloudinary's CDN handles range requests properly and is very fast, so we don't need to blob-fetch into RAM first!
@@ -418,38 +423,23 @@ export default function ScrollVideoSection() {
                             // Resize frames to 1080p maximum to save memory (prevents browser crashes/reclaims)
                             const vw = video.videoWidth || 1920;
                             const vh = video.videoHeight || 1080;
-                            const targetW = Math.min(1280, vw);
+                            const targetW = Math.min(1024, vw); // Lowered to 1024 for iOS stability
                             const targetH = Math.round((targetW / vw) * vh);
 
-                            const bitmap = await createImageBitmap(video, {
-                                resizeWidth: targetW,
-                                resizeHeight: targetH,
-                                resizeQuality: "medium"
-                            });
-
-                            if (framesRef.current) framesRef.current[i] = bitmap;
-                            globalFramesCache[i] = bitmap;
-                        } catch (e) {
-                            console.error("[ScrollVideo] createImageBitmap failed, falling back to canvas", e);
+                            // Safari bug workaround: direct createImageBitmap(video) often yields black frames.
+                            // We force drawing to an offscreen canvas first to pull pixels from the decoder.
                             const tmpCanvas = document.createElement("canvas");
-                            const vw = video.videoWidth || 1920;
-                            const vh = video.videoHeight || 1080;
-                            const targetW = Math.min(1280, vw);
-                            const targetH = Math.round((targetW / vw) * vh);
-
                             tmpCanvas.width = targetW;
                             tmpCanvas.height = targetH;
-                            const tmpCtx = tmpCanvas.getContext("2d");
+                            const tmpCtx = tmpCanvas.getContext("2d", { willReadFrequently: true });
                             if (tmpCtx) {
                                 tmpCtx.drawImage(video, 0, 0, targetW, targetH);
-                                try {
-                                    const bitmap = await createImageBitmap(tmpCanvas);
-                                    if (framesRef.current) framesRef.current[i] = bitmap;
-                                    globalFramesCache[i] = bitmap;
-                                } catch (b) {
-                                    console.error("[ScrollVideo] Canvas bitmap capture failed", b);
-                                }
+                                const bitmap = await createImageBitmap(tmpCanvas);
+                                if (framesRef.current) framesRef.current[i] = bitmap;
+                                globalFramesCache[i] = bitmap;
                             }
+                        } catch (e) {
+                            console.error("[ScrollVideo] Capture failed", e);
                         }
 
                         const p = Math.round(((i + 1) / TOTAL_FRAMES) * 100);

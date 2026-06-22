@@ -17,6 +17,7 @@ import CTASection from "@/components/homepage/CTASection";
 import HomeFooter from "@/components/homepage/HomeFooter";
 import ScrollVideoSection from "@/components/homepage/ScrollVideoSection";
 import MissionScrollSection from "@/components/homepage/MissionScrollSection";
+import HomeMobile from "@/components/homepage/HomeMobile";
 
 export default function HomeClient() {
   const { user, loading } = useAuth();
@@ -72,34 +73,42 @@ export default function HomeClient() {
 
   return (
     <div className="bg-background text-foreground font-display selection:bg-primary selection:text-white w-full">
-      <ScrollVideoSection />
+      {/* ─── Desktop & Tablet View ─── */}
+      <div className="hidden md:block">
+        <ScrollVideoSection />
 
-      {/* ─── Marketplace Content Reveal Wrapper ─── */}
-      <div
-        id="home-content-reveal"
-        className="relative z-10 bg-background shadow-[0_-20px_50px_rgba(0,0,0,0.3)]"
-      >
-        <HomeNavbar />
-        <HomeHero />
-        <ForwardMarquee />
-        <StatsBar />
-        <TrendingCategories />
-        {/* ─── Scroll-Linked Video Scene Boundary ─── */}
-        <div className="relative w-full z-10">
-          <FeaturesSection />
+        {/* ─── Marketplace Content Reveal Wrapper ─── */}
+        <div
+          id="home-content-reveal"
+          className="relative z-10 bg-background shadow-[0_-20px_50px_rgba(0,0,0,0.3)]"
+        >
+          <HomeNavbar />
+          <HomeHero />
+          <ForwardMarquee />
+          <StatsBar />
+          <TrendingCategories />
+          {/* ─── Scroll-Linked Video Scene Boundary ─── */}
+          <div className="relative w-full z-10">
+            <FeaturesSection />
 
-          <MissionScrollSection />
+            <MissionScrollSection />
+          </div>
+
+          <div id="post-video-content" style={{ display: 'block' }}>
+            <GlobalHubsSection />
+            <ReverseMarquee />
+            <BulkProcurement />
+            <ConnectivitySection />
+            <ComplianceSection />
+            <CTASection />
+            <HomeFooter />
+          </div>
         </div>
+      </div>
 
-        <div id="post-video-content" style={{ display: 'block' }}>
-          <GlobalHubsSection />
-          <ReverseMarquee />
-          <BulkProcurement />
-          <ConnectivitySection />
-          <ComplianceSection />
-          <CTASection />
-          <HomeFooter />
-        </div>
+      {/* ─── Mobile View ─── */}
+      <div className="block md:hidden">
+        <HomeMobile />
       </div>
     </div>
   );
