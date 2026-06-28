@@ -222,7 +222,7 @@ export default function TrendingCategories() {
             <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 dark:from-[#0A0E17]/90 via-slate-900/40 dark:via-[#0A0E17]/40 to-transparent" />
             <div className="absolute inset-0 bg-black/10 transition-opacity hover:bg-transparent duration-500" />
 
-            <div className="item-content-full absolute top-[35%] md:top-[45%] -translate-y-[50%] left-[6%] md:left-[10%] w-[90%] md:w-[650px] pointer-events-none z-20">
+            <div className="item-content-full absolute top-[35%] md:top-[45%] -translate-y-[50%] left-[4%] md:left-[4%] w-[90%] md:w-[600px] pointer-events-none z-20">
               <p className="text-white tracking-[0.2em] uppercase mb-2 md:mb-4 text-[10px] md:text-xs font-semibold relative before:content-[''] before:w-8 md:before:w-12 before:h-[1px] before:bg-white/60 before:absolute before:-left-10 md:before:-left-16 before:top-1/2 before:-translate-y-1/2 ml-10 md:ml-16 drop-shadow-md">
                 {cat.tag}
               </p>
