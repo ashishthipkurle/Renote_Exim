@@ -15,7 +15,8 @@ import {
   ListOrdered,
   Package,
   Heart,
-  Settings
+  Settings,
+  Menu
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -82,9 +83,9 @@ export default function DashboardHeader() {
         <div className="flex h-full items-center px-4 md:px-6">
 
           {/* LEFT SECTION */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
             {/* Logo */}
-            <Link href="/" className="flex items-center flex-shrink-0">
+            <Link href="/" className="hidden md:flex items-center flex-shrink-0">
               <Image
                 src={LogoImg}
                 alt="Ranote Exim Logo"
@@ -97,10 +98,13 @@ export default function DashboardHeader() {
             {!isProductDetails && pathname !== "/cart" && pathname !== "/checkout" && pathname !== "/wishlist" && pathname !== "/orders" && pathname !== "/profile" && (
               <button
                 onClick={toggleSidebar}
-                className="h-10 w-10 ml-4 lg:ml-8 rounded-xl flex items-center justify-center hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors border border-transparent hover:border-primary/20"
+                className="h-10 w-10 md:ml-4 lg:ml-8 rounded-xl flex items-center justify-center hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors border border-transparent hover:border-primary/20"
                 title={open ? "Collapse Sidebar" : "Expand Sidebar"}
               >
-                {open ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+                <Menu className="w-5 h-5 md:hidden" />
+                <div className="hidden md:block">
+                  {open ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+                </div>
               </button>
             )}
           </div>
@@ -111,8 +115,8 @@ export default function DashboardHeader() {
           {/* RIGHT SECTION: SEARCH + ACTIONS */}
           <div className="flex items-center gap-2 lg:gap-4">
 
-            {/* SEARCH BAR (Pushed to Right) */}
-            <div className="w-64 lg:w-80 relative group mr-2">
+            {/* SEARCH BAR (Pushed to Right, fills space on mobile) */}
+            <div className="flex-1 md:w-64 lg:w-80 relative group mr-2">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
               <input
                 type="text"
@@ -121,6 +125,7 @@ export default function DashboardHeader() {
               />
             </div>
 
+            {/* ALWAYS VISIBLE (Language & Theme) */}
             <div className="flex items-center gap-1 sm:gap-2">
               <LanguageSwitcher />
               {/* Theme Toggle */}
@@ -132,7 +137,10 @@ export default function DashboardHeader() {
                   {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                 </button>
               )}
+            </div>
 
+            {/* DESKTOP ONLY ACTIONS (Orders, Wishlist, Cart, Notifications) */}
+            <div className="hidden md:flex items-center gap-1 sm:gap-2">
               {/* Orders — hidden for exporters and importers */}
               {!isExporter && !isImporter && (
                 <Link
@@ -175,7 +183,7 @@ export default function DashboardHeader() {
 
             {/* PROFILE DROPDOWN OR SIGN IN */}
             {mounted && (
-              <div className="relative" ref={dropdownRef}>
+              <div className="hidden md:block relative" ref={dropdownRef}>
                 {loading ? (
                   <div className="size-9 rounded-full bg-muted animate-pulse border border-border/50" />
                 ) : user ? (

@@ -49,6 +49,16 @@
   --radius: 0.5rem;
  --board: 0 0% 92%;
  
+ /* Sidebar Tokens */
+ --sidebar: 0 0% 100%;
+ --sidebar-foreground: 0 0% 3.9%;
+ --sidebar-primary: 46 65% 52.3%;
+ --sidebar-primary-foreground: 0 0% 98%;
+ --sidebar-accent: 0 0% 96.1%;
+ --sidebar-accent-foreground: 0 0% 9%;
+ --sidebar-border: 0 0% 89.8%;
+ --sidebar-ring: 0 0% 3.9%;
+ 
  /* Typography Tokens */
  --display-2xl-size: 3.25rem;
  --display-2xl-line: 3.5rem;
@@ -85,6 +95,16 @@
     --input: 0 0% 14.9%;
     --ring: 0 0% 83.1%;
     --board: 0 0% 8%;
+    
+    /* Sidebar Tokens */
+    --sidebar: 0 0% 4%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 46 65% 52.3%;
+    --sidebar-primary-foreground: 0 0% 9%;
+    --sidebar-accent: 0 0% 14.9%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 0 0% 14.9%;
+    --sidebar-ring: 0 0% 83.1%;
   }
 }
 
@@ -101,7 +121,12 @@
  color: hsl(var(--foreground));
  scrollbar-width: none;
  -ms-overflow-style: none;
- zoom: 125%;
+ }
+
+ @media (min-width: 1024px) {
+   body {
+     zoom: 125%;
+   }
  }
 
  /* Force 'Straight' (Upright) Sora for all headers */

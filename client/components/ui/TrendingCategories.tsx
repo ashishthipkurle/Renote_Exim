@@ -75,6 +75,13 @@ export default function TrendingCategories() {
     const items = containerRef.current.querySelectorAll('.carousel-item');
     if (!items.length) return;
 
+    const isMobile = window.innerWidth < 768;
+    const thumbWidth = isMobile ? 180 : 220;
+    const thumbHeight = isMobile ? 260 : 320;
+    const thumbGap = isMobile ? 200 : 240;
+    const thumbTop = isMobile ? "75%" : "70%";
+    const thumbLeft = isMobile ? 55 : 50;
+
     // Setup initial state: first is full screen, rest are thumbnails
     gsap.set(items[0], { top: 0, left: 0, width: "100%", height: "100%", borderRadius: 0, opacity: 1 });
     gsap.set(items[0].querySelector('.item-content-full'), { opacity: 1, y: 0 });
@@ -82,10 +89,10 @@ export default function TrendingCategories() {
 
     for (let i = 1; i < items.length; i++) {
       gsap.set(items[i], {
-        top: "70%",
-        left: `calc(50% + ${(i - 1) * 240}px)`,
-        width: 220,
-        height: 320,
+        top: thumbTop,
+        left: `calc(${thumbLeft}% + ${(i - 1) * thumbGap}px)`,
+        width: thumbWidth,
+        height: thumbHeight,
         y: "-50%",
         borderRadius: 20,
         opacity: 1
@@ -108,6 +115,13 @@ export default function TrendingCategories() {
     gsap.set(targetItem, { zIndex: 10 });
     gsap.set(firstItem, { zIndex: 1 });
 
+    const isMobile = window.innerWidth < 768;
+    const thumbWidth = isMobile ? 180 : 220;
+    const thumbHeight = isMobile ? 260 : 320;
+    const thumbGap = isMobile ? 200 : 240;
+    const thumbTop = isMobile ? "75%" : "70%";
+    const thumbLeft = isMobile ? 55 : 50;
+
     const tl = gsap.timeline({
       onComplete: () => {
         for (let j = 0; j < idx; j++) {
@@ -120,10 +134,10 @@ export default function TrendingCategories() {
           gsap.set(resetEl, {
             x: 0,
             opacity: 1,
-            top: "70%",
-            left: `calc(50% + ${(newIndex - 1) * 240}px)`,
-            width: 220,
-            height: 320,
+            top: thumbTop,
+            left: `calc(${thumbLeft}% + ${(newIndex - 1) * thumbGap}px)`,
+            width: thumbWidth,
+            height: thumbHeight,
             y: "-50%",
             borderRadius: 20,
             zIndex: 2
@@ -173,7 +187,7 @@ export default function TrendingCategories() {
     for (let i = idx + 1; i < items.length; i++) {
       const newIndex = i - idx;
       tl.to(items[i], {
-        left: `calc(50% + ${(newIndex - 1) * 240}px)`,
+        left: `calc(${thumbLeft}% + ${(newIndex - 1) * thumbGap}px)`,
         duration: 0.8,
         ease: "power3.inOut"
       }, 0);
@@ -208,24 +222,24 @@ export default function TrendingCategories() {
             <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 dark:from-[#0A0E17]/90 via-slate-900/40 dark:via-[#0A0E17]/40 to-transparent" />
             <div className="absolute inset-0 bg-black/10 transition-opacity hover:bg-transparent duration-500" />
 
-            <div className="item-content-full absolute top-[45%] -translate-y-[50%] left-[6%] md:left-[10%] w-[90%] md:w-[650px] pointer-events-none z-20">
-              <p className="text-white tracking-[0.2em] uppercase mb-4 text-xs font-semibold relative before:content-[''] before:w-12 before:h-[1px] before:bg-white/60 before:absolute before:-left-16 before:top-1/2 before:-translate-y-1/2 ml-16 drop-shadow-md">
+            <div className="item-content-full absolute top-[35%] md:top-[45%] -translate-y-[50%] left-[6%] md:left-[10%] w-[90%] md:w-[650px] pointer-events-none z-20">
+              <p className="text-white tracking-[0.2em] uppercase mb-2 md:mb-4 text-[10px] md:text-xs font-semibold relative before:content-[''] before:w-8 md:before:w-12 before:h-[1px] before:bg-white/60 before:absolute before:-left-10 md:before:-left-16 before:top-1/2 before:-translate-y-1/2 ml-10 md:ml-16 drop-shadow-md">
                 {cat.tag}
               </p>
-              <h2 className="text-6xl md:text-8xl lg:text-[100px] font-bold text-white mb-2 leading-none drop-shadow-2xl">
+              <h2 className="text-5xl sm:text-6xl md:text-8xl lg:text-[100px] font-bold text-white mb-1 md:mb-2 leading-none drop-shadow-2xl max-w-[65%] md:max-w-full">
                 {cat.title}
               </h2>
-              <h2 className="text-5xl md:text-7xl lg:text-[80px] font-light text-white mb-6 drop-shadow-xl text-primary/90">
+              <h2 className="text-4xl sm:text-5xl md:text-7xl lg:text-[80px] font-light text-white mb-4 md:mb-6 drop-shadow-xl text-primary/90 max-w-[65%] md:max-w-full leading-tight">
                 {cat.subtitle}
               </h2>
-              <p className="text-slate-200 text-sm md:text-base leading-relaxed mb-10 max-w-lg drop-shadow-md font-medium">
+              <p className="text-slate-200 text-xs sm:text-sm md:text-base leading-relaxed mb-6 md:mb-10 max-w-[60%] sm:max-w-[70%] md:max-w-lg drop-shadow-md font-medium">
                 {cat.desc}
               </p>
               <Link
                 href={`/products?category=${cat.category}`}
-                className="w-max px-8 py-3.5 border border-white/40 text-white rounded-full hover:bg-white hover:text-black transition-all bg-black/30 backdrop-blur pointer-events-auto font-semibold flex items-center gap-3 group text-sm tracking-wide"
+                className="w-max px-6 py-2.5 md:px-8 md:py-3.5 border border-white/40 text-white rounded-full hover:bg-white hover:text-black transition-all bg-black/30 backdrop-blur pointer-events-auto font-semibold flex items-center gap-2 md:gap-3 group text-[10px] md:text-sm tracking-wide"
               >
-                <span className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-black/10 transition-colors material-icons text-xs">explore</span>
+                <span className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-black/10 transition-colors material-icons text-[10px] md:text-xs">explore</span>
                 DISCOVER MARKET
               </Link>
             </div>

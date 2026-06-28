@@ -15,7 +15,7 @@ import { getCart, removeFromCart, updateQuantity, CartItem as CartItemType, clea
 import Link from 'next/link';
 import { toast } from 'sonner';
 
-export default function CartSheet() {
+export default function CartSheet({ customTrigger }: { customTrigger?: React.ReactNode } = {}) {
  const [items, setItems] = useState<CartItemType[]>([]);
  const [isOpen, setIsOpen] = useState(false);
 
@@ -52,14 +52,16 @@ export default function CartSheet() {
  return (
  <Sheet open={isOpen} onOpenChange={setIsOpen}>
  <SheetTrigger asChild>
- <Button variant="ghost" size="icon" className="relative group">
- <ShoppingCart className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
- {totalItems > 0 && (
- <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-primary-foreground font-black text-[10px] flex items-center justify-center rounded-full animate-in zoom-in shadow-lg">
- {totalItems}
- </span>
+ {customTrigger ? customTrigger : (
+   <Button variant="ghost" size="icon" className="relative group">
+     <ShoppingCart className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+     {totalItems > 0 && (
+       <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-primary-foreground font-black text-[10px] flex items-center justify-center rounded-full animate-in zoom-in shadow-lg">
+         {totalItems}
+       </span>
+     )}
+   </Button>
  )}
- </Button>
  </SheetTrigger>
  <SheetContent className="w-full sm:max-w-md bg-background border-border dark:border-white/5 p-0 flex flex-col backdrop-blur-3xl">
  <SheetHeader className="p-6 border-b border-border dark:border-white/5 bg-background/40">

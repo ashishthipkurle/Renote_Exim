@@ -19,6 +19,7 @@ interface DashboardScalerProps {
  */
 export function DashboardScaler({ children, targetWidth = 1440 }: DashboardScalerProps) {
  const [scale, setScale] = useState(1);
+ const [isMobile, setIsMobile] = useState(false);
  const containerRef = useRef<HTMLDivElement>(null);
  const [isMounted, setIsMounted] = useState(false);
 
@@ -26,9 +27,15 @@ export function DashboardScaler({ children, targetWidth = 1440 }: DashboardScale
  setIsMounted(true);
  const handleResize = () => {
  const width = window.innerWidth;
- // We only scale DOWN. If width is 1920, scale stays at 1.0.
- const newScale = Math.min(width / targetWidth, 1.0); 
- setScale(newScale);
+ if (width < 1024) {
+   setIsMobile(true);
+   setScale(1.0);
+ } else {
+   setIsMobile(false);
+   // We only scale DOWN. If width is 1920, scale stays at 1.0.
+   const newScale = Math.min(width / targetWidth, 1.0); 
+   setScale(newScale);
+ }
  };
 
  handleResize();
@@ -49,14 +56,14 @@ export function DashboardScaler({ children, targetWidth = 1440 }: DashboardScale
  className="will-change-transform"
  style={{
  // Apply scaling ONLY once mounted on the client to avoid hydration mismatch
- width: (isMounted && scale < 1) ? `${targetWidth}px` : "100%",
- transform: (isMounted && scale < 1) ? `scale(${scale})` : "none",
+ width: (isMounted && !isMobile && scale < 1) ? `${targetWidth}px` : "100%",
+ transform: (isMounted && !isMobile && scale < 1) ? `scale(${scale})` : "none",
  transformOrigin: "top left",
  transition: "transform 0.1s ease-out",
  // V6 fix: When scaling down, we must increase the pre-scaled height proportionally
  // so that after transform: scale(), the visual height still fills exactly 100% of the screen.
- height: (isMounted && scale < 1) ? `${100 / scale}%` : "100%",
- minHeight: (isMounted && scale < 1) ? `${100 / scale}%` : "100%",
+ height: (isMounted && !isMobile && scale < 1) ? `${100 / scale}%` : "100%",
+ minHeight: (isMounted && !isMobile && scale < 1) ? `${100 / scale}%` : "100%",
  }}
  >
  {children}

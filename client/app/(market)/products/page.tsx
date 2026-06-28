@@ -101,8 +101,10 @@ export default async function ProductsPage({
   let products: ProductWithExporter[] = [];
   let total = 0;
 
+  let activeCategoryValues: string[] = [];
+
   try {
-    [products, total] = await Promise.all([
+    const [fetchedProducts, fetchedTotal, fetchedCategories] = await Promise.all([
       prisma.product.findMany({
         where,
         skip: (page - 1) * limit,
@@ -119,9 +121,18 @@ export default async function ProductsPage({
           stockQty: true,
           exporter: { select: { name: true, businessName: true, country: true } },
         } as any,
-      }) as unknown as ProductWithExporter[],
+      }) as unknown as Promise<ProductWithExporter[]>,
       prisma.product.count({ where }),
+      prisma.product.findMany({
+        where: { available: true },
+        select: { category: true },
+        distinct: ['category']
+      })
     ]);
+
+    products = fetchedProducts;
+    total = fetchedTotal;
+    activeCategoryValues = fetchedCategories.map((c: any) => c.category?.toUpperCase() || c.category);
 
     // Apply role-based price swap
     products = products.map((p) => ({
@@ -170,46 +181,51 @@ export default async function ProductsPage({
     OTHER: "grid_view",
   };
 
-  return (
-    <SidebarProvider>
-      <DashboardScaler targetWidth={1440}>
-        <div className="flex flex-col h-full w-full bg-board transition-colors duration-300 overflow-hidden border border-slate-200 dark:border-white/5 shadow-2xl">
-          <DashboardHeader />
+  const visibleCategories = ALL_CATEGORIES.filter(cat => activeCategoryValues.includes(cat.value));
 
-          <div className="flex flex-1 overflow-hidden relative border-t border-slate-200 dark:border-white/5">
+  return (
+    <SidebarProvider className="fixed inset-0 z-40 bg-board">
+      <DashboardScaler targetWidth={1440}>
+        <div className="flex flex-col h-full w-full bg-board transition-colors duration-300 overflow-hidden shadow-2xl relative">
+          <div className="flex-shrink-0 z-50 w-full bg-board border-b border-border/50 dark:border-white/10 shadow-sm relative">
+            <DashboardHeader />
+          </div>
+
+          <div className="flex flex-1 overflow-hidden relative">
             <ImporterSidebar basePath="/dashboard/importer">
-              {/* Marketplace Categories integrated into Sidebar */}
-              <div className="flex flex-col py-4 space-y-2">
-                <div className="px-4 mb-4">
-                  <h3 className="font-headline font-semibold text-[10px] uppercase tracking-wider text-muted-foreground">Market Verticals</h3>
+              <div className="flex flex-col py-2">
+                <div className="mb-2 flex items-center justify-between py-2 rounded-lg">
+                  <h3 className="font-headline font-semibold text-[10px] uppercase tracking-wider text-muted-foreground">Categories</h3>
                 </div>
                 
-                <Link
-                  href={buildUrl({ category: undefined, page: undefined })}
-                  className={`flex items-center px-4 py-2 rounded-lg transition-all group ${!categoryParam ? "bg-primary/5 text-primary font-bold shadow-sm" : "text-slate-500 hover:bg-slate-50 hover:text-primary"}`}
-                >
-                  <span className="material-symbols-outlined mr-3 text-[20px]">auto_awesome</span>
-                  <span className="font-headline font-semibold text-sm uppercase tracking-tight">New Arrivals</span>
-                </Link>
+                <div className="flex flex-col space-y-1">
+                  <Link
+                    href={buildUrl({ category: undefined, page: undefined })}
+                    className={`flex items-center px-2 py-2 rounded-lg transition-all group ${!categoryParam ? "bg-primary/5 text-primary font-bold shadow-sm" : "text-slate-500 hover:bg-slate-50 hover:text-primary"}`}
+                  >
+                    <span className="material-symbols-outlined mr-3 text-[20px]">auto_awesome</span>
+                    <span className="font-headline font-semibold text-sm uppercase tracking-tight">New Arrivals</span>
+                  </Link>
 
-                {ALL_CATEGORIES.map((cat) => {
-                  const isActive = categoryParam === cat.value;
-                  return (
-                    <Link
-                      key={cat.value}
-                      href={buildUrl({ category: isActive ? undefined : cat.value, page: undefined })}
-                      className={`flex items-center px-4 py-2 rounded-lg transition-all group ${isActive ? "bg-primary/5 text-primary font-bold shadow-sm" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"}`}
-                    >
-                      <span className="material-symbols-outlined mr-3 text-[20px]">{iconMap[cat.value] || "category"}</span>
-                      <span className="font-headline font-semibold text-sm uppercase tracking-tight">{cat.label}</span>
-                    </Link>
-                  );
-                })}
+                  {visibleCategories.map((cat) => {
+                    const isActive = categoryParam === cat.value;
+                    return (
+                      <Link
+                        key={cat.value}
+                        href={buildUrl({ category: isActive ? undefined : cat.value, page: undefined })}
+                        className={`flex items-center px-2 py-2 rounded-lg transition-all group ${isActive ? "bg-primary/5 text-primary font-bold shadow-sm" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"}`}
+                      >
+                        <span className="material-symbols-outlined mr-3 text-[20px]">{iconMap[cat.value] || "category"}</span>
+                        <span className="font-headline font-semibold text-sm uppercase tracking-tight">{cat.label}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
               </div>
             </ImporterSidebar>
             
             <SidebarInset className="overflow-hidden">
-              <div className="flex-1 overflow-y-auto custom-scrollbar bg-surface h-[calc(100vh-80px)]">
+              <div className="w-full h-full overflow-y-auto custom-scrollbar bg-surface">
                 <PageTransition>
                   {/* Editorial Header Section */}
                   <div className="w-full px-8 py-8">
@@ -228,7 +244,7 @@ export default async function ProductsPage({
                           />
                         </div>
                       ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8">
                           {products.map((product) => {
                             const image = product.images?.[0] ?? null;
                             const isInStock = product.stockQty > 0;
@@ -252,51 +268,31 @@ export default async function ProductsPage({
                                       </div>
                                     )}
                                     {/* Badge */}
-                                    <div className="absolute top-4 left-4">
+                                    <div className="absolute top-2 left-2 md:top-4 md:left-4">
                                       {isInStock ? (
-                                        <span className="bg-tertiary-fixed text-on-tertiary-container px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
-                                          <span className="material-symbols-outlined text-[12px]" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                                          In Stock
+                                        <span className="bg-tertiary-fixed text-on-tertiary-container px-2 py-0.5 md:px-3 md:py-1 rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-widest flex items-center gap-1 shadow-sm">
+                                          <span className="material-symbols-outlined text-[10px] md:text-[12px]" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                                          <span className="hidden sm:inline">In Stock</span>
+                                          <span className="sm:hidden">Stock</span>
                                         </span>
                                       ) : (
-                                        <span className="bg-surface-container-high text-on-surface-variant px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
-                                          <span className="material-symbols-outlined text-[12px]">schedule</span>
-                                          Pre-Order
+                                        <span className="bg-surface-container-high text-on-surface-variant px-2 py-0.5 md:px-3 md:py-1 rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-widest flex items-center gap-1 shadow-sm">
+                                          <span className="material-symbols-outlined text-[10px] md:text-[12px]">schedule</span>
+                                          <span className="hidden sm:inline">Pre-Order</span>
+                                          <span className="sm:hidden">Pre</span>
                                         </span>
                                       )}
                                     </div>
                                   </div>
 
                                   {/* Card Body */}
-                                  <div className="space-y-3">
-                                    <div className="flex justify-between items-start">
-                                      <div className="flex-1 mr-4">
-                                        <span className="text-[10px] font-label uppercase tracking-widest text-primary-foreground bg-primary/20 px-2 py-0.5 rounded">
-                                          {product.category}
-                                        </span>
-                                        <h2 className="text-base font-headline font-bold mt-1 text-foreground line-clamp-2 leading-tight group-hover:text-primary transition-colors uppercase tracking-tight">
-                                          {product.name}
-                                        </h2>
-                                      </div>
-                                      <div className="text-right">
-                                        <p className="text-lg font-headline font-bold text-foreground">{formatMoney(product.price)}</p>
-                                        <p className="text-[10px] font-label text-muted-foreground uppercase tracking-widest">/ Unit</p>
-                                      </div>
-                                    </div>
-
-                                    <div className="flex items-center gap-2 text-muted-foreground">
-                                      <span className="material-symbols-outlined text-sm text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
-                                      <span className="text-xs font-medium">
-                                        Verified Exporter: {product.exporter?.businessName || product.exporter?.name || "Partner"}
-                                      </span>
-                                    </div>
-
-                                    <div className="pt-4 flex items-center justify-between border-t border-border">
-                                      <span className="text-primary font-headline font-bold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
-                                        View Details
-                                        <span className="material-symbols-outlined text-sm transition-transform group-hover:translate-x-1">arrow_forward</span>
-                                      </span>
-                                    </div>
+                                  <div className="pt-2 pb-1">
+                                    <h2 className="text-xs sm:text-sm md:text-base font-headline font-bold text-foreground line-clamp-2 leading-tight group-hover:text-primary transition-colors uppercase tracking-tight">
+                                      {product.name}
+                                    </h2>
+                                    <p className="text-sm md:text-lg font-headline font-black text-foreground mt-1">
+                                      {formatMoney(product.price)}
+                                    </p>
                                   </div>
                                 </Link>
                               </div>

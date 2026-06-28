@@ -223,7 +223,7 @@ function Sidebar({
  <div
  data-slot="sidebar-container"
  className={cn(
- "fixed top-16 bottom-0 z-30 h-[calc(100%-4rem)] w-[var(--sidebar-width)] transition-[left,right,width] duration-200 ease-linear flex border-t border-border/50 dark:border-white/5",
+ "fixed top-16 bottom-0 z-30 h-[calc(100%-4rem)] w-[var(--sidebar-width)] transition-[left,right,width] duration-200 ease-linear flex",
  side === "left"
  ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
  : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",

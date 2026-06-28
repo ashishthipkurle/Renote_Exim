@@ -13,9 +13,11 @@ import NotificationDropdown from "./NotificationDropdown";
 interface NotificationBellProps {
   /** Optional class to add to the outer wrapper */
   className?: string;
+  /** Optional custom trigger element */
+  customTrigger?: React.ReactNode;
 }
 
-export default function NotificationBell({ className = "" }: NotificationBellProps) {
+export default function NotificationBell({ className = "", customTrigger }: NotificationBellProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -74,42 +76,47 @@ export default function NotificationBell({ className = "" }: NotificationBellPro
 
   return (
     <div className={`relative ${className}`} ref={containerRef}>
-      {/* Bell Button */}
-      <button
-        type="button"
-        onClick={handleToggle}
-        aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ""}`}
-        aria-expanded={isOpen}
-        aria-haspopup="dialog"
-        className={`
-          relative size-9 rounded-full flex items-center justify-center
-          text-muted-foreground transition-all active:scale-90
-          border border-transparent
-          ${isOpen
-            ? "bg-primary/10 text-primary border-primary/20"
-            : "hover:bg-primary/10 hover:text-primary hover:border-primary/20"
-          }
-        `}
-      >
-        <Bell className={`w-4 h-4 ${isOpen ? "" : "group-hover:animate-bounce"}`} />
+      {customTrigger ? (
+        <div onClick={handleToggle} className="cursor-pointer">
+          {customTrigger}
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={handleToggle}
+          aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ""}`}
+          aria-expanded={isOpen}
+          aria-haspopup="dialog"
+          className={`
+            relative size-9 rounded-full flex items-center justify-center
+            text-muted-foreground transition-all active:scale-90
+            border border-transparent
+            ${isOpen
+              ? "bg-primary/10 text-primary border-primary/20"
+              : "hover:bg-primary/10 hover:text-primary hover:border-primary/20"
+            }
+          `}
+        >
+          <Bell className={`w-4 h-4 ${isOpen ? "" : "group-hover:animate-bounce"}`} />
 
-        {/* Unread Badge */}
-        {unreadCount > 0 && (
-          <span
-            className="
-              absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px]
-              flex items-center justify-center
-              rounded-full bg-primary text-primary-foreground
-              text-[10px] font-bold leading-none px-1
-              shadow-lg shadow-primary/30
-              animate-in zoom-in-75 duration-300
-              ring-2 ring-background
-            "
-          >
-            {unreadCount > 99 ? "99+" : unreadCount}
-          </span>
-        )}
-      </button>
+          {/* Unread Badge */}
+          {unreadCount > 0 && (
+            <span
+              className="
+                absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px]
+                flex items-center justify-center
+                rounded-full bg-primary text-primary-foreground
+                text-[10px] font-bold leading-none px-1
+                shadow-lg shadow-primary/30
+                animate-in zoom-in-75 duration-300
+                ring-2 ring-background
+              "
+            >
+              {unreadCount > 99 ? "99+" : unreadCount}
+            </span>
+          )}
+        </button>
+      )}
 
       {/* Dropdown */}
       {isOpen && (
