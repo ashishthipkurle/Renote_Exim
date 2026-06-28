@@ -119,8 +119,15 @@ export default function ScrollVideoSection() {
         const yTo = gsap.quickTo(cursor, "y", { duration: 0.4, ease: "power3" });
 
         const onMouseMove = (e: MouseEvent) => {
-            xTo(e.clientX - 48);
-            yTo(e.clientY - 48);
+            let zoom = 1;
+            if (typeof window !== "undefined") {
+                const zoomStr = getComputedStyle(document.body).zoom;
+                if (zoomStr && zoomStr !== "normal") {
+                    zoom = zoomStr.endsWith("%") ? parseFloat(zoomStr) / 100 : parseFloat(zoomStr);
+                }
+            }
+            xTo((e.clientX / (zoom || 1)) - 48);
+            yTo((e.clientY / (zoom || 1)) - 48);
         };
 
         const onMouseEnter = () => {
@@ -282,13 +289,21 @@ export default function ScrollVideoSection() {
             const section = sectionRef.current;
             if (!canvas || !section) return;
 
+            let zoom = 1;
+            if (typeof window !== "undefined") {
+                const zoomStr = getComputedStyle(document.body).zoom;
+                if (zoomStr && zoomStr !== "normal") {
+                    zoom = zoomStr.endsWith("%") ? parseFloat(zoomStr) / 100 : parseFloat(zoomStr);
+                }
+            }
+
             // Force exact layout pixel height via JS to bypass iOS Safari's 100vh/inset-0 scaling bug
-            section.style.height = `${window.innerHeight}px`;
+            section.style.height = `${window.innerHeight / (zoom || 1)}px`;
 
             // Use precise container dimensions instead of often bugged window innerHeight in scaled iOS viewports
             const dpr = window.devicePixelRatio || 1;
             canvas.width = section.clientWidth * dpr;
-            canvas.height = window.innerHeight * dpr;
+            canvas.height = (window.innerHeight / (zoom || 1)) * dpr;
             // Redraw current frame across resize
             if (currentFrameRef.current >= 0 && currentFrameRef.current < TOTAL_FRAMES) {
                 const img = framesRef.current?.[currentFrameRef.current];

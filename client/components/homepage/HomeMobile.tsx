@@ -5,22 +5,35 @@ import Image from "next/image";
 import { ShoppingBag, ArrowRight, Globe, Shield, Zap, Package, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { useTranslation } from "@/lib/i18n/client";
+import { useTheme } from "next-themes";
+import { useState, useEffect } from "react";
+import LogoLight from "@/assests/LOGO_TEXT.png";
+import LogoDark from "@/assests/Logo-2-without-circle.png";
 
 import TrendingCategories from "@/components/ui/TrendingCategories";
 import HomeFooter from "@/components/homepage/HomeFooter";
 
 export default function HomeMobile() {
   const { t } = useTranslation();
+  const { theme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDark = mounted && (resolvedTheme === "dark" || theme === "dark");
+  const LogoImg = isDark ? LogoDark : LogoLight;
 
   return (
-    <div className="w-full bg-background text-foreground overflow-hidden">
+    <div className="w-full bg-background text-foreground overflow-x-hidden">
       {/* ─── Mobile Top Navbar ─── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-white/10 px-4 py-3 flex items-center justify-between">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Image src="/assets/LOGO.png" alt="Ranote Exim" width={120} height={32} className="object-contain" unoptimized />
+          <Image src={LogoImg} alt="Ranote Exim" className="h-8 w-auto object-contain" unoptimized />
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/login" className="text-xs font-bold uppercase tracking-wider text-white/70">Login</Link>
+          <Link href="/login" className="text-xs font-bold uppercase tracking-wider text-foreground/70">Login</Link>
           <Link href="/products" className="bg-primary text-white p-2 rounded-full shadow-lg shadow-primary/20">
             <ShoppingBag className="w-4 h-4" />
           </Link>
@@ -30,7 +43,8 @@ export default function HomeMobile() {
       {/* ─── Mobile Hero Section ─── */}
       <header className="relative pt-24 pb-16 px-4 min-h-[85vh] flex flex-col justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-[url('/assets/globe_dark_theme.avif')] bg-cover bg-center opacity-40 mix-blend-screen" />
+          <div className="absolute inset-0 bg-[url('/assets/globe_light_theme.png')] bg-cover bg-center dark:hidden opacity-100" />
+          <div className="absolute inset-0 hidden dark:block bg-[url('/assets/globe_dark_theme.avif')] bg-cover bg-center opacity-40 mix-blend-screen" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
           <div className="absolute top-20 right-0 w-64 h-64 bg-primary/20 rounded-full blur-[80px]" />
         </div>
@@ -42,15 +56,15 @@ export default function HomeMobile() {
             transition={{ duration: 0.6 }}
           >
             <h1 className="text-5xl font-black tracking-tighter leading-[1.1] mb-4">
-              <span className="text-white drop-shadow-lg">TRADE</span>
+              <span className="text-foreground drop-shadow-lg">TRADE</span>
               <br />
-              <span className="text-white drop-shadow-lg">WITHOUT</span>
+              <span className="text-foreground drop-shadow-lg">WITHOUT</span>
               <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-amber-600 text-glow">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-600 text-glow">
                 BORDERS
               </span>
             </h1>
-            <p className="text-base text-white/70 font-light leading-relaxed mb-8">
+            <p className="text-base text-muted-foreground font-light leading-relaxed mb-8">
               The next-generation B2B marketplace. Connect with verified suppliers, automate logistics, and track shipments globally.
             </p>
           </motion.div>
@@ -70,7 +84,7 @@ export default function HomeMobile() {
             </Link>
             <Link
               href="/faq"
-              className="w-full bg-white/5 border border-white/10 text-white font-semibold py-4 rounded-xl flex items-center justify-center gap-2 active:bg-white/10 transition-colors"
+              className="w-full bg-card border border-border text-foreground font-semibold py-4 rounded-xl flex items-center justify-center gap-2 active:bg-accent transition-colors"
             >
               Learn More
             </Link>
@@ -79,7 +93,7 @@ export default function HomeMobile() {
       </header>
 
       {/* ─── Fast Stats Marquee ─── */}
-      <div className="w-full bg-white/5 border-y border-white/10 py-4 overflow-hidden relative">
+      <div className="w-full bg-card/50 border-y border-border py-4 overflow-hidden relative">
         <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent z-10" />
         <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent z-10" />
         <div className="flex gap-8 whitespace-nowrap animate-[marquee_20s_linear_infinite] px-4 items-center">
@@ -90,9 +104,9 @@ export default function HomeMobile() {
             { label: "Secure Payments", val: "100%" },
           ].map((stat, i) => (
             <div key={i} className="flex items-center gap-2">
-              <span className="text-amber-400 font-black">{stat.val}</span>
-              <span className="text-white/60 text-xs font-medium uppercase tracking-widest">{stat.label}</span>
-              <span className="text-white/20 mx-4">•</span>
+              <span className="text-primary font-black">{stat.val}</span>
+              <span className="text-muted-foreground text-xs font-medium uppercase tracking-widest">{stat.label}</span>
+              <span className="text-muted-foreground/30 mx-4">•</span>
             </div>
           ))}
         </div>
@@ -102,8 +116,8 @@ export default function HomeMobile() {
       <section className="py-12 px-4 relative">
         <div className="mb-6 flex items-end justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-white mb-1">Explore Categories</h2>
-            <p className="text-xs text-white/50 uppercase tracking-widest">Global Marketplace</p>
+            <h2 className="text-2xl font-bold text-foreground mb-1">Explore Categories</h2>
+            <p className="text-xs text-muted-foreground uppercase tracking-widest">Global Marketplace</p>
           </div>
           <Link href="/products" className="text-primary text-sm font-semibold flex items-center">
             View All <ChevronRight className="w-4 h-4" />
@@ -117,10 +131,10 @@ export default function HomeMobile() {
       </section>
 
       {/* ─── Mobile Features Grid ─── */}
-      <section className="py-12 px-4 bg-gradient-to-b from-background to-white/[0.02]">
+      <section className="py-12 px-4 bg-gradient-to-b from-background to-muted/20">
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-white mb-2">Why Ranote Exim?</h2>
-          <p className="text-sm text-white/60">Enterprise-grade tools for modern global trade.</p>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Why Ranote Exim?</h2>
+          <p className="text-sm text-muted-foreground">Enterprise-grade tools for modern global trade.</p>
         </div>
 
         <div className="grid grid-cols-1 gap-4">
@@ -154,12 +168,12 @@ export default function HomeMobile() {
               bg: "bg-purple-400/10"
             }
           ].map((feature, idx) => (
-            <div key={idx} className="bg-white/5 border border-white/10 rounded-2xl p-5 flex flex-col gap-3">
+            <div key={idx} className="bg-card border border-border rounded-2xl p-5 flex flex-col gap-3">
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${feature.bg} ${feature.color}`}>
                 <feature.icon className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-white">{feature.title}</h3>
-              <p className="text-sm text-white/60 leading-relaxed">{feature.desc}</p>
+              <h3 className="text-lg font-bold text-foreground">{feature.title}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{feature.desc}</p>
             </div>
           ))}
         </div>
@@ -174,13 +188,13 @@ export default function HomeMobile() {
           <div className="w-16 h-16 bg-primary/20 text-primary rounded-full flex items-center justify-center mb-6">
             <Globe className="w-8 h-8" />
           </div>
-          <h2 className="text-3xl font-black text-white mb-4">Ready to Expand?</h2>
-          <p className="text-sm text-white/70 mb-8 max-w-[280px]">
+          <h2 className="text-3xl font-black text-foreground mb-4">Ready to Expand?</h2>
+          <p className="text-sm text-muted-foreground mb-8 max-w-[280px]">
             Join thousands of businesses sourcing globally with zero friction.
           </p>
           <Link
             href="/register"
-            className="w-full bg-white text-black font-black uppercase tracking-wider py-4 rounded-xl shadow-[0_0_30px_rgba(255,255,255,0.3)] active:scale-95 transition-transform"
+            className="w-full bg-primary text-primary-foreground font-black uppercase tracking-wider py-4 rounded-xl shadow-[0_0_30px_rgba(212,175,55,0.3)] active:scale-95 transition-transform"
           >
             Create Free Account
           </Link>

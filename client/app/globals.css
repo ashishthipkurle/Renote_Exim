@@ -101,6 +101,7 @@
  color: hsl(var(--foreground));
  scrollbar-width: none;
  -ms-overflow-style: none;
+ zoom: 125%;
  }
 
  /* Force 'Straight' (Upright) Sora for all headers */
