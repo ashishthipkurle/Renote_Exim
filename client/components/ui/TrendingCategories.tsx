@@ -13,7 +13,7 @@ export default function TrendingCategories() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch("/api/public/showcase");
+        const res = await fetch(`/api/public/showcase?t=${Date.now()}`, { cache: "no-store" });
         if (res.ok) {
           const data = await res.json();
           if (data && data.length > 0) {
