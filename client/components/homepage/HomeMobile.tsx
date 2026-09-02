@@ -25,6 +25,36 @@ export default function HomeMobile() {
   const isDark = mounted && (resolvedTheme === "dark" || theme === "dark");
   const LogoImg = isDark ? LogoDark : LogoLight;
 
+  const sectionRef = useRef<HTMLElement>(null);
+
+  // Parallax Scroll Effect for the realistic globe images
+  useEffect(() => {
+    const onScroll = () => {
+      const globes = document.querySelectorAll<HTMLElement>(".mobile-parallax-globe");
+      const section = sectionRef.current;
+      if (globes.length === 0 || !section) return;
+
+      const rect = section.getBoundingClientRect();
+      
+      // Calculate how far the section has scrolled *past* the top of the viewport.
+      const scrolled = Math.max(0, -rect.top);
+
+      const newY = 20 + scrolled * 0.04;
+      const rotation = scrolled * -0.02; // Negative value rotates it left-to-right
+      const scale = 1.05 + scrolled * 0.0003;
+
+      globes.forEach((globe) => {
+        globe.style.backgroundPosition = `center ${Math.min(newY, 100)}%`;
+        globe.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
+      });
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll(); // Initial call
+
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
     <div className="w-full bg-background text-foreground overflow-x-hidden">
       {/* ─── Mobile Top Navbar ─── */}
@@ -41,12 +71,12 @@ export default function HomeMobile() {
       </nav>
 
       {/* ─── Mobile Hero Section ─── */}
-      <header className="relative pt-24 pb-16 px-4 min-h-[85vh] flex flex-col justify-center overflow-hidden">
+      <header ref={sectionRef} className="relative pt-24 pb-16 px-4 min-h-[85vh] flex flex-col justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-[url('/assets/globe_light_theme.png')] bg-cover bg-center dark:hidden opacity-100" />
-          <div className="absolute inset-0 hidden dark:block bg-[url('/assets/globe_dark_theme.avif')] bg-cover bg-center opacity-40 mix-blend-screen" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
-          <div className="absolute top-20 right-0 w-64 h-64 bg-primary/20 rounded-full blur-[80px]" />
+          <div className="mobile-parallax-globe absolute inset-0 bg-[url('/assets/globe_light_theme.png')] bg-cover bg-center dark:hidden opacity-100 transition-transform duration-100 ease-linear" />
+          <div className="mobile-parallax-globe absolute inset-0 hidden dark:block bg-[url('/assets/globe_dark_theme.avif')] bg-cover bg-center opacity-40 mix-blend-screen transition-transform duration-100 ease-linear" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent pointer-events-none" />
+          <div className="absolute top-20 right-0 w-64 h-64 bg-primary/20 rounded-full blur-[80px] pointer-events-none" />
         </div>
 
         <div className="relative z-10 flex flex-col gap-6">
