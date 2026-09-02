@@ -184,10 +184,10 @@ export default function TrendingCategories() {
         <span className="text-slate-800 dark:text-white text-xs tracking-[0.3em] font-medium uppercase drop-shadow-lg opacity-90 dark:opacity-80 backdrop-blur-md px-3 py-1 bg-white/80 dark:bg-black/20 rounded-full border border-slate-200 dark:border-white/10">REN<span className="text-primary font-bold">X</span> PLORE</span>
       </div>
 
-      {!loading && categories.length > 0 && (
+      {!loading && categories.length > 0 ? (
         <div ref={containerRef} className="absolute inset-0 w-full h-full list-container">
           {categories.map((cat, idx) => (
-          <div key={`slide-${idx}`} className="carousel-item absolute overflow-hidden shadow-2xl bg-white dark:bg-[#0B0E14] rounded-lg cursor-pointer" onClick={(e) => {
+          <div key={`slide-${idx}`} className={`carousel-item absolute overflow-hidden shadow-2xl bg-white dark:bg-[#0B0E14] rounded-lg cursor-pointer ${idx === 0 ? "inset-0 w-full h-full z-10 opacity-100" : "opacity-0"}`} onClick={(e) => {
             const items = containerRef.current?.querySelectorAll('.carousel-item');
             if (!items) return;
             const itemArray = Array.from(items);
@@ -231,7 +231,11 @@ export default function TrendingCategories() {
           </div>
         ))}
         </div>
-      )}
+      ) : !loading && categories.length === 0 ? (
+        <div className="absolute inset-0 w-full h-full flex items-center justify-center">
+          <p className="text-muted-foreground font-medium uppercase tracking-widest text-sm">No showcase products available</p>
+        </div>
+      ) : null}
 
     </section>
   );
