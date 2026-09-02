@@ -75,8 +75,10 @@ export default function LoginForm() {
         await refreshUser();
         toast.success("Login successful!");
         const role = response.data.user?.role || "IMPORTER";
-        if (role === "USER") {
+        if (role.toUpperCase() === "USER") {
           router.push("/products");
+        } else if (role.toUpperCase() === "ADMIN") {
+          router.push("/dashboard/exporter");
         } else {
           router.push(`/dashboard/${role.toLowerCase()}`);
         }
@@ -144,8 +146,10 @@ export default function LoginForm() {
       toast.success("Login successful!");
 
       const role = response.data.user.role;
-      if (role === "USER") {
+      if (role.toUpperCase() === "USER") {
         router.push("/products");
+      } else if (role.toUpperCase() === "ADMIN") {
+        router.push("/dashboard/exporter");
       } else {
         router.push(`/dashboard/${role.toLowerCase()}`);
       }

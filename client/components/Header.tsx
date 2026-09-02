@@ -51,7 +51,7 @@ export default function Header() {
  <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
  ) : user ? (
  <div className="flex items-center gap-2">
- <Link href={user.role === "USER" ? "/products" : `/dashboard/${user.role?.toLowerCase()}`}>
+ <Link href={user.role?.toUpperCase() === "USER" ? "/products" : user.role?.toUpperCase() === "ADMIN" ? "/dashboard/exporter" : `/dashboard/${user.role?.toLowerCase()}`}>
  <Button variant="ghost" className="gap-2">
  {user.avatar ? (
  <Image src={user.avatar as string} alt="Avatar" width={32} height={32} className="w-8 h-8 rounded-full object-cover" unoptimized />
@@ -116,7 +116,7 @@ export default function Header() {
  {!loading && (
  user ? (
  <>
- <Link href={user.role === "USER" ? "/products" : `/dashboard/${user.role?.toLowerCase()}`} className="block">
+ <Link href={user.role?.toUpperCase() === "USER" ? "/products" : user.role?.toUpperCase() === "ADMIN" ? "/dashboard/exporter" : `/dashboard/${user.role?.toLowerCase()}`} className="block">
  <Button className="w-full gap-2">
  <User className="w-4 h-4" /> Dashboard
  </Button>

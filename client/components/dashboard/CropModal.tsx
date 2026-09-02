@@ -73,11 +73,10 @@ export default function CropModal({ images: initialImages, onComplete, onCancel 
  if (!activeImage) return null; // Safety check
 
  return createPortal(
- <div className="fixed inset-0 z-[9999] font-sans text-foreground h-screen w-screen flex flex-col bg-background animate-in fade-in duration-200">
- <div className="w-full h-full flex flex-col overflow-hidden">
+ <div className="fixed inset-0 z-[9999] font-sans text-foreground flex flex-col bg-background animate-in fade-in duration-200 overflow-hidden">
  
  {/* Header Navigation */}
- <header className="flex items-center justify-between px-6 py-4 border-b border-border bg-card shadow-sm z-10 flex-shrink-0">
+ <header className="flex items-center justify-between px-4 md:px-6 py-3 md:py-4 border-b border-border bg-card shadow-sm z-10 flex-shrink-0">
  <div className="flex items-center space-x-3">
  <div 
  onClick={onCancel}
@@ -85,16 +84,16 @@ export default function CropModal({ images: initialImages, onComplete, onCancel 
  >
  <X className="h-6 w-6 text-muted-foreground" />
  </div>
- <h1 className="text-lg font-semibold text-foreground">Edit Assets</h1>
+ <h1 className="text-base md:text-lg font-semibold text-foreground">Edit Assets</h1>
  </div>
  
- <div className="flex items-center space-x-6 text-muted-foreground">
+ <div className="flex items-center space-x-4 md:space-x-6 text-muted-foreground">
  <button 
  onClick={() => setIsCropping(!isCropping)}
  className={`p-1.5 hover:bg-muted rounded-lg transition-colors flex items-center justify-center ${isCropping ? "bg-primary text-white hover:bg-primary/90" : ""}`}
  title="Toggle Crop Mode"
  >
- <CropIcon className="h-6 w-6" />
+ <CropIcon className="h-5 w-5 md:h-6 md:w-6" />
  </button>
  </div>
 
@@ -102,7 +101,7 @@ export default function CropModal({ images: initialImages, onComplete, onCancel 
  <button 
  onClick={handleSaveAll}
  disabled={isConverting}
- className="bg-primary text-primary-foreground px-5 py-2 rounded-lg font-semibold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/10 flex items-center space-x-2 disabled:opacity-50"
+ className="bg-primary text-primary-foreground px-4 py-2 md:px-5 md:py-2 text-sm md:text-base rounded-lg font-semibold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/10 flex items-center space-x-2 disabled:opacity-50"
  >
  {isConverting ? <Loader2 className="w-4 h-4 animate-spin" /> : <span>Save Batch ({images.length})</span>}
  </button>
@@ -110,11 +109,11 @@ export default function CropModal({ images: initialImages, onComplete, onCancel 
  </header>
 
  {/* Canvas Preview Area */}
- <div className="flex-grow bg-muted/50 flex flex-col items-center justify-center p-8 relative overflow-hidden min-h-0">
- <div className="relative w-full max-w-4xl flex flex-col h-full bg-card shadow-xl rounded-lg overflow-hidden border border-border p-4">
+ <div className="flex-1 bg-muted/50 flex flex-col items-center justify-center p-2 md:p-6 relative min-h-0">
+ <div className="relative w-full max-w-4xl flex flex-col h-full bg-card shadow-xl rounded-lg border border-border p-2 md:p-4 min-h-0">
  
  {isCropping ? (
- <div className="relative w-full h-[60vh] md:h-[65vh] rounded-md overflow-hidden bg-muted">
+ <div className="relative w-full flex-1 min-h-0 rounded-md overflow-hidden bg-muted">
  <Cropper
  image={activeImage.currentUrl}
  crop={crop}
@@ -129,16 +128,18 @@ export default function CropModal({ images: initialImages, onComplete, onCancel 
  />
  </div>
  ) : (
+ <div className="relative w-full flex-1 min-h-0 flex items-center justify-center">
  <img 
  src={activeImage.currentUrl} 
  alt="Original Image" 
- className="max-w-full max-h-[60vh] md:max-h-[65vh] object-contain block mx-auto rounded-md"
+ className="max-w-full max-h-full object-contain block mx-auto rounded-md"
  />
+ </div>
  )}
 
  {/* Zoom Slider */}
  {isCropping && (
- <div className="flex flex-col items-center mt-6 w-full px-4 mb-2 z-10 relative">
+ <div className="flex flex-col items-center mt-4 flex-shrink-0 w-full px-4 z-10 relative">
  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">Zoom Image</label>
  <input 
  type="range"
@@ -236,7 +237,6 @@ export default function CropModal({ images: initialImages, onComplete, onCancel 
  </div>
  </footer>
 
- </div>
  </div>,
  document.body
  );

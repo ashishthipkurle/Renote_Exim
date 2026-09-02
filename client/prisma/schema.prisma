@@ -516,3 +516,19 @@ model OtpCode {
   @@index([email, purpose])
   @@map("otp_codes")
 }
+
+model HomeShowcaseItem {
+  id         String          @id @default(uuid())
+  title      String
+  subtitle   String
+  tag        String
+  category   ProductCategory
+  desc       String
+  image      String
+  orderIndex Int             @default(0)
+  isActive   Boolean         @default(true)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+
+  @@map("home_showcase_items")
+}

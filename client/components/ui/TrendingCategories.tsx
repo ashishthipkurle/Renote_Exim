@@ -6,50 +6,28 @@ import Link from "next/link";
 import gsap from "gsap";
 import { ProductCategory } from "@/lib/types";
 
-const CATEGORIES = [
-  {
-    title: "Luxury",
-    subtitle: "Goods",
-    tag: "High-End Sourcing",
-    category: ProductCategory.OTHER, // Or a specific one if added later
-    desc: "Exquisite craftsmanship and premium materials sourced from top-tier global suppliers for elite markets.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAGJAINthV2SEgWajgPH428NG66vtDwIuJIhFUvc2NgY7yCBAXSF-toT36X9GvtI4y_teyIZDgQtLnIEdp6-4n9An8S9yuukPsWrF_elBG573vIoOg3uNZ0yrXqKiUJImJr5pIjKs5yFLQDuaWM-nZH-VQHb6ryNSg4W7NyaLJXRSUbp6qOKknIAhFPSwLJFBnr8sh-Q3x0vcsFq_ZIuAJauu8dM0WtQj3dXKxiPORpu5q_BmOvZsKR1sQUJO1hfYtpejs-vOV1h-8",
-  },
-  {
-    title: "Consumer",
-    subtitle: "Electronics",
-    tag: "Tech & Innovation",
-    category: ProductCategory.ELECTRONICS,
-    desc: "Next-generation components and consumer tech directly from verified manufacturers across the globe.",
-    image: "/assets/consumer-electronics.jpg",
-  },
-  {
-    title: "Raw",
-    subtitle: "Materials",
-    tag: "Industrial Core",
-    category: ProductCategory.CONSTRUCTION,
-    desc: "Industrial-grade metals, minerals, and agricultural products for heavy manufacturing and construction.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuC9Bc88m8O11l_cbqn7bF__ywxVWWueCoosbhNBofiTCk0DRdT6tCnGuQlWbEk5qICLTpZSVEF3VWk35BzlEXlBX13ecZoHLYf1PsoMAWx-W53ioZRuwcdDm8cb0AqjqkCO5ZVbTzJroYM4HUIxWh12Y5JtdHz4ksawx_cN--_7fjtiilqXBQz-YzWImjr8RDUxcmrsquuG_elQB0Rj2WRFLLoJ5WbCsn_Gd3fib_TVpy-S2ggl69SJZkxVOWJT6hRnLgiGwlp1cec",
-  },
-  {
-    title: "Electric",
-    subtitle: "Automotive",
-    tag: "Future Mobility",
-    category: ProductCategory.AUTOMOTIVE,
-    desc: "EV components, traditional auto parts, and cutting-edge mobility solutions driving the auto sector.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuA69LSELe9Cx1tL3UYR_K6CETFwiiWlf-pkfJBqCViaWIpMLq4tn3rR82g9F00MYIMHcC-OdvebYLsKvbZ8fTZEc0nmiAx9UgGRMwXPw28bk2AwZRTpn-jq0umzDDtC6mN4f-oxLj82qmnjGmAfaVNJo1QgY1yUKJK6wly_WP2D0PcBKgyQWQWPtXCljyYtQk3n_iO3tXZMw0FsEKSy0xBo8rtjnP5xZzc7m9tdFFLcIEFE7BaDAdPLaSthANtZh1XiEQRjy415xoA",
-  },
-  {
-    title: "Energy",
-    subtitle: "Solutions",
-    tag: "Sustainable Grid",
-    category: ProductCategory.OTHER, // Energy often falls under Chemicals or Other for now
-    desc: "Solar panels, high-efficiency turbines, and sustainable grid infrastructure powering a green tomorrow.",
-    image: "/assets/energy-solution.png",
-  }
-];
-
 export default function TrendingCategories() {
+  const [categories, setCategories] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch("/api/public/showcase");
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            setCategories(data);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch showcase items:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCategories();
+  }, []);
   const containerRef = useRef<HTMLDivElement>(null);
   const isAnimating = useRef(false);
 
@@ -68,7 +46,7 @@ export default function TrendingCategories() {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, []);
+  }, [categories]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -100,7 +78,7 @@ export default function TrendingCategories() {
       gsap.set(items[i].querySelector('.item-content-full'), { opacity: 0, y: 40 });
       gsap.set(items[i].querySelector('.item-content-thumb'), { opacity: 1 });
     }
-  }, []);
+  }, [categories]);
 
   const handleSelect = (idx: number) => {
     if (isAnimating.current || !containerRef.current || idx === 0) return;
@@ -206,8 +184,9 @@ export default function TrendingCategories() {
         <span className="text-slate-800 dark:text-white text-xs tracking-[0.3em] font-medium uppercase drop-shadow-lg opacity-90 dark:opacity-80 backdrop-blur-md px-3 py-1 bg-white/80 dark:bg-black/20 rounded-full border border-slate-200 dark:border-white/10">REN<span className="text-primary font-bold">X</span> PLORE</span>
       </div>
 
-      <div ref={containerRef} className="absolute inset-0 w-full h-full list-container">
-        {CATEGORIES.map((cat, idx) => (
+      {!loading && categories.length > 0 && (
+        <div ref={containerRef} className="absolute inset-0 w-full h-full list-container">
+          {categories.map((cat, idx) => (
           <div key={`slide-${idx}`} className="carousel-item absolute overflow-hidden shadow-2xl bg-white dark:bg-[#0B0E14] rounded-lg cursor-pointer" onClick={(e) => {
             const items = containerRef.current?.querySelectorAll('.carousel-item');
             if (!items) return;
@@ -226,13 +205,10 @@ export default function TrendingCategories() {
               <p className="text-white tracking-[0.2em] uppercase mb-2 md:mb-4 text-[10px] md:text-xs font-semibold relative before:content-[''] before:w-8 md:before:w-12 before:h-[1px] before:bg-white/60 before:absolute before:-left-10 md:before:-left-16 before:top-1/2 before:-translate-y-1/2 ml-10 md:ml-16 drop-shadow-md">
                 {cat.tag}
               </p>
-              <h2 className="text-5xl sm:text-6xl md:text-8xl lg:text-[100px] font-bold text-white mb-1 md:mb-2 leading-none drop-shadow-2xl max-w-[65%] md:max-w-full">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-4 md:mb-6 leading-none drop-shadow-2xl max-w-[65%] md:max-w-full">
                 {cat.title}
               </h2>
-              <h2 className="text-4xl sm:text-5xl md:text-7xl lg:text-[80px] font-light text-white mb-4 md:mb-6 drop-shadow-xl text-primary/90 max-w-[65%] md:max-w-full leading-tight">
-                {cat.subtitle}
-              </h2>
-              <p className="text-slate-200 text-xs sm:text-sm md:text-base leading-relaxed mb-6 md:mb-10 max-w-[60%] sm:max-w-[70%] md:max-w-lg drop-shadow-md font-medium">
+              <p className="text-slate-200 text-xs sm:text-sm md:text-base leading-relaxed mb-6 md:mb-10 max-w-[60%] sm:max-w-[70%] md:max-w-lg drop-shadow-md font-medium line-clamp-4">
                 {cat.desc}
               </p>
               <Link
@@ -248,13 +224,14 @@ export default function TrendingCategories() {
               <p className="text-white/80 text-[10px] uppercase font-bold mb-1 tracking-[0.1em] drop-shadow-md border-b border-primary/40 pb-1 w-fit">
                 {cat.tag}
               </p>
-              <h3 className="text-2xl font-bold text-white leading-tight drop-shadow-xl">
-                {cat.title}<br /><span className="font-light text-primary/90">{cat.subtitle}</span>
+              <h3 className="text-lg md:text-xl font-bold text-white leading-tight drop-shadow-xl">
+                {cat.title}
               </h3>
             </div>
           </div>
         ))}
-      </div>
+        </div>
+      )}
 
     </section>
   );

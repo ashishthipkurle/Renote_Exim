@@ -19,7 +19,6 @@ export default async function DashboardPage() {
 
   switch (role) {
     case "ADMIN":
-      redirect("/dashboard/admin");
     case "EXPORTER":
       redirect("/dashboard/exporter");
     case "SUPPLIER":

@@ -135,7 +135,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (auth.role !== 'EXPORTER') {
+    if (auth.role !== 'EXPORTER' && auth.role !== 'ADMIN') {
       return NextResponse.json(
         { error: 'Access denied. Exporters only.' },
         { status: 403 }

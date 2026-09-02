@@ -18,6 +18,7 @@ import {
  Globe,
  ShieldCheck,
  Ship,
+ Monitor,
 } from "lucide-react";
 import {
  Sidebar,
@@ -46,7 +47,7 @@ export default function ExporterSidebar({ basePath }: { basePath: string }) {
  const pathname = usePathname();
  const { user } = useAuth();
  const { counts } = useUnreadCategories();
- const isMaster = user?.email === "exporter@gmail.com";
+ const isMaster = user?.role === "ADMIN";
 
  const nav: NavItem[] = [
  { href: basePath, labelKey: "sidebar.dashboard", defaultLabel: "Dashboard", icon: LayoutDashboard },
@@ -55,7 +56,10 @@ export default function ExporterSidebar({ basePath }: { basePath: string }) {
  { href: `${basePath}/ships`, labelKey: "sidebar.ships", defaultLabel: "Logistics", icon: Ship },
  { href: `${basePath}/feedback`, labelKey: "sidebar.feedback", defaultLabel: "Reviews", icon: MessageSquare },
  { href: `${basePath}/directory`, labelKey: "sidebar.buyers", defaultLabel: "Buyers", icon: Users, badgeCount: counts.buyers },
- ...(isMaster ? [{ href: `${basePath}/users`, labelKey: "sidebar.registry", defaultLabel: "Registry", icon: ShieldCheck }] : []),
+ ...(isMaster ? [
+   { href: `${basePath}/users`, labelKey: "sidebar.registry", defaultLabel: "Registry", icon: ShieldCheck },
+   { href: `${basePath}/showcase`, labelKey: "sidebar.showcase", defaultLabel: "Showcase", icon: Monitor }
+ ] : []),
  { href: `${basePath}/suppliers`, labelKey: "sidebar.dealers", defaultLabel: "Dealers", icon: Handshake, badgeCount: counts.dealers },
  { href: `${basePath}/analytics`, labelKey: "sidebar.analytics", defaultLabel: "Analytics", icon: LineChart },
  { href: `${basePath}/finance`, labelKey: "sidebar.finance", defaultLabel: "Finance", icon: CreditCard },

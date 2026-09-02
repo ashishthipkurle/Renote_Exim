@@ -162,11 +162,8 @@ export default function ProductForm({
       const apiUrl = isEdit ? `/api/products/${form.id}` : "/api/products";
       const method = isEdit ? "PUT" : "POST";
 
-      const finalCategory = form.category === "OTHER" ? (customCategory || "OTHER") : form.category;
-      
       const body = {
         ...form,
-        category: finalCategory,
       };
 
       await authFetch(apiUrl, {
@@ -286,17 +283,7 @@ export default function ProductForm({
                 </div>
               </div>
 
-              {form.category === "OTHER" && (
-                <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
-                  <label className={labelClass}>Specify Custom Category</label>
-                  <input
-                    value={customCategory}
-                    onChange={(e) => setCustomCategory(e.target.value)}
-                    placeholder="e.g. Rare Spices"
-                    className={inputClass}
-                  />
-                </motion.div>
-              )}
+
 
               <div>
                 <label className={labelClass}>Product Description *</label>

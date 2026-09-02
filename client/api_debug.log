@@ -1640,3 +1640,538 @@ Unknown field `companyName` for select statement on model `User`. Available opti
   "certifications": [],
   "quantity": 100
 }
+[2026-09-02T10:35:51.264Z] [POST /api/products] Body: {
+  "name": "3 Compartment Areca Plates",
+  "category": "Dishware",
+  "description": "### 3-Compartment Areca Leaf Plates\n\nBring a touch of nature to every meal with our **3-Compartment Areca Leaf Plates**, thoughtfully crafted from naturally fallen areca palm leaves. Designed with three convenient sections, these plates make it easy to serve main courses, sides, snacks, and accompaniments without mixing them together.\n\nEach plate features a **natural wood-like texture, warm earthy tones, and a beautifully rustic finish**, making it perfect for both everyday dining and special occasions. Lightweight yet sturdy, they offer a practical and elegant alternative to conventional disposable tableware.\n\n**Perfect for:** weddings, parties, catering, picnics, restaurants, festive gatherings, and everyday meals.\n\n**Why You'll Love It**\n\n* 🌿 Made from naturally fallen areca leaves\n* 🍽️ 3 separate compartments for organized serving\n* ♻️ Eco-conscious alternative to plastic and foam plates\n* 💪 Sturdy and convenient for serving\n* ✨ Natural, rustic, and premium appearance\n* 🎉 Ideal for events, catering, and celebrations\n\n**Serve beautifully. Eat naturally. Choose better for the planet.**\n",
+  "price": 3,
+  "regularPrice": 5,
+  "minOrderQty": 30,
+  "unit": "pices ",
+  "originCountry": "India",
+  "hsCode": "",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788341591/renote-exim/products/gdbalo7m3oc9tnnhtqug.png",
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788341603/renote-exim/products/jwgbnh9opjhqkjcozsvp.png",
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788341602/renote-exim/products/qbcy3jxghgehh7abjxhr.png",
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788341614/renote-exim/products/ji6pclvbboue50yuv3f2.png",
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788341637/renote-exim/products/jqey2cqkbjtpdlz9fx0h.png"
+  ],
+  "certifications": [],
+  "quantity": 300
+}
+[2026-09-02T10:35:51.285Z] [POST /api/products] ERROR 500: [
+  {
+    "received": "Dishware",
+    "code": "invalid_enum_value",
+    "options": [
+      "CHEMICALS",
+      "MACHINES",
+      "TEXTILES",
+      "MEDICAL",
+      "HANDICRAFTS",
+      "FOOD",
+      "ELECTRONICS",
+      "AUTOMOTIVE",
+      "CONSTRUCTION",
+      "AGRICULTURE",
+      "COSMETICS",
+      "PLASTICS",
+      "ENERGY",
+      "LOGISTICS",
+      "PACKAGING",
+      "METALS",
+      "LEATHER",
+      "FURNITURE",
+      "TOYS",
+      "SPORTS",
+      "OTHER"
+    ],
+    "path": [
+      "category"
+    ],
+    "message": "Invalid enum value. Expected 'CHEMICALS' | 'MACHINES' | 'TEXTILES' | 'MEDICAL' | 'HANDICRAFTS' | 'FOOD' | 'ELECTRONICS' | 'AUTOMOTIVE' | 'CONSTRUCTION' | 'AGRICULTURE' | 'COSMETICS' | 'PLASTICS' | 'ENERGY' | 'LOGISTICS' | 'PACKAGING' | 'METALS' | 'LEATHER' | 'FURNITURE' | 'TOYS' | 'SPORTS' | 'OTHER', received 'Dishware'"
+  }
+]
+[2026-09-02T10:35:51.286Z] [POST /api/products] Zod Error: [
+  {
+    "received": "Dishware",
+    "code": "invalid_enum_value",
+    "options": [
+      "CHEMICALS",
+      "MACHINES",
+      "TEXTILES",
+      "MEDICAL",
+      "HANDICRAFTS",
+      "FOOD",
+      "ELECTRONICS",
+      "AUTOMOTIVE",
+      "CONSTRUCTION",
+      "AGRICULTURE",
+      "COSMETICS",
+      "PLASTICS",
+      "ENERGY",
+      "LOGISTICS",
+      "PACKAGING",
+      "METALS",
+      "LEATHER",
+      "FURNITURE",
+      "TOYS",
+      "SPORTS",
+      "OTHER"
+    ],
+    "path": [
+      "category"
+    ],
+    "message": "Invalid enum value. Expected 'CHEMICALS' | 'MACHINES' | 'TEXTILES' | 'MEDICAL' | 'HANDICRAFTS' | 'FOOD' | 'ELECTRONICS' | 'AUTOMOTIVE' | 'CONSTRUCTION' | 'AGRICULTURE' | 'COSMETICS' | 'PLASTICS' | 'ENERGY' | 'LOGISTICS' | 'PACKAGING' | 'METALS' | 'LEATHER' | 'FURNITURE' | 'TOYS' | 'SPORTS' | 'OTHER', received 'Dishware'"
+  }
+]
+[2026-09-02T10:35:52.840Z] [POST /api/products] Body: {
+  "name": "3 Compartment Areca Plates",
+  "category": "Dishware",
+  "description": "### 3-Compartment Areca Leaf Plates\n\nBring a touch of nature to every meal with our **3-Compartment Areca Leaf Plates**, thoughtfully crafted from naturally fallen areca palm leaves. Designed with three convenient sections, these plates make it easy to serve main courses, sides, snacks, and accompaniments without mixing them together.\n\nEach plate features a **natural wood-like texture, warm earthy tones, and a beautifully rustic finish**, making it perfect for both everyday dining and special occasions. Lightweight yet sturdy, they offer a practical and elegant alternative to conventional disposable tableware.\n\n**Perfect for:** weddings, parties, catering, picnics, restaurants, festive gatherings, and everyday meals.\n\n**Why You'll Love It**\n\n* 🌿 Made from naturally fallen areca leaves\n* 🍽️ 3 separate compartments for organized serving\n* ♻️ Eco-conscious alternative to plastic and foam plates\n* 💪 Sturdy and convenient for serving\n* ✨ Natural, rustic, and premium appearance\n* 🎉 Ideal for events, catering, and celebrations\n\n**Serve beautifully. Eat naturally. Choose better for the planet.**\n",
+  "price": 3,
+  "regularPrice": 5,
+  "minOrderQty": 30,
+  "unit": "pices ",
+  "originCountry": "India",
+  "hsCode": "",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788341591/renote-exim/products/gdbalo7m3oc9tnnhtqug.png",
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788341603/renote-exim/products/jwgbnh9opjhqkjcozsvp.png",
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788341602/renote-exim/products/qbcy3jxghgehh7abjxhr.png",
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788341614/renote-exim/products/ji6pclvbboue50yuv3f2.png",
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788341637/renote-exim/products/jqey2cqkbjtpdlz9fx0h.png"
+  ],
+  "certifications": [],
+  "quantity": 300
+}
+[2026-09-02T10:35:52.843Z] [POST /api/products] ERROR 500: [
+  {
+    "received": "Dishware",
+    "code": "invalid_enum_value",
+    "options": [
+      "CHEMICALS",
+      "MACHINES",
+      "TEXTILES",
+      "MEDICAL",
+      "HANDICRAFTS",
+      "FOOD",
+      "ELECTRONICS",
+      "AUTOMOTIVE",
+      "CONSTRUCTION",
+      "AGRICULTURE",
+      "COSMETICS",
+      "PLASTICS",
+      "ENERGY",
+      "LOGISTICS",
+      "PACKAGING",
+      "METALS",
+      "LEATHER",
+      "FURNITURE",
+      "TOYS",
+      "SPORTS",
+      "OTHER"
+    ],
+    "path": [
+      "category"
+    ],
+    "message": "Invalid enum value. Expected 'CHEMICALS' | 'MACHINES' | 'TEXTILES' | 'MEDICAL' | 'HANDICRAFTS' | 'FOOD' | 'ELECTRONICS' | 'AUTOMOTIVE' | 'CONSTRUCTION' | 'AGRICULTURE' | 'COSMETICS' | 'PLASTICS' | 'ENERGY' | 'LOGISTICS' | 'PACKAGING' | 'METALS' | 'LEATHER' | 'FURNITURE' | 'TOYS' | 'SPORTS' | 'OTHER', received 'Dishware'"
+  }
+]
+[2026-09-02T10:35:52.844Z] [POST /api/products] Zod Error: [
+  {
+    "received": "Dishware",
+    "code": "invalid_enum_value",
+    "options": [
+      "CHEMICALS",
+      "MACHINES",
+      "TEXTILES",
+      "MEDICAL",
+      "HANDICRAFTS",
+      "FOOD",
+      "ELECTRONICS",
+      "AUTOMOTIVE",
+      "CONSTRUCTION",
+      "AGRICULTURE",
+      "COSMETICS",
+      "PLASTICS",
+      "ENERGY",
+      "LOGISTICS",
+      "PACKAGING",
+      "METALS",
+      "LEATHER",
+      "FURNITURE",
+      "TOYS",
+      "SPORTS",
+      "OTHER"
+    ],
+    "path": [
+      "category"
+    ],
+    "message": "Invalid enum value. Expected 'CHEMICALS' | 'MACHINES' | 'TEXTILES' | 'MEDICAL' | 'HANDICRAFTS' | 'FOOD' | 'ELECTRONICS' | 'AUTOMOTIVE' | 'CONSTRUCTION' | 'AGRICULTURE' | 'COSMETICS' | 'PLASTICS' | 'ENERGY' | 'LOGISTICS' | 'PACKAGING' | 'METALS' | 'LEATHER' | 'FURNITURE' | 'TOYS' | 'SPORTS' | 'OTHER', received 'Dishware'"
+  }
+]
+[2026-09-02T10:35:54.948Z] [POST /api/products] Body: {
+  "name": "3 Compartment Areca Plates",
+  "category": "Dishware",
+  "description": "### 3-Compartment Areca Leaf Plates\n\nBring a touch of nature to every meal with our **3-Compartment Areca Leaf Plates**, thoughtfully crafted from naturally fallen areca palm leaves. Designed with three convenient sections, these plates make it easy to serve main courses, sides, snacks, and accompaniments without mixing them together.\n\nEach plate features a **natural wood-like texture, warm earthy tones, and a beautifully rustic finish**, making it perfect for both everyday dining and special occasions. Lightweight yet sturdy, they offer a practical and elegant alternative to conventional disposable tableware.\n\n**Perfect for:** weddings, parties, catering, picnics, restaurants, festive gatherings, and everyday meals.\n\n**Why You'll Love It**\n\n* 🌿 Made from naturally fallen areca leaves\n* 🍽️ 3 separate compartments for organized serving\n* ♻️ Eco-conscious alternative to plastic and foam plates\n* 💪 Sturdy and convenient for serving\n* ✨ Natural, rustic, and premium appearance\n* 🎉 Ideal for events, catering, and celebrations\n\n**Serve beautifully. Eat naturally. Choose better for the planet.**\n",
+  "price": 3,
+  "regularPrice": 5,
+  "minOrderQty": 30,
+  "unit": "pices ",
+  "originCountry": "India",
+  "hsCode": "",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788341591/renote-exim/products/gdbalo7m3oc9tnnhtqug.png",
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788341603/renote-exim/products/jwgbnh9opjhqkjcozsvp.png",
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788341602/renote-exim/products/qbcy3jxghgehh7abjxhr.png",
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788341614/renote-exim/products/ji6pclvbboue50yuv3f2.png",
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788341637/renote-exim/products/jqey2cqkbjtpdlz9fx0h.png"
+  ],
+  "certifications": [],
+  "quantity": 300
+}
+[2026-09-02T10:35:54.949Z] [POST /api/products] ERROR 500: [
+  {
+    "received": "Dishware",
+    "code": "invalid_enum_value",
+    "options": [
+      "CHEMICALS",
+      "MACHINES",
+      "TEXTILES",
+      "MEDICAL",
+      "HANDICRAFTS",
+      "FOOD",
+      "ELECTRONICS",
+      "AUTOMOTIVE",
+      "CONSTRUCTION",
+      "AGRICULTURE",
+      "COSMETICS",
+      "PLASTICS",
+      "ENERGY",
+      "LOGISTICS",
+      "PACKAGING",
+      "METALS",
+      "LEATHER",
+      "FURNITURE",
+      "TOYS",
+      "SPORTS",
+      "OTHER"
+    ],
+    "path": [
+      "category"
+    ],
+    "message": "Invalid enum value. Expected 'CHEMICALS' | 'MACHINES' | 'TEXTILES' | 'MEDICAL' | 'HANDICRAFTS' | 'FOOD' | 'ELECTRONICS' | 'AUTOMOTIVE' | 'CONSTRUCTION' | 'AGRICULTURE' | 'COSMETICS' | 'PLASTICS' | 'ENERGY' | 'LOGISTICS' | 'PACKAGING' | 'METALS' | 'LEATHER' | 'FURNITURE' | 'TOYS' | 'SPORTS' | 'OTHER', received 'Dishware'"
+  }
+]
+[2026-09-02T10:35:54.950Z] [POST /api/products] Zod Error: [
+  {
+    "received": "Dishware",
+    "code": "invalid_enum_value",
+    "options": [
+      "CHEMICALS",
+      "MACHINES",
+      "TEXTILES",
+      "MEDICAL",
+      "HANDICRAFTS",
+      "FOOD",
+      "ELECTRONICS",
+      "AUTOMOTIVE",
+      "CONSTRUCTION",
+      "AGRICULTURE",
+      "COSMETICS",
+      "PLASTICS",
+      "ENERGY",
+      "LOGISTICS",
+      "PACKAGING",
+      "METALS",
+      "LEATHER",
+      "FURNITURE",
+      "TOYS",
+      "SPORTS",
+      "OTHER"
+    ],
+    "path": [
+      "category"
+    ],
+    "message": "Invalid enum value. Expected 'CHEMICALS' | 'MACHINES' | 'TEXTILES' | 'MEDICAL' | 'HANDICRAFTS' | 'FOOD' | 'ELECTRONICS' | 'AUTOMOTIVE' | 'CONSTRUCTION' | 'AGRICULTURE' | 'COSMETICS' | 'PLASTICS' | 'ENERGY' | 'LOGISTICS' | 'PACKAGING' | 'METALS' | 'LEATHER' | 'FURNITURE' | 'TOYS' | 'SPORTS' | 'OTHER', received 'Dishware'"
+  }
+]
+[2026-09-02T10:36:05.000Z] [POST /api/products] Body: {
+  "name": "3 Compartment Areca Plates",
+  "category": "Dishware",
+  "description": "### 3-Compartment Areca Leaf Plates\n\nBring a touch of nature to every meal with our **3-Compartment Areca Leaf Plates**, thoughtfully crafted from naturally fallen areca palm leaves. Designed with three convenient sections, these plates make it easy to serve main courses, sides, snacks, and accompaniments without mixing them together.\n\nEach plate features a **natural wood-like texture, warm earthy tones, and a beautifully rustic finish**, making it perfect for both everyday dining and special occasions. Lightweight yet sturdy, they offer a practical and elegant alternative to conventional disposable tableware.\n\n**Perfect for:** weddings, parties, catering, picnics, restaurants, festive gatherings, and everyday meals.\n\n**Why You'll Love It**\n\n* 🌿 Made from naturally fallen areca leaves\n* 🍽️ 3 separate compartments for organized serving\n* ♻️ Eco-conscious alternative to plastic and foam plates\n* 💪 Sturdy and convenient for serving\n* ✨ Natural, rustic, and premium appearance\n* 🎉 Ideal for events, catering, and celebrations\n\n**Serve beautifully. Eat naturally. Choose better for the planet.**\n",
+  "price": 3,
+  "regularPrice": 5,
+  "minOrderQty": 30,
+  "unit": "pices ",
+  "originCountry": "India",
+  "hsCode": "",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788341591/renote-exim/products/gdbalo7m3oc9tnnhtqug.png",
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788341603/renote-exim/products/jwgbnh9opjhqkjcozsvp.png",
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788341602/renote-exim/products/qbcy3jxghgehh7abjxhr.png",
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788341614/renote-exim/products/ji6pclvbboue50yuv3f2.png",
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788341637/renote-exim/products/jqey2cqkbjtpdlz9fx0h.png"
+  ],
+  "certifications": [],
+  "quantity": 300
+}
+[2026-09-02T10:36:05.003Z] [POST /api/products] ERROR 500: [
+  {
+    "received": "Dishware",
+    "code": "invalid_enum_value",
+    "options": [
+      "CHEMICALS",
+      "MACHINES",
+      "TEXTILES",
+      "MEDICAL",
+      "HANDICRAFTS",
+      "FOOD",
+      "ELECTRONICS",
+      "AUTOMOTIVE",
+      "CONSTRUCTION",
+      "AGRICULTURE",
+      "COSMETICS",
+      "PLASTICS",
+      "ENERGY",
+      "LOGISTICS",
+      "PACKAGING",
+      "METALS",
+      "LEATHER",
+      "FURNITURE",
+      "TOYS",
+      "SPORTS",
+      "OTHER"
+    ],
+    "path": [
+      "category"
+    ],
+    "message": "Invalid enum value. Expected 'CHEMICALS' | 'MACHINES' | 'TEXTILES' | 'MEDICAL' | 'HANDICRAFTS' | 'FOOD' | 'ELECTRONICS' | 'AUTOMOTIVE' | 'CONSTRUCTION' | 'AGRICULTURE' | 'COSMETICS' | 'PLASTICS' | 'ENERGY' | 'LOGISTICS' | 'PACKAGING' | 'METALS' | 'LEATHER' | 'FURNITURE' | 'TOYS' | 'SPORTS' | 'OTHER', received 'Dishware'"
+  }
+]
+[2026-09-02T10:36:05.003Z] [POST /api/products] Zod Error: [
+  {
+    "received": "Dishware",
+    "code": "invalid_enum_value",
+    "options": [
+      "CHEMICALS",
+      "MACHINES",
+      "TEXTILES",
+      "MEDICAL",
+      "HANDICRAFTS",
+      "FOOD",
+      "ELECTRONICS",
+      "AUTOMOTIVE",
+      "CONSTRUCTION",
+      "AGRICULTURE",
+      "COSMETICS",
+      "PLASTICS",
+      "ENERGY",
+      "LOGISTICS",
+      "PACKAGING",
+      "METALS",
+      "LEATHER",
+      "FURNITURE",
+      "TOYS",
+      "SPORTS",
+      "OTHER"
+    ],
+    "path": [
+      "category"
+    ],
+    "message": "Invalid enum value. Expected 'CHEMICALS' | 'MACHINES' | 'TEXTILES' | 'MEDICAL' | 'HANDICRAFTS' | 'FOOD' | 'ELECTRONICS' | 'AUTOMOTIVE' | 'CONSTRUCTION' | 'AGRICULTURE' | 'COSMETICS' | 'PLASTICS' | 'ENERGY' | 'LOGISTICS' | 'PACKAGING' | 'METALS' | 'LEATHER' | 'FURNITURE' | 'TOYS' | 'SPORTS' | 'OTHER', received 'Dishware'"
+  }
+]
+[2026-09-02T10:36:06.561Z] [POST /api/products] Body: {
+  "name": "3 Compartment Areca Plates",
+  "category": "Dishware",
+  "description": "### 3-Compartment Areca Leaf Plates\n\nBring a touch of nature to every meal with our **3-Compartment Areca Leaf Plates**, thoughtfully crafted from naturally fallen areca palm leaves. Designed with three convenient sections, these plates make it easy to serve main courses, sides, snacks, and accompaniments without mixing them together.\n\nEach plate features a **natural wood-like texture, warm earthy tones, and a beautifully rustic finish**, making it perfect for both everyday dining and special occasions. Lightweight yet sturdy, they offer a practical and elegant alternative to conventional disposable tableware.\n\n**Perfect for:** weddings, parties, catering, picnics, restaurants, festive gatherings, and everyday meals.\n\n**Why You'll Love It**\n\n* 🌿 Made from naturally fallen areca leaves\n* 🍽️ 3 separate compartments for organized serving\n* ♻️ Eco-conscious alternative to plastic and foam plates\n* 💪 Sturdy and convenient for serving\n* ✨ Natural, rustic, and premium appearance\n* 🎉 Ideal for events, catering, and celebrations\n\n**Serve beautifully. Eat naturally. Choose better for the planet.**\n",
+  "price": 3,
+  "regularPrice": 5,
+  "minOrderQty": 30,
+  "unit": "pices ",
+  "originCountry": "India",
+  "hsCode": "",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788341591/renote-exim/products/gdbalo7m3oc9tnnhtqug.png",
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788341603/renote-exim/products/jwgbnh9opjhqkjcozsvp.png",
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788341602/renote-exim/products/qbcy3jxghgehh7abjxhr.png",
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788341614/renote-exim/products/ji6pclvbboue50yuv3f2.png",
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788341637/renote-exim/products/jqey2cqkbjtpdlz9fx0h.png"
+  ],
+  "certifications": [],
+  "quantity": 300
+}
+[2026-09-02T10:36:06.563Z] [POST /api/products] ERROR 500: [
+  {
+    "received": "Dishware",
+    "code": "invalid_enum_value",
+    "options": [
+      "CHEMICALS",
+      "MACHINES",
+      "TEXTILES",
+      "MEDICAL",
+      "HANDICRAFTS",
+      "FOOD",
+      "ELECTRONICS",
+      "AUTOMOTIVE",
+      "CONSTRUCTION",
+      "AGRICULTURE",
+      "COSMETICS",
+      "PLASTICS",
+      "ENERGY",
+      "LOGISTICS",
+      "PACKAGING",
+      "METALS",
+      "LEATHER",
+      "FURNITURE",
+      "TOYS",
+      "SPORTS",
+      "OTHER"
+    ],
+    "path": [
+      "category"
+    ],
+    "message": "Invalid enum value. Expected 'CHEMICALS' | 'MACHINES' | 'TEXTILES' | 'MEDICAL' | 'HANDICRAFTS' | 'FOOD' | 'ELECTRONICS' | 'AUTOMOTIVE' | 'CONSTRUCTION' | 'AGRICULTURE' | 'COSMETICS' | 'PLASTICS' | 'ENERGY' | 'LOGISTICS' | 'PACKAGING' | 'METALS' | 'LEATHER' | 'FURNITURE' | 'TOYS' | 'SPORTS' | 'OTHER', received 'Dishware'"
+  }
+]
+[2026-09-02T10:36:06.564Z] [POST /api/products] Zod Error: [
+  {
+    "received": "Dishware",
+    "code": "invalid_enum_value",
+    "options": [
+      "CHEMICALS",
+      "MACHINES",
+      "TEXTILES",
+      "MEDICAL",
+      "HANDICRAFTS",
+      "FOOD",
+      "ELECTRONICS",
+      "AUTOMOTIVE",
+      "CONSTRUCTION",
+      "AGRICULTURE",
+      "COSMETICS",
+      "PLASTICS",
+      "ENERGY",
+      "LOGISTICS",
+      "PACKAGING",
+      "METALS",
+      "LEATHER",
+      "FURNITURE",
+      "TOYS",
+      "SPORTS",
+      "OTHER"
+    ],
+    "path": [
+      "category"
+    ],
+    "message": "Invalid enum value. Expected 'CHEMICALS' | 'MACHINES' | 'TEXTILES' | 'MEDICAL' | 'HANDICRAFTS' | 'FOOD' | 'ELECTRONICS' | 'AUTOMOTIVE' | 'CONSTRUCTION' | 'AGRICULTURE' | 'COSMETICS' | 'PLASTICS' | 'ENERGY' | 'LOGISTICS' | 'PACKAGING' | 'METALS' | 'LEATHER' | 'FURNITURE' | 'TOYS' | 'SPORTS' | 'OTHER', received 'Dishware'"
+  }
+]
+[2026-09-02T10:36:09.501Z] [POST /api/products] Body: {
+  "name": "3 Compartment Areca Plates",
+  "category": "Dishware",
+  "description": "### 3-Compartment Areca Leaf Plates\n\nBring a touch of nature to every meal with our **3-Compartment Areca Leaf Plates**, thoughtfully crafted from naturally fallen areca palm leaves. Designed with three convenient sections, these plates make it easy to serve main courses, sides, snacks, and accompaniments without mixing them together.\n\nEach plate features a **natural wood-like texture, warm earthy tones, and a beautifully rustic finish**, making it perfect for both everyday dining and special occasions. Lightweight yet sturdy, they offer a practical and elegant alternative to conventional disposable tableware.\n\n**Perfect for:** weddings, parties, catering, picnics, restaurants, festive gatherings, and everyday meals.\n\n**Why You'll Love It**\n\n* 🌿 Made from naturally fallen areca leaves\n* 🍽️ 3 separate compartments for organized serving\n* ♻️ Eco-conscious alternative to plastic and foam plates\n* 💪 Sturdy and convenient for serving\n* ✨ Natural, rustic, and premium appearance\n* 🎉 Ideal for events, catering, and celebrations\n\n**Serve beautifully. Eat naturally. Choose better for the planet.**\n",
+  "price": 3,
+  "regularPrice": 5,
+  "minOrderQty": 30,
+  "unit": "pices ",
+  "originCountry": "India",
+  "hsCode": "",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788341591/renote-exim/products/gdbalo7m3oc9tnnhtqug.png",
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788341603/renote-exim/products/jwgbnh9opjhqkjcozsvp.png",
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788341602/renote-exim/products/qbcy3jxghgehh7abjxhr.png",
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788341614/renote-exim/products/ji6pclvbboue50yuv3f2.png",
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788341637/renote-exim/products/jqey2cqkbjtpdlz9fx0h.png"
+  ],
+  "certifications": [],
+  "quantity": 300
+}
+[2026-09-02T10:36:09.503Z] [POST /api/products] ERROR 500: [
+  {
+    "received": "Dishware",
+    "code": "invalid_enum_value",
+    "options": [
+      "CHEMICALS",
+      "MACHINES",
+      "TEXTILES",
+      "MEDICAL",
+      "HANDICRAFTS",
+      "FOOD",
+      "ELECTRONICS",
+      "AUTOMOTIVE",
+      "CONSTRUCTION",
+      "AGRICULTURE",
+      "COSMETICS",
+      "PLASTICS",
+      "ENERGY",
+      "LOGISTICS",
+      "PACKAGING",
+      "METALS",
+      "LEATHER",
+      "FURNITURE",
+      "TOYS",
+      "SPORTS",
+      "OTHER"
+    ],
+    "path": [
+      "category"
+    ],
+    "message": "Invalid enum value. Expected 'CHEMICALS' | 'MACHINES' | 'TEXTILES' | 'MEDICAL' | 'HANDICRAFTS' | 'FOOD' | 'ELECTRONICS' | 'AUTOMOTIVE' | 'CONSTRUCTION' | 'AGRICULTURE' | 'COSMETICS' | 'PLASTICS' | 'ENERGY' | 'LOGISTICS' | 'PACKAGING' | 'METALS' | 'LEATHER' | 'FURNITURE' | 'TOYS' | 'SPORTS' | 'OTHER', received 'Dishware'"
+  }
+]
+[2026-09-02T10:36:09.504Z] [POST /api/products] Zod Error: [
+  {
+    "received": "Dishware",
+    "code": "invalid_enum_value",
+    "options": [
+      "CHEMICALS",
+      "MACHINES",
+      "TEXTILES",
+      "MEDICAL",
+      "HANDICRAFTS",
+      "FOOD",
+      "ELECTRONICS",
+      "AUTOMOTIVE",
+      "CONSTRUCTION",
+      "AGRICULTURE",
+      "COSMETICS",
+      "PLASTICS",
+      "ENERGY",
+      "LOGISTICS",
+      "PACKAGING",
+      "METALS",
+      "LEATHER",
+      "FURNITURE",
+      "TOYS",
+      "SPORTS",
+      "OTHER"
+    ],
+    "path": [
+      "category"
+    ],
+    "message": "Invalid enum value. Expected 'CHEMICALS' | 'MACHINES' | 'TEXTILES' | 'MEDICAL' | 'HANDICRAFTS' | 'FOOD' | 'ELECTRONICS' | 'AUTOMOTIVE' | 'CONSTRUCTION' | 'AGRICULTURE' | 'COSMETICS' | 'PLASTICS' | 'ENERGY' | 'LOGISTICS' | 'PACKAGING' | 'METALS' | 'LEATHER' | 'FURNITURE' | 'TOYS' | 'SPORTS' | 'OTHER', received 'Dishware'"
+  }
+]
+[2026-09-02T10:48:38.743Z] [POST /api/products] Body: {
+  "name": "3 Compartment Areca Plates",
+  "category": "OTHER",
+  "description": "3-Compartment Areca Leaf Plates\n\nBring a touch of nature to every meal with our 3-Compartment Areca Leaf Plates, thoughtfully crafted from naturally fallen areca palm leaves. Designed with three convenient sections, these plates make it easy to serve main courses, sides, snacks, and accompaniments without mixing them together.\n\nEach plate features a natural wood-like texture, warm earthy tones, and a beautifully rustic finish, making it perfect for both everyday dining and special occasions. Lightweight yet sturdy, they offer a practical and elegant alternative to conventional disposable tableware.\n\nPerfect for: weddings, parties, catering, picnics, restaurants, festive gatherings, and everyday meals.\n\nWhy You'll Love It\n\n🌿 Made from naturally fallen areca leaves\n🍽️ 3 separate compartments for organized serving\n♻️ Eco-conscious alternative to plastic and foam plates\n💪 Sturdy and convenient for serving\n✨ Natural, rustic, and premium appearance\n🎉 Ideal for events, catering, and celebrations\n\nServe beautifully. Eat naturally. Choose better for the planet.",
+  "price": 3,
+  "regularPrice": 5,
+  "minOrderQty": 30,
+  "unit": "pics",
+  "originCountry": "India",
+  "hsCode": "",
+  "images": [
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788345957/renote-exim/products/k4v2qqpbq0wa0hynyncr.png",
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788345958/renote-exim/products/xexuxwkarvj9eklgtknr.png",
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788345962/renote-exim/products/wtxijushqrdovvx8jxzx.png",
+    "https://res.cloudinary.com/dpy7s0cbs/image/upload/v1788345966/renote-exim/products/gudncsmbdjnvm3dw9lvg.png"
+  ],
+  "certifications": [],
+  "quantity": 300
+}

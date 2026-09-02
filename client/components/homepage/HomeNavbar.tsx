@@ -61,7 +61,7 @@ export default function HomeNavbar() {
         <div className="flex items-center gap-2 md:gap-4">
           {user && (
             <Link 
-              href={user.role === "USER" ? "/products" : `/dashboard/${user.role.toLowerCase()}`}
+              href={user.role?.toUpperCase() === "USER" ? "/products" : user.role?.toUpperCase() === "ADMIN" ? "/dashboard/exporter" : `/dashboard/${user.role?.toLowerCase()}`}
               className="hidden sm:flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary text-white text-xs font-black uppercase tracking-widest transition-all hover:scale-105 active:scale-95 shadow-lg shadow-primary/20"
             >
               <span className="material-icons text-sm">dashboard</span>
@@ -92,7 +92,7 @@ export default function HomeNavbar() {
                     <p className="text-xs text-muted-foreground truncate">{user.email}</p>
                   </div>
                   <Link
-                    href={user.role === "USER" ? "/products" : `/dashboard/${user.role.toLowerCase()}`}
+                    href={user.role?.toUpperCase() === "USER" ? "/products" : user.role?.toUpperCase() === "ADMIN" ? "/dashboard/exporter" : `/dashboard/${user.role?.toLowerCase()}`}
                     className="flex items-center gap-3 px-4 py-2 hover:bg-slate-50 dark:hover:bg-white/5 text-sm text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-white transition-colors"
                     onClick={() => setIsProfileMenuOpen(false)}
                   >
@@ -100,7 +100,7 @@ export default function HomeNavbar() {
                     {user.role === "USER" ? t("marketplace", "Marketplace") : t("dashboard", "Dashboard")}
                   </Link>
                   <Link
-                    href={user.role === "USER" ? "/products" : `/dashboard/${user.role.toLowerCase()}/settings`}
+                    href={user.role?.toUpperCase() === "USER" ? "/products" : user.role?.toUpperCase() === "ADMIN" ? "/dashboard/exporter/settings" : `/dashboard/${user.role?.toLowerCase()}/settings`}
                     className="flex items-center gap-3 px-4 py-2 hover:bg-slate-50 dark:hover:bg-white/5 text-sm text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-white transition-colors"
                     onClick={() => setIsProfileMenuOpen(false)}
                   >
@@ -163,7 +163,7 @@ export default function HomeNavbar() {
             </Link>
             {user && (
               <Link 
-                href={user.role === "USER" ? "/products" : `/dashboard/${user.role.toLowerCase()}`}
+                href={user.role?.toUpperCase() === "USER" ? "/products" : user.role?.toUpperCase() === "ADMIN" ? "/dashboard/exporter" : `/dashboard/${user.role?.toLowerCase()}`}
                 className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 text-foreground font-semibold transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >

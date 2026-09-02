@@ -46,7 +46,7 @@ export function DashboardScaler({ children, targetWidth = 1440 }: DashboardScale
  return (
  <div 
  ref={containerRef}
- className="w-full h-[100dvh] overflow-hidden bg-board relative"
+ className="fixed inset-0 overflow-hidden bg-board"
  id="dashboard-scaler-root"
  style={{ 
  backgroundColor: "hsl(var(--background))",

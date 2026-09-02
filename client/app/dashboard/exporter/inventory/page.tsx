@@ -60,8 +60,7 @@ export default async function ExporterInventoryPage({
   const limit = 10;
   const skip = (page - 1) * limit;
 
-  // Build where clause based on searchParams
-  const where: Prisma.ProductWhereInput = { exporterId: auth.userId };
+  const where: Prisma.ProductWhereInput = auth.role === "ADMIN" ? {} : { exporterId: auth.userId };
 
   if (searchParams.search) {
     where.OR = [
@@ -99,7 +98,7 @@ export default async function ExporterInventoryPage({
     // Fetch Category Stats
     const rawCategories = await prisma.product.groupBy({
       by: ['category'],
-      where: { exporterId: auth.userId },
+      where: auth.role === "ADMIN" ? {} : { exporterId: auth.userId },
       _count: { id: true },
     });
 
@@ -121,7 +120,7 @@ export default async function ExporterInventoryPage({
 
   try {
     const allProducts = await prisma.product.findMany({
-      where: { exporterId: auth.userId },
+      where: auth.role === "ADMIN" ? {} : { exporterId: auth.userId },
       select: { available: true, price: true, minOrderQty: true },
     });
     totalListed = allProducts.length;

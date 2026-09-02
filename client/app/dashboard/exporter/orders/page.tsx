@@ -32,7 +32,7 @@ export default async function ExporterOrdersPage({
   const limit = 10;
   const skip = (page - 1) * limit;
 
-  const where: any = { sellerId: auth.userId, orderStatus: { not: 'CHECKOUT' } };
+  const where: any = auth.role === "ADMIN" ? { orderStatus: { not: 'CHECKOUT' } } : { sellerId: auth.userId, orderStatus: { not: 'CHECKOUT' } };
 
   if (resolvedSearchParams.status && resolvedSearchParams.status !== "ALL") {
     const s = Array.isArray(resolvedSearchParams.status)
@@ -79,12 +79,12 @@ export default async function ExporterOrdersPage({
       }),
       prisma.order.count({ where }),
       prisma.transportMethod.findMany({
-        where: { exporterId: auth.userId },
+        where: auth.role === "ADMIN" ? {} : { exporterId: auth.userId },
         orderBy: { createdAt: 'desc' }
       })
     ]);
 
-    const baseWhere = { sellerId: auth.userId, orderStatus: { not: 'CHECKOUT' as const } };
+    const baseWhere: any = auth.role === "ADMIN" ? { orderStatus: { not: 'CHECKOUT' as const } } : { sellerId: auth.userId, orderStatus: { not: 'CHECKOUT' as const } };
     const [allCount, pendingCount, procCount, shippedCount, delivCount] =
       await Promise.all([
         prisma.order.count({ where: baseWhere }),
