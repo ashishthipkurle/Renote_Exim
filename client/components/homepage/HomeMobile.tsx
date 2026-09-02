@@ -6,7 +6,7 @@ import { ShoppingBag, ArrowRight, Globe, Shield, Zap, Package, ChevronRight } fr
 import { motion } from "framer-motion";
 import { useTranslation } from "@/lib/i18n/client";
 import { useTheme } from "next-themes";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import LogoLight from "@/assests/LOGO_TEXT.png";
 import LogoDark from "@/assests/Logo-2-without-circle.png";
 
