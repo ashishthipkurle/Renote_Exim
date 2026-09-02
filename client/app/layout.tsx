@@ -91,7 +91,7 @@ export default function RootLayout({
  })();
  `}} />
       </head>
-      <body className={`${sora.variable} font-sans antialiased overflow-x-hidden w-full max-w-[100vw]`}>
+      <body className={`${sora.variable} font-sans antialiased w-full max-w-[100vw]`}>
         <I18nProvider>
           <ThemeProvider>
             <AuthProvider>
