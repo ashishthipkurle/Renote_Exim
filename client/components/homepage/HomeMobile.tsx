@@ -27,32 +27,37 @@ export default function HomeMobile() {
 
   const sectionRef = useRef<HTMLElement>(null);
 
-  // Parallax Scroll Effect for the realistic globe images
+  // Continuous Spin + Parallax Effect for the realistic globe images
   useEffect(() => {
-    const onScroll = () => {
+    let animationFrameId: number;
+    let currentRotation = 0;
+
+    const render = () => {
       const globes = document.querySelectorAll<HTMLElement>(".mobile-parallax-globe");
       const section = sectionRef.current;
-      if (globes.length === 0 || !section) return;
-
-      const rect = section.getBoundingClientRect();
       
-      // Calculate how far the section has scrolled *past* the top of the viewport.
-      const scrolled = Math.max(0, -rect.top);
+      if (globes.length > 0 && section) {
+        const rect = section.getBoundingClientRect();
+        const scrolled = Math.max(0, -rect.top);
 
-      const newY = 20 + scrolled * 0.04;
-      const rotation = scrolled * -0.02; // Negative value rotates it left-to-right
-      const scale = 1.05 + scrolled * 0.0003;
+        currentRotation -= 0.03; // Continuous slow rotation
+        
+        const newY = 20 + scrolled * 0.04;
+        const scrollRotationOffset = scrolled * -0.01;
+        const scale = 1.05 + scrolled * 0.0002;
 
-      globes.forEach((globe) => {
-        globe.style.backgroundPosition = `center ${Math.min(newY, 100)}%`;
-        globe.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
-      });
+        globes.forEach((globe) => {
+          globe.style.backgroundPosition = `center ${Math.min(newY, 100)}%`;
+          globe.style.transform = `scale(${scale}) rotate(${currentRotation + scrollRotationOffset}deg)`;
+        });
+      }
+
+      animationFrameId = requestAnimationFrame(render);
     };
 
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll(); // Initial call
+    render(); // Start loop
 
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => cancelAnimationFrame(animationFrameId);
   }, []);
 
   return (

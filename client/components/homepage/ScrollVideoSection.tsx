@@ -88,6 +88,11 @@ export default function ScrollVideoSection() {
     const { user, loading: authLoading, logout } = useAuth();
     const [loaded, setLoaded] = useState(globalFramesCache.length >= 2);
     const [hasScrolled, setHasScrolled] = useState(false);
+    const [hasSeenIntroState, setHasSeenIntroState] = useState(false);
+
+    useEffect(() => {
+        setHasSeenIntroState(sessionStorage.getItem("ranote-video-intro-seen") === "true");
+    }, []);
 
 
     // Cover-draw: scale + center-crop bitmap to fill the canvas
@@ -590,7 +595,7 @@ export default function ScrollVideoSection() {
             >
                 <div className="w-full h-full relative overflow-hidden pointer-events-none">
 
-                    {loaded && progress < 100 && (
+                    {loaded && progress < 100 && !hasSeenIntroState && (
                         <div className="absolute bottom-16 md:bottom-24 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-4 w-64 md:w-80 transition-opacity duration-300">
                             <span className="text-white text-sm uppercase tracking-[0.3em] font-bold animate-pulse">
                                 Loading Experience
