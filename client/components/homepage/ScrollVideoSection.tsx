@@ -373,7 +373,14 @@ export default function ScrollVideoSection() {
 
         // ---------- 2. Extract frames in background ----------
         const extractFrames = async () => {
-            if (window.innerWidth < 768) return; // Save bandwidth and processing on mobile
+            // Do not extract frames on mobile/tablets (prevent massive memory usage / crashes on iOS Safari)
+            if (window.innerWidth <= 1024) {
+                setLoaded(true);
+                setProgress(100);
+                globalProgressCache = 100;
+                sessionStorage.setItem("ranote-video-intro-seen", "true");
+                return;
+            }
 
             if (globalFramesCache.length >= TOTAL_FRAMES) {
                 setLoaded(true);
@@ -563,7 +570,15 @@ export default function ScrollVideoSection() {
                             if (self.progress >= 1 && revealEl) {
                                 // Once reveal is complete, we MUST destroy the transform matrix 
                                 // otherwise CSS `sticky` positioning fails across the entire page.
-                                gsap.set(revealEl, { clearProps: "transform" });
+                                if (!revealEl.dataset.cleared) {
+                                    gsap.set(revealEl, { clearProps: "transform" });
+                                    revealEl.dataset.cleared = "true";
+                                    window.dispatchEvent(new Event('resize'));
+                                }
+                            } else if (self.progress < 1 && revealEl) {
+                                if (revealEl.dataset.cleared) {
+                                    delete revealEl.dataset.cleared;
+                                }
                             }
                         },
                     }
