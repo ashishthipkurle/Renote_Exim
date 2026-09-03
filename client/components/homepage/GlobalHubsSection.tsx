@@ -11,14 +11,6 @@ export default function GlobalHubsSection() {
         [key: string]: boolean;
     }>({});
 
-    const { scrollYProgress } = useScroll({
-        target: sectionRef,
-        offset: ["start end", "end start"]
-    });
-
-    const x = useTransform(scrollYProgress, [0, 1], ["300px", "-300px"]);
-    const y = useTransform(scrollYProgress, [0, 1], ["-300px", "300px"]);
-
     const handleItemClick = (itemId: string) => {
         // Start loading animation
         setLoadingItems((prev) => ({ ...prev, [itemId]: true }));
@@ -50,7 +42,10 @@ export default function GlobalHubsSection() {
                     alt="Cargo Ship"
                     width={1200} height={800}
                     className="w-[1200px] max-w-none object-contain drop-shadow-[0_30px_60px_rgba(0,0,0,0.8)]"
-                    style={{ x, y }}
+                    initial={{ x: "300px", y: "-300px" }}
+                    whileInView={{ x: "-300px", y: "300px" }}
+                    transition={{ duration: 1.5, ease: "easeOut" }}
+                    viewport={{ once: false, margin: "-100px" }}
                 />
             </div>
 

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { useTranslation } from "@/lib/i18n/client";
 import Plane2 from "@/assests/Plane2.png";
 
@@ -32,12 +32,7 @@ export default function ConnectivitySection() {
     return () => clearInterval(timer);
   }, []);
 
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"]
-  });
 
-  const y = useTransform(scrollYProgress, [0, 1], ["800px", "-800px"]);
 
   return (
     <section ref={sectionRef} className="py-24 bg-slate-50 dark:bg-background relative z-20 reveal-on-scroll overflow-hidden">
@@ -48,7 +43,10 @@ export default function ConnectivitySection() {
             alt="Airplane" 
             width={1400} 
             height={400} 
-            style={{ y }}
+            initial={{ y: "800px" }}
+            whileInView={{ y: "-800px" }}
+            transition={{ duration: 2.5, ease: "easeInOut" }}
+            viewport={{ once: false, margin: "-100px" }}
             className="w-[1400px] max-w-none h-auto object-contain drop-shadow-[0_45px_65px_rgba(0,0,0,0.5)] -ml-[300px]" 
         />
       </div>
