@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/components/auth/AuthProvider";
 import LogoImg from "@/assests/LOGO.png";
 import { useTranslation } from "@/lib/i18n/client";
-import ThumbnailImg from "@/assests/4k Video frame 2/1.png";
+import ThumbnailImg from "@/assests/4k_Video_frame_2/1.png";
 
 
 /**
@@ -167,12 +167,14 @@ export default function ScrollVideoSection() {
         if (progress >= 100 || failed || hasSeenIntro) return;
 
         const preventScroll = (e: Event) => {
+            if (window.innerWidth < 768) return; // Don't lock on mobile
             // Allow scroll if progress is significantly along, or if failed
             if (progress >= 100) return;
             e.preventDefault();
         };
 
         const preventKeys = (e: KeyboardEvent) => {
+            if (window.innerWidth < 768) return;
             if (['ArrowDown', 'ArrowUp', 'Space', 'PageDown', 'PageUp', 'Home', 'End', ' '].includes(e.key)) {
                 if (progress < 100) e.preventDefault();
             }
@@ -366,6 +368,8 @@ export default function ScrollVideoSection() {
 
         // ---------- 2. Extract frames in background ----------
         const extractFrames = async () => {
+            if (window.innerWidth < 768) return; // Save bandwidth and processing on mobile
+
             if (globalFramesCache.length >= TOTAL_FRAMES) {
                 setLoaded(true);
                 setProgress(100);
@@ -624,11 +628,12 @@ export default function ScrollVideoSection() {
                             >
                                 <Image
                                     src={ThumbnailImg}
-                                    alt="Ranote Exim"
+                                    alt=""
                                     fill
                                     priority
                                     className="object-cover"
                                     unoptimized
+                                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
                                 />
                             </motion.div>
                         )}
