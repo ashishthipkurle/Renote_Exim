@@ -48,7 +48,8 @@ export default function ConnectivitySection() {
             trigger: sectionRef.current,
             start: "top bottom",
             end: "bottom top",
-            scrub: 1,
+            scrub: true,
+            invalidateOnRefresh: true,
           },
         }
       );
