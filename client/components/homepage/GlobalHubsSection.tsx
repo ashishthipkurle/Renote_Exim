@@ -1,15 +1,38 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { motion, useScroll, useTransform } from "framer-motion";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useTranslation } from "@/lib/i18n/client";
 
 export default function GlobalHubsSection() {
     const { t } = useTranslation();
+    const shipRef = useRef<HTMLImageElement>(null);
     const sectionRef = useRef<HTMLElement>(null);
     const [loadingItems, setLoadingItems] = useState<{
         [key: string]: boolean;
     }>({});
+
+    useEffect(() => {
+        gsap.registerPlugin(ScrollTrigger);
+        if (shipRef.current && sectionRef.current) {
+            gsap.fromTo(
+                shipRef.current,
+                { x: "300px", y: "-300px" },
+                {
+                    x: "-300px",
+                    y: "300px",
+                    ease: "none",
+                    scrollTrigger: {
+                        trigger: sectionRef.current,
+                        start: "top bottom",
+                        end: "bottom top",
+                        scrub: 1,
+                    },
+                }
+            );
+        }
+    }, []);
 
     const handleItemClick = (itemId: string) => {
         // Start loading animation
@@ -37,15 +60,13 @@ export default function GlobalHubsSection() {
 
             {/* Animated Cargo Ship */}
             <div className="absolute inset-0 pointer-events-none z-[5] flex justify-center items-center opacity-90 overflow-visible">
-                <motion.img
+                <Image
+                    ref={shipRef}
                     src="/custom-ship-2.png"
                     alt="Cargo Ship"
                     width={1200} height={800}
                     className="w-[1200px] max-w-none object-contain drop-shadow-[0_30px_60px_rgba(0,0,0,0.8)]"
-                    initial={{ x: "300px", y: "-300px" }}
-                    whileInView={{ x: "-300px", y: "300px" }}
-                    transition={{ duration: 1.5, ease: "easeOut" }}
-                    viewport={{ once: false, margin: "-100px" }}
+                    unoptimized
                 />
             </div>
 

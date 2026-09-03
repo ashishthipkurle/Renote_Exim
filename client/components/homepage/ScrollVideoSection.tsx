@@ -574,6 +574,7 @@ export default function ScrollVideoSection() {
                                     gsap.set(revealEl, { clearProps: "transform" });
                                     revealEl.dataset.cleared = "true";
                                     window.dispatchEvent(new Event('resize'));
+                                    ScrollTrigger.refresh();
                                 }
                             } else if (self.progress < 1 && revealEl) {
                                 if (revealEl.dataset.cleared) {
