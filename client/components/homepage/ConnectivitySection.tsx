@@ -1,13 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { useTranslation } from "@/lib/i18n/client";
 import Plane2 from "@/assests/Plane2.png";
 
 export default function ConnectivitySection() {
   const { t } = useTranslation();
-  const airplaneRef = useRef<HTMLImageElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const [vesselCount, setVesselCount] = useState(0);
   const [flightCount, setFlightCount] = useState(0);
@@ -34,33 +32,25 @@ export default function ConnectivitySection() {
     return () => clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-    if (airplaneRef.current && sectionRef.current) {
-      gsap.fromTo(
-        airplaneRef.current,
-        { x: "0px", y: "800px" },
-        {
-          x: "0px",
-          y: "-800px",
-          ease: "none",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: true,
-            invalidateOnRefresh: true,
-          },
-        }
-      );
-    }
-  }, []);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"]
+  });
+
+  const y = useTransform(scrollYProgress, [0, 1], ["800px", "-800px"]);
 
   return (
     <section ref={sectionRef} className="py-24 bg-slate-50 dark:bg-background relative z-20 reveal-on-scroll overflow-hidden">
       {/* Animated Airplane */}
       <div className="absolute inset-0 pointer-events-none z-50 flex items-center justify-start overflow-visible">
-        <Image ref={airplaneRef} src={Plane2} alt="Airplane" width={1400} height={400} className="w-[1400px] max-w-none h-auto object-contain drop-shadow-[0_45px_65px_rgba(0,0,0,0.5)] -ml-[300px]" unoptimized />
+        <motion.img 
+            src={Plane2.src} 
+            alt="Airplane" 
+            width={1400} 
+            height={400} 
+            style={{ y }}
+            className="w-[1400px] max-w-none h-auto object-contain drop-shadow-[0_45px_65px_rgba(0,0,0,0.5)] -ml-[300px]" 
+        />
       </div>
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
