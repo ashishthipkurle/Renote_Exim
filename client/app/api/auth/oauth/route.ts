@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
 
 /**
  * GET /api/auth/oauth?provider=google|linkedin
@@ -16,33 +17,33 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const subdomain = process.env.NEXT_PUBLIC_NHOST_SUBDOMAIN;
-    const region = process.env.NEXT_PUBLIC_NHOST_REGION;
+    const supabase = createClient();
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const redirectTo = `${appUrl}/api/auth/callback`;
 
-    if (!subdomain || !region) {
+    const supabaseProvider = provider === "linkedin" ? "linkedin_oidc" : provider;
+
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: supabaseProvider as any,
+      options: {
+        redirectTo,
+        queryParams: provider === "google" ? { prompt: "consent" } : undefined
+      },
+    });
+
+    if (error) {
+      console.error("[OAuth] Error getting Supabase OAuth URL:", error);
       return NextResponse.json(
-        { error: "Nhost configuration missing" },
+        { error: "Failed to generate OAuth URL" },
         { status: 500 }
       );
     }
 
-    // Build the redirect URL for after OAuth completes
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const redirectTo = `${appUrl}/auth/callback`;
-
-    // Nhost v4 OAuth sign-in URL
-    let providerUrl = `https://${subdomain}.auth.${region}.nhost.run/v1/signin/provider/${provider}?redirectTo=${encodeURIComponent(redirectTo)}`;
-
-    // Force Google to always show the account picker instead of auto-selecting previous account
-    if (provider === "google") {
-      providerUrl += "&prompt=consent";
-    }
-
-    return NextResponse.json({ providerUrl });
+    return NextResponse.json({ providerUrl: data.url });
   } catch (error: any) {
-    console.error("[OAuth] Error generating provider URL:", error);
+    console.error("[OAuth] Error:", error);
     return NextResponse.json(
-      { error: "Failed to generate OAuth URL" },
+      { error: "Internal Server Error" },
       { status: 500 }
     );
   }

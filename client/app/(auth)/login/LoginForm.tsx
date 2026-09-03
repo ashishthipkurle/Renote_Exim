@@ -345,7 +345,7 @@ export default function LoginForm() {
                     </div>
 
                     <div className="w-full">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+                      <div className="flex flex-col gap-3 mb-5">
                         <Button
                           type="button"
                           variant="ghost"
@@ -426,12 +426,7 @@ export default function LoginForm() {
                         )}
                       />
 
-                      <div className="flex items-center gap-3 py-1">
-                        <input className="w-5 h-5 rounded border-input bg-background text-primary focus:ring-ring/30" id="remember" type="checkbox" />
-                        <label className="text-sm text-muted-foreground select-none cursor-pointer" htmlFor="remember">
-                          Stay signed in on this device
-                        </label>
-                      </div>
+
 
                       <Button type="submit" disabled={isLoading || !form.formState.isValid} size="lg" className="h-14 w-full rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-black text-xs uppercase tracking-[0.2em] shadow-xl transition-all active:scale-95 group">
                         {isLoading ? (

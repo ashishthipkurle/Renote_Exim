@@ -15,95 +15,102 @@ export async function GET(request: NextRequest) {
  const { searchParams } = new URL(request.url);
  const scope = searchParams.get('scope') || auth.role.toLowerCase();
 
- if (scope === 'importer' || auth.role === 'IMPORTER') {
- const [totalOrders, activeShipments, totalSpentResult, pendingOrders, paidOrders] = await Promise.all([
- prisma.order.count({ where: { buyerId: auth.userId } }),
- prisma.shipment.count({
- where: {
- order: { buyerId: auth.userId },
- currentStatus: { in: ['PREPARING', 'IN_TRANSIT', 'CUSTOMS', 'OUT_FOR_DELIVERY'] },
- },
- }),
- prisma.order.aggregate({
- where: { buyerId: auth.userId, paymentStatus: { in: ['PAID', 'PARTIAL'] } },
- _sum: { totalPrice: true },
- }),
- prisma.order.count({
- where: {
- buyerId: auth.userId,
- orderStatus: { in: ['QUOTE_REQUESTED', 'PO_RAISED', 'PAYMENT_CONFIRMED', 'PROCESSING'] },
- },
- }),
- prisma.order.findMany({
- where: { buyerId: auth.userId, paymentStatus: { in: ['PAID', 'PARTIAL'] } },
- include: { product: true },
- }),
- ]);
+  if (scope === 'importer') {
+    const isOwner = auth.role !== 'ADMIN';
+    const buyerWhere = isOwner ? { buyerId: auth.userId } : {};
+    
+    const [totalOrders, activeShipments, totalSpentResult, pendingOrders, paidOrders] = await Promise.all([
+      prisma.order.count({ where: buyerWhere }),
+      prisma.shipment.count({
+        where: {
+          order: buyerWhere,
+          currentStatus: { in: ['PREPARING', 'IN_TRANSIT', 'CUSTOMS', 'OUT_FOR_DELIVERY'] },
+        },
+      }),
+      prisma.order.aggregate({
+        where: { ...buyerWhere, paymentStatus: { in: ['PAID', 'PARTIAL'] } },
+        _sum: { totalPrice: true },
+      }),
+      prisma.order.count({
+        where: {
+          ...buyerWhere,
+          orderStatus: { in: ['QUOTE_REQUESTED', 'PO_RAISED', 'PAYMENT_CONFIRMED', 'PROCESSING'] },
+        },
+      }),
+      prisma.order.findMany({
+        where: { ...buyerWhere, paymentStatus: { in: ['PAID', 'PARTIAL'] } },
+        include: { product: true },
+      }),
+    ]);
 
- const monthlySpending = Array.from({ length: 6 }).map((_, i) => {
- const d = new Date();
- d.setMonth(d.getMonth() - i);
- return {
- month: d.toLocaleString('default', { month: 'short' }),
- spent: 0,
- year: d.getFullYear(),
- monthNum: d.getMonth()
- };
- }).reverse();
+    const monthlySpending = Array.from({ length: 6 }).map((_, i) => {
+      const d = new Date();
+      d.setMonth(d.getMonth() - i);
+      return {
+        month: d.toLocaleString('default', { month: 'short' }),
+        spent: 0,
+        year: d.getFullYear(),
+        monthNum: d.getMonth()
+      };
+    }).reverse();
 
- const categoryMap = new Map<string, number>();
+    const categoryMap = new Map<string, number>();
 
- paidOrders.forEach((order: any) => {
- const cat = order.product?.category || 'OTHER';
- categoryMap.set(cat, (categoryMap.get(cat) || 0) + order.totalPrice);
- 
- const orderDate = new Date(order.createdAt);
- const m = monthlySpending.find((m: any) => m.monthNum === orderDate.getMonth() && m.year === orderDate.getFullYear());
- if (m) {
- m.spent += order.totalPrice;
- }
- });
+    paidOrders.forEach((order: any) => {
+      const cat = order.product?.category || 'OTHER';
+      categoryMap.set(cat, (categoryMap.get(cat) || 0) + order.totalPrice);
+      
+      const orderDate = new Date(order.createdAt);
+      const m = monthlySpending.find((m: any) => m.monthNum === orderDate.getMonth() && m.year === orderDate.getFullYear());
+      if (m) {
+        m.spent += order.totalPrice;
+      }
+    });
 
- const categories = Array.from(categoryMap.entries()).map(([name, spent]) => ({ name, spent }));
+    const categories = Array.from(categoryMap.entries()).map(([name, spent]) => ({ name, spent }));
 
- return NextResponse.json({
- totalOrders,
- activeShipments,
- totalSpent: totalSpentResult._sum.totalPrice ?? 0,
- pendingOrders,
- monthlySpending,
- categories
- });
- }
+    return NextResponse.json({
+      totalOrders,
+      activeShipments,
+      totalSpent: totalSpentResult._sum.totalPrice ?? 0,
+      pendingOrders,
+      monthlySpending,
+      categories
+    }, { headers: { 'Cache-Control': 'no-store, max-age=0' } });
+  }
 
- if (scope === 'exporter' || auth.role === 'EXPORTER') {
- const [totalProducts, activeOrders, totalRevResult, totalShipments] = await Promise.all([
- prisma.product.count({ where: { exporterId: auth.userId } }),
- prisma.order.count({
- where: {
- sellerId: auth.userId,
- orderStatus: { in: ['QUOTE_REQUESTED', 'PO_RAISED', 'PAYMENT_CONFIRMED', 'PROCESSING', 'SHIPPED'] },
- },
- }),
- prisma.order.aggregate({
- where: {
- sellerId: auth.userId,
- paymentStatus: { in: ['PAID', 'PARTIAL'] },
- },
- _sum: { totalPrice: true },
- }),
- prisma.shipment.count({
- where: { order: { sellerId: auth.userId } },
- }),
- ]);
+  if (scope === 'exporter') {
+    const isOwner = auth.role !== 'ADMIN';
+    const sellerWhere = isOwner ? { sellerId: auth.userId } : {};
+    const exporterWhere = isOwner ? { exporterId: auth.userId } : {};
 
- return NextResponse.json({
- totalProducts,
- activeOrders,
- totalRevenue: totalRevResult._sum.totalPrice ?? 0,
- totalShipments,
- });
- }
+    const [totalProducts, activeOrders, totalRevResult, totalShipments] = await Promise.all([
+      prisma.product.count({ where: exporterWhere }),
+      prisma.order.count({
+        where: {
+          ...sellerWhere,
+          orderStatus: { in: ['QUOTE_REQUESTED', 'PO_RAISED', 'PAYMENT_CONFIRMED', 'PROCESSING', 'SHIPPED'] },
+        },
+      }),
+      prisma.order.aggregate({
+        where: {
+          ...sellerWhere,
+          paymentStatus: { in: ['PAID', 'PARTIAL'] },
+        },
+        _sum: { totalPrice: true },
+      }),
+      prisma.shipment.count({
+        where: { order: sellerWhere },
+      }),
+    ]);
+
+    return NextResponse.json({
+      totalProducts,
+      activeOrders,
+      totalRevenue: totalRevResult._sum.totalPrice ?? 0,
+      totalShipments,
+    }, { headers: { 'Cache-Control': 'no-store, max-age=0' } });
+  }
 
  if (scope === 'admin' || auth.role === 'ADMIN') {
  const [totalUsers, totalProducts, totalOrders, totalRevResult, activeShipments, recentOrders] =
