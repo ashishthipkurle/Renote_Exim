@@ -91,7 +91,7 @@ export default function ScrollVideoSection() {
     const [hasSeenIntroState, setHasSeenIntroState] = useState(false);
 
     useEffect(() => {
-        setHasSeenIntroState(localStorage.getItem("ranote-video-intro-seen") === "true");
+        setHasSeenIntroState(sessionStorage.getItem("ranote-video-intro-seen") === "true");
     }, []);
 
 
@@ -168,7 +168,7 @@ export default function ScrollVideoSection() {
 
     // Lock scroll while buffering frames (only if not seen before in this session)
     useEffect(() => {
-        const hasSeenIntro = localStorage.getItem("ranote-video-intro-seen") === "true";
+        const hasSeenIntro = sessionStorage.getItem("ranote-video-intro-seen") === "true";
         if (progress >= 100 || failed || hasSeenIntro) return;
 
         const preventScroll = (e: Event) => {
@@ -373,14 +373,12 @@ export default function ScrollVideoSection() {
 
         // ---------- 2. Extract frames in background ----------
         const extractFrames = async () => {
-            // Do not extract frames on mobile/tablets/touch devices (prevent massive memory usage / crashes on iOS Safari)
-            // This covers all iPads including the 12.9" iPad Pro which has a width of 1366px.
-            const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-            if (isTouchDevice || window.innerWidth <= 1024) {
+            // Do not extract frames on mobile/tablets (prevent massive memory usage / crashes on iOS Safari)
+            if (window.innerWidth <= 1024) {
                 setLoaded(true);
                 setProgress(100);
                 globalProgressCache = 100;
-                localStorage.setItem("ranote-video-intro-seen", "true");
+                sessionStorage.setItem("ranote-video-intro-seen", "true");
                 return;
             }
 
@@ -491,7 +489,7 @@ export default function ScrollVideoSection() {
                         }
 
                         if (i === TOTAL_FRAMES - 1) {
-                            localStorage.setItem("ranote-video-intro-seen", "true");
+                            sessionStorage.setItem("ranote-video-intro-seen", "true");
                             isExtractionRunning = false;
                         }
 
@@ -638,14 +636,14 @@ export default function ScrollVideoSection() {
                         style={{ display: "block", width: "100%", height: "100%" }}
                     />
 
-                    {/* Thumbnail Image - Visible before scroll or if extraction skipped on iPad */}
+                    {/* Thumbnail Image - Visible before scroll */}
                     <AnimatePresence>
-                        {(!hasScrolled || globalFramesCache.length === 0) && (
+                        {!hasScrolled && (
                             <motion.div
-                                initial={{ opacity: 1, rotate: 0 }}
-                                animate={{ opacity: 1, rotate: 360 }}
+                                initial={{ opacity: 1 }}
+                                animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
-                                transition={{ duration: 180, ease: "linear", repeat: Infinity }}
+                                transition={{ duration: 0 }}
                                 className="absolute inset-0 z-[5] pointer-events-none"
                             >
                                 <Image
@@ -653,7 +651,7 @@ export default function ScrollVideoSection() {
                                     alt=""
                                     fill
                                     priority
-                                    className="object-cover scale-[1.5]"
+                                    className="object-cover"
                                     unoptimized
                                     onError={(e) => { e.currentTarget.style.display = 'none'; }}
                                 />
