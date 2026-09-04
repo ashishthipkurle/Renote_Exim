@@ -75,7 +75,7 @@ export default function ImporterSidebar({ basePath, children }: { basePath: stri
  <SidebarContent className="px-3 pt-4">
  
  {/* Mobile Only: Logo & Profile */}
- <div className="md:hidden mb-6 mt-2 space-y-6">
+ <div className="lg:hidden mb-6 mt-2 space-y-6">
    <div className="flex items-center justify-center">
      <Link href="/" className="flex items-center flex-shrink-0">
        <Image
@@ -142,7 +142,7 @@ export default function ImporterSidebar({ basePath, children }: { basePath: stri
  )}
 
  {/* Mobile Vertical Actions */}
- <div className="md:hidden mt-2 mb-4">
+ <div className="lg:hidden mt-2 mb-4">
    <SidebarMenu>
      {user && (
        <SidebarMenuItem>
@@ -223,7 +223,7 @@ export default function ImporterSidebar({ basePath, children }: { basePath: stri
 
  {/* Mobile Only: Sign Out at Bottom */}
  {user && (
-   <div className="md:hidden p-4 mt-auto w-full">
+   <div className="lg:hidden p-4 mt-auto w-full">
      <button onClick={logout} className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-red-500 hover:text-red-600 bg-red-500/10 hover:bg-red-500/20 font-bold transition-all active:scale-95 shadow-sm border border-red-500/20">
        <LogOut className="size-5" />
        <span>Sign Out</span>

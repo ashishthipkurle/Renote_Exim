@@ -26,7 +26,7 @@ const TOTAL_FRAMES = 75;
 const SCROLL_DISTANCE = 3000; // px of scroll for full video playback
 
 // Global cache to persist frames across navigation within the same session (SPA navigation)
-let globalFramesCache: ImageBitmap[] = [];
+const globalFramesCache: ImageBitmap[] = [];
 let globalProgressCache = 0;
 let isExtractionRunning = false;
 
@@ -412,7 +412,7 @@ export default function ScrollVideoSection() {
             document.body.appendChild(video);
 
             // Cloudinary's CDN handles range requests properly and is very fast, so we don't need to blob-fetch into RAM first!
-            let finalSrc = "https://res.cloudinary.com/dpy7s0cbs/video/upload/f_auto,q_auto/v1780753542/Continuous_Shot_Company_Video_Generation.mp4";
+            const finalSrc = "https://res.cloudinary.com/dpy7s0cbs/video/upload/f_auto,q_auto/v1780753542/Continuous_Shot_Company_Video_Generation.mp4";
 
             video.src = finalSrc;
             video.muted = true;
