@@ -80,7 +80,7 @@ export default function DashboardHeader() {
   return (
     <>
       <header className={`sticky top-0 z-40 border-b border-border/50 dark:border-white/10 bg-background/20 backdrop-blur-xl transition-all duration-300 w-full h-14`}>
-        <div className="flex h-full items-center px-4 md:pl-6 md:pr-28 lg:pr-32">
+        <div className="flex h-full items-center px-4 md:pl-6 md:pr-10 lg:pr-14">
 
           {/* LEFT SECTION */}
           <div className="flex items-center gap-2 md:gap-4">

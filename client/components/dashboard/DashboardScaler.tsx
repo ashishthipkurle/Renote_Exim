@@ -27,7 +27,9 @@ export function DashboardScaler({ children, targetWidth = 1440 }: DashboardScale
  setIsMounted(true);
  const handleResize = () => {
  const width = window.innerWidth;
- if (width < 1024) {
+ // Increase breakpoint to 1440 so iPads and small laptops use native responsive layout
+ // instead of optical scaling, which causes clipping bugs in Safari.
+ if (width < 1440) {
    setIsMobile(true);
    setScale(1.0);
  } else {
