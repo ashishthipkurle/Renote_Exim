@@ -110,29 +110,29 @@ export default function DashboardHeader() {
           </div>
 
           {/* SPACER */}
-          <div className="flex-1" />
+          <div className="flex-1 min-w-[1rem]" />
 
           {/* RIGHT SECTION: SEARCH + ACTIONS */}
-          <div className="flex items-center gap-2 lg:gap-4">
+          <div className="flex flex-shrink-0 items-center gap-1 sm:gap-2 lg:gap-4">
 
             {/* SEARCH BAR (Pushed to Right, fills space on mobile) */}
-            <div className="flex-1 md:w-64 lg:w-80 relative group mr-2">
+            <div className="flex-1 max-w-[140px] sm:max-w-[180px] md:max-w-[220px] lg:max-w-xs relative group mr-1 md:mr-2">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
               <input
                 type="text"
                 placeholder={t("search_placeholder", "Search shipments, assets...")}
-                className="w-full bg-muted/50 border border-border/50 dark:border-white/5 focus:border-white/40 rounded-full pl-10 pr-4 py-2 text-sm text-foreground outline-none transition-all focus:bg-background shadow-inner"
+                className="w-full bg-muted/50 border border-border/50 dark:border-white/5 focus:border-white/40 rounded-full pl-9 pr-3 py-1.5 md:pl-10 md:pr-4 md:py-2 text-xs md:text-sm text-foreground outline-none transition-all focus:bg-background shadow-inner"
               />
             </div>
 
             {/* ALWAYS VISIBLE (Language & Theme) */}
-            <div className="flex items-center gap-1 sm:gap-2">
+            <div className="flex flex-shrink-0 items-center gap-1 sm:gap-2">
               <LanguageSwitcher />
               {/* Theme Toggle */}
               {mounted && (
                 <button
                   onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  className="size-9 rounded-full hover:bg-primary/10 flex items-center justify-center text-muted-foreground hover:text-primary transition-all active:scale-95 border border-transparent hover:border-primary/20"
+                  className="size-8 md:size-9 rounded-full hover:bg-primary/10 flex items-center justify-center text-muted-foreground hover:text-primary transition-all active:scale-95 border border-transparent hover:border-primary/20"
                 >
                   {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                 </button>
