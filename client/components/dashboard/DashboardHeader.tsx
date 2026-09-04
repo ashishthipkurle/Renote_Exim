@@ -85,7 +85,7 @@ export default function DashboardHeader() {
           {/* LEFT SECTION */}
           <div className="flex items-center gap-2 md:gap-4">
             {/* Logo */}
-            <Link href="/" className="hidden md:flex items-center flex-shrink-0">
+            <Link href="/" className="hidden lg:flex items-center flex-shrink-0">
               <Image
                 src={LogoImg}
                 alt="Ranote Exim Logo"
@@ -101,8 +101,8 @@ export default function DashboardHeader() {
                 className="h-10 w-10 md:ml-4 lg:ml-8 rounded-xl flex items-center justify-center hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors border border-transparent hover:border-primary/20"
                 title={open ? "Collapse Sidebar" : "Expand Sidebar"}
               >
-                <Menu className="w-5 h-5 md:hidden" />
-                <div className="hidden md:block">
+                <Menu className="w-5 h-5 lg:hidden" />
+                <div className="hidden lg:block">
                   {open ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
                 </div>
               </button>
@@ -140,7 +140,7 @@ export default function DashboardHeader() {
             </div>
 
             {/* DESKTOP ONLY ACTIONS (Orders, Wishlist, Cart, Notifications) */}
-            <div className="hidden md:flex items-center gap-1 sm:gap-2">
+            <div className="hidden lg:flex items-center gap-1 sm:gap-2">
               {/* Orders — hidden for exporters and importers */}
               {!isExporter && !isImporter && (
                 <Link
@@ -183,7 +183,7 @@ export default function DashboardHeader() {
 
             {/* PROFILE DROPDOWN OR SIGN IN */}
             {mounted && (
-              <div className="hidden md:block relative" ref={dropdownRef}>
+              <div className="hidden lg:block relative" ref={dropdownRef}>
                 {loading ? (
                   <div className="size-9 rounded-full bg-muted animate-pulse border border-border/50" />
                 ) : user ? (
