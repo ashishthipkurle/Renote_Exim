@@ -93,6 +93,20 @@ export default function DashboardHeader() {
                 unoptimized
               />
             </Link>
+
+            {/* Sidebar Toggle */}
+            {!isProductDetails && pathname !== "/cart" && pathname !== "/checkout" && pathname !== "/wishlist" && pathname !== "/orders" && pathname !== "/profile" && (
+              <button
+                onClick={toggleSidebar}
+                className="h-10 w-10 md:ml-4 lg:ml-8 rounded-xl flex items-center justify-center hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors border border-transparent hover:border-primary/20"
+                title={open ? "Collapse Sidebar" : "Expand Sidebar"}
+              >
+                <Menu className="w-5 h-5 md:hidden" />
+                <div className="hidden md:block">
+                  {open ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+                </div>
+              </button>
+            )}
           </div>
 
           {/* SPACER */}

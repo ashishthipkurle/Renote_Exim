@@ -27,8 +27,8 @@ import {
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
-const SIDEBAR_WIDTH = "12rem"
-const SIDEBAR_WIDTH_MOBILE = "14rem"
+const SIDEBAR_WIDTH = "13rem"
+const SIDEBAR_WIDTH_MOBILE = "15rem"
 const SIDEBAR_WIDTH_ICON = "3rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
@@ -237,15 +237,8 @@ function Sidebar({
  <div
  data-sidebar="sidebar"
  data-slot="sidebar-inner"
- className="bg-sidebar group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm relative"
+ className="bg-sidebar group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm"
  >
- <button
-   onClick={toggleSidebar}
-   className="absolute top-4 right-3 z-50 p-1.5 rounded-md hover:bg-black/5 dark:hover:bg-white/10 text-muted-foreground hover:text-primary transition-colors hidden md:block"
-   title={state === "expanded" ? "Collapse Sidebar" : "Expand Sidebar"}
- >
-   <PanelLeftIcon className="w-4 h-4" />
- </button>
  {children}
  </div>
  </div>
