@@ -286,15 +286,13 @@ function SidebarInset({ className, style, children, ...props }: React.ComponentP
  {/* Inner surface: removed hardcoded margin/padding to allow full-bleed layout */}
  <div
  style={{
- borderRadius: noPadding ? "0" : "0.5rem",
  overflow: "hidden",
  boxSizing: "border-box",
- margin: noPadding ? "0" : "0.5rem",
- padding: noPadding ? "0" : "2rem"
  }}
  className={cn(
  "relative z-10 flex-1 flex flex-col overflow-hidden",
- !noPadding && "rounded-lg shadow-sm bg-background"
+ !noPadding && "rounded-none md:rounded-lg shadow-sm bg-background m-0 md:m-2 p-0 md:p-4 lg:p-8",
+ noPadding && "rounded-none m-0 p-0"
  )}
  >
  {children}

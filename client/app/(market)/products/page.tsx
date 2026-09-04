@@ -228,11 +228,11 @@ export default async function ProductsPage({
               <div className="w-full h-full overflow-y-auto custom-scrollbar bg-surface">
                 <PageTransition>
                   {/* Editorial Header Section */}
-                  <div className="w-full px-8 py-8">
+                  <div className="w-full px-0 py-2 sm:py-4 md:py-6 lg:px-4">
                   
 
                     {/* ─── Product Grid ─── */}
-                    <div className="">
+                    <div className="w-full">
                       {products.length === 0 ? (
                         <div className="py-20 text-center">
                           <EmptyState
@@ -244,55 +244,80 @@ export default async function ProductsPage({
                           />
                         </div>
                       ) : (
-                        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8">
+                        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-0 border-t border-l border-border/50">
                           {products.map((product) => {
                             const image = product.images?.[0] ?? null;
                             const isInStock = product.stockQty > 0;
 
                             return (
-                              <div key={product.id} className="group">
+                              <div key={product.id} className="group relative bg-white dark:bg-card p-2 md:p-3 hover:shadow-md transition-shadow duration-300 border-r border-b border-border/50">
+                                {/* Wishlist Heart */}
+                                <div className="absolute top-2 right-2 z-10 cursor-pointer p-1 rounded-full bg-white/50 dark:bg-black/50 backdrop-blur-sm hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors">
+                                  <span className="material-symbols-outlined text-gray-400 hover:text-red-500 transition-colors text-[20px] md:text-[22px]">favorite_border</span>
+                                </div>
                                 <Link href={`/products/${product.id}`} className="block">
                                   {/* Card Image */}
-                                  <div className="relative mb-3 overflow-hidden rounded-lg bg-[#f8f9fa] dark:bg-white/[0.03] aspect-square border border-border dark:border-white/5 group-hover:border-primary/40 transition-all duration-500 shadow-sm group-hover:shadow-md">
+                                  <div className="relative mb-2 overflow-hidden bg-transparent aspect-square flex items-center justify-center">
                                     {image ? (
                                       <Image
                                         src={image}
                                         alt={product.name}
                                         fill
                                         sizes="(max-width:640px) 100vw,(max-width:1280px) 50vw,33vw"
-                                        className="object-contain p-2 transition-transform duration-700 group-hover:scale-110"
+                                        className="object-contain transition-transform duration-700 group-hover:scale-105"
                                       />
                                     ) : (
                                       <div className="absolute inset-0 flex items-center justify-center text-muted-foreground/30">
                                         <span className="material-symbols-outlined text-6xl">inventory_2</span>
                                       </div>
                                     )}
-                                    {/* Badge */}
-                                    <div className="absolute top-2 left-2 md:top-4 md:left-4">
-                                      {isInStock ? (
-                                        <span className="bg-tertiary-fixed text-on-tertiary-container px-2 py-0.5 md:px-3 md:py-1 rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-widest flex items-center gap-1 shadow-sm">
-                                          <span className="material-symbols-outlined text-[10px] md:text-[12px]" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                                          <span className="hidden sm:inline">In Stock</span>
-                                          <span className="sm:hidden">Stock</span>
-                                        </span>
-                                      ) : (
-                                        <span className="bg-surface-container-high text-on-surface-variant px-2 py-0.5 md:px-3 md:py-1 rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-widest flex items-center gap-1 shadow-sm">
-                                          <span className="material-symbols-outlined text-[10px] md:text-[12px]">schedule</span>
-                                          <span className="hidden sm:inline">Pre-Order</span>
-                                          <span className="sm:hidden">Pre</span>
-                                        </span>
-                                      )}
-                                    </div>
                                   </div>
 
+                                  {/* Sponsored / Hashtag */}
+                                  <p className="text-[10px] md:text-[11px] text-[#2874f0] dark:text-blue-400 font-semibold mb-1">#BestSeller</p>
+
                                   {/* Card Body */}
-                                  <div className="pt-2 pb-1">
-                                    <h2 className="text-xs sm:text-sm md:text-base font-headline font-bold text-foreground line-clamp-2 leading-tight group-hover:text-primary transition-colors uppercase tracking-tight">
+                                  <div>
+                                    <h2 className="text-[11px] sm:text-xs md:text-sm font-medium text-foreground/90 line-clamp-2 leading-tight group-hover:text-primary transition-colors">
                                       {product.name}
                                     </h2>
-                                    <p className="text-sm md:text-lg font-headline font-black text-foreground mt-1">
-                                      {formatMoney(product.price)}
-                                    </p>
+                                    
+                                    {/* Ratings Mock */}
+                                    <div className="flex items-center gap-1 mt-1.5">
+                                      <div className="flex items-center text-[#388e3c]">
+                                        <span className="material-symbols-outlined text-[12px] md:text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                                        <span className="material-symbols-outlined text-[12px] md:text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                                        <span className="material-symbols-outlined text-[12px] md:text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                                        <span className="material-symbols-outlined text-[12px] md:text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                                        <span className="material-symbols-outlined text-[12px] md:text-[14px]">star_half</span>
+                                      </div>
+                                      <span className="text-[10px] text-muted-foreground ml-0.5">(4.5)</span>
+                                      <span className="ml-1 bg-green-500 text-white text-[8px] font-bold px-1 py-0.5 rounded-sm uppercase tracking-wider">Top</span>
+                                    </div>
+
+                                    {/* Price */}
+                                    <div className="flex items-center flex-wrap gap-1.5 mt-1.5">
+                                      {product.regularPrice > product.price ? (
+                                        <>
+                                          <span className="text-[#388e3c] font-bold text-xs md:text-sm">
+                                            ↓{Math.round(((product.regularPrice - product.price) / product.regularPrice) * 100)}%
+                                          </span>
+                                          <span className="text-muted-foreground line-through text-xs md:text-sm">
+                                            {formatMoney(product.regularPrice)}
+                                          </span>
+                                        </>
+                                      ) : null}
+                                      <span className="font-bold text-sm md:text-base text-foreground">
+                                        {formatMoney(product.price)}
+                                      </span>
+                                    </div>
+
+                                    {/* Badges */}
+                                    <div className="mt-1.5">
+                                      <span className="inline-block bg-[#e8f5e9] text-[#2e7d32] dark:bg-green-900/30 dark:text-green-400 px-1.5 py-0.5 text-[9px] md:text-[10px] rounded font-semibold border border-green-200 dark:border-green-800">
+                                        Hot Deal
+                                      </span>
+                                    </div>
                                   </div>
                                 </Link>
                               </div>
