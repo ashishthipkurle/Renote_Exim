@@ -80,12 +80,12 @@ export default function DashboardHeader() {
   return (
     <>
       <header className={`sticky top-0 z-40 border-b border-border/50 dark:border-white/10 bg-background/20 backdrop-blur-xl transition-all duration-300 w-full h-14`}>
-        <div className="flex h-full items-center px-4 md:px-6">
+        <div className="flex h-full items-center px-4 md:pl-6 md:pr-12 lg:pr-16">
 
           {/* LEFT SECTION */}
           <div className="flex items-center gap-2 md:gap-4">
             {/* Logo */}
-            <Link href="/" className="hidden xl:flex items-center flex-shrink-0">
+            <Link href="/" className="hidden md:flex items-center flex-shrink-0">
               <Image
                 src={LogoImg}
                 alt="Ranote Exim Logo"
@@ -101,8 +101,8 @@ export default function DashboardHeader() {
                 className="h-10 w-10 md:ml-4 lg:ml-8 rounded-xl flex items-center justify-center hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors border border-transparent hover:border-primary/20"
                 title={open ? "Collapse Sidebar" : "Expand Sidebar"}
               >
-                <Menu className="w-5 h-5 xl:hidden" />
-                <div className="hidden xl:block">
+                <Menu className="w-5 h-5 md:hidden" />
+                <div className="hidden md:block">
                   {open ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
                 </div>
               </button>
@@ -140,7 +140,7 @@ export default function DashboardHeader() {
             </div>
 
             {/* DESKTOP ONLY ACTIONS (Orders, Wishlist, Cart, Notifications) */}
-            <div className="hidden xl:flex items-center gap-1 sm:gap-2">
+            <div className="hidden md:flex items-center gap-1 sm:gap-2">
               {/* Orders — hidden for exporters and importers */}
               {!isExporter && !isImporter && (
                 <Link
@@ -183,7 +183,7 @@ export default function DashboardHeader() {
 
             {/* PROFILE DROPDOWN OR SIGN IN */}
             {mounted && (
-              <div className="hidden xl:block relative" ref={dropdownRef}>
+              <div className="hidden md:block relative" ref={dropdownRef}>
                 {loading ? (
                   <div className="size-9 rounded-full bg-muted animate-pulse border border-border/50" />
                 ) : user ? (
