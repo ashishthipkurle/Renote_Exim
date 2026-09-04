@@ -80,7 +80,7 @@ export default function DashboardHeader() {
   return (
     <>
       <header className={`sticky top-0 z-40 border-b border-border/50 dark:border-white/10 bg-background/20 backdrop-blur-xl transition-all duration-300 w-full h-14`}>
-        <div className="flex h-full items-center px-4 md:pl-6 md:pr-10 lg:pr-14">
+        <div className="flex h-full items-center px-4 md:pl-6 md:pr-4 lg:pr-8">
 
           {/* LEFT SECTION */}
           <div className="flex items-center gap-2 md:gap-4">
@@ -113,42 +113,42 @@ export default function DashboardHeader() {
           <div className="flex-1 min-w-[1rem]" />
 
           {/* RIGHT SECTION: SEARCH + ACTIONS */}
-          <div className="flex flex-shrink-0 items-center gap-1 sm:gap-2 lg:gap-4">
+          <div className="flex flex-shrink-0 items-center gap-1 md:gap-2">
 
             {/* SEARCH BAR (Pushed to Right, fills space on mobile) */}
-            <div className="flex-1 max-w-[140px] sm:max-w-[180px] md:max-w-[220px] lg:max-w-xs relative group mr-1 md:mr-2">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+            <div className="flex-1 max-w-[140px] sm:max-w-[180px] md:max-w-[200px] lg:max-w-xs relative group mr-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground group-focus-within:text-primary transition-colors" />
               <input
                 type="text"
-                placeholder={t("search_placeholder", "Search shipments, assets...")}
-                className="w-full bg-muted/50 border border-border/50 dark:border-white/5 focus:border-white/40 rounded-full pl-9 pr-3 py-1.5 md:pl-10 md:pr-4 md:py-2 text-xs md:text-sm text-foreground outline-none transition-all focus:bg-background shadow-inner"
+                placeholder={t("search_placeholder", "Search...")}
+                className="w-full bg-muted/50 border border-border/50 dark:border-white/5 focus:border-white/40 rounded-full pl-8 pr-3 py-1.5 md:pl-9 md:pr-4 md:py-1.5 text-xs text-foreground outline-none transition-all focus:bg-background shadow-inner"
               />
             </div>
 
             {/* ALWAYS VISIBLE (Language & Theme) */}
-            <div className="flex flex-shrink-0 items-center gap-1 sm:gap-2">
+            <div className="flex flex-shrink-0 items-center gap-1">
               <LanguageSwitcher />
               {/* Theme Toggle */}
               {mounted && (
                 <button
                   onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  className="size-8 md:size-9 rounded-full hover:bg-primary/10 flex items-center justify-center text-muted-foreground hover:text-primary transition-all active:scale-95 border border-transparent hover:border-primary/20"
+                  className="size-7 md:size-8 rounded-full hover:bg-primary/10 flex items-center justify-center text-muted-foreground hover:text-primary transition-all active:scale-95 border border-transparent hover:border-primary/20"
                 >
-                  {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                  {theme === "dark" ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
                 </button>
               )}
             </div>
 
             {/* DESKTOP ONLY ACTIONS (Orders, Wishlist, Cart, Notifications) */}
-            <div className="hidden md:flex items-center gap-1 sm:gap-2">
+            <div className="hidden md:flex items-center gap-1">
               {/* Orders — hidden for exporters and importers */}
               {!isExporter && !isImporter && (
                 <Link
                   href="/orders"
-                  className="size-9 flex items-center justify-center rounded-full hover:bg-primary/10 transition-all border border-transparent hover:border-primary/20 group text-muted-foreground hover:text-primary"
+                  className="size-7 md:size-8 flex items-center justify-center rounded-full hover:bg-primary/10 transition-all border border-transparent hover:border-primary/20 group text-muted-foreground hover:text-primary"
                   title="Orders"
                 >
-                  <Package className="w-4 h-4" />
+                  <Package className="w-3.5 h-3.5" />
                 </Link>
               )}
 
@@ -156,12 +156,12 @@ export default function DashboardHeader() {
               {!isExporter && (
                 <Link
                   href="/wishlist"
-                  className="size-9 flex items-center justify-center rounded-full hover:bg-primary/10 transition-all border border-transparent hover:border-primary/20 group text-muted-foreground hover:text-primary relative"
+                  className="size-7 md:size-8 flex items-center justify-center rounded-full hover:bg-primary/10 transition-all border border-transparent hover:border-primary/20 group text-muted-foreground hover:text-primary relative"
                   title="Wishlist"
                 >
-                  <Heart className="w-4 h-4" />
+                  <Heart className="w-3.5 h-3.5" />
                   {mounted && wishlistCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-primary-foreground font-black text-[10px] flex items-center justify-center rounded-full animate-in zoom-in shadow-lg">
+                    <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-primary text-primary-foreground font-black text-[9px] flex items-center justify-center rounded-full animate-in zoom-in shadow-lg">
                       {wishlistCount}
                     </span>
                   )}
@@ -170,16 +170,18 @@ export default function DashboardHeader() {
 
               {/* Cart — hidden for exporters */}
               {!isExporter && (
-                <div className="size-9 flex items-center justify-center rounded-full hover:bg-primary/10 transition-all border border-transparent hover:border-primary/20 group">
+                <div className="size-7 md:size-8 flex items-center justify-center rounded-full hover:bg-primary/10 transition-all border border-transparent hover:border-primary/20 group">
                   <CartSheet />
                 </div>
               )}
 
               {/* Notifications */}
-              <NotificationBell />
+              <div className="scale-90 origin-right">
+                <NotificationBell />
+              </div>
             </div>
 
-            <div className="h-6 w-px bg-border dark:bg-white/10 mx-1 xs:block" />
+            <div className="h-5 w-px bg-border dark:bg-white/10 mx-1 xs:block" />
 
             {/* PROFILE DROPDOWN OR SIGN IN */}
             {mounted && (
@@ -245,9 +247,9 @@ export default function DashboardHeader() {
                 ) : (
                   <Link
                     href="/login"
-                    className="px-4 py-2 bg-primary text-primary-foreground rounded-full text-sm font-bold hover:opacity-90 transition-all active:scale-95 shadow-lg shadow-primary/20 flex items-center gap-2"
+                    className="px-3 py-1.5 md:px-4 md:py-1.5 bg-primary text-primary-foreground rounded-full text-xs md:text-sm font-bold hover:opacity-90 transition-all active:scale-95 shadow-lg shadow-primary/20 flex items-center gap-1.5"
                   >
-                    <LogOut className="w-4 h-4 rotate-180" />
+                    <LogOut className="w-3.5 h-3.5 rotate-180" />
                     <span>{t("signin", "Sign In")}</span>
                   </Link>
                 )}
