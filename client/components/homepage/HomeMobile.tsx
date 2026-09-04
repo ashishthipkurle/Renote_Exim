@@ -27,37 +27,31 @@ export default function HomeMobile() {
 
   const sectionRef = useRef<HTMLElement>(null);
 
-  // Continuous Spin + Parallax Effect for the realistic globe images
+  // Parallax Effect for the realistic globe images (only on scroll)
   useEffect(() => {
-    let animationFrameId: number;
-    let currentRotation = 0;
-
-    const render = () => {
+    const onScroll = () => {
       const globes = document.querySelectorAll<HTMLElement>(".mobile-parallax-globe");
       const section = sectionRef.current;
       
-      if (globes.length > 0 && section) {
-        const rect = section.getBoundingClientRect();
-        const scrolled = Math.max(0, -rect.top);
+      if (globes.length === 0 || !section) return;
 
-        currentRotation -= 0.03; // Continuous slow rotation
-        
-        const newY = 20 + scrolled * 0.04;
-        const scrollRotationOffset = scrolled * -0.01;
-        const scale = 1.05 + scrolled * 0.0002;
+      const rect = section.getBoundingClientRect();
+      const scrolled = Math.max(0, -rect.top);
+      
+      const newY = 20 + scrolled * 0.04;
+      const scrollRotationOffset = scrolled * -0.01;
+      const scale = 1.05 + scrolled * 0.0002;
 
-        globes.forEach((globe) => {
-          globe.style.backgroundPosition = `center ${Math.min(newY, 100)}%`;
-          globe.style.transform = `scale(${scale}) rotate(${currentRotation + scrollRotationOffset}deg)`;
-        });
-      }
-
-      animationFrameId = requestAnimationFrame(render);
+      globes.forEach((globe) => {
+        globe.style.backgroundPosition = `center ${Math.min(newY, 100)}%`;
+        globe.style.transform = `scale(${scale}) rotate(${scrollRotationOffset}deg)`;
+      });
     };
 
-    render(); // Start loop
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll(); // Initial call
 
-    return () => cancelAnimationFrame(animationFrameId);
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
