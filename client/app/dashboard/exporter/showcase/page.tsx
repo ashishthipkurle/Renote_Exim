@@ -253,8 +253,8 @@ export default function AdminShowcasePage() {
         <div className="max-w-6xl mx-auto space-y-12">
           
           {/* Add Product Section */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden">
-            <div className="p-6 border-b border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-slate-800/30 flex items-center gap-3">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl shadow-xl shadow-slate-200/20 dark:shadow-none">
+            <div className="p-6 border-b border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-slate-800/30 flex items-center gap-3 rounded-t-2xl">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
                 <Star className="w-5 h-5 fill-current" />
               </div>
@@ -310,10 +310,11 @@ export default function AdminShowcasePage() {
 
                   {/* Dropdown Results */}
                   {isDropdownOpen && !selectedProduct && (
-                    <div className="absolute z-50 mt-2 w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl shadow-slate-200/50 dark:shadow-black/40 max-h-64 overflow-y-auto custom-scrollbar">
+                    <div className="absolute z-50 mt-2 w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl shadow-slate-200/50 dark:shadow-black/40 max-h-64 overflow-y-auto overscroll-contain custom-scrollbar">
                       {filteredProducts.length > 0 ? (
                         filteredProducts.map(p => (
                           <button
+                            type="button"
                             key={p.id}
                             className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors border-b border-slate-100 dark:border-white/5 last:border-b-0"
                             onClick={() => {
