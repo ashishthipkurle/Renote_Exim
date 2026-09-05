@@ -62,6 +62,19 @@ const defaultProduct: ProductData = {
   quantity: 0,
 };
 
+const UNITS = [
+  { value: "pcs", label: "Pieces (pcs)" },
+  { value: "kg", label: "Kilograms (kg)" },
+  { value: "g", label: "Grams (g)" },
+  { value: "tons", label: "Metric Tons" },
+  { value: "lbs", label: "Pounds (lbs)" },
+  { value: "liters", label: "Liters (L)" },
+  { value: "boxes", label: "Boxes" },
+  { value: "cartons", label: "Cartons" },
+  { value: "pallets", label: "Pallets" },
+  { value: "containers", label: "Containers" },
+];
+
 const VALID_CATEGORIES = new Set([
   "CHEMICALS", "MACHINES", "TEXTILES", "MEDICAL", "HANDICRAFTS",
   "FOOD", "ELECTRONICS", "AUTOMOTIVE", "CONSTRUCTION", "AGRICULTURE", 
@@ -352,13 +365,17 @@ export default function ProductForm({
                 </div>
                 <div>
                   <label className={labelClass}>Unit</label>
-                  <input
+                  <select
                     name="unit"
                     value={form.unit}
                     onChange={handleChange}
-                    placeholder="e.g. Metric Tons"
                     className={inputClass}
-                  />
+                  >
+                    <option value="" disabled>Select unit</option>
+                    {UNITS.map(u => (
+                      <option key={u.value} value={u.value}>{u.label}</option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label className={labelClass}>Stock Available</label>
@@ -452,34 +469,7 @@ export default function ProductForm({
             </div>
           </div>
 
-          {/* Quick Stats/Info Card */}
-          <div className="bg-primary/5 border border-primary/10 rounded-xl p-6">
-            <h3 className="font-bold text-primary mb-4 flex items-center gap-2">
-              <Tag className="w-4 h-4" />
-              Listing Quality
-            </h3>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex justify-between text-xs font-medium">
-                  <span className="text-slate-500">Completeness</span>
-                  <span className="text-primary">85%</span>
-                </div>
-                <div className="h-1.5 w-full bg-primary/10 rounded-full overflow-hidden">
-                  <div className="h-full bg-primary w-[85%]" />
-                </div>
-              </div>
-              <ul className="text-[11px] text-slate-600 dark:text-slate-400 space-y-2">
-                <li className="flex items-start gap-2">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                  Detailed descriptions increase buyer interest by 40%
-                </li>
-                <li className="flex items-start gap-2">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                  Adding HS codes speeds up customs clearance
-                </li>
-              </ul>
-            </div>
-          </div>
+
         </div>
       </div>
       
