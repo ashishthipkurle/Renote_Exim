@@ -406,7 +406,7 @@ export default function OrdersTable({ orders, counts, transportMethods = [] }: O
     <div className="space-y-0">
       {/* ── Shopify-style tabs ──────────────────────────────────────────── */}
       <div className="bg-card border border-border rounded-t-xl">
-        <div className="flex items-center border-b border-border">
+        <div className="flex items-center border-b border-border overflow-x-auto custom-scrollbar">
           {statusTabs.map((tab) => (
             <button
               key={tab.id}

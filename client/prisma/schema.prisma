@@ -45,6 +45,8 @@ model User {
   suppliersAsExporter Supplier[]         @relation("ExporterSuppliers")
   suppliersAsImporter Supplier[]         @relation("ImporterSuppliers")
   transportMethods    TransportMethod[]  @relation("ExporterTransportMethods")
+  reviewsReceived     Review[]           @relation("UserReviewsReceived")
+  reviewsGiven        Review[]           @relation("UserReviewsGiven")
 
   @@map("users")
 }
@@ -79,6 +81,7 @@ model Product {
   orders           Order[]                  @relation("ProductOrders")
   priceHistory     PriceHistory[]
   exporter         User                     @relation("ExporterProducts", fields: [exporterId], references: [id])
+  reviews          Review[]                 @relation("ProductReviews")
 
   @@index([searchVector], type: Gin)
   @@map("products")
@@ -146,6 +149,7 @@ model Order {
   product                Product       @relation("ProductOrders", fields: [productId], references: [id])
   seller                 User          @relation("SellerOrders", fields: [sellerId], references: [id])
   shipment               Shipment?
+  review                 Review?
 
   @@map("orders")
 }
@@ -360,6 +364,25 @@ model StripeEvent {
   processedAt   DateTime @default(now())
 
   @@map("stripe_events")
+}
+
+model Review {
+  id         String   @id @default(uuid())
+  orderId    String   @unique
+  productId  String
+  userId     String   // The exporter being reviewed
+  reviewerId String   // The importer giving the review
+  rating     Float
+  comment    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  order      Order    @relation(fields: [orderId], references: [id])
+  product    Product  @relation("ProductReviews", fields: [productId], references: [id])
+  user       User     @relation("UserReviewsReceived", fields: [userId], references: [id])
+  reviewer   User     @relation("UserReviewsGiven", fields: [reviewerId], references: [id])
+
+  @@map("reviews")
 }
 
 enum Role {

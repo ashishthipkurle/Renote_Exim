@@ -23,6 +23,7 @@ import {
  SidebarMenuButton,
  SidebarMenuItem,
  SidebarSeparator,
+ useSidebar,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -36,6 +37,7 @@ interface NavItem {
 export default function SupplierSidebar({ basePath }: { basePath: string }) {
  const pathname = usePathname();
  const { user } = useAuth();
+ const { setOpenMobile } = useSidebar();
 
  const nav: NavItem[] = [
  { href: basePath, label: "Dashboard", icon: LayoutDashboard },
@@ -66,7 +68,7 @@ export default function SupplierSidebar({ basePath }: { basePath: string }) {
  : "text-slate-500 dark:text-muted-foreground hover:bg-slate-100 dark:hover:bg-white/5 hover:text-[#D4AF37] dark:hover:text-[#D4AF37]"
  )}
  >
- <Link href={item.href} className="flex items-center gap-3 w-full">
+ <Link href={item.href} className="flex items-center gap-3 w-full" onClick={() => setOpenMobile(false)}>
  <item.icon className="size-5 transition-colors" />
  <span className="font-semibold text-sm">{item.label}</span>
  </Link>
@@ -91,7 +93,7 @@ export default function SupplierSidebar({ basePath }: { basePath: string }) {
  : "text-slate-500 dark:text-muted-foreground hover:bg-slate-100 dark:hover:bg-white/5 hover:text-[#D4AF37] dark:hover:text-[#D4AF37]"
  )}
  >
- <Link href={`${basePath}/settings`} className="flex items-center gap-3 w-full">
+ <Link href={`${basePath}/settings`} className="flex items-center gap-3 w-full" onClick={() => setOpenMobile(false)}>
  <Settings className="size-5" />
  <span className="font-semibold text-sm">Settings</span>
  </Link>

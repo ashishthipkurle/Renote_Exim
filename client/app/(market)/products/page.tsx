@@ -97,6 +97,7 @@ export default async function ProductsPage({
     images: string[];
     stockQty: number;
     exporter: { name: string | null; businessName: string | null; country: string | null };
+    reviews: { rating: number }[];
   };
   let products: ProductWithExporter[] = [];
   let total = 0;
@@ -134,10 +135,11 @@ export default async function ProductsPage({
     total = fetchedTotal;
     activeCategoryValues = fetchedCategories.map((c: any) => c.category?.toUpperCase() || c.category);
 
-    // Apply role-based price swap
+    // Apply role-based price swap and mock reviews array (since DB push failed)
     products = products.map((p) => ({
       ...p,
-      price: role === "IMPORTER" ? p.price : (p.regularPrice || p.price)
+      price: role === "IMPORTER" ? p.price : (p.regularPrice || p.price),
+      reviews: [] // Default to empty until DB is updated
     }));
   } catch (error) {
     console.error("Failed to fetch products from Prisma:", error);
@@ -248,6 +250,13 @@ export default async function ProductsPage({
                           {products.map((product) => {
                             const image = product.images?.[0] ?? null;
                             const isInStock = product.stockQty > 0;
+                            const reviewsCount = product.reviews?.length || 0;
+                            const averageRating = reviewsCount > 0 
+                              ? product.reviews.reduce((acc, r) => acc + r.rating, 0) / reviewsCount 
+                              : 0;
+                            const ratingDisplay = averageRating > 0 ? averageRating.toFixed(1) : "0.0";
+                            const fullStars = Math.floor(averageRating);
+                            const hasHalfStar = averageRating - fullStars >= 0.5;
 
                             return (
                               <div key={product.id} className="group relative bg-white dark:bg-card p-2 md:p-3 hover:shadow-md transition-shadow duration-300 border-r border-b border-border/50">
@@ -282,17 +291,19 @@ export default async function ProductsPage({
                                       {product.name}
                                     </h2>
                                     
-                                    {/* Ratings Mock */}
+                                    {/* Ratings */}
                                     <div className="flex items-center gap-1 mt-1.5">
                                       <div className="flex items-center text-[#388e3c]">
-                                        <span className="material-symbols-outlined text-[12px] md:text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                                        <span className="material-symbols-outlined text-[12px] md:text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                                        <span className="material-symbols-outlined text-[12px] md:text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                                        <span className="material-symbols-outlined text-[12px] md:text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                                        <span className="material-symbols-outlined text-[12px] md:text-[14px]">star_half</span>
+                                        {[...Array(5)].map((_, i) => {
+                                          if (i < fullStars) return <span key={i} className="material-symbols-outlined text-[12px] md:text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>;
+                                          if (i === fullStars && hasHalfStar) return <span key={i} className="material-symbols-outlined text-[12px] md:text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>star_half</span>;
+                                          return <span key={i} className="material-symbols-outlined text-[12px] md:text-[14px]">star</span>;
+                                        })}
                                       </div>
-                                      <span className="text-[10px] text-muted-foreground ml-0.5">(4.5)</span>
-                                      <span className="ml-1 bg-green-500 text-white text-[8px] font-bold px-1 py-0.5 rounded-sm uppercase tracking-wider">Top</span>
+                                      <span className="text-[10px] text-muted-foreground ml-0.5">({ratingDisplay})</span>
+                                      {averageRating >= 4.5 && (
+                                        <span className="ml-1 bg-green-500 text-white text-[8px] font-bold px-1 py-0.5 rounded-sm uppercase tracking-wider">Top</span>
+                                      )}
                                     </div>
 
                                     {/* Price */}

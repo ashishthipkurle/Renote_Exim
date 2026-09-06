@@ -20,11 +20,12 @@ export async function POST(request: NextRequest) {
 
  if (!order) return NextResponse.json({ error: 'Order not found' }, { status: 404 });
  if (order.review) return NextResponse.json({ error: 'Review already exists' }, { status: 400 });
- if (order.status !== 'DELIVERED') return NextResponse.json({ error: 'Can only review delivered orders' }, { status: 400 });
+ if (order.orderStatus !== 'DELIVERED') return NextResponse.json({ error: 'Can only review delivered orders' }, { status: 400 });
 
  const review = await prisma.review.create({
  data: {
  orderId,
+ productId: order.productId,
  userId, // Being reviewed
  reviewerId: context.userId,
  rating: Number(rating),
@@ -49,7 +50,8 @@ export async function GET(request: NextRequest) {
  const reviews = await prisma.review.findMany({
  where: { userId },
  include: {
- reviewer: { select: { name: true, avatar: true } }
+ reviewer: { select: { name: true, avatar: true } },
+ product: { select: { name: true } }
  },
  orderBy: { createdAt: 'desc' }
  });

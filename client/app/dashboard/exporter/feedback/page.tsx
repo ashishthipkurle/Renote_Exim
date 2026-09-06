@@ -1,21 +1,42 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useAuth } from '@/components/auth/AuthProvider';
 import {
     Star,
     MessageSquare,
     AlertCircle,
     ShieldCheck,
     Zap,
-    User
+    User,
+    Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function ExporterFeedback() {
     const [activeTab, setActiveTab] = useState('ALL');
+    const { user } = useAuth();
+    const [feedbacks, setFeedbacks] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    // Currently no dummy data. Waiting for API integration.
-    const feedbacks: any[] = []; 
+    useEffect(() => {
+        if (!user?.id) {
+            setLoading(false);
+            return;
+        }
+        const fetchFeedbacks = async () => {
+            try {
+                const res = await axios.get(`/api/reviews?userId=${user.id}`);
+                setFeedbacks(res.data.reviews || []);
+            } catch (error) {
+                console.error("Error fetching feedbacks:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchFeedbacks();
+    }, [user?.id]);
 
     const filteredFeedbacks = activeTab === 'ALL' ? feedbacks : feedbacks.filter(f => f.category === activeTab);
 
@@ -44,7 +65,11 @@ export default function ExporterFeedback() {
 
             <div className="flex-1 overflow-y-auto p-10 space-y-16 custom-scrollbar animate-in fade-in slide-in-from-bottom-4 duration-1000">
                 <div className="max-w-[1700px] mx-auto space-y-16">
-                    {filteredFeedbacks.length === 0 ? (
+                    {loading ? (
+                        <div className="flex justify-center items-center py-32">
+                            <Loader2 className="w-10 h-10 animate-spin text-primary" />
+                        </div>
+                    ) : filteredFeedbacks.length === 0 ? (
                         <div className="bg-card/40 dark:bg-white/5 backdrop-blur-3xl border border-border dark:border-white/5 shadow-xl dark:shadow-2xl rounded-lg p-24 text-center">
                             <div className="flex flex-col items-center gap-8 opacity-40">
                                 <div className="p-10 rounded-lg bg-black/5 dark:bg-white/10 border border-border dark:border-white/10">
@@ -72,28 +97,38 @@ export default function ExporterFeedback() {
                                                 VERIFIED_NODE
                                             </span>
                                             <div className="flex items-center gap-2 text-[9px] font-black text-muted-foreground uppercase tracking-widest bg-black/5 dark:bg-white/10 px-4 py-2 rounded-full">
-                                                {item.date}
+                                                {new Date(item.createdAt).toLocaleDateString()}
                                             </div>
                                         </div>
 
                                         <div className="flex items-center gap-4 mb-6">
-                                            <div className="w-12 h-12 rounded-full bg-black/10 dark:bg-white/10 flex items-center justify-center border border-border dark:border-white/10 text-muted-foreground">
-                                                <User className="w-5 h-5" />
+                                            <div className="w-12 h-12 rounded-full bg-black/10 dark:bg-white/10 flex items-center justify-center border border-border dark:border-white/10 text-muted-foreground overflow-hidden">
+                                                {item.reviewer?.avatar ? (
+                                                    <img src={item.reviewer.avatar} alt="avatar" className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <User className="w-5 h-5" />
+                                                )}
                                             </div>
                                             <div>
                                                 <h3 className="text-lg font-black text-foreground dark:text-white tracking-tighter uppercase group-hover:translate-x-1 transition-transform">
-                                                    {item.user}
+                                                    {item.reviewer?.name || 'Anonymous'}
                                                 </h3>
                                                 <div className="flex items-center gap-1 mt-1 text-[#D4AF37]">
                                                     {[...Array(5)].map((_, i) => (
-                                                        <Star key={i} className={`w-3.5 h-3.5 ${i < item.rating ? 'fill-current' : 'fill-transparent opacity-30 text-muted-foreground'}`} />
+                                                        <Star key={i} className={`w-3.5 h-3.5 ${i < Math.round(item.rating) ? 'fill-current' : 'fill-transparent opacity-30 text-muted-foreground'}`} />
                                                     ))}
                                                 </div>
                                             </div>
                                         </div>
 
+                                        {item.product?.name && (
+                                            <div className="mb-4 text-xs font-semibold text-primary truncate max-w-full">
+                                                Product: {item.product.name}
+                                            </div>
+                                        )}
+
                                         <p className="text-muted-foreground/60 text-sm font-medium line-clamp-4 leading-relaxed group-hover:text-muted-foreground/80 transition-colors">
-                                            "{item.comment}"
+                                            "{item.comment || 'No comment provided'}"
                                         </p>
                                     </div>
 

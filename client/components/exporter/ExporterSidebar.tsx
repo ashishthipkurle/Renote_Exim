@@ -28,6 +28,7 @@ import {
  SidebarMenuButton,
  SidebarMenuItem,
  SidebarSeparator,
+ useSidebar,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -48,6 +49,7 @@ export default function ExporterSidebar({ basePath }: { basePath: string }) {
  const { user } = useAuth();
  const { counts } = useUnreadCategories();
  const isMaster = user?.role === "ADMIN";
+ const { setOpenMobile } = useSidebar();
 
  const nav: NavItem[] = [
  { href: basePath, labelKey: "sidebar.dashboard", defaultLabel: "Dashboard", icon: LayoutDashboard },
@@ -85,7 +87,7 @@ export default function ExporterSidebar({ basePath }: { basePath: string }) {
  : "text-slate-500 dark:text-muted-foreground hover:bg-slate-100 dark:hover:bg-white/5 hover:text-[#D4AF37] dark:hover:text-[#D4AF37]"
  )}
  >
- <Link href={item.href} className="flex items-center gap-3 w-full">
+ <Link href={item.href} className="flex items-center gap-3 w-full" onClick={() => setOpenMobile(false)}>
  <item.icon className="size-5 transition-colors" />
  <span className="font-semibold text-sm flex-1">{t(item.labelKey, item.defaultLabel)}</span>
  {item.badgeCount && item.badgeCount > 0 ? (
@@ -115,7 +117,7 @@ export default function ExporterSidebar({ basePath }: { basePath: string }) {
  : "text-slate-500 dark:text-muted-foreground hover:bg-slate-100 dark:hover:bg-white/5 hover:text-[#D4AF37] dark:hover:text-[#D4AF37]"
  )}
  >
- <Link href={`${basePath}/settings`} className="flex items-center gap-3 w-full">
+ <Link href={`${basePath}/settings`} className="flex items-center gap-3 w-full" onClick={() => setOpenMobile(false)}>
  <Settings className="size-5 transition-colors" />
  <span className="font-semibold text-sm">{t("sidebar.settings", "Settings")}</span>
  </Link>

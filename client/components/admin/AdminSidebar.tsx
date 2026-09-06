@@ -26,6 +26,7 @@ import {
  SidebarMenuButton,
  SidebarMenuItem,
  SidebarSeparator,
+ useSidebar,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/lib/i18n/client";
@@ -40,6 +41,7 @@ type NavItem = {
 export default function AdminSidebar({ basePath = "/dashboard/admin" }: { basePath?: string }) {
  const { t } = useTranslation();
  const pathname = usePathname();
+ const { setOpenMobile } = useSidebar();
 
  const nav: NavItem[] = [
  { href: basePath, labelKey: "sidebar.overview", defaultLabel: "Overview", icon: LayoutDashboard },
@@ -75,7 +77,7 @@ export default function AdminSidebar({ basePath = "/dashboard/admin" }: { basePa
  : "text-slate-500 dark:text-muted-foreground hover:bg-slate-100 dark:hover:bg-white/5"
  )}
  >
- <Link href={item.href} className="flex items-center gap-3 w-full">
+ <Link href={item.href} className="flex items-center gap-3 w-full" onClick={() => setOpenMobile(false)}>
  <item.icon className={cn("size-5 transition-colors", isActive(item.href) ? "text-primary" : "group-hover:text-primary")} />
  <span className="font-semibold text-sm">{t(item.labelKey, item.defaultLabel)}</span>
  </Link>
@@ -100,7 +102,7 @@ export default function AdminSidebar({ basePath = "/dashboard/admin" }: { basePa
  : "text-slate-500 dark:text-muted-foreground hover:bg-slate-100 dark:hover:bg-white/5"
  )}
  >
- <Link href={`${basePath}/settings`} className="flex items-center gap-3 w-full">
+ <Link href={`${basePath}/settings`} className="flex items-center gap-3 w-full" onClick={() => setOpenMobile(false)}>
  <Settings className={cn("size-5 transition-colors", isActive(`${basePath}/settings`) ? "text-primary" : "group-hover:text-primary")} />
  <span className="font-semibold text-sm">{t("sidebar.settings", "Settings")}</span>
  </Link>

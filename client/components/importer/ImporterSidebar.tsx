@@ -22,6 +22,7 @@ import {
  SidebarMenuButton,
  SidebarMenuItem,
  SidebarSeparator,
+ useSidebar,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { useUnreadCategories } from "@/hooks/useUnreadCategories";
@@ -49,6 +50,7 @@ export default function ImporterSidebar({ basePath, children }: { basePath: stri
  const { user, logout } = useAuth();
  const { theme, setTheme } = useTheme();
  const [mounted, setMounted] = useState(false);
+ const { setOpenMobile } = useSidebar();
 
  useEffect(() => {
    setMounted(true);
@@ -77,7 +79,7 @@ export default function ImporterSidebar({ basePath, children }: { basePath: stri
  {/* Mobile Only: Logo & Profile */}
  <div className="md:hidden mb-6 mt-2 space-y-6">
    <div className="flex items-center justify-center">
-     <Link href="/" className="flex items-center flex-shrink-0">
+     <Link href="/" className="flex items-center flex-shrink-0" onClick={() => setOpenMobile(false)}>
        <Image
          src={LogoImg}
          alt="Ranote Exim Logo"
@@ -106,7 +108,7 @@ export default function ImporterSidebar({ basePath, children }: { basePath: stri
      </div>
    ) : (
      <div className="flex justify-center w-full px-4 pt-4">
-       <Link href="/login" className="text-sm font-bold text-primary bg-primary/10 py-2 px-6 rounded-full w-full text-center">Sign In</Link>
+       <Link href="/login" className="text-sm font-bold text-primary bg-primary/10 py-2 px-6 rounded-full w-full text-center" onClick={() => setOpenMobile(false)}>Sign In</Link>
      </div>
    )}
  </div>
@@ -126,7 +128,7 @@ export default function ImporterSidebar({ basePath, children }: { basePath: stri
  : "text-slate-500 dark:text-muted-foreground hover:bg-slate-100 dark:hover:bg-white/5 hover:text-[#D4AF37] dark:hover:text-[#D4AF37]"
  )}
  >
- <Link href={item.href} className="flex items-center gap-3 w-full">
+ <Link href={item.href} className="flex items-center gap-3 w-full" onClick={() => setOpenMobile(false)}>
  <item.icon className="size-5 transition-colors" />
  <span className="font-semibold text-sm flex-1">{item.label}</span>
  {item.badgeCount && item.badgeCount > 0 ? (
@@ -147,7 +149,7 @@ export default function ImporterSidebar({ basePath, children }: { basePath: stri
      {user && (
        <SidebarMenuItem>
          <SidebarMenuButton asChild className="text-slate-500 dark:text-muted-foreground hover:bg-slate-100 dark:hover:bg-white/5 hover:text-[#D4AF37] dark:hover:text-[#D4AF37] transition-all duration-300 rounded-xl px-2 py-3">
-           <Link href="/dashboard" className="flex items-center gap-3 w-full">
+           <Link href="/dashboard" className="flex items-center gap-3 w-full" onClick={() => setOpenMobile(false)}>
              <Home className="size-5 transition-colors" />
              <span className="font-bold text-sm flex-1 tracking-tight">Dashboard</span>
            </Link>
@@ -156,7 +158,7 @@ export default function ImporterSidebar({ basePath, children }: { basePath: stri
      )}
      <SidebarMenuItem>
        <SidebarMenuButton asChild className="text-slate-500 dark:text-muted-foreground hover:bg-slate-100 dark:hover:bg-white/5 hover:text-[#D4AF37] dark:hover:text-[#D4AF37] transition-all duration-300 rounded-xl px-2 py-3">
-         <Link href="/orders" className="flex items-center gap-3 w-full">
+         <Link href="/orders" className="flex items-center gap-3 w-full" onClick={() => setOpenMobile(false)}>
            <Package className="size-5 transition-colors" />
            <span className="font-bold text-sm flex-1 tracking-tight">Orders</span>
          </Link>
@@ -164,7 +166,7 @@ export default function ImporterSidebar({ basePath, children }: { basePath: stri
      </SidebarMenuItem>
      <SidebarMenuItem>
        <SidebarMenuButton asChild className="text-slate-500 dark:text-muted-foreground hover:bg-slate-100 dark:hover:bg-white/5 hover:text-[#D4AF37] dark:hover:text-[#D4AF37] transition-all duration-300 rounded-xl px-2 py-3">
-         <Link href="/wishlist" className="flex items-center gap-3 w-full">
+         <Link href="/wishlist" className="flex items-center gap-3 w-full" onClick={() => setOpenMobile(false)}>
            <Heart className="size-5 transition-colors" />
            <span className="font-bold text-sm flex-1 tracking-tight">Wishlist</span>
          </Link>
@@ -211,7 +213,7 @@ export default function ImporterSidebar({ basePath, children }: { basePath: stri
  : "text-slate-500 dark:text-muted-foreground hover:bg-slate-100 dark:hover:bg-white/5 hover:text-[#D4AF37] dark:hover:text-[#D4AF37]"
  )}
  >
- <Link href={`${basePath}/settings`} className="flex items-center gap-3 w-full">
+ <Link href={`${basePath}/settings`} className="flex items-center gap-3 w-full" onClick={() => setOpenMobile(false)}>
  <Settings className="size-5 transition-colors" />
  <span className="font-semibold text-sm">Settings</span>
  </Link>

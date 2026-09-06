@@ -258,9 +258,9 @@ export default function ExporterDashboard() {
  <main className="flex-1 flex flex-col h-full overflow-hidden bg-background relative">
 
 
- <header className="flex-shrink-0 h-24 px-10 flex items-center justify-between border-b border-border dark:border-white/5 bg-background/40 backdrop-blur-xl z-40">
+ <header className="flex-shrink-0 h-20 lg:h-24 px-6 lg:px-10 flex items-center justify-between border-b border-border dark:border-white/5 bg-background/40 backdrop-blur-xl z-40">
  <div>
- <h1 className="text-3xl font-black text-foreground dark:text-white tracking-tighter uppercase">
+ <h1 className="text-2xl lg:text-3xl font-black text-foreground dark:text-white tracking-tighter uppercase">
  Intelligence Node
  </h1>
  </div>
@@ -275,8 +275,8 @@ export default function ExporterDashboard() {
  <div className="fixed inset-0 z-40" onClick={() => { setPeriodOpen(false); setCalendarOpen(false); }} />
  )}
 
- <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
- <div className="max-w-[1920px] mx-auto space-y-12">
+ <div className="flex-1 overflow-y-auto p-4 lg:p-8 custom-scrollbar">
+ <div className="max-w-[1920px] mx-auto space-y-8 lg:space-y-12">
 
  {/* ── Period filter indicator ── */}
  {period !== "all" && (
@@ -288,7 +288,7 @@ export default function ExporterDashboard() {
  )}
 
  {/* ── KPI Cards ── */}
- <div className="grid grid-cols-4 gap-6">
+ <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
  {statCards.map((s) => (
  <Link key={s.label} href={s.href}
  className="bg-card/40 dark:bg-white/5 backdrop-blur-3xl border border-border dark:border-white/5 p-5 rounded-lg relative overflow-hidden group transition-all duration-500 hover:-translate-y-2 cursor-pointer block shadow-xl dark:shadow-2xl"
@@ -330,10 +330,10 @@ export default function ExporterDashboard() {
  </div>
 
  {/* ── Map + Transactions ── */}
- <div className="grid grid-cols-3 gap-5" style={{ height: "520px" }}>
+ <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:h-[520px]">
 
  {/* Map Wrapper */}
- <div className="col-span-2 bg-card dark:bg-[#050505]/40 backdrop-blur-xl border border-border dark:border-white/5 shadow-xl rounded-lg flex flex-col h-full overflow-hidden">
+ <div className="col-span-1 lg:col-span-2 bg-card dark:bg-[#050505]/40 backdrop-blur-xl border border-border dark:border-white/5 shadow-xl rounded-lg flex flex-col h-[500px] lg:h-full overflow-hidden">
  {/* Map header */}
  <div className="flex-shrink-0 flex items-center justify-between px-5 py-3 z-20 relative border-b border-border dark:border-white/5 bg-background/50 dark:bg-transparent">
  <div className="min-w-0 flex items-center gap-3">
@@ -414,7 +414,7 @@ export default function ExporterDashboard() {
  </div>
  </div>
 
- <div className="bg-card/40 dark:bg-white/5 backdrop-blur-3xl border border-border dark:border-white/5 shadow-xl dark:shadow-2xl rounded-lg p-8 flex flex-col h-full relative overflow-hidden">
+ <div className="bg-card/40 dark:bg-white/5 backdrop-blur-3xl border border-border dark:border-white/5 shadow-xl dark:shadow-2xl rounded-lg p-6 lg:p-8 flex flex-col h-[500px] lg:h-full relative overflow-hidden">
  <div className="absolute top-0 right-0 w-32 h-32 bg-black/5 dark:bg-white/10 blur-[60px] rounded-full" />
  <div className="flex items-center justify-between mb-8 relative z-10">
  <div>
@@ -462,8 +462,8 @@ export default function ExporterDashboard() {
  </div>
 
  {/* ── Revenue + Top Buyers ── */}
- <div className="grid grid-cols-2 gap-6 pb-12">
- <div className="bg-card/40 dark:bg-white/5 backdrop-blur-3xl border border-border dark:border-white/5 shadow-xl dark:shadow-2xl rounded-lg p-10 relative overflow-hidden">
+ <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-12">
+ <div className="bg-card/40 dark:bg-white/5 backdrop-blur-3xl border border-border dark:border-white/5 shadow-xl dark:shadow-2xl rounded-lg p-6 lg:p-10 relative overflow-hidden">
  <div className="absolute -left-12 -bottom-12 w-48 h-48 bg-black/5 dark:bg-white/10 rounded-full blur-[80px]" />
  <div className="flex items-center justify-between mb-10 relative z-10">
  <div>
@@ -504,7 +504,7 @@ export default function ExporterDashboard() {
  </div>
  </div>
 
- <div className="bg-card/40 dark:bg-white/5 backdrop-blur-3xl border border-border dark:border-white/5 shadow-xl dark:shadow-2xl rounded-lg p-10 relative overflow-hidden">
+ <div className="bg-card/40 dark:bg-white/5 backdrop-blur-3xl border border-border dark:border-white/5 shadow-xl dark:shadow-2xl rounded-lg p-6 lg:p-10 relative overflow-hidden">
  <div className="absolute -right-12 -bottom-12 w-48 h-48 bg-black/5 dark:bg-white/10 rounded-full blur-[80px]" />
  <div className="flex justify-between items-center mb-10 relative z-10">
  <div>
