@@ -7,33 +7,55 @@ import { useTranslation } from "@/lib/i18n/client";
 export default function HomeHero() {
   const { t } = useTranslation();
   const sectionRef = useRef<HTMLElement>(null);
+  const globesRef = useRef<HTMLElement[]>([]);
+  const rafRef = useRef<number>(0);
 
   // Parallax Scroll Effect for the realistic globe images
+  // Optimised for iPad: uses only GPU-composited properties (transform, opacity)
+  // with requestAnimationFrame throttling and cached DOM queries.
   useEffect(() => {
+    // Cache globe elements once — avoids querySelectorAll on every scroll tick
+    globesRef.current = Array.from(
+      document.querySelectorAll<HTMLElement>(".parallax-globe")
+    );
+
+    let ticking = false;
+
     const onScroll = () => {
-      const globes = document.querySelectorAll<HTMLElement>(".parallax-globe");
-      const section = sectionRef.current;
-      if (globes.length === 0 || !section) return;
+      if (ticking) return;
+      ticking = true;
 
-      const rect = section.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
+      rafRef.current = requestAnimationFrame(() => {
+        ticking = false;
 
-      // Calculate how far the section has scrolled *past* the top of the viewport.
-      const scrolled = Math.max(0, -rect.top);
+        const globes = globesRef.current;
+        const section = sectionRef.current;
+        if (globes.length === 0 || !section) return;
 
-      const newY = 20 + scrolled * 0.04;
-      const rotation = scrolled * -0.02; // Negative value rotates it left-to-right
-      const scale = 1.05 + scrolled * 0.0003;
+        const rect = section.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
 
-      globes.forEach((globe) => {
-        globe.style.backgroundPosition = `center ${Math.min(newY, 100)}%`;
-        globe.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
+        // How far the section has scrolled past the top of the viewport.
+        const scrolled = Math.max(0, -rect.top);
 
-        // Fade out dark theme specifically slightly if needed, or just let it be
-        if (globe.id === "hero-globe-dark") {
-          globe.style.opacity = scrolled > viewportHeight
-            ? "0.6"
-            : String(Math.min(1, Math.max(0.6, 0.9 - scrolled * 0.0003)));
+        // translateY simulates the old backgroundPosition shift, but is GPU-composited
+        const translateY = Math.min(scrolled * 0.04, 80); // capped to prevent over-scroll
+        const rotation = scrolled * -0.02;
+        const scale = 1.05 + scrolled * 0.0003;
+
+        for (let i = 0; i < globes.length; i++) {
+          const globe = globes[i];
+          // translate3d promotes to its own compositor layer — no paint/layout
+          globe.style.transform = `translate3d(0, ${-translateY}px, 0) scale(${scale}) rotate(${rotation}deg)`;
+
+          if (globe.id === "hero-globe-dark") {
+            globe.style.opacity =
+              scrolled > viewportHeight
+                ? "0.6"
+                : String(
+                    Math.min(1, Math.max(0.6, 0.9 - scrolled * 0.0003))
+                  );
+          }
         }
       });
     };
@@ -41,7 +63,10 @@ export default function HomeHero() {
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll(); // Initial call
 
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(rafRef.current);
+    };
   }, []);
 
   return (
@@ -51,18 +76,20 @@ export default function HomeHero() {
     >
       <div className="absolute inset-0 z-0">
 
-        {/* Light Mode Realistic Globe */}
+        {/* Light Mode Realistic Globe — GPU-promoted layer, no CSS transitions on transform */}
         <div
-          className="parallax-globe absolute inset-0 bg-[url('/assets/globe_light_theme.png')] bg-cover bg-center dark:hidden opacity-100 transition-transform duration-100 ease-linear"
+          className="parallax-globe absolute inset-[-10%] bg-[url('/assets/globe_light_theme.png')] bg-cover bg-[center_20%] dark:hidden opacity-100"
           id="hero-globe-light"
           aria-hidden="true"
+          style={{ willChange: "transform", contain: "layout style", backfaceVisibility: "hidden" }}
         />
 
-        {/* Dark Mode Realistic Globe */}
+        {/* Dark Mode Realistic Globe — GPU-promoted layer, no CSS transitions on transform */}
         <div
-          className="parallax-globe absolute inset-0 hidden dark:block bg-[url('/assets/globe_dark_theme.avif')] bg-cover bg-center opacity-90 transition-transform duration-100 ease-linear"
+          className="parallax-globe absolute inset-[-10%] hidden dark:block bg-[url('/assets/globe_dark_theme.avif')] bg-cover bg-[center_20%] opacity-90"
           id="hero-globe-dark"
           aria-hidden="true"
+          style={{ willChange: "transform, opacity", contain: "layout style", backfaceVisibility: "hidden" }}
         />
 
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-slate-50 dark:from-background-dark/90 dark:via-transparent dark:to-background-dark transition-colors duration-500 pointer-events-none" aria-hidden="true" />
