@@ -56,7 +56,7 @@ export default function AdminShowcasePage() {
     
     const fetchProducts = async () => {
       try {
-        const res = await fetch("/api/products?limit=50");
+        const res = await fetch("/api/products?limit=100&exporterId=me");
         if (res.ok) {
           const data = await res.json();
           setProducts(data.products || []);

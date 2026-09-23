@@ -51,6 +51,7 @@ export async function GET(request: NextRequest) {
     const minPrice = searchParams.get('minPrice');
     const maxPrice = searchParams.get('maxPrice');
     const search = searchParams.get('search');
+    const exporterId = searchParams.get('exporterId');
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '12');
 
@@ -77,6 +78,13 @@ export async function GET(request: NextRequest) {
         { name: { contains: search, mode: 'insensitive' } },
         { description: { contains: search, mode: 'insensitive' } },
       ];
+    }
+    if (exporterId) {
+      if (exporterId === 'me' && auth?.userId) {
+        where.exporterId = auth.userId;
+      } else {
+        where.exporterId = exporterId;
+      }
     }
 
     const [products, total] = await Promise.all([
