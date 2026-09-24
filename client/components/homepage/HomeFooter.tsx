@@ -94,7 +94,7 @@ export default function HomeFooter() {
             <h4 className="text-slate-900 dark:text-white font-bold mb-6">{t("footer.col_company", "Company")}</h4>
             <ul className="space-y-3 text-sm text-slate-600 dark:text-slate-500">
               <li>
-                <Link className="hover:text-primary transition-colors" href="/faq">
+                <Link className="hover:text-primary transition-colors" href="/about">
                   {t("footer.about", "About Us")}
                 </Link>
               </li>

@@ -154,12 +154,12 @@ export default function HomeNavbar() {
               Marketplace
             </Link>
             <Link 
-              href="/faq" 
+              href="/about" 
               className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 text-foreground font-semibold transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              <span className="material-icons text-primary text-lg">help_outline</span>
-              FAQ
+              <span className="material-icons text-primary text-lg">info_outline</span>
+              About Us
             </Link>
             {user && (
               <Link 

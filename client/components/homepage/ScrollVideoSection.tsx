@@ -167,19 +167,45 @@ export default function ScrollVideoSection() {
     }, [isProfileOpen]);
 
     // Lock scroll while buffering frames (only if not seen before in this session)
+    // FIX: Only lock when the user is actually near the top (viewing the video section).
+    // If the browser restores a mid-page scroll position on reload, don't block scrolling.
+    // Also includes a safety timeout so scrolling is never permanently blocked.
     useEffect(() => {
         const hasSeenIntro = sessionStorage.getItem("ranote-video-intro-seen") === "true";
         if (progress >= 100 || failed || hasSeenIntro) return;
+
+        // If the user is already scrolled past the video section, skip locking entirely.
+        // The wrapper has height SCROLL_DISTANCE + 1000, so if scrollY is past that, they're beyond the video.
+        const wrapperEl = wrapperRef.current;
+        const isUserPastVideoSection = () => {
+            if (!wrapperEl) return false;
+            const rect = wrapperEl.getBoundingClientRect();
+            // If the top of the wrapper is already well above the viewport, user has scrolled past it
+            return rect.bottom < window.innerHeight * 0.5;
+        };
+
+        // If user landed mid-page (browser scroll restoration), don't lock at all
+        if (isUserPastVideoSection()) return;
+
+        // Safety timeout: force-unlock scrolling after 15 seconds no matter what
+        const safetyTimer = setTimeout(() => {
+            window.removeEventListener('wheel', preventScroll);
+            window.removeEventListener('touchmove', preventScroll);
+            window.removeEventListener('keydown', preventKeys);
+        }, 15000);
 
         const preventScroll = (e: Event) => {
             if (window.innerWidth < 768) return; // Don't lock on mobile
             // Allow scroll if progress is significantly along, or if failed
             if (progress >= 100) return;
+            // Don't block if user has somehow scrolled past the video section
+            if (isUserPastVideoSection()) return;
             e.preventDefault();
         };
 
         const preventKeys = (e: KeyboardEvent) => {
             if (window.innerWidth < 768) return;
+            if (isUserPastVideoSection()) return;
             if (['ArrowDown', 'ArrowUp', 'Space', 'PageDown', 'PageUp', 'Home', 'End', ' '].includes(e.key)) {
                 if (progress < 100) e.preventDefault();
             }
@@ -190,6 +216,7 @@ export default function ScrollVideoSection() {
         window.addEventListener('keydown', preventKeys, { passive: false });
 
         return () => {
+            clearTimeout(safetyTimer);
             window.removeEventListener('wheel', preventScroll);
             window.removeEventListener('touchmove', preventScroll);
             window.removeEventListener('keydown', preventKeys);
@@ -686,7 +713,7 @@ export default function ScrollVideoSection() {
                                     <Home className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                                     <span className="text-[10px] font-black uppercase tracking-[0.2em]">Home</span>
                                 </Link>
-                                <Link href="/faq" className="flex items-center gap-2 group text-white/70 hover:text-white transition-all duration-300">
+                                <Link href="/about" className="flex items-center gap-2 group text-white/70 hover:text-white transition-all duration-300">
                                     <Info className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                                     <span className="text-[10px] font-black uppercase tracking-[0.2em]">About</span>
                                 </Link>

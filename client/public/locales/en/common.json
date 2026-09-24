@@ -14,11 +14,12 @@
   "notifications": "Notifications",
   "search_placeholder": "Search shipments, assets...",
   "hero": {
-    "title_part1": "TRADE WITHOUT",
-    "title_part2": "BORDERS",
-    "subtitle": "The next-generation B2B marketplace. Connect with verified suppliers, automate logistics, and track shipments in real-time across our immersive global network.",
-    "cta_start": "Start Importing",
-    "cta_buy": "Buy Products"
+    "title_part1": "EXPORTING INDIA'S QUALITY",
+    "title_part2": "TO THE WORLD",
+    "subtitle": "RANOTE EXIM is an Indian Merchant Exporter and Global Sourcing Partner, connecting international buyers with quality products and reliable suppliers across India.",
+    "features": "QUALITY SOURCING | EXPORT SUPPORT | GLOBAL TRADE",
+    "cta_start": "Request a Quote",
+    "cta_buy": "Explore Products"
   },
   "stats": {
     "shipments": "Shipments Tracked",
@@ -103,10 +104,11 @@
     "feature3_desc": "Automated customs documentation and regulatory checks for over 190 jurisdictions."
   },
   "cta": {
-    "title": "READY TO SCALE?",
-    "subtitle": "Join over 10,000 global enterprises transforming their supply chain with",
-    "join_btn": "Join the Network",
-    "contact_btn": "Contact Sales"
+    "title": "LOOKING TO SOURCE FROM INDIA?",
+    "subtitle_1": "Tell us what you need.",
+    "subtitle_2": "Whether you are looking for a specific product, a new supplier, bulk quantities or an export-ready Indian sourcing option, share your requirement with us.",
+    "join_btn": "SEND YOUR REQUIREMENT",
+    "contact_btn": "WHATSAPP RANOTE EXIM"
   },
   "footer": {
     "description": "Reimagining global trade infrastructure for the digital age. Secure, fast, and transparent.",
@@ -124,19 +126,18 @@
     "copyright": "All rights reserved."
   },
   "compliance": {
-    "badge": "Bureaucracy Simplified",
-    "title_part1": "SMART TRADE",
-    "title_part2": "COMPLIANCE",
-    "subtitle": "Navigate complex international regulations with our AI-driven legal engine. We handle the paperwork so you can focus on the deal.",
-    "card1_title": "Automated Customs",
-    "card1_desc": "Instantly generate HS codes, commercial invoices, and packing lists compliant with destination country laws.",
-    "card1_stat": "99.8% Accuracy",
-    "card2_title": "VAT/Tax Intelligence",
-    "card2_desc": "Real-time calculation of landed costs including duties, taxes, and port fees for accurate profit forecasting.",
-    "card2_stat": "Global Coverage",
-    "card3_title": "Blockchain Ledger",
-    "card3_desc": "Immutable record keeping for every transaction and document version, ensuring audit-proof trade history.",
-    "card3_stat": "Crypto-Secured"
+    "badge": "Export Documentation",
+    "title_part1": "TRADE DOCUMENTATION",
+    "title_part2": "& COMPLIANCE",
+    "subtitle": "International trade requires accurate documentation and attention to product, destination, and regulatory requirements. RANOTE EXIM coordinates export documentation and works with relevant professionals and service partners where required to support compliant trade execution.",
+    "card1_title": "Commercial Documents",
+    "card1_desc": "Preparation and coordination of commercial invoices, proforma invoices, and purchase orders aligned with buyer and destination country requirements.",
+    "card2_title": "Packing & Shipping Documentation",
+    "card2_desc": "Packing lists, shipping bills, bills of lading, and airway bills — coordinated with freight partners and customs house agents.",
+    "card3_title": "Product & Destination Requirements",
+    "card3_desc": "Assistance with certificates of origin, phytosanitary certificates, test reports, and other product- or destination-specific documentation as applicable.",
+    "card4_title": "Logistics Coordination",
+    "card4_desc": "Working with trusted freight forwarders, customs brokers, and logistics partners to coordinate shipment from origin to destination."
   },
   "connectivity": {
     "badge": "Live Operations",
@@ -174,11 +175,14 @@
     "badge": "Enterprise Sourcing",
     "title_part1": "BULK PROCUREMENT",
     "title_part2": "SOLUTIONS",
-    "card_title": "Verified Global Suppliers",
-    "card_desc": "Access a curated network of 50,000+ top-tier manufacturers. We audit every factory for compliance, capacity, and financial stability so you can source with total confidence.",
-    "list_item1": "Factory Audits & Certifications",
-    "list_item2": "Quality Control Inspections",
-    "list_item3": "Trade Finance Support",
+    "card_title": "RELIABLE INDIAN SOURCING",
+    "card_desc": "We work with suitable Indian manufacturers and suppliers based on product requirements, specifications, quantity, quality expectations and export feasibility.",
+    "list_item1_title": "SUPPLIER IDENTIFICATION",
+    "list_item1_desc": "Identify suitable sourcing options in India.",
+    "list_item2_title": "QUALITY COORDINATION",
+    "list_item2_desc": "Coordinate product specifications and quality requirements.",
+    "list_item3_title": "EXPORT SUPPORT",
+    "list_item3_desc": "Support documentation and shipment coordination for export orders.",
     "button": "Request Bulk Quote",
     "category1_title": "Raw Metals & Minerals",
     "category1_desc": "Copper, Lithium, Rare Earths",

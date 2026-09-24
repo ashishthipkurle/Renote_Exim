@@ -101,10 +101,10 @@ export default function HomeHero() {
       <div className="relative z-10 container mx-auto px-6 text-center flex flex-col items-center justify-center h-full mt-10">
 
 
-        <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-foreground mb-8 tracking-tight leading-none drop-shadow-2xl transition-colors duration-500">
-          {t("hero.title_part1", "TRADE WITHOUT")} <br />
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-foreground mb-8 tracking-tight leading-none drop-shadow-2xl transition-colors duration-500">
+          {t("hero.title_part1", "EXPORTING INDIA'S QUALITY")} <br />
           <span className="gradient-text-gold text-glow relative inline-block">
-            {t("hero.title_part2", "BORDERS")}
+            {t("hero.title_part2", "TO THE WORLD")}
             <svg
               className="absolute -bottom-2 w-full h-3 text-[#D4AF37] opacity-60"
               fill="none"
@@ -120,24 +120,28 @@ export default function HomeHero() {
           </span>
         </h1>
 
-        <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-12 leading-relaxed font-light drop-shadow-lg transition-colors duration-500">
-          {t("hero.subtitle", "The next-generation B2B marketplace. Connect with verified suppliers, automate logistics, and track shipments in real-time across our immersive global network.")}
+        <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-6 leading-relaxed font-light drop-shadow-lg transition-colors duration-500">
+          {t("hero.subtitle", "RANOTE EXIM is an Indian Merchant Exporter and Global Sourcing Partner, connecting international buyers with quality products and reliable suppliers across India.")}
+        </p>
+
+        <p className="text-base md:text-lg text-foreground font-medium max-w-3xl mx-auto mb-12 tracking-wider transition-colors duration-500">
+          {t("hero.features", "QUALITY SOURCING | EXPORT SUPPORT | GLOBAL TRADE")}
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 w-full max-w-lg mx-auto">
           <Link
-            className="w-full sm:w-1/2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-5 px-8 rounded-xl primary-glow transition-all duration-300 text-lg flex items-center justify-center gap-2 group flowing-border primary-glow-hover shadow-[0_0_40px_-10px_rgba(19,91,236,0.6)] hover:shadow-[0_0_60px_-10px_rgba(19,91,236,0.8)] hover:-translate-y-1"
-            href="/products"
+            className="w-full sm:w-1/2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-4 px-6 rounded-xl primary-glow transition-all duration-300 text-base flex items-center justify-center gap-2 group flowing-border primary-glow-hover shadow-[0_0_40px_-10px_rgba(19,91,236,0.6)] hover:shadow-[0_0_60px_-10px_rgba(19,91,236,0.8)] hover:-translate-y-1"
+            href="/contact"
           >
-            {t("hero.cta_start", "Start Importing")}
+            {t("hero.cta_start", "Request a Quote")}
             <span className="material-icons group-hover:translate-x-1 transition-transform text-sm">arrow_forward</span>
           </Link>
           <Link
-            className="w-full sm:w-1/2 hover:bg-background/80 dark:hover:bg-white/10 text-foreground font-semibold py-5 px-8 rounded-xl transition-all duration-300 text-lg flex items-center justify-center gap-2 border border-border hover:border-border/80 hover:-translate-y-1 bg-background/40 backdrop-blur-xl shadow-lg"
+            className="w-full sm:w-1/2 hover:bg-background/80 dark:hover:bg-white/10 text-foreground font-semibold py-4 px-6 rounded-xl transition-all duration-300 text-base flex items-center justify-center gap-2 border border-border hover:border-border/80 hover:-translate-y-1 bg-background/40 backdrop-blur-xl shadow-lg"
             href="/products"
           >
             <span className="material-icons text-primary text-xl">shopping_cart</span>
-            {t("hero.cta_buy", "Buy Products")}
+            {t("hero.cta_buy", "Explore Products")}
           </Link>
         </div>
       </div>

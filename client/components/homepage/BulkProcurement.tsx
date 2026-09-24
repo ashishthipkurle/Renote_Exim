@@ -67,22 +67,31 @@ export default function BulkProcurement() {
             <div className="w-12 h-12 rounded-xl bg-white dark:bg-slate-800 border border-blue-100 dark:border-slate-700 flex items-center justify-center mb-6 shadow-sm relative z-10">
               <ShieldCheck className="w-6 h-6 text-[#D4AF37] stroke-[1.5]" />
             </div>
-            <h3 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white mb-4 relative z-10">{t("bulk.card_title", "Verified Global Suppliers")}</h3>
+            <h3 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white mb-4 relative z-10">{t("bulk.card_title", "RELIABLE INDIAN SOURCING")}</h3>
             <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-8 max-w-sm relative z-10">
-              {t("bulk.card_desc", "Access a curated network of 50,000+ top-tier manufacturers. We audit every factory for compliance, capacity, and financial stability so you can source with total confidence.")}
+              {t("bulk.card_desc", "We work with suitable Indian manufacturers and suppliers based on product requirements, specifications, quantity, quality expectations and export feasibility.")}
             </p>
             <ul className="space-y-4 mb-8 relative z-10">
-              <li className="flex items-center gap-3">
-                <Check className="w-4 h-4 text-green-600 dark:text-green-500 shrink-0 stroke-[3]" />
-                <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{t("bulk.list_item1", "Factory Audits & Certifications")}</span>
+              <li className="flex items-start gap-3">
+                <Check className="w-4 h-4 text-green-600 dark:text-green-500 shrink-0 stroke-[3] mt-0.5" />
+                <div>
+                  <span className="text-sm font-bold text-slate-800 dark:text-slate-200 block">{t("bulk.list_item1_title", "SUPPLIER IDENTIFICATION")}</span>
+                  <span className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 block">{t("bulk.list_item1_desc", "Identify suitable sourcing options in India.")}</span>
+                </div>
               </li>
-              <li className="flex items-center gap-3">
-                <Check className="w-4 h-4 text-green-600 dark:text-green-500 shrink-0 stroke-[3]" />
-                <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{t("bulk.list_item2", "Quality Control Inspections")}</span>
+              <li className="flex items-start gap-3">
+                <Check className="w-4 h-4 text-green-600 dark:text-green-500 shrink-0 stroke-[3] mt-0.5" />
+                <div>
+                  <span className="text-sm font-bold text-slate-800 dark:text-slate-200 block">{t("bulk.list_item2_title", "QUALITY COORDINATION")}</span>
+                  <span className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 block">{t("bulk.list_item2_desc", "Coordinate product specifications and quality requirements.")}</span>
+                </div>
               </li>
-              <li className="flex items-center gap-3">
-                <Check className="w-4 h-4 text-green-600 dark:text-green-500 shrink-0 stroke-[3]" />
-                <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{t("bulk.list_item3", "Trade Finance Support")}</span>
+              <li className="flex items-start gap-3">
+                <Check className="w-4 h-4 text-green-600 dark:text-green-500 shrink-0 stroke-[3] mt-0.5" />
+                <div>
+                  <span className="text-sm font-bold text-slate-800 dark:text-slate-200 block">{t("bulk.list_item3_title", "EXPORT SUPPORT")}</span>
+                  <span className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 block">{t("bulk.list_item3_desc", "Support documentation and shipment coordination for export orders.")}</span>
+                </div>
               </li>
             </ul>
             <div className="mt-auto relative z-10">

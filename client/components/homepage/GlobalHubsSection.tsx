@@ -75,7 +75,7 @@ export default function GlobalHubsSection() {
                     <div className="relative rounded-lg overflow-hidden glass-card p-8 border border-border shadow-2xl bg-background/60 backdrop-blur-xl">
                         <h3 className="text-3xl font-bold text-foreground mb-4">{t("hubs.title", "Strategic Global Hubs")}</h3>
                         <p className="text-muted-foreground mb-8 leading-relaxed text-sm">
-                            {t("hubs.description", "Our network of strategically located port facilities ensures your cargo never stops moving. From Shanghai to Rotterdam, we maintain priority access and dedicated customs channels.")}
+                            {t("hubs.description", "Our network of strategically located port facilities ensures your cargo never stops moving. From Singapore to Kuwait, we maintain priority access and dedicated customs channels.")}
                         </p>
 
                         <div className="space-y-6">
@@ -88,25 +88,32 @@ export default function GlobalHubsSection() {
                             </div>
                             <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-4">
                                 <div>
-                                    <h4 className="text-slate-900 dark:text-white font-bold">{t("hubs.rotterdam", "Port of Rotterdam")}</h4>
-                                    <p className="text-sm text-slate-500 dark:text-slate-400">{t("hubs.rotterdam_region", "EMEA Gateway")}</p>
+                                    <h4 className="text-slate-900 dark:text-white font-bold">{t("hubs.srilanka", "Sri Lanka")}</h4>
+                                    <p className="text-sm text-slate-500 dark:text-slate-400">{t("hubs.srilanka_region", "South Asia Hub")}</p>
                                 </div>
                                 <span className="px-3 py-1 bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-500/30 rounded-full text-[10px] uppercase font-bold tracking-widest">{t("hubs.status_active", "ACTIVE")}</span>
                             </div>
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h4 className="text-slate-900 dark:text-white font-bold">{t("hubs.la", "Port of Los Angeles")}</h4>
-                                    <p className="text-sm text-slate-500 dark:text-slate-400">{t("hubs.la_region", "Americas Terminal")}</p>
+                                    <h4 className="text-slate-900 dark:text-white font-bold">{t("hubs.kuwait", "Kuwait")}</h4>
+                                    <p className="text-sm text-slate-500 dark:text-slate-400">{t("hubs.kuwait_region", "Middle East Hub")}</p>
                                 </div>
-                                <span className="px-3 py-1 bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-500/30 rounded-full text-[10px] uppercase font-bold tracking-widest">{t("hubs.status_congested", "CONGESTED")}</span>
+                                <span className="px-3 py-1 bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-500/30 rounded-full text-[10px] uppercase font-bold tracking-widest">{t("hubs.status_active", "ACTIVE")}</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div className="w-full md:w-[55%] space-y-8 reveal-trigger pl-0 md:pl-10" style={{ transitionDelay: "200ms" }}>
-                    <h2 className="text-5xl md:text-6xl font-bold text-foreground leading-tight">{t("hubs.main_title_part1", "STRATEGIC")} <br /><span className="text-primary">{t("hubs.main_title_part2", "GLOBAL HUBS")}</span></h2>
-                    <p className="text-muted-foreground text-lg leading-relaxed max-w-xl">{t("hubs.main_subtitle", "Our physical presence in 40+ major logistical hubs ensures your goods are handled with priority. From Singapore to Rotterdam, we provide on-ground support.")}</p>
+                    <h2 className="text-4xl md:text-5xl font-bold text-foreground leading-tight uppercase">FROM INDIA <br /><span className="text-primary">TO GLOBAL MARKETS</span></h2>
+                    <div className="text-muted-foreground text-lg leading-relaxed max-w-xl">
+                        <p className="mb-6">
+                            Based in Maharashtra, India, RANOTE EXIM works with Indian suppliers and manufacturers to support sourcing requirements from international buyers.
+                        </p>
+                        <p className="text-foreground font-semibold leading-loose">
+                            Sri Lanka <span className="text-primary/40 mx-2">|</span> Singapore <span className="text-primary/40 mx-2">|</span> Malaysia <span className="text-primary/40 mx-2">|</span> Vietnam <span className="text-primary/40 mx-2">|</span> Thailand <span className="text-primary/40 mx-2">|</span> Philippines <span className="text-primary/40 mx-2">|</span> UAE <span className="text-primary/40 mx-2">|</span> Saudi Arabia <span className="text-primary/40 mx-2">|</span> Oman <span className="text-primary/40 mx-2">|</span> Qatar <span className="text-primary/40 mx-2">|</span> Kuwait <span className="text-primary/40 mx-2">|</span> Bahrain
+                        </p>
+                    </div>
                     <div className="space-y-4 pt-4 max-w-xl">
                         <div
                             onClick={() => handleItemClick("expedited")}
