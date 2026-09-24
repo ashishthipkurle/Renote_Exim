@@ -131,7 +131,7 @@ export default function HomeHero() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 w-full max-w-lg mx-auto">
           <Link
             className="w-full sm:w-1/2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-4 px-6 rounded-xl primary-glow transition-all duration-300 text-base flex items-center justify-center gap-2 group flowing-border primary-glow-hover shadow-[0_0_40px_-10px_rgba(19,91,236,0.6)] hover:shadow-[0_0_60px_-10px_rgba(19,91,236,0.8)] hover:-translate-y-1"
-            href="/contact"
+            href="/quotation"
           >
             {t("hero.cta_start", "Request a Quote")}
             <span className="material-icons group-hover:translate-x-1 transition-transform text-sm">arrow_forward</span>
