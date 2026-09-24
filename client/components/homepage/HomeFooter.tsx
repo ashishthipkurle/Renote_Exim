@@ -1,165 +1,88 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { useTranslation } from "@/lib/i18n/client";
+import { Linkedin, Instagram, Facebook, MapPin, Phone, Mail, Globe } from "lucide-react";
 
 export default function HomeFooter() {
-  const { t } = useTranslation();
-  const [email, setEmail] = useState("");
-  const [subscribed, setSubscribed] = useState(false);
-
-  const handleSubscribe = () => {
-    if (email && email.includes("@")) {
-      setSubscribed(true);
-      setEmail("");
-      setTimeout(() => setSubscribed(false), 3000);
-    }
-  };
-
   return (
-    <footer className="bg-background border-t border-border pt-20 pb-10">
+    <footer className="bg-background border-t border-border pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
-          <div className="col-span-1 md:col-span-1">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-white font-bold">
-                <span className="material-icons text-sm">public</span>
-              </div>
-              <span className="text-xl font-bold tracking-wide text-foreground">
-                RANOTE<span className="text-primary">EXIM</span>
-              </span>
-            </div>
-            <p className="text-muted-foreground text-sm leading-relaxed mb-6">
-              {t("footer.description", "Reimagining global trade infrastructure for the digital age. Secure, fast, and transparent.")}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+          {/* Company Info */}
+          <div className="col-span-1">
+            <h3 className="text-2xl font-bold tracking-wide text-foreground mb-4">
+              RANOTE EXIM PRIVATE LIMITED
+            </h3>
+            <p className="text-muted-foreground text-sm leading-relaxed font-semibold mb-1">
+              Indian Merchant Exporter & Global Sourcing Partner
             </p>
-            <div className="flex gap-4">
-              <a
-                className="w-8 h-8 rounded-full bg-slate-200 dark:bg-white/5 flex items-center justify-center text-slate-500 hover:bg-primary hover:text-white transition-colors"
-                href="https://facebook.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Facebook"
-              >
-                <i className="material-icons text-sm">facebook</i>
-              </a>
-              <a
-                className="w-8 h-8 rounded-full bg-slate-200 dark:bg-white/5 flex items-center justify-center text-slate-500 hover:bg-primary hover:text-white transition-colors"
-                href="https://linkedin.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="LinkedIn"
-              >
-                <i className="material-icons text-sm">work</i>
-              </a>
-              <a
-                className="w-8 h-8 rounded-full bg-slate-200 dark:bg-white/5 flex items-center justify-center text-slate-500 hover:bg-primary hover:text-white transition-colors"
-                href="https://twitter.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Twitter"
-              >
-                <i className="material-icons text-sm">flutter_dash</i>
-              </a>
+            <p className="text-primary text-sm font-bold mb-6 italic">
+              Where Standards Reach Higher
+            </p>
+            <div className="space-y-3 text-sm text-muted-foreground">
+              <div className="flex items-center gap-3">
+                <MapPin className="w-4 h-4 text-primary" />
+                <span>Kolhapur, Maharashtra, India</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <Phone className="w-4 h-4 text-primary" />
+                <span>+91 9225125205</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <Mail className="w-4 h-4 text-primary" />
+                <span>connect@ranoteexim.com</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <Globe className="w-4 h-4 text-primary" />
+                <span>ranoteexim.com</span>
+              </div>
             </div>
           </div>
 
-          <div>
-            <h4 className="text-foreground font-bold mb-6">{t("footer.col_platform", "Platform")}</h4>
+          {/* Quick Links */}
+          <div className="col-span-1">
+            <h4 className="text-lg font-semibold text-foreground mb-6">Quick Links</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
-              <li>
-                <Link className="hover:text-primary transition-colors" href="/products">
-                  {t("marketplace", "Marketplace")}
-                </Link>
-              </li>
-              <li>
-                <Link className="hover:text-primary transition-colors" href="/register">
-                  {t("sidebar.shipments", "Logistics")}
-                </Link>
-              </li>
-              <li>
-                <Link className="hover:text-primary transition-colors" href="/register">
-                  {t("sidebar.analytics", "Finance")}
-                </Link>
-              </li>
-              <li>
-                <Link className="hover:text-primary transition-colors" href="/faq">
-                  {t("sidebar.notifications", "Compliance")}
-                </Link>
-              </li>
+              <li><Link href="/" className="hover:text-primary transition-colors">Home</Link></li>
+              <li><Link href="/about" className="hover:text-primary transition-colors">About Us</Link></li>
+              <li><Link href="/products" className="hover:text-primary transition-colors">Products</Link></li>
+              <li><Link href="/sourcing" className="hover:text-primary transition-colors">Sourcing</Link></li>
+              <li><Link href="/export-process" className="hover:text-primary transition-colors">Export Process</Link></li>
+              <li><Link href="/markets" className="hover:text-primary transition-colors">Markets</Link></li>
+              <li><Link href="/contact" className="hover:text-primary transition-colors">Contact</Link></li>
             </ul>
           </div>
 
-          <div>
-            <h4 className="text-slate-900 dark:text-white font-bold mb-6">{t("footer.col_company", "Company")}</h4>
-            <ul className="space-y-3 text-sm text-slate-600 dark:text-slate-500">
-              <li>
-                <Link className="hover:text-primary transition-colors" href="/about">
-                  {t("footer.about", "About Us")}
-                </Link>
-              </li>
-              <li>
-                <Link className="hover:text-primary transition-colors" href="/faq">
-                  {t("footer.careers", "Careers")}
-                </Link>
-              </li>
-              <li>
-                <Link className="hover:text-primary transition-colors" href="/faq">
-                  {t("footer.press", "Press")}
-                </Link>
-              </li>
-              <li>
-                <Link className="hover:text-primary transition-colors" href="/faq">
-                  {t("contact", "Contact")}
-                </Link>
-              </li>
-            </ul>
-          </div>
+          {/* Social & Legal */}
+          <div className="col-span-1 flex flex-col justify-between">
+            <div>
+              <h4 className="text-lg font-semibold text-foreground mb-6">Social</h4>
+              <div className="flex gap-4">
+                <a href="#" className="w-10 h-10 rounded-full bg-muted flex items-center justify-center hover:bg-primary hover:text-white transition-colors" aria-label="LinkedIn">
+                  <Linkedin className="w-5 h-5" />
+                </a>
+                <a href="#" className="w-10 h-10 rounded-full bg-muted flex items-center justify-center hover:bg-primary hover:text-white transition-colors" aria-label="Instagram">
+                  <Instagram className="w-5 h-5" />
+                </a>
+                <a href="#" className="w-10 h-10 rounded-full bg-muted flex items-center justify-center hover:bg-primary hover:text-white transition-colors" aria-label="Facebook">
+                  <Facebook className="w-5 h-5" />
+                </a>
+              </div>
+            </div>
 
-          <div>
-            <h4 className="text-slate-900 dark:text-white font-bold mb-6">{t("footer.col_subscribe", "Subscribe")}</h4>
-            <p className="text-slate-600 dark:text-slate-500 text-sm mb-4">{t("footer.subscribe_desc", "Get the latest trade insights.")}</p>
-            {subscribed ? (
-              <div className="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm font-semibold py-3">
-                <span className="material-icons text-sm">check_circle</span>
-                Subscribed successfully!
-              </div>
-            ) : (
-              <div className="flex shadow-sm rounded-l-lg">
-                <input
-                  className="bg-white dark:bg-white/5 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white rounded-l-lg px-4 py-3 text-sm w-full focus:outline-none focus:border-primary transition-colors"
-                  placeholder={t("footer.email_placeholder", "Email address")}
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSubscribe()}
-                />
-                <button 
-                  className="bg-primary text-white px-4 py-2 rounded-r-lg hover:bg-primary/90 transition-colors primary-glow-hover" 
-                  type="button" 
-                  aria-label="Subscribe"
-                  onClick={handleSubscribe}
-                >
-                  <span className="material-icons text-sm">arrow_forward</span>
-                </button>
-              </div>
-            )}
+            <div className="mt-8 md:mt-0">
+              <h4 className="text-lg font-semibold text-foreground mb-4">Legal</h4>
+              <ul className="space-y-3 text-sm text-muted-foreground">
+                <li><Link href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link></li>
+                <li><Link href="/terms" className="hover:text-primary transition-colors">Terms & Conditions</Link></li>
+                <li><Link href="/disclaimer" className="hover:text-primary transition-colors">Disclaimer</Link></li>
+              </ul>
+            </div>
           </div>
         </div>
 
-        <div className="border-t border-border pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-muted-foreground">
-          <p>&copy; 2026 Ranote Exim. {t("footer.copyright", "All rights reserved.")}</p>
-          <div className="flex gap-8 mt-4 md:mt-0">
-            <Link className="hover:text-slate-800 dark:hover:text-slate-400 transition-colors" href="/privacy">
-              {t("footer.privacy", "Privacy Policy")}
-            </Link>
-            <Link className="hover:text-slate-800 dark:hover:text-slate-400 transition-colors" href="/terms">
-              {t("footer.terms", "Terms of Service")}
-            </Link>
-            <Link className="hover:text-slate-800 dark:hover:text-slate-400 transition-colors" href="/cookies">
-              {t("footer.cookies", "Cookie Settings")}
-            </Link>
-          </div>
+        <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
+          <p>© {new Date().getFullYear()} Ranote Exim Private Limited. All rights reserved.</p>
         </div>
       </div>
     </footer>

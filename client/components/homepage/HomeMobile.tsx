@@ -12,6 +12,7 @@ import LogoDark from "@/assests/Logo-2-without-circle.png";
 
 import TrendingCategories from "@/components/ui/TrendingCategories";
 import HomeFooter from "@/components/homepage/HomeFooter";
+import SriLankaCampaign from "@/components/homepage/SriLankaCampaign";
 
 export default function HomeMobile() {
   const { t } = useTranslation();
@@ -207,6 +208,9 @@ export default function HomeMobile() {
           ))}
         </div>
       </section>
+
+      {/* ─── Mobile Sri Lanka Campaign ─── */}
+      <SriLankaCampaign />
 
       {/* ─── Mobile CTA ─── */}
       <section className="py-16 px-4 relative overflow-hidden">

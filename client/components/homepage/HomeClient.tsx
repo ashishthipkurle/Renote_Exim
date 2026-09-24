@@ -18,6 +18,7 @@ import HomeFooter from "@/components/homepage/HomeFooter";
 import ScrollVideoSection from "@/components/homepage/ScrollVideoSection";
 import MissionScrollSection from "@/components/homepage/MissionScrollSection";
 import HomeMobile from "@/components/homepage/HomeMobile";
+import SriLankaCampaign from "@/components/homepage/SriLankaCampaign";
 
 export default function HomeClient() {
   const { user, loading } = useAuth();
@@ -90,6 +91,7 @@ export default function HomeClient() {
           {/* ─── Scroll-Linked Video Scene Boundary ─── */}
           <div className="relative w-full z-10">
             <FeaturesSection />
+            <SriLankaCampaign />
 
             <MissionScrollSection />
           </div>
