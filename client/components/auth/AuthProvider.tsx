@@ -22,26 +22,22 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<StoredUser | null>(() => {
-    if (typeof window !== "undefined") {
-      const cached = window.localStorage.getItem("user_profile");
-      if (cached) {
-        try {
-          return JSON.parse(cached);
-        } catch (e) {
-          return null;
-        }
+  const [user, setUser] = useState<StoredUser | null>(null);
+
+  const [loading, setLoading] = useState(true);
+
+  // Hydrate from localStorage AFTER mount to avoid server/client mismatch
+  useEffect(() => {
+    const cached = window.localStorage.getItem("user_profile");
+    if (cached) {
+      try {
+        setUser(JSON.parse(cached));
+        setLoading(false);
+      } catch (e) {
+        setLoading(true);
       }
     }
-    return null;
-  });
-
-  const [loading, setLoading] = useState(() => {
-    if (typeof window !== "undefined") {
-      return !window.localStorage.getItem("user_profile");
-    }
-    return true;
-  });
+  }, []);
 
   const supabase = createClient();
 

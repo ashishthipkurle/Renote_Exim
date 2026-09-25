@@ -14,9 +14,10 @@ export default function HomeHero() {
   // Optimised for iPad: uses only GPU-composited properties (transform, opacity)
   // with requestAnimationFrame throttling and cached DOM queries.
   useEffect(() => {
+    if (!sectionRef.current) return;
     // Cache globe elements once — avoids querySelectorAll on every scroll tick
     globesRef.current = Array.from(
-      document.querySelectorAll<HTMLElement>(".parallax-globe")
+      sectionRef.current.querySelectorAll<HTMLElement>(".parallax-globe")
     );
 
     let ticking = false;
@@ -120,7 +121,7 @@ export default function HomeHero() {
           </span>
         </h1>
 
-        <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-6 leading-relaxed font-light drop-shadow-lg transition-colors duration-500">
+        <p className="text-lg md:text-xl text-slate-800 dark:text-slate-200 max-w-3xl mx-auto mb-6 leading-relaxed font-medium drop-shadow-xl transition-colors duration-500">
           {t("hero.subtitle", "RANOTE EXIM is an Indian Merchant Exporter and Global Sourcing Partner, connecting international buyers with quality products and reliable suppliers across India.")}
         </p>
 

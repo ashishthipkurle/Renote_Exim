@@ -110,7 +110,7 @@ export default function GlobalHubsSection() {
                         <p className="mb-6">
                             Based in Maharashtra, India, RANOTE EXIM works with Indian suppliers and manufacturers to support sourcing requirements from international buyers.
                         </p>
-                        <p className="text-foreground font-semibold leading-loose">
+                        <p className="font-semibold leading-loose text-[#D4AF37]">
                             Sri Lanka <span className="text-primary/40 mx-2">|</span> Singapore <span className="text-primary/40 mx-2">|</span> Malaysia <span className="text-primary/40 mx-2">|</span> Vietnam <span className="text-primary/40 mx-2">|</span> Thailand <span className="text-primary/40 mx-2">|</span> Philippines <span className="text-primary/40 mx-2">|</span> UAE <span className="text-primary/40 mx-2">|</span> Saudi Arabia <span className="text-primary/40 mx-2">|</span> Oman <span className="text-primary/40 mx-2">|</span> Qatar <span className="text-primary/40 mx-2">|</span> Kuwait <span className="text-primary/40 mx-2">|</span> Bahrain
                         </p>
                     </div>

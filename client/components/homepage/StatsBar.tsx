@@ -14,9 +14,46 @@ interface Stats {
   uptime: string;
 }
 
+function AnimatedStat({ value }: { value: number }) {
+  const { formatCompact } = useFormat();
+  const [displayValue, setDisplayValue] = useState(0);
+
+  useEffect(() => {
+    if (!value) return;
+    let start = 0;
+    const end = value;
+    if (start === end) return;
+    
+    // Ease-out function for smooth decelaration
+    const easeOutQuad = (t: number) => t * (2 - t);
+    const duration = 2000; // 2 seconds
+    let startTime: number | null = null;
+    let animationFrameId: number;
+
+    const step = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      const easedProgress = easeOutQuad(progress);
+      
+      setDisplayValue(Math.floor(easedProgress * (end - start) + start));
+      
+      if (progress < 1) {
+        animationFrameId = window.requestAnimationFrame(step);
+      } else {
+        setDisplayValue(end);
+      }
+    };
+    
+    animationFrameId = window.requestAnimationFrame(step);
+    
+    return () => window.cancelAnimationFrame(animationFrameId);
+  }, [value]);
+
+  return <>{formatCompact(displayValue)}</>;
+}
+
 export default function StatsBar() {
   const { t } = useTranslation();
-  const { formatCompact } = useFormat();
   const [stats, setStats] = useState<Stats | null>(null);
 
   useEffect(() => {
@@ -39,7 +76,7 @@ export default function StatsBar() {
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
         <div className="text-center md:text-left border-r border-border last:border-0 pr-4 group hover:bg-muted p-4 rounded transition-colors">
           <h3 className="text-4xl font-bold text-foreground mb-1 group-hover:text-primary transition-colors">
-            {formatCompact(stats?.shipments || 2400000)}+
+            {stats ? <AnimatedStat value={stats.shipments} /> : 0}+
           </h3>
           <p className="text-sm text-muted-foreground uppercase tracking-wider font-semibold">
             {t("stats.shipments", "Shipments Tracked")}
@@ -47,7 +84,7 @@ export default function StatsBar() {
         </div>
         <div className="text-center md:text-left border-r border-border last:border-0 pr-4 group hover:bg-muted p-4 rounded transition-colors">
           <h3 className="text-4xl font-bold text-foreground mb-1 group-hover:text-primary transition-colors">
-            ${formatCompact(stats?.volume || 85000000000)}
+            ${stats ? <AnimatedStat value={stats.volume} /> : 0}
           </h3>
           <p className="text-sm text-muted-foreground uppercase tracking-wider font-semibold">
             {t("stats.volume", "Trade Volume")}
@@ -55,7 +92,7 @@ export default function StatsBar() {
         </div>
         <div className="text-center md:text-left border-r border-border last:border-0 pr-4 group hover:bg-muted p-4 rounded transition-colors">
           <h3 className="text-4xl font-bold text-foreground mb-1 group-hover:text-primary transition-colors">
-            {formatCompact(stats?.countries || 190)}+
+            {stats ? <AnimatedStat value={stats.countries} /> : 0}+
           </h3>
           <p className="text-sm text-muted-foreground uppercase tracking-wider font-semibold">
             {t("stats.countries", "Countries Served")}

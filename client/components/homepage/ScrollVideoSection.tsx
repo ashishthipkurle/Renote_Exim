@@ -1,6 +1,6 @@
 "use client";
 
-8
+
 import { useEffect, useRef, useState, useCallback } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -82,16 +82,18 @@ export default function ScrollVideoSection() {
     const textRefs = useRef<(HTMLDivElement | null)[]>([]);
     const framesRef = useRef<ImageBitmap[]>(globalFramesCache);
     const currentFrameRef = useRef(-1);
-    const [progress, setProgress] = useState(globalProgressCache);
+    const [progress, setProgress] = useState(0);
     const [failed, setFailed] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const { user, loading: authLoading, logout } = useAuth();
-    const [loaded, setLoaded] = useState(globalFramesCache.length >= 2);
+    const [loaded, setLoaded] = useState(false);
     const [hasScrolled, setHasScrolled] = useState(false);
     const [hasSeenIntroState, setHasSeenIntroState] = useState(false);
 
     useEffect(() => {
         setHasSeenIntroState(sessionStorage.getItem("ranote-video-intro-seen") === "true");
+        if (globalFramesCache.length >= 2) setLoaded(true);
+        if (globalProgressCache > 0) setProgress(globalProgressCache);
     }, []);
 
 

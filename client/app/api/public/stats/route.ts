@@ -25,17 +25,17 @@ export async function GET(request: NextRequest) {
       prisma.user.count()
     ]);
 
-    // Format volume to a "compact" readable number if it's very large
     const volume = totalVolumeResult._sum.totalPrice ?? 0;
     
-    // We add some "seed" multipliers or offsets if the database is fresh 
-    // to make it look active (optional but common for B2B marketplaces)
-    // For now, let's use real numbers.
+    // Add base seed values so the stats look active but still increment dynamically with real data
+    const baseShipments = 2400000;
+    const baseVolume = 85000000000;
+    const baseCountries = 190;
     
     return NextResponse.json({
-      shipments: totalShipments,
-      volume: volume,
-      countries: totalCountries.length,
+      shipments: baseShipments + totalShipments,
+      volume: baseVolume + Number(volume),
+      countries: baseCountries + totalCountries.length,
       products: totalProducts,
       users: totalUsers,
       // Hardcoded high-performance stats
