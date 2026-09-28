@@ -79,14 +79,14 @@ export default function HomeMobile() {
             View All <ChevronRight className="w-4 h-4" />
           </Link>
         </div>
-        
+
         {/* We can reuse the existing TrendingCategories, but it might need to handle its own mobile view properly. */}
         <div className="w-full">
           <TrendingCategories />
         </div>
       </section>
 
-            {/* ─── Mobile Sri Lanka Campaign ─── */}
+      {/* ─── Mobile Sri Lanka Campaign ─── */}
       <SriLankaCampaign />
 
       {/* ─── Mobile Features Grid ─── */}

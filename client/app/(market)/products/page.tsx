@@ -59,8 +59,13 @@ export default async function ProductsPage({
   // Build Prisma where clause
   const where: Prisma.ProductWhereInput = { available: true };
 
-  if (categoryParam && ALL_CATEGORIES.some((c) => c.value === categoryParam)) {
-    where.category = categoryParam as ProductCategory;
+  if (categoryParam) {
+    if (categoryParam.startsWith("CUSTOM_CAT:")) {
+      where.category = "Other" as ProductCategory;
+      where.certifications = { has: categoryParam };
+    } else if (ALL_CATEGORIES.some((c) => c.value === categoryParam)) {
+      where.category = categoryParam as ProductCategory;
+    }
   }
 
   if (searchQuery && searchQuery.trim().length > 0) {
@@ -126,14 +131,23 @@ export default async function ProductsPage({
       prisma.product.count({ where }),
       prisma.product.findMany({
         where: { available: true },
-        select: { category: true },
-        distinct: ['category']
+        select: { category: true, certifications: true },
       })
     ]);
 
     products = fetchedProducts;
     total = fetchedTotal;
-    activeCategoryValues = fetchedCategories.map((c: any) => c.category?.toUpperCase() || c.category);
+    
+    const baseCategories = new Set(fetchedCategories.map((c: any) => c.category?.toUpperCase() || c.category));
+    const customCats = new Set<string>();
+    fetchedCategories.forEach((c: any) => {
+      c.certifications?.forEach((cert: string) => {
+        if (cert.startsWith("CUSTOM_CAT:")) {
+          customCats.add(cert);
+        }
+      });
+    });
+    activeCategoryValues = [...Array.from(baseCategories), ...Array.from(customCats)];
 
     // Apply role-based price swap and mock reviews array (since DB push failed)
     products = products.map((p) => ({
@@ -184,6 +198,15 @@ export default async function ProductsPage({
   };
 
   const visibleCategories = ALL_CATEGORIES.filter(cat => activeCategoryValues.includes(cat.value));
+  
+  // Add custom categories to the visible categories list
+  activeCategoryValues.forEach(val => {
+    if (val.startsWith("CUSTOM_CAT:")) {
+      const labelName = val.replace("CUSTOM_CAT:", "");
+      visibleCategories.push({ value: val as any, label: labelName });
+      iconMap[val] = "category"; // Default icon for custom categories
+    }
+  });
 
   return (
     <SidebarProvider className="fixed inset-0 z-40 bg-board">

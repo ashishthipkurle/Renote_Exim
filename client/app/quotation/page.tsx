@@ -11,6 +11,7 @@ export default async function QuotationPage() {
   const user = auth?.user ? {
     name: auth.user.name,
     email: auth.user.email,
+    phone: auth.user.phone,
     businessName: auth.user.businessName,
   } : null;
 

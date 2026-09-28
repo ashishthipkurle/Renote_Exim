@@ -28,7 +28,7 @@ export default function QuotationClient({
 }: {
   products: Product[];
   isLoggedIn: boolean;
-  user: { name: string; email: string; businessName?: string } | null;
+  user: { name: string; email: string; phone?: string; businessName?: string } | null;
 }) {
   const router = useRouter();
   const [quoteItems, setQuoteItems] = useState<QuoteItem[]>([]);
@@ -94,8 +94,21 @@ export default function QuotationClient({
     
     message += "%0APlease provide the best possible rates.";
 
-    // In a real application, you would send `message` to your backend API here
-    // which would then use the WhatsApp Business API to send it to the admin.
+    // Send the data to our Next.js backend API
+    fetch('/api/whatsapp/send-quote', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        clientName: user?.name || "A client",
+        clientEmail: user?.email,
+        clientPhone: user?.phone,
+        businessName: user?.businessName,
+        items: quoteItems.map(item => ({
+          name: item.product.name,
+          quantity: item.quantity
+        }))
+      })
+    }).catch(err => console.error("Failed to send quote", err));
     
     setShowSuccessModal(true);
     setQuoteItems([]);

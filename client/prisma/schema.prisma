@@ -57,6 +57,7 @@ model Product {
   name             String
   description      String
   category         ProductCategory
+
   moq              Int                      @default(1)
   minOrderQty      Int                      @default(1)
   b2bPrice         Float?
@@ -545,7 +546,7 @@ model HomeShowcaseItem {
   title      String
   subtitle   String
   tag        String
-  category   ProductCategory
+  category   String
   desc       String
   image      String
   orderIndex Int             @default(0)
@@ -554,4 +555,28 @@ model HomeShowcaseItem {
   updatedAt  DateTime        @updatedAt
 
   @@map("home_showcase_items")
+}
+
+model QuotationRequest {
+  id           String          @id @default(uuid())
+  clientName   String
+  clientEmail  String
+  clientPhone  String?
+  businessName String?
+  status       String          @default("PENDING") // PENDING, RESPONDED, CLOSED
+  items        QuotationItem[]
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  @@map("quotation_requests")
+}
+
+model QuotationItem {
+  id                 String           @id @default(uuid())
+  quotationRequestId String
+  productName        String
+  quantity           Int
+  quotationRequest   QuotationRequest @relation(fields: [quotationRequestId], references: [id], onDelete: Cascade)
+
+  @@map("quotation_items")
 }

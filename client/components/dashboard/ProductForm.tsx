@@ -84,6 +84,7 @@ const VALID_CATEGORIES = new Set([
 
 function normalizeCategory(value: string | null): string {
   if (!value) return "OTHER";
+  if (value.startsWith("CUSTOM_CAT:")) return value;
   const upper = value.trim().toUpperCase();
   if (VALID_CATEGORIES.has(upper)) return upper;
   
@@ -109,18 +110,33 @@ export default function ProductForm({
   const router = useRouter();
 
   const [form, setForm] = useState<ProductData>(() => {
-    if (initialData) return initialData;
+    if (initialData) {
+      let cat = initialData.category;
+      const customCert = initialData.certifications?.find(c => c.startsWith("CUSTOM_CAT:"));
+      if (customCert) {
+        cat = customCert;
+      }
+      return { ...initialData, category: cat };
+    }
     const cat = searchParams.get("category");
+    const custom = searchParams.get("customCategory");
     return {
       ...defaultProduct,
-      category: normalizeCategory(cat),
+      category: custom ? `CUSTOM_CAT:${custom}` : normalizeCategory(cat),
     };
+  });
+
+  const [customCategory, setCustomCategory] = useState(() => {
+    if (initialData?.certifications) {
+      const custom = initialData.certifications.find(c => c.startsWith("CUSTOM_CAT:"));
+      return custom ? custom.replace("CUSTOM_CAT:", "") : (searchParams.get("customCategory") || "");
+    }
+    return searchParams.get("customCategory") || "";
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [newCertification, setNewCertification] = useState("");
-  const [customCategory, setCustomCategory] = useState("");
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -175,8 +191,19 @@ export default function ProductForm({
       const apiUrl = isEdit ? `/api/products/${form.id}` : "/api/products";
       const method = isEdit ? "PUT" : "POST";
 
+      // Filter out any existing CUSTOM_CAT tags just in case
+      let certs = form.certifications.filter(c => !c.startsWith("CUSTOM_CAT:"));
+      let finalCategory = form.category;
+      
+      if (form.category.startsWith("CUSTOM_CAT:")) {
+        certs.push(form.category);
+        finalCategory = "OTHER";
+      }
+
       const body = {
         ...form,
+        category: finalCategory,
+        certifications: certs,
       };
 
       await authFetch(apiUrl, {
@@ -281,6 +308,9 @@ export default function ProductForm({
                     {CATEGORIES.map(c => (
                       <option key={c.value} value={c.value}>{c.label}</option>
                     ))}
+                    {customCategory && (
+                       <option value={`CUSTOM_CAT:${customCategory}`}>{customCategory}</option>
+                    )}
                   </select>
                 </div>
                 <div>
@@ -433,13 +463,13 @@ export default function ProductForm({
                   </button>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {form.certifications.map((cert, i) => (
+                  {form.certifications.filter(c => !c.startsWith("CUSTOM_CAT:")).map((cert, i) => (
                     <span key={i} className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-xs font-semibold">
                       {cert}
-                      <X className="w-3 h-3 cursor-pointer hover:scale-125 transition-transform" onClick={() => removeCertification(i)} />
+                      <X className="w-3 h-3 cursor-pointer hover:scale-125 transition-transform" onClick={() => removeCertification(form.certifications.indexOf(cert))} />
                     </span>
                   ))}
-                  {form.certifications.length === 0 && (
+                  {form.certifications.filter(c => !c.startsWith("CUSTOM_CAT:")).length === 0 && (
                     <p className="text-xs text-slate-400 italic">No certifications added yet</p>
                   )}
                 </div>

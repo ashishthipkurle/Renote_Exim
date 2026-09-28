@@ -24,7 +24,6 @@ const MAJOR_CATEGORIES = [
   { id: "HANDICRAFTS", name: "Handicrafts", icon: Hammer, color: "bg-amber-800/10 text-amber-800" },
   { id: "LOGISTICS", name: "Logistics", icon: Truck, color: "bg-sky-500/10 text-sky-600" },
   { id: "COSMETICS", name: "Cosmetics", icon: Sparkles, color: "bg-pink-500/10 text-pink-600" },
-  { id: "OTHER", name: "Other Industry", icon: Package, color: "bg-slate-500/10 text-slate-600" },
 ];
 
 const SUB_INDUSTRIES = [
@@ -57,10 +56,12 @@ const SUB_INDUSTRIES = [
   "Weather Systems", "Welding Equipment", "Windows", "Wood Products", "Workwear", "Woven Fabrics", "Yarn", "Zinc Products"
 ];
 
-export default function CategoryDirectory() {
+export default function CategoryDirectory({ customCategories = [] }: { customCategories?: string[] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [search, setSearch] = useState("");
+  const [isAddingCustom, setIsAddingCustom] = useState(false);
+  const [customInput, setCustomInput] = useState("");
 
   const isSelected = searchParams.get("action") === "new";
   const selectedCategory = searchParams.get("category");
@@ -72,8 +73,9 @@ export default function CategoryDirectory() {
     ).slice(0, 8);
   }, [search]);
 
-  const handleSelect = (categoryId: string) => {
-    router.push(`/dashboard/exporter/inventory/add?action=new&category=${categoryId}`, { scroll: false });
+  const handleSelect = (categoryId: string, customCategory?: string) => {
+    const url = `/dashboard/exporter/inventory/add?action=new&category=${categoryId}${customCategory ? `&customCategory=${encodeURIComponent(customCategory)}` : ""}`;
+    router.push(url, { scroll: false });
   };
 
   const handleBack = () => {
@@ -121,7 +123,7 @@ export default function CategoryDirectory() {
                         filteredSubIndustries.map((item) => (
                           <button
                             key={item}
-                            onClick={() => handleSelect("OTHER")}
+                            onClick={() => handleSelect("OTHER", item)}
                             className="w-full px-6 py-4 text-left text-sm hover:bg-slate-50 dark:hover:bg-white/5 border-b border-slate-100 dark:border-white/5 last:border-0 flex items-center justify-between group"
                           >
                             <span className="text-slate-700 dark:text-slate-300">{item}</span>
@@ -154,7 +156,103 @@ export default function CategoryDirectory() {
                   <span className="text-sm font-bold text-slate-700 dark:text-slate-200 text-center">{cat.name}</span>
                 </motion.button>
               ))}
+              {customCategories.map((customName, i) => (
+                <motion.button
+                  key={`custom_${customName}`}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: (MAJOR_CATEGORIES.length + i) * 0.05 }}
+                  onClick={() => handleSelect("OTHER", customName)}
+                  className="flex flex-col items-center justify-center p-8 bg-white dark:bg-slate-950 border border-slate-200 dark:border-white/5 rounded-2xl hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 transition-all group active:scale-95"
+                >
+                  <div className={`w-16 h-16 bg-slate-500/10 text-slate-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                    <Package className="w-8 h-8" />
+                  </div>
+                  <span className="text-sm font-bold text-slate-700 dark:text-slate-200 text-center">{customName}</span>
+                </motion.button>
+              ))}
+              <motion.button
+                key="add_custom"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: (MAJOR_CATEGORIES.length + customCategories.length) * 0.05 }}
+                onClick={() => setIsAddingCustom(true)}
+                className="flex flex-col items-center justify-center p-8 bg-white dark:bg-slate-950 border border-dashed border-slate-300 dark:border-white/20 rounded-2xl hover:border-primary/50 hover:bg-slate-50 dark:hover:bg-white/5 transition-all group active:scale-95"
+              >
+                <div className="w-16 h-16 bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 group-hover:text-primary transition-all">
+                  <span className="material-symbols-outlined text-3xl">add</span>
+                </div>
+                <span className="text-sm font-bold text-slate-500 dark:text-slate-400 text-center group-hover:text-primary transition-colors">Add Custom Category</span>
+              </motion.button>
             </div>
+
+            <AnimatePresence>
+              {isAddingCustom && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    onClick={() => setIsAddingCustom(false)}
+                    className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+                  />
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                    className="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-white/10"
+                  >
+                    <div className="p-8">
+                      <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Create Custom Category</h3>
+                      <p className="text-slate-500 dark:text-slate-400 text-sm mb-8">
+                        Enter a unique category name for your product. It will be added to the directory permanently.
+                      </p>
+                      
+                      <div className="space-y-4">
+                        <div>
+                          <label className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2 block">Category Name *</label>
+                          <input
+                            type="text"
+                            autoFocus
+                            placeholder="e.g. Furniture, Scrap Metal..."
+                            value={customInput}
+                            onChange={(e) => setCustomInput(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" && customInput.trim()) {
+                                handleSelect("OTHER", customInput.trim());
+                                setIsAddingCustom(false);
+                              }
+                            }}
+                            className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 text-slate-900 dark:text-white placeholder:text-slate-400 transition-all"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="p-6 bg-slate-50 dark:bg-slate-950/50 border-t border-slate-100 dark:border-white/5 flex gap-4 justify-end">
+                      <button
+                        onClick={() => setIsAddingCustom(false)}
+                        className="px-6 py-3 font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/5 rounded-xl transition-all"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (customInput.trim()) {
+                            handleSelect("OTHER", customInput.trim());
+                            setIsAddingCustom(false);
+                          }
+                        }}
+                        disabled={!customInput.trim()}
+                        className="px-8 py-3 bg-primary text-primary-foreground font-bold rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:pointer-events-none transition-all flex items-center gap-2"
+                      >
+                        Continue <ArrowRight className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </motion.div>
+                </div>
+              )}
+            </AnimatePresence>
 
             {/* Quick Tips */}
             <div className="flex flex-col md:flex-row items-center justify-center gap-10 py-10 opacity-60">
@@ -176,14 +274,7 @@ export default function CategoryDirectory() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
           >
-            <div className="mb-6 flex items-center justify-between">
-              <button
-                onClick={handleBack}
-                className="flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Back to Category Selection
-              </button>
+            <div className="mb-6 flex justify-end">
               <div className="px-4 py-1.5 bg-primary/10 text-primary rounded-full text-xs font-bold uppercase tracking-wider">
                 Listing in: {selectedCategory}
               </div>

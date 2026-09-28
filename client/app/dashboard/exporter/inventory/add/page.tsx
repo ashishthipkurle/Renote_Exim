@@ -1,14 +1,42 @@
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import CategoryDirectory from "../CategoryDirectory";
+import { prisma } from "@/lib/prisma";
 
-export default function AddProductPage() {
+interface PageProps {
+  searchParams: { [key: string]: string | string[] | undefined };
+}
+
+export default async function AddProductPage({ searchParams }: PageProps) {
+  const isSelected = searchParams.action === "new";
+  const backHref = isSelected ? "/dashboard/exporter/inventory/add" : "/dashboard/exporter/inventory";
+
+  let customCategories: string[] = [];
+  try {
+    const products = await prisma.product.findMany({
+      select: { certifications: true },
+      distinct: ['certifications'],
+    });
+    
+    const customCats = new Set<string>();
+    products.forEach((p) => {
+      p.certifications?.forEach((cert) => {
+        if (cert.startsWith("CUSTOM_CAT:")) {
+          customCats.add(cert.replace("CUSTOM_CAT:", ""));
+        }
+      });
+    });
+    customCategories = Array.from(customCats);
+  } catch (error) {
+    console.error("Failed to fetch custom categories:", error);
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
       <header className="flex-shrink-0 p-8 lg:px-12 border-b border-slate-200 dark:border-white/5 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">
         <div className="flex items-center gap-6 max-w-7xl mx-auto w-full">
           <Link
-            href="/dashboard/exporter/inventory"
+            href={backHref}
             className="p-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl hover:bg-slate-50 dark:hover:bg-white/10 transition-all text-slate-500 hover:text-primary group shadow-sm"
           >
             <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
@@ -24,7 +52,7 @@ export default function AddProductPage() {
 
       <div className="flex-1 overflow-y-auto p-8 lg:p-12">
         <div className="max-w-7xl mx-auto">
-          <CategoryDirectory />
+          <CategoryDirectory customCategories={customCategories} />
         </div>
       </div>
     </div>

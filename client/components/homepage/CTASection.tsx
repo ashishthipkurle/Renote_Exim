@@ -30,7 +30,7 @@ export default function CTASection() {
             </Link>
             <Link
               className="w-full sm:w-auto inline-flex items-center justify-center text-foreground border border-border hover:bg-background/50 dark:hover:bg-white/5 font-bold py-5 px-10 rounded-xl transition-all duration-300 text-lg hover:-translate-y-1 shadow-lg"
-              href="https://wa.me/919999999999" target="_blank" rel="noopener noreferrer"
+              href="https://wa.me/919370366075" target="_blank" rel="noopener noreferrer"
             >
               {t("cta.contact_btn", "WHATSAPP RANOTE EXIM")}
             </Link>
