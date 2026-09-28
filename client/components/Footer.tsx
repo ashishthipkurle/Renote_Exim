@@ -59,12 +59,12 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/faq" className="hover:text-blue-400 transition-colors">
+                <Link href="/pricing" className="hover:text-blue-400 transition-colors">
                   Pricing
                 </Link>
               </li>
               <li>
-                <Link href="/faq" className="hover:text-blue-400 transition-colors">
+                <Link href="/contact" className="hover:text-blue-400 transition-colors">
                   Contact
                 </Link>
               </li>
@@ -76,27 +76,27 @@ export default function Footer() {
             <h3 className="text-white font-bold mb-4">Services</h3>
             <ul className="space-y-3">
               <li>
-                <Link href="/register" className="hover:text-blue-400 transition-colors">
+                <Link href="/export-process" className="hover:text-blue-400 transition-colors">
                   Export Services
                 </Link>
               </li>
               <li>
-                <Link href="/products" className="hover:text-blue-400 transition-colors">
+                <Link href="/sourcing" className="hover:text-blue-400 transition-colors">
                   Import Services
                 </Link>
               </li>
               <li>
-                <Link href="/register" className="hover:text-blue-400 transition-colors">
+                <Link href="/sourcing" className="hover:text-blue-400 transition-colors">
                   Logistics Support
                 </Link>
               </li>
               <li>
-                <Link href="/register" className="hover:text-blue-400 transition-colors">
+                <Link href="/export-process" className="hover:text-blue-400 transition-colors">
                   Compliance Management
                 </Link>
               </li>
               <li>
-                <Link href="/register" className="hover:text-blue-400 transition-colors">
+                <Link href="/markets" className="hover:text-blue-400 transition-colors">
                   Trade Analytics
                 </Link>
               </li>
