@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/components/auth/AuthProvider";
 import LogoImg from "@/assests/LOGO.png";
 import { useTranslation } from "@/lib/i18n/client";
-import ThumbnailImg from "@/assests/4k_Video_frame_2/1.png";
+const ThumbnailImg = "/frames/1.png";
 
 
 /**

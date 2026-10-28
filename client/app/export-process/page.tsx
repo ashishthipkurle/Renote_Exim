@@ -1,7 +1,7 @@
 'use client';
 
 import HomeFooter from "@/components/homepage/HomeFooter";
-import { ArrowLeft, Box, Ship, DocumentScanner, BadgeCheck, FileText } from "lucide-react";
+import { ArrowLeft, Box, Ship, FileCheck, BadgeCheck, FileText } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -10,7 +10,7 @@ export default function ExportProcessPage() {
     
     const steps = [
         {
-            icon: DocumentScanner,
+            icon: FileCheck,
             title: "1. Quotation & Agreement",
             desc: "Once you submit a request, we provide a detailed quotation including product specs, incoterms, and pricing. Upon approval, a formal sales contract is signed."
         },
