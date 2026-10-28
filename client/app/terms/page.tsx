@@ -9,14 +9,14 @@ export default function TermsOfService() {
  <section>
  <h2 className="text-2xl font-bold text-white mb-4">1. Acceptance of Terms</h2>
  <p>
- By accessing or using Renote Exim, you agree to be bound by these Terms of Service. If you do not agree to all the terms and conditions, you may not access the platform.
+ By accessing or using Ranote Exim, you agree to be bound by these Terms of Service. If you do not agree to all the terms and conditions, you may not access the platform.
  </p>
  </section>
 
  <section>
  <h2 className="text-2xl font-bold text-white mb-4">2. Marketplace Usage</h2>
  <p>
- Renote Exim provides a platform for exporters and importers to interact. We are not a party to the actual transactions between users unless explicitly stated. Users are responsible for verifying the quality and shipment of goods.
+ Ranote Exim provides a platform for exporters and importers to interact. We are not a party to the actual transactions between users unless explicitly stated. Users are responsible for verifying the quality and shipment of goods.
  </p>
  </section>
 
@@ -37,7 +37,7 @@ export default function TermsOfService() {
  <section>
  <h2 className="text-2xl font-bold text-white mb-4">5. Limitation of Liability</h2>
  <p>
- To the maximum extent permitted by law, Renote Exim shall not be liable for any indirect, incidental, special, consequential or punitive damages, or any loss of profits or revenues.
+ To the maximum extent permitted by law, Ranote Exim shall not be liable for any indirect, incidental, special, consequential or punitive damages, or any loss of profits or revenues.
  </p>
  </section>
 

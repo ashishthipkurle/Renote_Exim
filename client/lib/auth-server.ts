@@ -68,7 +68,8 @@ export async function getApiAuthContext(
       };
     }
 
-    console.log("[Auth] Verified Supabase User:", user.id, user.email);
+    // PII Redacted
+    // console.log("[Auth] Verified Supabase User:", user.id, user.email);
 
     // Fetch full profile from Prisma to get the Role and other metadata
     const dbUser = await prisma.user.findUnique({
@@ -83,7 +84,8 @@ export async function getApiAuthContext(
     });
 
     if (!dbUser) {
-      console.warn("[Auth] User in Supabase but missing in Prisma:", user.email);
+      // PII Redacted
+      // console.warn("[Auth] User in Supabase but missing in Prisma:", user.email);
       return {
         auth: null,
         error: NextResponse.json({ error: "User profile not found in database" }, { status: 401 }),

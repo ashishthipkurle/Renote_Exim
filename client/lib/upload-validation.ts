@@ -28,6 +28,14 @@ export interface FileValidationResult {
   bucket?: "private" | "public_images";
 }
 
+const MIME_TYPE_EXTENSIONS: Record<string, string[]> = {
+  "application/pdf": [".pdf"],
+  "image/jpeg": [".jpg", ".jpeg"],
+  "image/png": [".png"],
+  "image/webp": [".webp"],
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"]
+};
+
 export type UploadCategory = keyof typeof UPLOAD_RULES;
 
 export function validateFileUpload(file: File, category: UploadCategory): FileValidationResult {
@@ -39,6 +47,15 @@ export function validateFileUpload(file: File, category: UploadCategory): FileVa
 
   if (!rules.allowedTypes.includes(file.type)) {
     return { isValid: false, error: `Invalid file type. Allowed: ${rules.allowedTypes.join(", ")}` };
+  }
+
+  // Prevent MIME spoofing by verifying extension matches the expected type
+  const expectedExtensions = MIME_TYPE_EXTENSIONS[file.type] || [];
+  const fileName = file.name.toLowerCase();
+  const hasValidExtension = expectedExtensions.some(ext => fileName.endsWith(ext));
+
+  if (!hasValidExtension) {
+    return { isValid: false, error: "File extension does not match the uploaded content type." };
   }
 
   const bucket = category === "productImage" ? "public_images" : "private";

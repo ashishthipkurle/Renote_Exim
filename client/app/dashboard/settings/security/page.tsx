@@ -294,7 +294,7 @@ export default function SecuritySettingsPage() {
  <h4 className="text-sm font-bold">Security Tip</h4>
  </div>
  <p className="text-xs text-muted-foreground leading-relaxed">
- Never share your credentials OR your Multi-Factor verification codes with anyone, including Renote Exim support.
+ Never share your credentials OR your Multi-Factor verification codes with anyone, including Ranote Exim support.
  </p>
  </div>
  </div>

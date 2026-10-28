@@ -6,8 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const faqs = [
  {
- question: "What is Renote Exim?",
- answer: "Renote Exim is a premium B2B platform designed to connect global exporters and importers. We provide tools for product discovery, secure messaging, and trade management."
+ question: "What is Ranote Exim?",
+ answer: "Ranote Exim is a premium B2B platform designed to connect global exporters and importers. We provide tools for product discovery, secure messaging, and trade management."
  },
  {
  question: "How do I verify my account?",
@@ -46,7 +46,7 @@ export default function FAQ() {
  </div>
  <h1 className="text-5xl font-bold text-white mb-6 tracking-tight">How can we help?</h1>
  <p className="text-slate-400 text-lg max-w-xl mx-auto">
- Find answers to common questions about Renote Exim. If you can't find what you're looking for, please contact our support team.
+ Find answers to common questions about Ranote Exim. If you can't find what you're looking for, please contact our support team.
  </p>
 
  <div className="mt-12 relative max-w-xl mx-auto">

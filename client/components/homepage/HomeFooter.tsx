@@ -26,7 +26,7 @@ export default function HomeFooter() {
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="w-4 h-4 text-primary" />
-                <span>+91 9225125205</span>
+                <span>+91 9370366075</span>
               </div>
               <div className="flex items-center gap-3">
                 <Mail className="w-4 h-4 text-primary" />

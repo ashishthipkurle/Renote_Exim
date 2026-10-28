@@ -29,7 +29,8 @@ export async function POST(request: NextRequest) {
       }
     )
 
-    console.log("[Login] Attempting Supabase sign-in for:", validatedData.email);
+    // PII Redacted
+    // console.log("[Login] Attempting Supabase sign-in for:", validatedData.email);
     
     const { data, error } = await supabase.auth.signInWithPassword({
       email: validatedData.email,
@@ -51,8 +52,8 @@ export async function POST(request: NextRequest) {
 
     if (!dbUser) {
       return NextResponse.json(
-        { error: "User profile not found in database" },
-        { status: 404 }
+        { error: "Invalid email or password" }, // Generic error for security
+        { status: 401 } // Generic status code 401 instead of 404
       );
     }
 

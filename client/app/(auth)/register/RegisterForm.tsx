@@ -247,7 +247,7 @@ function RegisterFormContent() {
 
             <div className="space-y-2 mb-8">
               <h1 className="text-2xl font-extrabold tracking-tight">Create Account</h1>
-              <p className="text-muted-foreground text-sm">Join the Renote Exim global trade network.</p>
+              <p className="text-muted-foreground text-sm">Join the Ranote Exim global trade network.</p>
             </div>
 
             {showOtpStep ? (

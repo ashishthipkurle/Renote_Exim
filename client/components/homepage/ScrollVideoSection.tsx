@@ -402,8 +402,8 @@ export default function ScrollVideoSection() {
 
         // ---------- 2. Extract frames in background ----------
         const extractFrames = async () => {
-            // Do not extract frames on mobile/tablets (prevent massive memory usage / crashes on iOS Safari)
-            if (window.innerWidth <= 1024) {
+            // Do not extract frames on small mobile screens (prevent massive memory usage / crashes on iOS Safari)
+            if (window.innerWidth < 768) {
                 setLoaded(true);
                 setProgress(100);
                 globalProgressCache = 100;
@@ -428,8 +428,6 @@ export default function ScrollVideoSection() {
             isExtractionRunning = true;
 
             const video = document.createElement("video");
-            // Fix for iOS Safari: Videos that are 1px or opacity: 0 are often 
-            // optimized out of the hardware decoder, yielding black frames.
             video.style.position = "fixed";
             video.style.top = "0";
             video.style.left = "0";
@@ -440,20 +438,57 @@ export default function ScrollVideoSection() {
             video.style.zIndex = "-9999";
             document.body.appendChild(video);
 
-            // Cloudinary's CDN handles range requests properly and is very fast, so we don't need to blob-fetch into RAM first!
-            const finalSrc = "https://res.cloudinary.com/dpy7s0cbs/video/upload/f_auto,q_auto/v1780753542/Continuous_Shot_Company_Video_Generation.mp4";
-
-            video.src = finalSrc;
             video.muted = true;
             video.playsInline = true;
             video.setAttribute("playsinline", "");
             video.setAttribute("webkit-playsinline", ""); // iOS compatibility
             video.preload = "auto";
-            video.crossOrigin = "anonymous";
+            video.src = "/videos/Continuous_Shot_Company_Video_Generation.mp4";
 
             await new Promise<void>((resolve, reject) => {
-                video.onloadeddata = () => resolve();
-                video.onerror = () => reject(new Error("Video failed to load"));
+                if (video.readyState >= 2) {
+                    resolve();
+                    return;
+                }
+                const onLoaded = () => {
+                    cleanup();
+                    resolve();
+                };
+                const onError = () => {
+                    cleanup();
+                    // Fallback to Cloudinary CDN if local video fails
+                    video.crossOrigin = "anonymous";
+                    video.src = "https://res.cloudinary.com/dpy7s0cbs/video/upload/f_auto,q_auto/v1780753542/Continuous_Shot_Company_Video_Generation.mp4";
+                    const onFallbackLoaded = () => {
+                        cleanupFallback();
+                        resolve();
+                    };
+                    const onFallbackError = () => {
+                        cleanupFallback();
+                        reject(new Error("Video failed to load"));
+                    };
+                    const cleanupFallback = () => {
+                        video.removeEventListener("loadeddata", onFallbackLoaded);
+                        video.removeEventListener("loadedmetadata", onFallbackLoaded);
+                        video.removeEventListener("canplay", onFallbackLoaded);
+                        video.removeEventListener("error", onFallbackError);
+                    };
+                    video.addEventListener("loadeddata", onFallbackLoaded);
+                    video.addEventListener("loadedmetadata", onFallbackLoaded);
+                    video.addEventListener("canplay", onFallbackLoaded);
+                    video.addEventListener("error", onFallbackError);
+                    video.load();
+                };
+                const cleanup = () => {
+                    video.removeEventListener("loadeddata", onLoaded);
+                    video.removeEventListener("loadedmetadata", onLoaded);
+                    video.removeEventListener("canplay", onLoaded);
+                    video.removeEventListener("error", onError);
+                };
+                video.addEventListener("loadeddata", onLoaded);
+                video.addEventListener("loadedmetadata", onLoaded);
+                video.addEventListener("canplay", onLoaded);
+                video.addEventListener("error", onError);
                 video.load();
             });
 
@@ -464,7 +499,7 @@ export default function ScrollVideoSection() {
                 // Ignore autoplay policy errors
             }
 
-            const duration = video.duration;
+            const duration = video.duration || 8;
             const interval = duration / (TOTAL_FRAMES - 1);
 
             for (let i = 0; i < TOTAL_FRAMES; i++) {
@@ -553,7 +588,8 @@ export default function ScrollVideoSection() {
             ScrollTrigger.refresh();
         };
 
-        extractFrames().catch(() => {
+        extractFrames().catch((err) => {
+            console.error("[ScrollVideo] Frame extraction failed:", err);
             setFailed(true);
             isExtractionRunning = false;
         });

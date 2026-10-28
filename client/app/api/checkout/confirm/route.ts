@@ -72,6 +72,12 @@ export async function POST(req: NextRequest) {
           throw new Error(`Product not found: ${item.productId}`);
         }
 
+        // SSOT Pricing: Recalculate price on the server instead of trusting the client
+        const unitPrice = auth.role === 'IMPORTER' 
+          ? (product.b2bPrice ?? product.price) 
+          : (product.regularPrice ?? product.price);
+        const itemTotal = unitPrice * item.quantity;
+
         // Create the order with PAID status directly
         await tx.order.create({
           data: {
@@ -81,8 +87,8 @@ export async function POST(req: NextRequest) {
             sellerId: item.sellerId,
             productId: item.productId,
             quantity: item.quantity,
-            unitPrice: item.unitPrice,
-            totalPrice: item.itemTotal,
+            unitPrice: unitPrice, // Using server calculated price
+            totalPrice: itemTotal, // Using server calculated price
             currency: item.currency,
             orderStatus: 'QUOTE_CONFIRMED',
             paymentStatus: 'PAID',
@@ -95,9 +101,12 @@ export async function POST(req: NextRequest) {
           },
         });
 
-        // Decrement inventory
-        await tx.product.update({
-          where: { id: item.productId },
+        // Decrement inventory (Atomic Optimistic Locking)
+        const updatedProduct = await tx.product.updateMany({
+          where: { 
+            id: item.productId,
+            stockQty: { gte: item.quantity } // Ensure enough stock
+          },
           data: {
             stockQty: {
               decrement: item.quantity,
@@ -105,13 +114,8 @@ export async function POST(req: NextRequest) {
           },
         });
 
-        // Ensure stock doesn't go below 0
-        const updatedProduct = await tx.product.findUnique({ where: { id: item.productId } });
-        if (updatedProduct && updatedProduct.stockQty < 0) {
-          await tx.product.update({
-            where: { id: item.productId },
-            data: { stockQty: 0 },
-          });
+        if (updatedProduct.count === 0) {
+           throw new Error(`Insufficient stock for product: ${item.productId}`);
         }
       }
     });

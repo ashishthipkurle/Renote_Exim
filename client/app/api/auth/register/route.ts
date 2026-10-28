@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
         data: {
           userId: userId,
           type: "ORDER_UPDATE",
-          title: "Welcome to Renote Exim!",
+          title: "Welcome to Ranote Exim!",
           message: `Welcome ${validatedData.name ?? ""}! Your account has been created successfully.`,
         },
       });

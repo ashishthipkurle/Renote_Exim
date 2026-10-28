@@ -16,7 +16,7 @@ export default function CookiePolicy() {
  <section>
  <h2 className="text-2xl font-bold text-white mb-4">2. How We Use Them</h2>
  <p>
- Renote Exim uses cookies for the following purposes:
+ Ranote Exim uses cookies for the following purposes:
  </p>
  <ul className="list-disc pl-6 space-y-2 mt-4">
  <li><strong>Essential:</strong> Necessary for you to log in and use secure areas of our platform.</li>

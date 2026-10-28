@@ -73,13 +73,13 @@ export default function HomeHero() {
   return (
     <header
       ref={sectionRef}
-      className="relative min-h-[900px] lg:min-h-[1000px] flex items-center justify-center overflow-hidden pt-20 pb-12 bg-background transition-colors duration-500"
+      className="relative min-h-[650px] lg:min-h-[750px] flex items-center justify-center overflow-hidden pt-6 md:pt-10 pb-12 bg-background transition-colors duration-500"
     >
       <div className="absolute inset-0 z-0">
 
         {/* Light Mode Realistic Globe — GPU-promoted layer, no CSS transitions on transform */}
         <div
-          className="parallax-globe absolute inset-[-10%] bg-[url('/assets/globe_light_theme.png')] bg-cover bg-[center_20%] dark:hidden opacity-100"
+          className="parallax-globe absolute inset-[-10%] bg-[url('/assets/globe_light_theme.png')] bg-cover bg-[center_12%] dark:hidden opacity-100"
           id="hero-globe-light"
           aria-hidden="true"
           style={{ willChange: "transform", contain: "layout style", backfaceVisibility: "hidden" }}
@@ -87,7 +87,7 @@ export default function HomeHero() {
 
         {/* Dark Mode Realistic Globe — GPU-promoted layer, no CSS transitions on transform */}
         <div
-          className="parallax-globe absolute inset-[-10%] hidden dark:block bg-[url('/assets/globe_dark_theme.avif')] bg-cover bg-[center_20%] opacity-90"
+          className="parallax-globe absolute inset-[-10%] hidden dark:block bg-[url('/assets/globe_dark_theme.avif')] bg-cover bg-[center_12%] opacity-90"
           id="hero-globe-dark"
           aria-hidden="true"
           style={{ willChange: "transform, opacity", contain: "layout style", backfaceVisibility: "hidden" }}
@@ -99,11 +99,10 @@ export default function HomeHero() {
         <div className="absolute bottom-1/3 right-1/4 w-[35rem] h-[35rem] bg-indigo-500/20 dark:bg-indigo-600/10 rounded-full blur-[140px] transition-opacity duration-500 opacity-20 dark:opacity-100 pointer-events-none" aria-hidden="true" />
       </div>
 
-      <div className="relative z-10 container mx-auto px-6 text-center flex flex-col items-center justify-center h-full mt-10">
+      <div className="relative z-10 container mx-auto px-6 text-center flex flex-col items-center justify-center h-full mt-2">
 
-
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-foreground mb-8 tracking-tight leading-none drop-shadow-2xl transition-colors duration-500">
-          {t("hero.title_part1", "EXPORTING INDIA'S QUALITY")} <br />
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-foreground mb-5 tracking-tight leading-[1.08] drop-shadow-2xl transition-colors duration-500 flex flex-col items-center gap-1 sm:gap-2">
+          <span>{t("hero.title_part1", "EXPORTING INDIA'S QUALITY")}</span>
           <span className="gradient-text-gold text-glow relative inline-block">
             {t("hero.title_part2", "TO THE WORLD")}
             <svg
@@ -121,11 +120,11 @@ export default function HomeHero() {
           </span>
         </h1>
 
-        <p className="text-lg md:text-xl text-slate-800 dark:text-slate-200 max-w-3xl mx-auto mb-6 leading-relaxed font-medium drop-shadow-xl transition-colors duration-500">
+        <p className="text-lg md:text-xl text-slate-800 dark:text-slate-200 max-w-3xl mx-auto mb-4 leading-relaxed font-medium drop-shadow-xl transition-colors duration-500">
           {t("hero.subtitle", "RANOTE EXIM is an Indian Merchant Exporter and Global Sourcing Partner, connecting international buyers with quality products and reliable suppliers across India.")}
         </p>
 
-        <p className="text-base md:text-lg text-foreground font-medium max-w-3xl mx-auto mb-12 tracking-wider transition-colors duration-500">
+        <p className="text-base md:text-lg text-foreground font-medium max-w-3xl mx-auto mb-8 tracking-wider transition-colors duration-500">
           {t("hero.features", "QUALITY SOURCING | EXPORT SUPPORT | GLOBAL TRADE")}
         </p>
 

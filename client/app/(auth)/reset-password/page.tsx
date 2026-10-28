@@ -84,7 +84,7 @@ export default function ResetPasswordPage() {
  <Zap className="w-5 h-5" />
  </div>
  <span className="text-2xl font-black tracking-tight">
- Renote<span className="text-primary">Exim</span>
+ Ranote<span className="text-primary">Exim</span>
  </span>
  </Link>
  </div>

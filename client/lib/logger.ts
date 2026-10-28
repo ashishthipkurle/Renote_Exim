@@ -13,13 +13,29 @@ interface LogPayload {
 }
 
 class Logger {
+  private maskPII(data: Record<string, unknown>): Record<string, unknown> {
+    const masked = { ...data };
+    const piiKeys = ['email', 'user', 'name', 'phone', 'address', 'token', 'password', 'id', 'userId'];
+    
+    for (const key of Object.keys(masked)) {
+      if (piiKeys.some(pii => key.toLowerCase().includes(pii))) {
+        masked[key] = '[REDACTED]';
+      } else if (typeof masked[key] === 'object' && masked[key] !== null) {
+        masked[key] = this.maskPII(masked[key] as Record<string, unknown>);
+      }
+    }
+    return masked;
+  }
+
   private formatLog(level: LogLevel, payload: LogPayload) {
     const timestamp = new Date().toISOString();
+    const safeContext = payload.context ? this.maskPII(payload.context) : undefined;
+    
     const logData = {
       timestamp,
       level: level.toUpperCase(),
       message: payload.message,
-      context: payload.context,
+      context: safeContext,
       error: payload.error instanceof Error ? {
         name: payload.error.name,
         message: payload.error.message,

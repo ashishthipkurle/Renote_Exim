@@ -20,7 +20,7 @@ export default function Footer() {
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center group-hover:rotate-12 transition-transform">
                 <Globe className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-white tracking-tight">Renote Exim</span>
+              <span className="text-xl font-bold text-white tracking-tight">Ranote Exim</span>
             </Link>
             <p className="text-slate-400 text-sm leading-relaxed max-w-xs">
               The world&apos;s most advanced B2B platform for global trade. Connecting verified exporters and importers with seamless trade tools.
@@ -66,11 +66,11 @@ export default function Footer() {
             <div className="space-y-4">
               <div className="flex items-center gap-3 text-sm text-slate-400">
                 <Mail className="w-4 h-4 text-blue-500" />
-                <a href="mailto:support@renoteexim.com" className="hover:text-blue-400 transition-colors">support@renoteexim.com</a>
+                <a href="mailto:support@ranoteexim.com" className="hover:text-blue-400 transition-colors">support@ranoteexim.com</a>
               </div>
               <div className="flex items-center gap-3 text-sm text-slate-400">
                 <Phone className="w-4 h-4 text-blue-500" />
-                <a href="tel:+18001234567" className="hover:text-blue-400 transition-colors">+1 (800) RENOTE-EX</a>
+                <a href="tel:+919370366075" className="hover:text-blue-400 transition-colors">+91 9370366075</a>
               </div>
               <div className="mt-6 flex items-center gap-2 p-3 bg-blue-500/5 border border-blue-500/10 rounded-xl">
                 <Shield className="w-4 h-4 text-blue-400" />
@@ -82,7 +82,7 @@ export default function Footer() {
 
         <div className="pt-8 border-t border-slate-900 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-slate-500 text-[12px]">
-            &copy; {new Date().getFullYear()} Renote Exim Platform. All rights reserved.
+            &copy; {new Date().getFullYear()} Ranote Exim Platform. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
             <Link href="/privacy" className="text-slate-500 hover:text-white text-[12px] transition-colors">Privacy Policy</Link>

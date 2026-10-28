@@ -21,32 +21,32 @@ const sora = Sora({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
   title: {
-    default: "Renote Exim - Global Import Export Platform",
-    template: "%s | Renote Exim",
+    default: "Ranote Exim - Global Import Export Platform",
+    template: "%s | Ranote Exim",
   },
   description: "Enterprise-grade import-export platform connecting businesses worldwide",
   keywords: ["import", "export", "trade", "global business", "B2B", "marketplace"],
-  authors: [{ name: "Renote Exim" }],
-  creator: "Renote Exim",
+  authors: [{ name: "Ranote Exim" }],
+  creator: "Ranote Exim",
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "/",
-    siteName: "Renote Exim",
-    title: "Renote Exim - Global Import Export Platform",
+    siteName: "Ranote Exim",
+    title: "Ranote Exim - Global Import Export Platform",
     description: "Enterprise-grade import-export platform connecting businesses worldwide",
     images: [
       {
         url: "/og-image.jpg", // Needs to be added to public folder
         width: 1200,
         height: 630,
-        alt: "Renote Exim Cover",
+        alt: "Ranote Exim Cover",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Renote Exim - Global Import Export Platform",
+    title: "Ranote Exim - Global Import Export Platform",
     description: "Enterprise-grade import-export platform connecting businesses worldwide",
     images: ["/og-image.jpg"],
   },
