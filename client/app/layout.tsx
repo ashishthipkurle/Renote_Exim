@@ -19,7 +19,7 @@ const sora = Sora({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://ranoteexim.com"),
   title: {
     default: "Ranote Exim - Global Import Export Platform",
     template: "%s | Ranote Exim",
