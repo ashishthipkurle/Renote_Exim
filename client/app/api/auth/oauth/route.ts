@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     }
 
     const supabase = createClient();
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://ranoteexim.com";
     const redirectTo = `${appUrl}/api/auth/callback`;
 
     const supabaseProvider = provider === "linkedin" ? "linkedin_oidc" : provider;
